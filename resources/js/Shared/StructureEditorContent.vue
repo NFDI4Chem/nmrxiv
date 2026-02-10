@@ -2,9 +2,7 @@
     <div class="flex flex-col h-full">
         <!-- Title Section -->
         <div class="mb-6">
-            <h2 class="text-3xl font-bold text-gray-900">
-                Structure Search
-            </h2>
+            <h2 class="text-3xl font-bold text-gray-900">Structure Search</h2>
             <p class="mt-2 text-gray-600">
                 Draw, paste, or import a chemical structure
             </p>
@@ -20,38 +18,58 @@
                 @dragleave.prevent="isDragging = false"
                 @drop.prevent="handleDrop"
             >
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
                 </svg>
                 Drop or select MOL/SDF
                 <input
                     ref="fileInput"
                     type="file"
                     accept=".mol,.sdf,.sd"
-                    @change="handleFileSelect"
                     class="sr-only"
+                    @change="handleFileSelect"
                 />
             </label>
 
             <!-- Clipboard Paste -->
             <button
-                @click="pasteFromClipboard"
                 class="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                @click="pasteFromClipboard"
             >
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
                 </svg>
                 Paste from Clipboard
             </button>
         </div>
-        
+
         <!-- Structure Editor Card -->
         <div
             :id="editorId"
             class="w-full bg-white rounded-xl border border-gray-200 shadow-sm mb-4"
             style="height: 450px"
         />
-        
+
         <!-- Search Type Selection -->
         <div class="mb-8">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
@@ -59,82 +77,91 @@
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Exact Match -->
-                            <label
-                                for="search-type-exact"
-                                class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                                :class="searchType === 'exact' ? 'border-gray-900 bg-gray-50' : ''"
-                            >
-                                <input
-                                    id="search-type-exact"
-                                    :value="searchType"
-                                    @input="$emit('update:searchType', 'exact')"
-                                    name="search-type"
-                                    value="exact"
-                                    type="radio"
-                                    :checked="searchType === 'exact'"
-                                    class="sr-only"
-                                />
-                                <div class="flex-1">
-                                    <span class="block text-sm font-semibold text-gray-900">
-                                        Exact Match
-                                    </span>
-                                    <span class="block text-xs text-gray-500 mt-1">
-                                        Find identical structures
-                                    </span>
-                                </div>
-                            </label>
-                
+                <label
+                    for="search-type-exact"
+                    class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
+                    :class="
+                        searchType === 'exact'
+                            ? 'border-gray-900 bg-gray-50'
+                            : ''
+                    "
+                >
+                    <input
+                        id="search-type-exact"
+                        name="search-type"
+                        value="exact"
+                        type="radio"
+                        :checked="searchType === 'exact'"
+                        class="sr-only"
+                        @input="$emit('update:searchType', 'exact')"
+                    />
+                    <div class="flex-1">
+                        <span class="block text-sm font-semibold text-gray-900">
+                            Exact Match
+                        </span>
+                        <span class="block text-xs text-gray-500 mt-1">
+                            Find identical structures
+                        </span>
+                    </div>
+                </label>
+
                 <!-- Substructure Search -->
-                            <label
-                                for="search-type-sub"
-                                class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                                :class="searchType === 'substructure' ? 'border-gray-900 bg-gray-50' : ''"
-                            >
-                                <input
-                                    id="search-type-sub"
-                                    :value="searchType"
-                                    @input="$emit('update:searchType', 'substructure')"
-                                    name="search-type"
-                                    type="radio"
-                                    value="substructure"
-                                    :checked="searchType === 'substructure'"
-                                    class="sr-only"
-                                />
-                                <div class="flex-1">
-                                    <span class="block text-sm font-semibold text-gray-900">
-                                        Substructure
-                                    </span>
-                                    <span class="block text-xs text-gray-500 mt-1">
-                                        Find containing structures
-                                    </span>
-                                </div>
-                            </label>
-                
+                <label
+                    for="search-type-sub"
+                    class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
+                    :class="
+                        searchType === 'substructure'
+                            ? 'border-gray-900 bg-gray-50'
+                            : ''
+                    "
+                >
+                    <input
+                        id="search-type-sub"
+                        name="search-type"
+                        type="radio"
+                        value="substructure"
+                        :checked="searchType === 'substructure'"
+                        class="sr-only"
+                        @input="$emit('update:searchType', 'substructure')"
+                    />
+                    <div class="flex-1">
+                        <span class="block text-sm font-semibold text-gray-900">
+                            Substructure
+                        </span>
+                        <span class="block text-xs text-gray-500 mt-1">
+                            Find containing structures
+                        </span>
+                    </div>
+                </label>
+
                 <!-- Similarity Search -->
-                            <label
-                                for="search-type-similar"
-                                class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                                :class="searchType === 'similarity' ? 'border-gray-900 bg-gray-50' : ''"
-                            >
-                                <input
-                                    id="search-type-similar"
-                                    :value="searchType"
-                                    @input="$emit('update:searchType', 'similarity')"
-                                    name="search-type"
-                                    value="similarity"
-                                    type="radio"
-                                    :checked="searchType === 'similarity'"
-                                    class="sr-only"
-                                />
-                                <div class="flex-1">
-                                    <span class="block text-sm font-semibold text-gray-900">
-                                        Similarity
-                                    </span>
-                                    <span class="block text-xs text-gray-500 mt-1">
-                                        Find similar structures
-                                    </span>
-                                </div>
-                            </label>
+                <label
+                    for="search-type-similar"
+                    class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
+                    :class="
+                        searchType === 'similarity'
+                            ? 'border-gray-900 bg-gray-50'
+                            : ''
+                    "
+                >
+                    <input
+                        id="search-type-similar"
+                        name="search-type"
+                        value="similarity"
+                        type="radio"
+                        :checked="searchType === 'similarity'"
+                        class="sr-only"
+                        @input="$emit('update:searchType', 'similarity')"
+                    />
+                    <div class="flex-1">
+                        <span class="block text-sm font-semibold text-gray-900">
+                            Similarity
+                        </span>
+                        <span class="block text-xs text-gray-500 mt-1">
+                            Find similar structures
+                        </span>
+                    </div>
+                </label>
             </div>
         </div>
     </div>
@@ -178,11 +205,13 @@ export default {
 
         const loadFile = async (file) => {
             if (!props.editor) return;
-            
+
             const validExtensions = [".mol", ".sdf", ".sd"];
             const fileName = file.name.toLowerCase();
-            const isValid = validExtensions.some((ext) => fileName.endsWith(ext));
-            
+            const isValid = validExtensions.some((ext) =>
+                fileName.endsWith(ext)
+            );
+
             if (!isValid) {
                 alert("Please upload a MOL or SDF file");
                 return;
@@ -199,10 +228,10 @@ export default {
 
         const pasteFromClipboard = async () => {
             if (!props.editor) return;
-            
+
             try {
                 const text = await navigator.clipboard.readText();
-                
+
                 // Try as SMILES first
                 try {
                     const OCL = (await import("openchemlib/full")).default;
@@ -214,12 +243,16 @@ export default {
                     if (text.includes("M  END") || text.includes("$$$$")) {
                         props.editor.setMolFile(text);
                     } else {
-                        alert("Clipboard content is not a valid SMILES or MOL format");
+                        alert(
+                            "Clipboard content is not a valid SMILES or MOL format"
+                        );
                     }
                 }
             } catch (error) {
                 console.error("Error reading clipboard:", error);
-                alert("Unable to read clipboard. Please allow clipboard access.");
+                alert(
+                    "Unable to read clipboard. Please allow clipboard access."
+                );
             }
         };
 
