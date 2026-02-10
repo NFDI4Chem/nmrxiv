@@ -11,7 +11,7 @@
         </button>
 
         <TransitionRoot :show="open" as="template" appear>
-            <Dialog as="div" class="relative z-50" @close="closeModal">
+            <HDialog as="div" class="relative z-50" @close="closeModal">
                 <TransitionChild
                     as="template"
                     enter="ease-out duration-200"
@@ -31,7 +31,12 @@
                 >
                     <!-- Selection View -->
                     <TransitionChild
-                        v-if="!showStructureEditor && !showSpectraUpload && !showPeakListSearch && !showMetadataSearch"
+                        v-if="
+                            !showStructureEditor &&
+                            !showSpectraUpload &&
+                            !showPeakListSearch &&
+                            !showMetadataSearch
+                        "
                         as="template"
                         enter="ease-out duration-200"
                         enter-from="opacity-0 scale-95"
@@ -65,12 +70,18 @@
                                     :key="option.type"
                                     class="group relative bg-white rounded-3xl p-6 text-left transition-all duration-200 min-h-[320px] flex flex-col overflow-hidden"
                                     :class="[
-                                        option.comingSoon 
-                                            ? 'border border-gray-200 cursor-not-allowed opacity-60' 
+                                        option.comingSoon
+                                            ? 'border border-gray-200 cursor-not-allowed opacity-60'
                                             : 'cursor-pointer hover:shadow-lg active:scale-[0.98] border border-gray-200 hover:border-gray-300',
-                                        selectedType === option.type && !option.comingSoon ? 'border-2 border-blue-500 shadow-lg' : ''
+                                        selectedType === option.type &&
+                                        !option.comingSoon
+                                            ? 'border-2 border-blue-500 shadow-lg'
+                                            : '',
                                     ]"
-                                    @click="!option.comingSoon && selectAndProceed(option.type)"
+                                    @click="
+                                        !option.comingSoon &&
+                                            selectAndProceed(option.type)
+                                    "
                                 >
                                     <!-- Coming Soon Badge -->
                                     <div
@@ -163,15 +174,19 @@
                             <div class="flex-1 overflow-y-auto">
                                 <div class="px-4 py-6 max-w-6xl mx-auto">
                                     <StructureEditorContent
+                                        v-model:search-type="
+                                            structureSearchType
+                                        "
                                         editor-id="structureSearchEditor"
-                                        v-model:search-type="structureSearchType"
                                         :editor="structureEditor"
                                     />
                                 </div>
                             </div>
-                            
+
                             <!-- Footer with Actions -->
-                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div
+                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                            >
                                 <a
                                     href="#"
                                     autofocus
@@ -213,9 +228,11 @@
                                     />
                                 </div>
                             </div>
-                            
+
                             <!-- Footer with Actions -->
-                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div
+                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                            >
                                 <a
                                     href="#"
                                     autofocus
@@ -227,10 +244,23 @@
                                 <a
                                     href="#"
                                     @click.prevent="performSpectraSearch"
-                                    :class="spectraFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'"
+                                    :class="
+                                        spectraFiles.length === 0
+                                            ? 'opacity-50 cursor-not-allowed'
+                                            : 'hover:bg-gray-800'
+                                    "
                                     class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
                                 >
-                                    Search {{ spectraFiles.length > 0 ? `(${spectraFiles.length} file${spectraFiles.length > 1 ? 's' : ''})` : '' }}
+                                    Search
+                                    {{
+                                        spectraFiles.length > 0
+                                            ? `(${spectraFiles.length} file${
+                                                  spectraFiles.length > 1
+                                                      ? "s"
+                                                      : ""
+                                              })`
+                                            : ""
+                                    }}
                                 </a>
                             </div>
                         </DialogPanel>
@@ -254,13 +284,17 @@
                             <div class="flex-1 overflow-y-auto">
                                 <div class="px-4 py-6 max-w-6xl mx-auto">
                                     <PeakListSearchContent
-                                        @search-params-updated="handlePeakListParams"
+                                        @search-params-updated="
+                                            handlePeakListParams
+                                        "
                                     />
                                 </div>
                             </div>
-                            
+
                             <!-- Footer with Actions -->
-                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div
+                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                            >
                                 <a
                                     href="#"
                                     autofocus
@@ -298,13 +332,17 @@
                             <div class="flex-1 overflow-y-auto">
                                 <div class="px-4 py-6 max-w-6xl mx-auto">
                                     <MetadataSearchContent
-                                        @search-params-updated="handleMetadataParams"
+                                        @search-params-updated="
+                                            handleMetadataParams
+                                        "
                                     />
                                 </div>
                             </div>
-                            
+
                             <!-- Footer with Actions -->
-                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div
+                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                            >
                                 <a
                                     href="#"
                                     autofocus
@@ -324,7 +362,7 @@
                         </DialogPanel>
                     </TransitionChild>
                 </div>
-            </Dialog>
+            </HDialog>
         </TransitionRoot>
     </div>
 </template>
@@ -333,7 +371,7 @@
 import { ref, watchEffect, markRaw, onMounted, nextTick } from "vue";
 import { useMagicKeys } from "@vueuse/core";
 import {
-    Dialog,
+    Dialog as HDialog,
     DialogPanel,
     TransitionChild,
     TransitionRoot,
@@ -354,7 +392,7 @@ import MetadataSearchContent from "@/Shared/MetadataSearchContent.vue";
 
 export default {
     components: {
-        Dialog,
+        HDialog,
         DialogPanel,
         TransitionChild,
         TransitionRoot,
@@ -519,7 +557,7 @@ export default {
                     "structureSearchEditor",
                     1
                 );
-                
+
                 // Check if there's a query parameter in URL and load it
                 const url = new URL(window.location.href);
                 const querySmiles = url.searchParams.get("query");
@@ -527,10 +565,15 @@ export default {
                     try {
                         // Set the molecule from SMILES
                         structureEditor.value.setMolFile(
-                            OCL.Molecule.fromSmiles(decodeURIComponent(querySmiles)).toMolfile()
+                            OCL.Molecule.fromSmiles(
+                                decodeURIComponent(querySmiles)
+                            ).toMolfile()
                         );
                     } catch (error) {
-                        console.error("Error loading structure from query:", error);
+                        console.error(
+                            "Error loading structure from query:",
+                            error
+                        );
                     }
                 }
             }
@@ -577,7 +620,9 @@ export default {
             // TODO: Implement spectra file upload and search
             // For now, just log the files
             console.log("Searching with spectra files:", spectraFiles.value);
-            alert(`Ready to search with ${spectraFiles.value.length} file(s). Upload functionality will be implemented next.`);
+            alert(
+                `Ready to search with ${spectraFiles.value.length} file(s). Upload functionality will be implemented next.`
+            );
         };
 
         const performPeakListSearch = () => {
@@ -608,7 +653,12 @@ export default {
                 // Open modal for any search param value
                 open.value = true;
                 // Set selected type if it matches a valid option
-                const validTypes = ["structure", "spectra", "peaks", "metadata"];
+                const validTypes = [
+                    "structure",
+                    "spectra",
+                    "peaks",
+                    "metadata",
+                ];
                 if (validTypes.includes(searchParam)) {
                     selectedType.value = searchParam;
                     // Show structure editor if structure type
