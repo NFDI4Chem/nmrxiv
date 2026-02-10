@@ -190,15 +190,15 @@
                                 <a
                                     href="#"
                                     autofocus
-                                    @click.prevent="backToOptions"
                                     class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                    @click.prevent="backToOptions"
                                 >
                                     Cancel
                                 </a>
                                 <a
                                     href="#"
-                                    @click.prevent="performStructureSearch"
                                     class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                    @click.prevent="performStructureSearch"
                                 >
                                     Search
                                 </a>
@@ -236,20 +236,20 @@
                                 <a
                                     href="#"
                                     autofocus
-                                    @click.prevent="backToOptions"
                                     class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                    @click.prevent="backToOptions"
                                 >
                                     Cancel
                                 </a>
                                 <a
                                     href="#"
-                                    @click.prevent="performSpectraSearch"
                                     :class="
                                         spectraFiles.length === 0
                                             ? 'opacity-50 cursor-not-allowed'
                                             : 'hover:bg-gray-800'
                                     "
                                     class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                    @click.prevent="performSpectraSearch"
                                 >
                                     Search
                                     {{
@@ -298,15 +298,15 @@
                                 <a
                                     href="#"
                                     autofocus
-                                    @click.prevent="backToOptions"
                                     class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                    @click.prevent="backToOptions"
                                 >
                                     Cancel
                                 </a>
                                 <a
                                     href="#"
-                                    @click.prevent="performPeakListSearch"
                                     class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                    @click.prevent="performPeakListSearch"
                                 >
                                     Search
                                 </a>
@@ -346,15 +346,15 @@
                                 <a
                                     href="#"
                                     autofocus
-                                    @click.prevent="backToOptions"
                                     class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                    @click.prevent="backToOptions"
                                 >
                                     Cancel
                                 </a>
                                 <a
                                     href="#"
-                                    @click.prevent="performMetadataSearch"
                                     class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                    @click.prevent="performMetadataSearch"
                                 >
                                     Search
                                 </a>
@@ -368,7 +368,7 @@
 </template>
 
 <script>
-import { ref, watchEffect, markRaw, onMounted, nextTick } from "vue";
+import { ref, watchEffect, onMounted, nextTick } from "vue";
 import { useMagicKeys } from "@vueuse/core";
 import {
     Dialog as HDialog,
@@ -376,14 +376,7 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import {
-    MagnifyingGlassIcon,
-    BeakerIcon,
-    ChartBarIcon,
-    QueueListIcon,
-    DocumentMagnifyingGlassIcon,
-    PlusIcon,
-} from "@heroicons/vue/24/outline";
+import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import OCL from "openchemlib/full";
 import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
 import SpectraUploadContent from "@/Shared/SpectraUploadContent.vue";
@@ -397,10 +390,6 @@ export default {
         TransitionChild,
         TransitionRoot,
         MagnifyingGlassIcon,
-        BeakerIcon,
-        ChartBarIcon,
-        QueueListIcon,
-        DocumentMagnifyingGlassIcon,
         PlusIcon,
         StructureEditorContent,
         SpectraUploadContent,
@@ -431,7 +420,6 @@ export default {
                 description:
                     "Draw or paste a structure to search by exact match, substructure, or similarity.",
                 image: "/img/molecule-formats.png",
-                icon: markRaw(BeakerIcon),
                 bgClass: "bg-teal-100",
                 iconClass: "text-teal-600",
                 comingSoon: false,
@@ -443,7 +431,6 @@ export default {
                 description:
                     "Upload raw NMR data from Bruker or JEOL to find similar spectra.",
                 image: "/img/instrument-format.png",
-                icon: markRaw(ChartBarIcon),
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
                 comingSoon: true,
@@ -455,7 +442,6 @@ export default {
                 description:
                     "Enter peak positions to search for matching spectra in the database.",
                 image: "/img/spectra-format.png",
-                icon: markRaw(QueueListIcon),
                 bgClass: "bg-amber-100",
                 iconClass: "text-amber-600",
                 comingSoon: true,
@@ -467,7 +453,6 @@ export default {
                 description:
                     "Search by compound name, author, project, or other metadata.",
                 image: "/img/metadata-format.png",
-                icon: markRaw(DocumentMagnifyingGlassIcon),
                 bgClass: "bg-rose-100",
                 iconClass: "text-rose-600",
                 comingSoon: true,
