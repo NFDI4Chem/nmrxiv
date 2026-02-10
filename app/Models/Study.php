@@ -72,7 +72,6 @@ class Study extends Model implements Auditable
     protected function casts(): array
     {
         return [
-            'authors' => 'array',
             'citations' => 'array',
             'molecules' => 'array',
             'processing_logs' => 'array',
@@ -338,6 +337,25 @@ class Study extends Model implements Auditable
     public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
+    }
+
+    /**
+     * Get all of the authors that belong to the study.
+     */
+    public function studyAuthors(): BelongsToMany
+    {
+        return $this->belongsToMany(Author::class)
+            ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Accessor for authors attribute (alias for studyAuthors relationship).
+     */
+    protected function authors(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->studyAuthors,
+        );
     }
 
     public function scopeFilter($query, array $filters)
