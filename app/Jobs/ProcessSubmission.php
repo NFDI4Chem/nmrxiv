@@ -58,7 +58,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
             if ($project) {
                 if ($draft) {
-                    $environment = env('APP_ENV', 'local');
+                    $environment = config('app.env', 'local');
 
                     $projectPath = preg_replace(
                         '~//+~',
@@ -123,7 +123,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
             if ($project) {
                 $_studies = $project->studies;
                 if ($draft) {
-                    $environment = env('APP_ENV', 'local');
+                    $environment = config('app.env', 'local');
 
                     foreach ($_studies as $study) {
                         // $study->users()->sync($project->user()->getDictionary());
@@ -202,7 +202,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     $path,
                     $fsObjectChild->path
                 );
-                Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newPath);
+                Storage::disk(config('filesystems.default'))->move($fsObjectChild->path, $newPath);
                 $fsObjectChild->path = $newPath;
                 $fsObjectChild->save();
             } else {

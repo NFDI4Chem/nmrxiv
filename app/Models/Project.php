@@ -82,7 +82,7 @@ class Project extends Model implements Auditable
     public function getProjectPhotoUrlAttribute()
     {
         return $this->project_photo_path
-                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->project_photo_path)
+                    ? Storage::disk(config('filesystems.default_public'))->url($this->project_photo_path)
                     : '';
     }
 
@@ -267,12 +267,12 @@ class Project extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
-        return env('APP_URL', null).'/project/P'.$this->getRawOriginal('identifier');
+        return config('app.url').'/project/P'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.urlencode($this->url);
+        return config('app.url').'/projects/'.urlencode($this->url);
     }
 
     /**

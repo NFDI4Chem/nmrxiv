@@ -46,7 +46,7 @@ class Molecule extends Model
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/compound/M'.$this->getRawOriginal('identifier');
+        return config('app.url').'/compound/M'.$this->getRawOriginal('identifier');
     }
 
     public function samples(): BelongsToMany

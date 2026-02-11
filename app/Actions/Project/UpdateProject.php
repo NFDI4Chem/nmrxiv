@@ -36,7 +36,7 @@ class UpdateProject
             if (array_key_exists('photo', $input)) {
                 $image = $input['photo'];
                 if (! is_null($image)) {
-                    $s3 = Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'));
+                    $s3 = Storage::disk(config('filesystems.default_public'));
                     $file_name = uniqid().'.'.$image->getClientOriginalExtension();
                     $s3filePath = '/projects/'.$file_name;
                     $s3->put($s3filePath, file_get_contents($image), 'public');

@@ -199,7 +199,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
-            'schema' => $environment = env('SCHEMA_VERSION', 'local'),
+            'schema' => config('app.schema_version', 'beta'),
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
             ],

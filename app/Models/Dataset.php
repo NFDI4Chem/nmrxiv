@@ -81,19 +81,19 @@ class Dataset extends Model implements Auditable
     public function getDatasetPhotoUrlAttribute()
     {
         return $this->dataset_photo_path
-                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->dataset_photo_path)
+                    ? Storage::disk(config('filesystems.default_public'))->url($this->dataset_photo_path)
                     : '';
     }
 
     protected function getPublicUrlAttribute()
     {
         // return  env('APP_URL', null).'/datasets/'.urlencode($this->slug);
-        return env('APP_URL', null).'/dataset/D'.$this->getRawOriginal('identifier');
+        return config('app.url').'/dataset/D'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/datasets/'.urlencode($this->url);
+        return config('app.url').'/datasets/'.urlencode($this->url);
     }
 
     public function study(): BelongsTo

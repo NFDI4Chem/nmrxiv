@@ -84,7 +84,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         Log::info("Study {$study->id}: Using filesystem driver: {$filesystemDriver}, bucket: {$bucket}");
 
                         $s3keys = [];
-                        $environment = env('APP_ENV', 'local');
+                        $environment = config('app.env', 'local');
                         $relative_URL = $fsObject->relative_url;
                         if ($fsObject->type == 'file') {
                             Log::info("Study {$study->id}: Processing single file");
@@ -322,15 +322,16 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
      */
     protected function storageClient()
     {
+        $diskName = config('filesystems.default');
         $config = [
-            'region' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.region'),
+            'region' => config('filesystems.disks.'.$diskName.'.region'),
             'version' => 'latest',
             'use_path_style_endpoint' => true,
-            'url' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
-            'endpoint' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
+            'url' => config('filesystems.disks.'.$diskName.'.endpoint'),
+            'endpoint' => config('filesystems.disks.'.$diskName.'.endpoint'),
             'credentials' => [
-                'key' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.key'),
-                'secret' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.secret'),
+                'key' => config('filesystems.disks.'.$diskName.'.key'),
+                'secret' => config('filesystems.disks.'.$diskName.'.secret'),
             ],
         ];
 
