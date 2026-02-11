@@ -802,43 +802,22 @@
                 :show="showSingleSampleModal"
                 @close="showSingleSampleModal = false"
             >
-                <template #title>
-                    <div class="flex items-center">
-                        <svg
-                            class="w-6 h-6 text-blue-500 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            ></path>
-                        </svg>
-                        Project Contains Single Sample
-                    </div>
-                </template>
+                <template #title> Single sample detected in project </template>
                 <template #content>
                     <div class="space-y-3">
                         <p class="text-sm text-gray-600">
-                            Your project contains only one sample. You can
-                            choose to publish it as a sample or as a project.
+                            Your project contains only one sample. In nmrXiv,
+                            single samples can be published directly without
+                            creating a project. Projects are intended to group
+                            multiple related samples, for example those
+                            belonging to the same study or publication.
+                            <a
+                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
+                                target="_blank"
+                                class="text-blue-600 hover:text-blue-700"
+                                >Click to read more.</a
+                            >
                         </p>
-                        <div
-                            class="bg-blue-50 border border-blue-200 rounded-md p-3"
-                        >
-                            <p class="text-sm text-blue-800">
-                                <strong>Publishing as a Sample:</strong> The
-                                data will be published as an individual sample.
-                            </p>
-                            <p class="text-sm text-blue-800 mt-2">
-                                <strong>Publishing as a Project:</strong> The
-                                data will be published as a project, containing
-                                your single sample.
-                            </p>
-                        </div>
                         <p class="text-sm text-gray-600">
                             How would you like to proceed?
                         </p>
