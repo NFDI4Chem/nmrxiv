@@ -381,6 +381,41 @@
                         </div>
                     </div>
 
+                    <!-- Author Section -->
+                    <div
+                        v-if="
+                            study.data.authors && study.data.authors.length > 0
+                        "
+                        class="mt-6"
+                    >
+                        <div class="relative">
+                            <div
+                                class="absolute inset-0 flex items-center"
+                                aria-hidden="true"
+                            >
+                                <div
+                                    class="w-full border-t border-gray-100"
+                                ></div>
+                            </div>
+                            <div
+                                class="relative flex items-center justify-between"
+                            >
+                                <span
+                                    class="pr-3 text-md bg-white font-medium text-gray-400"
+                                >
+                                    Authors
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div
+                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
+                            >
+                                <author-card :authors="study.data.authors" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="relative">&nbsp;</div>
                     <div
                         v-if="study.data.sample.molecules.length > 0"
@@ -729,6 +764,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div
                         v-if="
                             study.data.description &&
@@ -787,6 +823,7 @@ import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 import Depictor3D from "@/Shared/Depictor3D.vue";
+import AuthorCard from "@/Shared/AuthorCard.vue";
 export default {
     components: {
         SampleLayout,
@@ -803,6 +840,7 @@ export default {
         Head,
         Citation,
         ShowProjectDates,
+        AuthorCard,
     },
     props: ["project", "tab", "study"],
     data() {
