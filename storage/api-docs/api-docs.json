@@ -1938,7 +1938,7 @@
                     "ELN Submission"
                 ],
                 "summary": "Upload and process data from Electronic Lab Notebook (ELN) systems",
-                "description": "Creates or updates a draft with data from external ELN systems. Currently supports Chemotion. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
+                "description": "Creates or updates a draft with data from external ELN systems. Currently supports Chemotion and NoBs. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
                 "operationId": "uploadELNData",
                 "parameters": [
                     {
@@ -1949,7 +1949,8 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "chemotion"
+                                "chemotion",
+                                "nobs"
                             ],
                             "example": "chemotion"
                         }
@@ -2076,7 +2077,8 @@
                                                 "type": "string"
                                             },
                                             "example": [
-                                                "chemotion"
+                                                "chemotion",
+                                                "nobs"
                                             ]
                                         }
                                     },
@@ -2142,7 +2144,8 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "chemotion"
+                                "chemotion",
+                                "nobs"
                             ],
                             "example": "chemotion"
                         }
@@ -2271,7 +2274,8 @@
                                                 "type": "string"
                                             },
                                             "example": [
-                                                "chemotion"
+                                                "chemotion",
+                                                "nobs"
                                             ]
                                         }
                                     },
