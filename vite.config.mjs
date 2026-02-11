@@ -27,8 +27,12 @@ export default defineConfig({
             'ziggy-js': path.resolve('vendor/tightenco/ziggy'),
         }
     },
-        server: {
-        // host: '127.0.0.1', // Force IPv4 localhost to avoid CSP issues with [::1]
-        https: false
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        https: false,
+        hmr: {
+            host: 'localhost',
+        },
     },
 });
