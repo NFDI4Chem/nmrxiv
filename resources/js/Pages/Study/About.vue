@@ -170,6 +170,56 @@
                                     </dd>
                                 </div>
                             </div>
+
+                            <!-- Author -->
+                            <div
+                                v-if="
+                                    (project &&
+                                        project.authors &&
+                                        project.authors.length > 0) ||
+                                    (study &&
+                                        study.authors &&
+                                        study.authors.length > 0)
+                                "
+                                class="mb-8"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-0 flex items-center"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            class="w-full border-t border-gray-300"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="relative flex items-center justify-between"
+                                    >
+                                        <span
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                        >
+                                            Author
+                                        </span>
+                                    </div>
+                                </div>
+                                <dd
+                                    class="mt-2 text-md text-gray-900 space-y-5"
+                                >
+                                    <div
+                                        class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
+                                    >
+                                        <author-card
+                                            :authors="
+                                                study.authors &&
+                                                study.authors.length > 0
+                                                    ? study.authors
+                                                    : project.authors
+                                            "
+                                        />
+                                    </div>
+                                </dd>
+                            </div>
+
                             <div class="mb-4">
                                 <!-- <div class="relative">
                                     <div
@@ -609,6 +659,7 @@ import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
+import AuthorCard from "@/Shared/AuthorCard.vue";
 export default {
     components: {
         StudyContent,
@@ -619,6 +670,7 @@ export default {
         InformationCircleIcon,
         JetInputError,
         Depictor2D,
+        AuthorCard,
     },
     props: [
         "study",
@@ -732,7 +784,7 @@ export default {
         },
         standardizeMolecules(mol) {
             return axios.post(
-                "https://api.cheminf.studio/latest/chem/standardize",
+                "https://api.naturalproducts.net/latest/chem/standardize",
                 mol
             );
         },

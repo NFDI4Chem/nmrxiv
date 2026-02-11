@@ -1,7 +1,7 @@
 <template>
     <Head title="Forgot Password" />
 
-    <jet-authentication-card class="index_beams">
+    <jet-authentication-card>
         <template #logo>
             <jet-authentication-card-logo />
         </template>
@@ -33,6 +33,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <jet-button
+                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >

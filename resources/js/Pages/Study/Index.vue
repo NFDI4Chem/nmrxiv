@@ -123,7 +123,7 @@
                     <div v-for="study in studies.data" :key="study.uuid">
                         <study-card
                             :preview="preview"
-                            :obfuscation-code="project.obfuscationcode"
+                            :obfuscation-code="project?.obfuscationcode"
                             :study="study"
                         />
                     </div>
@@ -224,23 +224,32 @@ export default {
             if (this.project) {
                 this.loading = true;
                 if (!this.preview) {
-                    this.fetchStudies(
-                        route("dashboard.project.studies", this.project.id)
-                    );
+                    if (this.project?.id) {
+                        this.fetchStudies(
+                            route("dashboard.project.studies", this.project.id)
+                        );
+                    }
                 } else {
-                    this.fetchStudies(
-                        route("studies.preview", this.project.obfuscationcode)
-                    );
+                    if (this.project?.obfuscationcode) {
+                        this.fetchStudies(
+                            route(
+                                "studies.preview",
+                                this.project.obfuscationcode
+                            )
+                        );
+                    }
                 }
             }
         }
     },
     methods: {
         openDatasetCreateDialog() {
-            this.emitter.emit("openDatasetCreateDialog", {
-                draft_id: this.project.draft_id,
-                return_url: "/projects/" + this.project.id,
-            });
+            if (this.project?.id && this.project?.draft_id) {
+                this.emitter.emit("openDatasetCreateDialog", {
+                    draft_id: this.project.draft_id,
+                    return_url: "/projects/" + this.project.id,
+                });
+            }
         },
         fetchStudies(url) {
             axios.get(url).then((response) => {

@@ -8,7 +8,7 @@ class StudyResource extends JsonResource
 {
     private bool $lite = true;
 
-    private array $properties = ['sample', 'users', 'license'];
+    private array $properties = ['sample', 'users', 'license', 'authors'];
 
     public function lite(bool $lite, ?array $properties = []): self
     {
@@ -107,6 +107,18 @@ class StudyResource extends JsonResource
                         function () {
                             return [
                                 'license' => new LicenseResource($this->license),
+                            ];
+                        }
+                    ),
+                ];
+            }),
+            $this->mergeWhen(! $this->lite, function () {
+                return [
+                    $this->mergeWhen(
+                        in_array('authors', $this->properties),
+                        function () {
+                            return [
+                                'authors' => $this->studyAuthors ? AuthorResource::collection($this->studyAuthors) : [],
                             ];
                         }
                     ),

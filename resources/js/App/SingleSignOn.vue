@@ -15,7 +15,7 @@
             <div v-if="hasNFDIAAIClientID" class="flex-1 w-64 px-1">
                 <a
                     href="/auth/login/regapp"
-                    class="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
+                    class="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-full shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
                 >
                     <span class="sr-only">Sign in with NFDI AAI</span>
                     <img
@@ -29,7 +29,7 @@
             <div v-if="hasOrcidClientID" class="flex-1 w-64 px-1">
                 <a
                     href="/auth/login/orcid"
-                    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
+                    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
                 >
                     <span class="sr-only">Sign in with ORCID</span>
                     <img
@@ -43,7 +43,7 @@
             <div v-if="hasTwitterClientID" class="flex-1 w-64 px-1">
                 <a
                     href="/auth/login/twitter"
-                    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-sky-500 hover:bg-gray-50"
+                    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm bg-white text-sm font-medium text-sky-500 hover:bg-gray-50"
                 >
                     <span class="sr-only">Sign in with Twitter</span>
                     <svg
@@ -69,7 +69,7 @@
             <div v-if="hasGithubClientID" class="flex-1 w-32 px-1">
                 <a
                     href="/auth/login/github"
-                    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
+                    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
                 >
                     <span class="sr-only">Sign in with GitHub</span>
                     <svg
