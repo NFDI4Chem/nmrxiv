@@ -93,7 +93,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::IMG, 'https://nmriumdev.nmrxiv.org')
             ->add(Directive::IMG, 'https://upload.wikimedia.org')
             ->add(Directive::IMG, 'https://pbs.twimg.com')
-            ->add(Directive::IMG, 'https://api.naturalproducts.net')
+            ->add(Directive::IMG, 'https://api.cheminf.studio')
             ->add(Directive::IMG, 'https://api.naturalproducts.net')
             ->add(Directive::IMG, 'https://dev.api.naturalproducts.net')
             ->add(Directive::IMG, 'https://placehold.co');
@@ -109,11 +109,11 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, config('services.chemistry_standardize.url'))
             ->add(Directive::CONNECT, env('EUROPEMC_WS_API', 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'))
             ->add(Directive::CONNECT, config('services.chemotion_tracker.base_url'))
-            ->add(Directive::CONNECT, env('CM_API', 'https://api.naturalproducts.net'))
+            ->add(Directive::CONNECT, env('CM_API', 'https://api.cheminf.studio'))
             ->add(Directive::CONNECT, env('AWS_ENDPOINT', 'https://s3.uni-jena.de'))
             ->add(Directive::CONNECT, 'https://nmrium.nmrxiv.org')
             ->add(Directive::CONNECT, 'https://nmriumdev.nmrxiv.org')
-            ->add(Directive::CONNECT, 'https://api.naturalproducts.net')
+            ->add(Directive::CONNECT, 'https://api.cheminf.studio')
             ->add(Directive::CONNECT, 'https://api.naturalproducts.net')
             ->add(Directive::CONNECT, 'https://dev.api.naturalproducts.net');
 
@@ -126,7 +126,7 @@ class NmrxivPolicy implements Preset
         // Frame sources
         $policy
             ->add(Directive::FRAME, Keyword::SELF)
-            ->add(Directive::FRAME, 'https://api.naturalproducts.net')
+            ->add(Directive::FRAME, 'https://api.cheminf.studio')
             ->add(Directive::FRAME, 'https://api.naturalproducts.net')
             ->add(Directive::FRAME, 'https://dev.api.naturalproducts.net')
             ->add(Directive::FRAME, 'https://nmrium.nmrxiv.org')
