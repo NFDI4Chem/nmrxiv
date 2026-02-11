@@ -29,4 +29,9 @@ class Author extends Model
     {
         return $this->belongsToMany(Project::class);
     }
+
+    public function studies(): BelongsToMany
+    {
+        return $this->belongsToMany(Study::class, 'author_study');
+    }
 }

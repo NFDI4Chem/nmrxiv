@@ -63,7 +63,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $fsObject = new FileSystemObject;
                         $fsObject->type = 'directory';
                         $fsObject->name = $project->slug;
-                        $environment = env('APP_ENV', 'local');
+                        $environment = config('app.env', 'local');
                         $fsObject->path = $environment.'/'.$project->uuid;
                         $fsObject->key = $project->uuid;
                         $fsObject->status = 'present';
@@ -73,11 +73,11 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                     if ($fsObject && $fsObject->status != 'missing') {
                         $path = $fsObject->path;
                         $s3Client = $this->storageClient();
-                        $bucket = config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
+                        $bucket = config('filesystems.disks.'.config('filesystems.default').'.bucket');
                         $s3keys = [];
-                        $environment = env('APP_ENV', 'local');
+                        $environment = config('app.env', 'local');
                         if ($fsObject->type == 'file') {
-                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->exists($path)) {
+                            if (Storage::disk(config('filesystems.default'))->exists($path)) {
                                 array_push($s3keys, substr($fsObject->path, 1));
                             }
                         } else {
@@ -163,8 +163,8 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $zip->finish();
                         fclose($archiveDestination);
 
-                        Storage::disk(env('FILESYSTEM_DRIVER'))->setVisibility($zipFilePath, 'public');
-                        $url = Storage::disk(env('FILESYSTEM_DRIVER'))->url($zipFilePath);
+                        Storage::disk(config('filesystems.default'))->setVisibility($zipFilePath, 'public');
+                        $url = Storage::disk(config('filesystems.default'))->url($zipFilePath);
                         $project->download_url = $url;
                         $project->internal_status = 'complete';
                         $project->save();
@@ -185,15 +185,16 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
      */
     protected function storageClient()
     {
+        $diskName = config('filesystems.default');
         $config = [
-            'region' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.region'),
+            'region' => config('filesystems.disks.'.$diskName.'.region'),
             'version' => 'latest',
             'use_path_style_endpoint' => true,
-            'url' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
-            'endpoint' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
+            'url' => config('filesystems.disks.'.$diskName.'.endpoint'),
+            'endpoint' => config('filesystems.disks.'.$diskName.'.endpoint'),
             'credentials' => [
-                'key' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.key'),
-                'secret' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.secret'),
+                'key' => config('filesystems.disks.'.$diskName.'.key'),
+                'secret' => config('filesystems.disks.'.$diskName.'.secret'),
             ],
         ];
 

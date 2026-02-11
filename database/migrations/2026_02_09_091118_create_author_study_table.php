@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('author_study', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('author_id')->constrained()->onDelete('cascade');
-            $table->foreignId('study_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('author_id');
+            $table->unsignedBigInteger('study_id');
             $table->string('contributor_type')->nullable();
-            $table->integer('sort_order')->default(0);
+            $table->smallInteger('sort_order')->nullable();
             $table->timestamps();
 
-            $table->unique(['author_id', 'study_id']);
+            $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
+            $table->foreign('study_id')->references('id')->on('studies')->onDelete('cascade');
         });
     }
 

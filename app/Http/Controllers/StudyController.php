@@ -82,7 +82,7 @@ class StudyController extends Controller
         Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project ? $project->nonPersonalTeam : null;
+        $team = $project?->nonPersonalTeam;
         $license = null;
         if ($study->license_id) {
             $license = $getLicense->getLicensebyId($study->license_id);
@@ -104,7 +104,7 @@ class StudyController extends Controller
         Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project ? $project->team : null;
+        $team = $project?->team;
 
         return $this->renderTabView('Datasets', $study, $team, $project, null, null, false);
     }
@@ -114,7 +114,7 @@ class StudyController extends Controller
         switch ($model) {
             case 'study':
                 $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-                $team = $project->nonPersonalTeam;
+                $team = $project?->nonPersonalTeam;
                 $license = null;
                 if ($study->license_id) {
                     $license = $getLicense->getLicensebyId($study->license_id);
@@ -125,7 +125,7 @@ class StudyController extends Controller
                 break;
             case 'files':
                 $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-                $team = $project->nonPersonalTeam;
+                $team = $project?->nonPersonalTeam;
                 $studyFSObject = $study->fsObject;
 
                 return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, true);
@@ -133,7 +133,7 @@ class StudyController extends Controller
                 break;
             case 'datasets':
                 $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-                $team = $project->nonPersonalTeam;
+                $team = $project?->nonPersonalTeam;
 
                 return $this->renderTabView('Datasets', $study, $team, $project, null, null, true);
 
@@ -146,9 +146,9 @@ class StudyController extends Controller
         switch ($tab) {
             case 'About':
                 return Inertia::render('Study/About', [
-                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
+                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules', 'studyAuthors'),
                     'team' => $team ? $team->load('users', 'owner') : null,
-                    'project' => $project ? $project->load('users', 'owner') : null,
+                    'project' => $project ? $project->load('users', 'owner', 'authors') : null,
                     'members' => $study->allUsers(),
                     'preview' => $preview,
                     'availableRoles' => array_values(Jetstream::$roles),
@@ -384,7 +384,7 @@ class StudyController extends Controller
         Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project ? $project->nonPersonalTeam : null;
+        $team = $project?->nonPersonalTeam;
         $studyFSObject = $study->fsObject;
 
         return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, false);
@@ -436,7 +436,7 @@ class StudyController extends Controller
 
         } else {
             if ($file) {
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
                 $path = preg_replace(
                     '~//+~',
                     '/',
@@ -551,7 +551,7 @@ class StudyController extends Controller
         $content = $request->get('img');
         if ($content) {
             $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';
-            Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+            Storage::disk(config('filesystems.default_public'))->put($path, $content, 'public');
             $study->study_photo_path = $path;
             $study->save();
         }

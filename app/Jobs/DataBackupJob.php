@@ -30,9 +30,9 @@ class DataBackupJob implements ShouldQueue
         Artisan::call('backup:run --only-db');
 
         // Define the bucket name and prefix.
-        $bucket = env('AWS_BUCKET');
-        $prefix = env('APP_ENV').'/database';
-        $disk = Storage::disk(env('FILESYSTEM_DRIVER'));
+        $bucket = config('filesystems.disks.ceph.bucket');
+        $prefix = config('app.env').'/database';
+        $disk = Storage::disk(config('filesystems.default'));
 
         // Get the contents of the bucket with the specified prefix.
         $contents = $disk->listContents($prefix, false);
