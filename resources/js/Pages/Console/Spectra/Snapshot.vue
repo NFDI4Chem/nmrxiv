@@ -215,7 +215,9 @@ export default {
                         this.loadSpectra();
                     }
                 } else if (e.message == "error" && this.autoImport) {
-                    console.warn(`Skipping dataset ${this.currentId} due to error`);
+                    console.warn(
+                        `Skipping dataset ${this.currentId} due to error`
+                    );
                     this.index = this.index + 1;
                     this.loadSpectra();
                 }
@@ -239,18 +241,26 @@ export default {
             }
 
             this.$nextTick(() => {
-                if (this.$refs.spectraEditorREF && typeof this.$refs.spectraEditorREF.loadSpectra === 'function') {
+                if (
+                    this.$refs.spectraEditorREF &&
+                    typeof this.$refs.spectraEditorREF.loadSpectra ===
+                        "function"
+                ) {
                     this.$refs.spectraEditorREF.loadSpectra();
 
                     if (this.autoImport) {
                         this.errorTimeout = setTimeout(() => {
-                            console.warn(`Timeout loading dataset ${this.currentId}, skipping to next`);
+                            console.warn(
+                                `Timeout loading dataset ${this.currentId}, skipping to next`
+                            );
                             this.index = this.index + 1;
                             this.loadSpectra();
                         }, 30000);
                     }
                 } else {
-                    console.error('SpectraSnapshot component ref not available, skipping to next');
+                    console.error(
+                        "SpectraSnapshot component ref not available, skipping to next"
+                    );
                     if (this.autoImport) {
                         this.index = this.index + 1;
                         this.loadSpectra();

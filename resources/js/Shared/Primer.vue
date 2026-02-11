@@ -35,10 +35,7 @@
                             projects.
                         </p>
                         <div class="w-full">
-                            <img
-                                src="/img/primer.png"
-                                class="mx-auto"
-                            />
+                            <img src="/img/primer.png" class="mx-auto" />
                         </div>
                         <p class="text-md">
                             nmrXiv allows you to upload NMR raw data from any

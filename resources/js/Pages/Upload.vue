@@ -4,39 +4,66 @@
         <template #header>
             <!-- Animated mesh gradient background -->
             <div class="relative border-b border-zinc-900/5 overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"></div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                ></div>
                 <div class="absolute inset-0 opacity-20">
-                    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-                    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-                    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+                    <div
+                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                    ></div>
+                    <div
+                        class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+                    ></div>
+                    <div
+                        class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+                    ></div>
                 </div>
                 <!-- End of Background pattern -->
                 <div class="relative px-6 py-4">
-                <div class="w-full sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <span
-                            v-if="currentStep"
-                            class="ml-14 text-sm font-bold text-teal-600 group-hover:text-teal-800"
-                            >Step
-                            <span v-if="currentStep.id"
-                                >{{ currentStep.id }}
-                            </span>
-                            / 3 -
-                            <span v-if="currentStep.id == '1'">
-                                <span v-if="showPrimer && currentDraft">
-                                    Introduction
+                    <div
+                        class="w-full sm:flex sm:items-center sm:justify-between"
+                    >
+                        <div>
+                            <span
+                                v-if="currentStep"
+                                class="ml-14 text-sm font-bold text-teal-600 group-hover:text-teal-800"
+                                >Step
+                                <span v-if="currentStep.id"
+                                    >{{ currentStep.id }}
                                 </span>
-                                <span v-else>File Upload</span>
+                                / 3 -
+                                <span v-if="currentStep.id == '1'">
+                                    <span v-if="showPrimer && currentDraft">
+                                        Introduction
+                                    </span>
+                                    <span v-else>File Upload</span>
+                                </span>
+                                <span v-if="currentStep.id == '2'">
+                                    Auto Processing, Assignments and Validation
+                                </span>
                             </span>
-                            <span v-if="currentStep.id == '2'">
-                                Auto Processing, Assignments and Validation
-                            </span>
-                        </span>
-                        <h3
-                            class="text-sm text-gray-700 uppercase font-bold tracking-widest"
-                        >
-                            <span v-if="currentStep">
-                                <span v-if="step == '1'">
+                            <h3
+                                class="text-sm text-gray-700 uppercase font-bold tracking-widest"
+                            >
+                                <span v-if="currentStep">
+                                    <span v-if="step == '1'">
+                                        <Link
+                                            class="mr-2 ml-1 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            :href="'/upload'"
+                                        >
+                                            ←
+                                        </Link>
+                                    </span>
+                                    <span v-else>
+                                        <a
+                                            class="cursor-pointer mr-2 ml-1 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            @click="selectStep(1)"
+                                        >
+                                            ←
+                                        </a>
+                                    </span>
+                                </span>
+                                <span v-else>
                                     <Link
                                         class="mr-2 ml-1 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                         :href="'/upload'"
@@ -44,196 +71,182 @@
                                         ←
                                     </Link>
                                 </span>
-                                <span v-else>
-                                    <a
-                                        class="cursor-pointer mr-2 ml-1 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                        @click="selectStep(1)"
-                                    >
-                                        ←
-                                    </a>
-                                </span>
-                            </span>
-                            <span v-else>
-                                <Link
-                                    class="mr-2 ml-1 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                    :href="'/upload'"
-                                >
-                                    ←
-                                </Link>
-                            </span>
 
-                            <span v-if="currentStep && currentDraft">
-                                <p
-                                    class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
-                                    contenteditable
-                                    @blur="updateDraft($event)"
-                                >
-                                    {{ currentDraft.name }}
-                                </p>
-                                <jet-input-error
-                                    :message="draftForm.errors.name"
-                                    class="mt-2"
-                                />
-                            </span>
-                            <span v-else> Submit data to nmrXiv </span>
-                        </h3>
-                    </div>
-                    <div class="mt-3 sm:ml-4 sm:mt-0">
-                        <div v-if="showPrimer && currentDraft">
-                            <div class="float-left">
-                                <div
-                                    class="relative mt-2 flex items-start"
-                                    @change="hidePrimer()"
-                                >
-                                    <div class="flex h-5 items-center">
-                                        <input
-                                            id="comments"
-                                            aria-describedby="comments-description"
-                                            name="comments"
-                                            type="checkbox"
-                                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        />
-                                    </div>
-                                    <div class="ml-3 text-sm mr-5">
-                                        <label
-                                            for="comments"
-                                            class="font-medium text-gray-700"
-                                            >Don't show this again</label
-                                        >
+                                <span v-if="currentStep && currentDraft">
+                                    <p
+                                        class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
+                                        contenteditable
+                                        @blur="updateDraft($event)"
+                                    >
+                                        {{ currentDraft.name }}
+                                    </p>
+                                    <jet-input-error
+                                        :message="draftForm.errors.name"
+                                        class="mt-2"
+                                    />
+                                </span>
+                                <span v-else> Submit data to nmrXiv </span>
+                            </h3>
+                        </div>
+                        <div class="mt-3 sm:ml-4 sm:mt-0">
+                            <div v-if="showPrimer && currentDraft">
+                                <div class="float-left">
+                                    <div
+                                        class="relative mt-2 flex items-start"
+                                        @change="hidePrimer()"
+                                    >
+                                        <div class="flex h-5 items-center">
+                                            <input
+                                                id="comments"
+                                                aria-describedby="comments-description"
+                                                name="comments"
+                                                type="checkbox"
+                                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                            />
+                                        </div>
+                                        <div class="ml-3 text-sm mr-5">
+                                            <label
+                                                for="comments"
+                                                class="font-medium text-gray-700"
+                                                >Don't show this again</label
+                                            >
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <jet-button
-                                class="ml-2 float-right"
-                                :class="{
-                                    'opacity-25': createDatasetForm.processing,
-                                }"
-                                @click="skipPrimer()"
-                            >
-                                Proceed
-                            </jet-button>
-                        </div>
-                        <div v-else>
-                            <span v-if="!currentStep">
-                                <Link
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
-                                    :href="returnUrl"
+                                <jet-button
+                                    class="ml-2 float-right"
+                                    :class="{
+                                        'opacity-25':
+                                            createDatasetForm.processing,
+                                    }"
+                                    @click="skipPrimer()"
                                 >
-                                    Cancel
-                                </Link>
-                            </span>
-                            <span v-else>
-                                <span v-if="currentStep.id == '1'">
+                                    Proceed
+                                </jet-button>
+                            </div>
+                            <div v-else>
+                                <span v-if="!currentStep">
                                     <Link
-                                        class="mx-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+                                        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                                         :href="returnUrl"
                                     >
                                         Cancel
                                     </Link>
-                                    <jet-button
-                                        id="tour-step-proceed-from-step-1"
-                                        class="ml-2"
-                                        :class="{
-                                            'opacity-25':
-                                                createDatasetForm.processing,
-                                        }"
-                                        :disabled="
-                                            createDatasetForm.processing ||
-                                            loading ||
-                                            loadingStep
-                                        "
-                                        @click="process()"
-                                    >
-                                        <span v-if="loadingStep">
-                                            <svg
-                                                class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <circle
-                                                    class="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    stroke-width="4"
-                                                ></circle>
-                                                <path
-                                                    class="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                ></path>
-                                            </svg>
-                                        </span>
-                                        Proceed
-                                    </jet-button>
                                 </span>
-                                <span v-else-if="currentStep.id == '2'">
-                                    <jet-secondary-button
-                                        class="ml-2 float-left"
-                                        :class="{
-                                            'opacity-25':
-                                                createDatasetForm.processing,
-                                        }"
-                                        :disabled="createDatasetForm.processing"
-                                        @click="selectStep(1)"
-                                    >
-                                        Back
-                                    </jet-secondary-button>
-                                    <jet-button
-                                        id="tour-step-proceed-from-step-2"
-                                        class="ml-2"
-                                        :class="{
-                                            'opacity-25':
-                                                createDatasetForm.processing,
-                                        }"
-                                        :disabled="
-                                            createDatasetForm.processing ||
-                                            loading ||
-                                            loadingStep
-                                        "
-                                        @click="closeDraft()"
-                                    >
-                                        <span v-if="loadingStep">
-                                            <svg
-                                                class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <circle
-                                                    class="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    stroke-width="4"
-                                                ></circle>
-                                                <path
-                                                    class="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                ></path>
-                                            </svg>
-                                        </span>
-                                        Proceed
-                                    </jet-button>
+                                <span v-else>
+                                    <span v-if="currentStep.id == '1'">
+                                        <Link
+                                            class="mx-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+                                            :href="returnUrl"
+                                        >
+                                            Cancel
+                                        </Link>
+                                        <jet-button
+                                            id="tour-step-proceed-from-step-1"
+                                            class="ml-2"
+                                            :class="{
+                                                'opacity-25':
+                                                    createDatasetForm.processing,
+                                            }"
+                                            :disabled="
+                                                createDatasetForm.processing ||
+                                                loading ||
+                                                loadingStep
+                                            "
+                                            @click="process()"
+                                        >
+                                            <span v-if="loadingStep">
+                                                <svg
+                                                    class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        class="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        stroke-width="4"
+                                                    ></circle>
+                                                    <path
+                                                        class="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                            </span>
+                                            Proceed
+                                        </jet-button>
+                                    </span>
+                                    <span v-else-if="currentStep.id == '2'">
+                                        <jet-secondary-button
+                                            class="ml-2 float-left"
+                                            :class="{
+                                                'opacity-25':
+                                                    createDatasetForm.processing,
+                                            }"
+                                            :disabled="
+                                                createDatasetForm.processing
+                                            "
+                                            @click="selectStep(1)"
+                                        >
+                                            Back
+                                        </jet-secondary-button>
+                                        <jet-button
+                                            id="tour-step-proceed-from-step-2"
+                                            class="ml-2"
+                                            :class="{
+                                                'opacity-25':
+                                                    createDatasetForm.processing,
+                                            }"
+                                            :disabled="
+                                                createDatasetForm.processing ||
+                                                loading ||
+                                                loadingStep
+                                            "
+                                            @click="closeDraft()"
+                                        >
+                                            <span v-if="loadingStep">
+                                                <svg
+                                                    class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        class="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        stroke-width="4"
+                                                    ></circle>
+                                                    <path
+                                                        class="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                            </span>
+                                            Proceed
+                                        </jet-button>
+                                    </span>
+                                    <span v-else-if="currentStep.id == '3'">
+                                        <Link
+                                            id="tour-step-finish"
+                                            class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            :href="route('dashboard')"
+                                        >
+                                            Finish
+                                        </Link>
+                                    </span>
                                 </span>
-                                <span v-else-if="currentStep.id == '3'">
-                                    <Link
-                                        id="tour-step-finish"
-                                        class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                        :href="route('dashboard')"
-                                    >
-                                        Finish
-                                    </Link>
-                                </span>
-                            </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </template>
         <!-- End of Header -->

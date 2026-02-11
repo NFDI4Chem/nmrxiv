@@ -84,7 +84,8 @@
                             No recent activity
                         </h3>
                         <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            Your recently updated projects will appear here for quick access.
+                            Your recently updated projects will appear here for
+                            quick access.
                         </p>
                     </div>
                 </template>

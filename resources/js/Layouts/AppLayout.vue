@@ -69,15 +69,26 @@
                             v-if="editableTeamRole"
                             class="mt-1 flex-1 h-0 overflow-y-auto"
                         >
-                            <div v-if="!isUploadPage" class="px-4 py-4 border-b border-gray-100 text-center">
+                            <div
+                                v-if="!isUploadPage"
+                                class="px-4 py-4 border-b border-gray-100 text-center"
+                            >
                                 <create mode="button"></create>
                                 <a
                                     href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                     target="_blank"
                                     class="inline-flex items-center justify-center gap-1.5 mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200"
                                 >
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    <svg
+                                        class="w-3.5 h-3.5"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"
+                                        ></path>
                                     </svg>
                                     <span>Need help?</span>
                                 </a>
@@ -93,41 +104,48 @@
                                         v-if="item.prefix && !item.name"
                                         :class="[
                                             index > 0 ? 'mt-6' : 'mt-0',
-                                            'px-3 mb-2'
+                                            'px-3 mb-2',
                                         ]"
                                     >
-                                        <h3 class="text-xs font-medium text-gray-400 tracking-wide">
+                                        <h3
+                                            class="text-xs font-medium text-gray-400 tracking-wide"
+                                        >
                                             {{ item.prefix }}
                                         </h3>
                                     </div>
 
-                            <!-- Main Item -->
-                            <Link
-                                v-if="item.href && item.name"
-                                :href="item.href"
-                                :class="[
-                                    $page.url === item.href
-                                        ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
-                                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
-                                    'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg transition-all duration-200 ease-in-out',
-                                ]"
-                            >
-                                <component
-                                    :is="item.icon"
-                                    :class="[
-                                        $page.url === item.href
-                                            ? 'text-gray-900'
-                                            : 'text-gray-400 group-hover:text-gray-600',
-                                        'h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                                    ]"
-                                    aria-hidden="true"
-                                />
-                                <span class="truncate flex-1">{{ item.name }}</span>
-                            </Link>
+                                    <!-- Main Item -->
+                                    <Link
+                                        v-if="item.href && item.name"
+                                        :href="item.href"
+                                        :class="[
+                                            $page.url === item.href
+                                                ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
+                                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
+                                            'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg transition-all duration-200 ease-in-out',
+                                        ]"
+                                    >
+                                        <component
+                                            :is="item.icon"
+                                            :class="[
+                                                $page.url === item.href
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-400 group-hover:text-gray-600',
+                                                'h-5 w-5 flex-shrink-0 transition-colors duration-200',
+                                            ]"
+                                            aria-hidden="true"
+                                        />
+                                        <span class="truncate flex-1">{{
+                                            item.name
+                                        }}</span>
+                                    </Link>
 
                                     <!-- Child Items -->
                                     <div
-                                        v-if="item.children && item.children.length > 0"
+                                        v-if="
+                                            item.children &&
+                                            item.children.length > 0
+                                        "
                                         class="ml-3 mt-1 space-y-0.5"
                                     >
                                         <Link
@@ -151,7 +169,9 @@
                                                 ]"
                                                 aria-hidden="true"
                                             />
-                                            <span class="truncate flex-1">{{ child.name }}</span>
+                                            <span class="truncate flex-1">{{
+                                                child.name
+                                            }}</span>
                                         </Link>
                                     </div>
                                 </div>
@@ -322,7 +342,9 @@
                 class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto"
             >
                 <!-- Logo Section -->
-                <div class="flex py-4 items-center justify-center flex-shrink-0 px-4 pb-3">
+                <div
+                    class="flex py-4 items-center justify-center flex-shrink-0 px-4 pb-3"
+                >
                     <Link :href="route('landing')" class="group">
                         <jet-application-logo
                             class="block h-9 w-auto transition-transform group-hover:scale-105 duration-200"
@@ -342,8 +364,16 @@
                             target="_blank"
                             class="inline-flex items-center justify-center gap-1.5 mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200"
                         >
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            <svg
+                                class="w-3.5 h-3.5"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                    clip-rule="evenodd"
+                                ></path>
                             </svg>
                             <span>Need help?</span>
                         </a>
@@ -357,14 +387,16 @@
                             class="space-y-1"
                         >
                             <!-- Section Header -->
-                            <div 
-                                v-if="item.prefix" 
+                            <div
+                                v-if="item.prefix"
                                 :class="[
                                     index > 0 ? 'mt-6' : 'mt-0',
-                                    'px-3 mb-2'
+                                    'px-3 mb-2',
                                 ]"
                             >
-                                <h3 class="text-xs font-medium text-gray-400 tracking-wide">
+                                <h3
+                                    class="text-xs font-medium text-gray-400 tracking-wide"
+                                >
                                     {{ item.prefix }}
                                 </h3>
                             </div>
@@ -390,7 +422,9 @@
                                     ]"
                                     aria-hidden="true"
                                 />
-                                <span class="truncate flex-1">{{ item.name }}</span>
+                                <span class="truncate flex-1">{{
+                                    item.name
+                                }}</span>
                             </Link>
 
                             <!-- Child Items -->
@@ -419,7 +453,9 @@
                                         ]"
                                         aria-hidden="true"
                                     />
-                                    <span class="truncate flex-1">{{ child.name }}</span>
+                                    <span class="truncate flex-1">{{
+                                        child.name
+                                    }}</span>
                                 </Link>
                             </div>
                         </div>
@@ -452,8 +488,7 @@
                     <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
-                    <div class="flex-1 flex">
-                    </div>
+                    <div class="flex-1 flex"></div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
                         <span
@@ -1079,7 +1114,7 @@ export default {
     },
     computed: {
         isUploadPage() {
-            return this.$page.url.startsWith('/upload');
+            return this.$page.url.startsWith("/upload");
         },
         editableTeamRole() {
             if (this.$page.props.teamRole && this.$page.props.teamRole.name) {

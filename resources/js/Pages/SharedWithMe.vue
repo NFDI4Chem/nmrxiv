@@ -84,7 +84,9 @@
                             No shared projects
                         </h3>
                         <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            When colleagues share projects with you, they'll appear here. You'll receive an email invitation to accept.
+                            When colleagues share projects with you, they'll
+                            appear here. You'll receive an email invitation to
+                            accept.
                         </p>
                     </div>
                 </template>

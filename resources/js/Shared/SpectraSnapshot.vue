@@ -72,7 +72,7 @@ export default {
                     }
                     if (type == "nmr-wrapper:error") {
                         this.spectraError = e.data;
-                        console.error('NMRium error:', e.data);
+                        console.error("NMRium error:", e.data);
                         this.updateLoadingStatus(false, "error");
                         return;
                     }
@@ -142,20 +142,30 @@ export default {
                             );
 
                             this.loadingTimeout = setTimeout(() => {
-                                console.warn('Spectra loading timeout for dataset', this.id);
+                                console.warn(
+                                    "Spectra loading timeout for dataset",
+                                    this.id
+                                );
                                 this.updateLoadingStatus(false, "error");
                             }, 25000);
                         } else {
-                            console.warn('No NMRium info found for dataset', this.id);
+                            console.warn(
+                                "No NMRium info found for dataset",
+                                this.id
+                            );
                             this.updateLoadingStatus(false, "error");
                         }
                     })
                     .catch((error) => {
-                        console.error('Failed to fetch NMRium info for dataset', this.id, error);
+                        console.error(
+                            "Failed to fetch NMRium info for dataset",
+                            this.id,
+                            error
+                        );
                         this.updateLoadingStatus(false, "error");
                     });
             } else {
-                console.error('Iframe not available for dataset', this.id);
+                console.error("Iframe not available for dataset", this.id);
                 this.updateLoadingStatus(false, "error");
             }
         },
@@ -177,12 +187,16 @@ export default {
                             this.updateLoadingStatus(false, "dataset loaded");
                         })
                         .catch((error) => {
-                            console.error('Failed to save snapshot for dataset', this.id, error);
+                            console.error(
+                                "Failed to save snapshot for dataset",
+                                this.id,
+                                error
+                            );
                             this.updateLoadingStatus(false, "error");
                         });
                 });
                 reader.addEventListener("error", () => {
-                    console.error('Failed to read blob for dataset', this.id);
+                    console.error("Failed to read blob for dataset", this.id);
                     this.updateLoadingStatus(false, "error");
                 });
                 reader.readAsText(data.blob);

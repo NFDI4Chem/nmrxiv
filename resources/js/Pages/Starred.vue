@@ -84,7 +84,8 @@
                             No starred items
                         </h3>
                         <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            Star your important projects and datasets to find them quickly.
+                            Star your important projects and datasets to find
+                            them quickly.
                         </p>
                     </div>
                 </template>

@@ -69,9 +69,11 @@
                                     />
                                 </div>
                             </div>
-                            
+
                             <!-- Footer with Actions -->
-                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div
+                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                            >
                                 <a
                                     href="#"
                                     @click.prevent="openDialog(false)"
@@ -143,26 +145,36 @@ export default {
                         "structureSearchEditor",
                         1
                     );
-                    
+
                     // Check if there's a query parameter in URL and load it
                     const url = new URL(window.location.href);
                     const querySmiles = url.searchParams.get("query");
                     const queryType = url.searchParams.get("type");
-                    
+
                     // Load the search type if present
-                    if (queryType && ["exact", "substructure", "similarity"].includes(queryType)) {
+                    if (
+                        queryType &&
+                        ["exact", "substructure", "similarity"].includes(
+                            queryType
+                        )
+                    ) {
                         this.type = queryType;
                     }
-                    
+
                     // Load the structure if present
                     if (querySmiles && this.editor) {
                         try {
                             // Set the molecule from SMILES
                             this.editor.setMolFile(
-                                OCL.Molecule.fromSmiles(decodeURIComponent(querySmiles)).toMolfile()
+                                OCL.Molecule.fromSmiles(
+                                    decodeURIComponent(querySmiles)
+                                ).toMolfile()
                             );
                         } catch (error) {
-                            console.error("Error loading structure from query:", error);
+                            console.error(
+                                "Error loading structure from query:",
+                                error
+                            );
                         }
                     }
                 });

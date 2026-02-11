@@ -2,9 +2,7 @@
     <div class="flex flex-col h-full">
         <!-- Title Section -->
         <div class="mb-6">
-            <h2 class="text-3xl font-bold text-gray-900">
-                Metadata Search
-            </h2>
+            <h2 class="text-3xl font-bold text-gray-900">Metadata Search</h2>
             <p class="mt-2 text-gray-600">
                 Search by free text or specific NMR metadata fields
             </p>
@@ -14,7 +12,9 @@
             <!-- Left Column: Free Text Search -->
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-900 mb-2">
+                    <label
+                        class="block text-sm font-semibold text-gray-900 mb-2"
+                    >
                         Free Text Search
                     </label>
                     <textarea
@@ -27,10 +27,14 @@
 
                 <!-- Sample Information -->
                 <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">Sample Information</h3>
-                    
+                    <h3 class="text-sm font-semibold text-gray-900">
+                        Sample Information
+                    </h3>
+
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             NMR Solvent
                         </label>
                         <input
@@ -42,7 +46,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Temperature (K)
                         </label>
                         <input
@@ -55,7 +61,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Sample Tube Diameter (mm)
                         </label>
                         <select
@@ -75,10 +83,14 @@
             <div class="space-y-4">
                 <!-- Acquisition Parameters -->
                 <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">Acquisition Parameters</h3>
-                    
+                    <h3 class="text-sm font-semibold text-gray-900">
+                        Acquisition Parameters
+                    </h3>
+
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Acquisition Nucleus
                         </label>
                         <select
@@ -95,7 +107,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Proton Frequency (MHz)
                         </label>
                         <select
@@ -114,7 +128,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             NMR Method
                         </label>
                         <input
@@ -126,7 +142,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Pulse Sequence Name
                         </label>
                         <input
@@ -138,7 +156,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Number of Scans
                         </label>
                         <input
@@ -152,10 +172,14 @@
 
                 <!-- Instrument Information -->
                 <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">Instrument Information</h3>
-                    
+                    <h3 class="text-sm font-semibold text-gray-900">
+                        Instrument Information
+                    </h3>
+
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Manufacturer
                         </label>
                         <select
@@ -171,7 +195,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        <label
+                            class="block text-xs font-medium text-gray-700 mb-1.5"
+                        >
                             Instrument Model
                         </label>
                         <input
