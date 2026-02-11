@@ -187,6 +187,7 @@ export default {
             ],
             index: 0,
             autoImport: false,
+            errorTimeout: null,
         };
     },
     watch: {},
@@ -195,10 +196,28 @@ export default {
             this.currentId = this.datasets[this.index];
         }
     },
+    beforeUnmount() {
+        if (this.errorTimeout) {
+            clearTimeout(this.errorTimeout);
+        }
+    },
     methods: {
         status(e) {
-            if (!e.status && e.message == "dataset loaded") {
-                if (this.autoImport) {
+            if (this.errorTimeout) {
+                clearTimeout(this.errorTimeout);
+                this.errorTimeout = null;
+            }
+
+            if (!e.status) {
+                if (e.message == "dataset loaded") {
+                    if (this.autoImport) {
+                        this.index = this.index + 1;
+                        this.loadSpectra();
+                    }
+                } else if (e.message == "error" && this.autoImport) {
+                    console.warn(
+                        `Skipping dataset ${this.currentId} due to error`
+                    );
                     this.index = this.index + 1;
                     this.loadSpectra();
                 }
@@ -211,8 +230,43 @@ export default {
             }
         },
         loadSpectra() {
+            if (this.index >= this.datasets.length) {
+                return;
+            }
+
             this.currentId = this.datasets[this.index];
-            this.$refs.spectraEditorREF.loadSpectra();
+
+            if (this.errorTimeout) {
+                clearTimeout(this.errorTimeout);
+            }
+
+            this.$nextTick(() => {
+                if (
+                    this.$refs.spectraEditorREF &&
+                    typeof this.$refs.spectraEditorREF.loadSpectra ===
+                        "function"
+                ) {
+                    this.$refs.spectraEditorREF.loadSpectra();
+
+                    if (this.autoImport) {
+                        this.errorTimeout = setTimeout(() => {
+                            console.warn(
+                                `Timeout loading dataset ${this.currentId}, skipping to next`
+                            );
+                            this.index = this.index + 1;
+                            this.loadSpectra();
+                        }, 30000);
+                    }
+                } else {
+                    console.error(
+                        "SpectraSnapshot component ref not available, skipping to next"
+                    );
+                    if (this.autoImport) {
+                        this.index = this.index + 1;
+                        this.loadSpectra();
+                    }
+                }
+            });
         },
     },
 };
