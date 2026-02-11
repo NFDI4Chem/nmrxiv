@@ -1,67 +1,26 @@
 <template>
     <app-layout title="Projects">
         <template #header>
-            <div class="relative border-b border-zinc-900/5">
+            <div class="relative border-b border-zinc-900/5 overflow-hidden">
+                <!-- Animated mesh gradient background -->
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                ></div>
+                <div class="absolute inset-0 opacity-20">
+                    <div
+                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                    ></div>
+                    <div
+                        class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+                    ></div>
+                    <div
+                        class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+                    ></div>
+                </div>
+
                 <div
                     class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
                 >
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"
-                        >
-                            <defs>
-                                <pattern
-                                    id=":r99:"
-                                    width="72"
-                                    height="56"
-                                    patternUnits="userSpaceOnUse"
-                                    x="-12"
-                                    y="4"
-                                >
-                                    <path d="M.5 56V.5H72" fill="none"></path>
-                                </pattern>
-                            </defs>
-                            <rect
-                                width="100%"
-                                height="100%"
-                                stroke-width="0"
-                                fill="url(#:r99:)"
-                            ></rect>
-                            <svg x="-12" y="4" class="overflow-visible">
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="288"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="144"
-                                    y="56"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="504"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="720"
-                                    y="336"
-                                ></rect>
-                            </svg>
-                        </svg>
-                    </div>
                     <div
                         class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                     >
@@ -72,7 +31,7 @@
                         assignments. Learn more about
                         <a
                             class="text-teal-900"
-                            href="https://docs.nmrxiv.org/docs/introduction/intro"
+                            href="https://docs.nmrxiv.org/introduction/intro"
                             target="_blank"
                             >projects</a
                         >.
@@ -248,23 +207,26 @@
                     class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
                 >
                     <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
+                        class="mx-auto h-16 w-16 text-gray-300"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        stroke-width="1.5"
                         aria-hidden="true"
                     >
                         <path
-                            vector-effect="non-scaling-stroke"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                            d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
                         />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No projects
+                    <h3 class="mt-4 text-base font-semibold text-gray-900">
+                        No projects available
                     </h3>
+                    <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                        Public projects will appear here once they are
+                        published.
+                    </p>
                 </div>
             </div>
         </div>
@@ -361,3 +323,33 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+/* Blob animations */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+</style>
