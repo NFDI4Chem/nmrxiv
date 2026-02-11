@@ -383,7 +383,9 @@
 
                     <!-- Author Section -->
                     <div
-                        v-if="study.data.authors && study.data.authors.length > 0"
+                        v-if="
+                            study.data.authors && study.data.authors.length > 0
+                        "
                         class="mt-6"
                     >
                         <div class="relative">
@@ -391,7 +393,9 @@
                                 class="absolute inset-0 flex items-center"
                                 aria-hidden="true"
                             >
-                                <div class="w-full border-t border-gray-100"></div>
+                                <div
+                                    class="w-full border-t border-gray-100"
+                                ></div>
                             </div>
                             <div
                                 class="relative flex items-center justify-between"

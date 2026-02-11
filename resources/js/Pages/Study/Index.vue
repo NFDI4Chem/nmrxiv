@@ -232,7 +232,10 @@ export default {
                 } else {
                     if (this.project?.obfuscationcode) {
                         this.fetchStudies(
-                            route("studies.preview", this.project.obfuscationcode)
+                            route(
+                                "studies.preview",
+                                this.project.obfuscationcode
+                            )
                         );
                     }
                 }

@@ -173,7 +173,14 @@
 
                             <!-- Author -->
                             <div
-                                v-if="(project && project.authors && project.authors.length > 0) || (study && study.authors && study.authors.length > 0)"
+                                v-if="
+                                    (project &&
+                                        project.authors &&
+                                        project.authors.length > 0) ||
+                                    (study &&
+                                        study.authors &&
+                                        study.authors.length > 0)
+                                "
                                 class="mb-8"
                             >
                                 <div class="relative">
@@ -195,11 +202,20 @@
                                         </span>
                                     </div>
                                 </div>
-                                <dd class="mt-2 text-md text-gray-900 space-y-5">
+                                <dd
+                                    class="mt-2 text-md text-gray-900 space-y-5"
+                                >
                                     <div
                                         class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
                                     >
-                                        <author-card :authors="study.authors && study.authors.length > 0 ? study.authors : project.authors" />
+                                        <author-card
+                                            :authors="
+                                                study.authors &&
+                                                study.authors.length > 0
+                                                    ? study.authors
+                                                    : project.authors
+                                            "
+                                        />
                                     </div>
                                 </dd>
                             </div>

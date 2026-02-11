@@ -4,7 +4,8 @@
         @close="createStudyDialog = false"
     >
         <template #title>
-            {{ project?.name || 'Project' }} <span class="text-gray-400">></span> New Study
+            {{ project?.name || "Project" }}
+            <span class="text-gray-400">></span> New Study
         </template>
 
         <template #content>
