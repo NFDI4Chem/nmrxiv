@@ -436,7 +436,7 @@ class StudyController extends Controller
 
         } else {
             if ($file) {
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
                 $path = preg_replace(
                     '~//+~',
                     '/',
@@ -551,7 +551,7 @@ class StudyController extends Controller
         $content = $request->get('img');
         if ($content) {
             $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';
-            Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+            Storage::disk(config('filesystems.default_public'))->put($path, $content, 'public');
             $study->study_photo_path = $path;
             $study->save();
         }

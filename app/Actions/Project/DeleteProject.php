@@ -205,9 +205,9 @@ class DeleteProject
         $fsoIds = $this->getChildrenIds($filesystemobject, []);
         if (Storage::has($filesystemobject->path)) {
             if ($filesystemobject->type == 'directory') {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->deleteDirectory($filesystemobject->path);
+                Storage::disk(config('filesystems.default'))->deleteDirectory($filesystemobject->path);
             } else {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($filesystemobject->path);
+                Storage::disk(config('filesystems.default'))->delete($filesystemobject->path);
             }
             FileSystemObject::whereIn('id', $fsoIds)->delete();
         }

@@ -14,5 +14,7 @@ return [
      * Ontologies
      *
      */
-    'measurement_technique' => env('MEASUREMENT_TECHNIQUE', 'http://purl.obolibrary.org/obo/CHMO_0000613'),
+    'ontologies' => [
+        'measurement_technique' => env('MEASUREMENT_TECHNIQUE', 'http://purl.obolibrary.org/obo/CHMO_0000613'),
+    ],
 ];

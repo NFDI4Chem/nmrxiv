@@ -137,7 +137,7 @@ class Study extends Model implements Auditable
     public function getStudyPhotoUrlAttribute()
     {
         return $this->study_photo_path
-                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->study_photo_path)
+                    ? Storage::disk(config('filesystems.default_public'))->url($this->study_photo_path)
                     : '';
     }
 
@@ -179,12 +179,12 @@ class Study extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
-        return env('APP_URL', null).'/sample/S'.$this->getRawOriginal('identifier');
+        return config('app.url').'/sample/S'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/studies/'.urlencode($this->url);
+        return config('app.url').'/studies/'.urlencode($this->url);
     }
 
     public function draft(): BelongsTo

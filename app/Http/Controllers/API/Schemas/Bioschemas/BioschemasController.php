@@ -577,7 +577,7 @@ class BioschemasController extends Controller
         $sampleSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02']);
         $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
-        $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
+        $sampleSchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $sampleSchema->hasBioChemEntityPart($this->prepareMoleculesSchemas($sample));
 
         return $sampleSchema;
@@ -791,7 +791,7 @@ class BioschemasController extends Controller
             $datasetSchema->description($dataset->description);
             $datasetSchema->keywords($nmriumInfo[0]);
             $datasetSchema->license($dataset->study->license->url);
-            $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
+            $datasetSchema->url(config('app.url').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
             $datasetSchema->dateCreated($dataset->created_at ? $dataset->created_at->toISOString() : null);
             $datasetSchema->dateModified($dataset->updated_at ? $dataset->updated_at->toISOString() : null);
             $datasetSchema->datePublished($dataset->release_date ? Carbon::parse($dataset->release_date)->toISOString() : null);
@@ -846,7 +846,7 @@ class BioschemasController extends Controller
         $studySchema->description($study->description);
         $studySchema->keywords(BioschemasHelper::getTags($study));
         $studySchema->license($study->license->url);
-        $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
+        $studySchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->dateCreated($study->created_at ? $study->created_at->toISOString() : null);
         $studySchema->dateModified($study->updated_at ? $study->updated_at->toISOString() : null);
         $studySchema->datePublished($study->release_date ? Carbon::parse($study->release_date)->toISOString() : null);
@@ -894,7 +894,7 @@ class BioschemasController extends Controller
         $projectSchema->keywords(BioschemasHelper::getTags($project));
         $projectSchema->license($project->license->url);
         $projectSchema->publisher(BioschemasHelper::preparePublisher());
-        $projectSchema->url(env('APP_URL').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
+        $projectSchema->url(config('app.url').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
         $projectSchema->dateCreated($project->created_at ? $project->created_at->toISOString() : null);
         $projectSchema->dateModified($project->updated_at ? $project->updated_at->toISOString() : null);
         $projectSchema->datePublished($project->release_date ? Carbon::parse($project->release_date)->toISOString() : null);
