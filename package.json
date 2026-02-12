@@ -7,7 +7,17 @@
         "format": "prettier resources/js  --write",
         "docs:dev": "vitepress dev docs",
         "docs:build": "vitepress build docs",
-        "docs:preview": "vitepress preview docs"
+        "docs:preview": "vitepress preview docs",
+        "prepare": "husky"
+    },
+    "lint-staged": {
+        "*.php": [
+            "vendor/bin/pint"
+        ],
+        "*.{js,vue}": [
+            "eslint --fix",
+            "prettier --write"
+        ]
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.3",
@@ -20,8 +30,10 @@
         "eslint": "^8.21.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-vue": "^9.3.0",
+        "husky": "^9.1.7",
         "laravel-vapor": "^0.7.1",
         "laravel-vite-plugin": "^1.2.0",
+        "lint-staged": "^16.2.7",
         "lodash": "^4.17.19",
         "postcss": "^8.4.19",
         "postcss-import": "^16.1.0",
