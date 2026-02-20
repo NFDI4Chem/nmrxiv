@@ -64,7 +64,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             // Mark as processing
             $study->update([
                 'metadata_bagit_generation_status' => 'processing',
-                'metadata_bagit_generation_logs' => array_merge($study->metadata_bagit_generation_logs ?? [], [
+                'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
                     'started_at' => now()->toIso8601String(),
                 ]),
             ]);
@@ -77,7 +77,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             // Mark as completed with metadata
             $study->update([
                 'metadata_bagit_generation_status' => 'completed',
-                'metadata_bagit_generation_logs' => array_merge($study->metadata_bagit_generation_logs ?? [], [
+                'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
                     'completed_at' => now()->toIso8601String(),
                     'storage_path' => $result['location'],
                     'image_count' => $result['imageCount'],
@@ -93,7 +93,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             if ($study) {
                 $study->update([
                     'metadata_bagit_generation_status' => 'failed',
-                    'metadata_bagit_generation_logs' => array_merge($study->metadata_bagit_generation_logs ?? [], [
+                    'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
                         'failed_at' => now()->toIso8601String(),
                         'error_message' => $e->getMessage(),
                     ]),
