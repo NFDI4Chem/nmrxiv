@@ -64,6 +64,8 @@ class Study extends Model implements Auditable
         'doi',
         'identifier',
         'validation_id',
+        'metadata_bagit_generation_status',
+        'metadata_bagit_generation_logs',
     ];
 
     /**
@@ -75,6 +77,7 @@ class Study extends Model implements Auditable
             'citations' => 'array',
             'molecules' => 'array',
             'processing_logs' => 'array',
+            'metadata_bagit_generation_logs' => 'array',
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'is_archived' => 'boolean',
