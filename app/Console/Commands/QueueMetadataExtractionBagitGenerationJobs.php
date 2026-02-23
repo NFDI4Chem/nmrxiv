@@ -120,9 +120,6 @@ class QueueMetadataExtractionBagitGenerationJobs extends Command
         $this->newLine(2);
 
         $this->info("✓ Successfully dispatched {$jobsDispatched} jobs to the queue");
-        $this->newLine();
-        $this->line('Start queue workers with:');
-        $this->line('  php artisan queue:work --queue=default --tries=3 --timeout=600');
 
         return self::SUCCESS;
     }
