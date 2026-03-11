@@ -215,8 +215,8 @@
         <div class="mt-4 flex justify-end">
             <button
                 v-if="hasAnyValue"
-                @click="clearAll"
                 class="text-xs font-medium text-gray-600 hover:text-red-600 underline transition-colors"
+                @click="clearAll"
             >
                 Clear all fields
             </button>

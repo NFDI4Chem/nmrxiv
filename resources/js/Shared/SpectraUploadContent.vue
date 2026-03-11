@@ -25,8 +25,8 @@
                 type="file"
                 multiple
                 accept=".jdx,.dx,.jdf,.fid,.zip,.nmrML,.mnova"
-                @change="handleFileSelect"
                 class="sr-only"
+                @change="handleFileSelect"
             />
 
             <div
