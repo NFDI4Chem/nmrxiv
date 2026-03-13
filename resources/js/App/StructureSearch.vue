@@ -63,8 +63,8 @@
                             <div class="flex-1 overflow-y-auto">
                                 <div class="px-4 py-6 max-w-6xl mx-auto">
                                     <StructureEditorContent
-                                        editor-id="structureSearchEditor"
                                         v-model:search-type="type"
+                                        editor-id="structureSearchEditor"
                                         :editor="editor"
                                     />
                                 </div>
@@ -76,15 +76,15 @@
                             >
                                 <a
                                     href="#"
-                                    @click.prevent="openDialog(false)"
                                     class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                    @click.prevent="openDialog(false)"
                                 >
                                     Cancel
                                 </a>
                                 <a
                                     href="#"
-                                    @click.prevent="search"
                                     class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                    @click.prevent="search"
                                 >
                                     Search
                                 </a>

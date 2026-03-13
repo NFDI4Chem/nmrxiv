@@ -785,8 +785,8 @@
                     <!-- Scrollable Container - Full Width -->
                     <div class="relative">
                         <div
-                            class="overflow-x-auto scrollbar-hide px-6 sm:px-8 lg:px-12"
                             ref="scrollContainer"
+                            class="overflow-x-auto scrollbar-hide px-6 sm:px-8 lg:px-12"
                         >
                             <div
                                 class="flex gap-3 pb-4"
@@ -814,8 +814,8 @@
                                                 {{ feature.name }}
                                             </h3>
                                             <p
-                                                class="text-base text-gray-600 leading-relaxed"
                                                 v-if="feature.shortDescription"
+                                                class="text-base text-gray-600 leading-relaxed"
                                             >
                                                 {{ feature.shortDescription }}
                                             </p>
@@ -823,9 +823,9 @@
                                     </div>
                                     <div class="flex justify-end">
                                         <button
-                                            @click="openFeatureModal(index)"
                                             class="flex items-center justify-center h-11 w-11 rounded-3xl bg-gray-900 text-white hover:bg-gray-700 transition-colors flex-shrink-0"
                                             :aria-label="`Learn more about ${feature.name}`"
+                                            @click="openFeatureModal(index)"
                                         >
                                             <svg
                                                 class="h-5 w-5"
@@ -851,9 +851,9 @@
                     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
                         <div class="flex justify-end gap-2 mt-6">
                             <button
-                                @click="scrollLeft"
                                 class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="!canScrollLeft"
+                                @click="scrollLeft"
                             >
                                 <svg
                                     class="h-5 w-5 text-gray-900"
@@ -870,9 +870,9 @@
                                 </svg>
                             </button>
                             <button
-                                @click="scrollRight"
                                 class="h-10 w-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="!canScrollRight"
+                                @click="scrollRight"
                             >
                                 <svg
                                     class="h-5 w-5 text-white"
@@ -897,8 +897,8 @@
             <TransitionRoot appear :show="isFeatureModalOpen" as="template">
                 <Dialog
                     as="div"
-                    @close="closeFeatureModal"
                     class="relative z-50"
+                    @close="closeFeatureModal"
                 >
                     <TransitionChild
                         as="template"
@@ -932,8 +932,8 @@
                                 >
                                     <div class="absolute right-6 top-6">
                                         <button
-                                            @click="closeFeatureModal"
                                             class="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                                            @click="closeFeatureModal"
                                         >
                                             <XMarkIcon
                                                 class="h-5 w-5 text-gray-900"
@@ -970,8 +970,8 @@
                                         </div>
 
                                         <div
-                                            class="mt-8"
                                             v-if="selectedFeature.learnMoreUrl"
+                                            class="mt-8"
                                         >
                                             <a
                                                 :href="
@@ -1672,6 +1672,28 @@ export default {
         },
     },
 
+    mounted() {
+        axios.get(route("bioschemas.datacatalog")).then((response) => {
+            this.schema = response.data;
+        });
+
+        // Setup scroll listener
+        this.$nextTick(() => {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                container.addEventListener("scroll", this.updateScrollButtons);
+                this.updateScrollButtons();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        const container = this.$refs.scrollContainer;
+        if (container) {
+            container.removeEventListener("scroll", this.updateScrollButtons);
+        }
+    },
+
     methods: {
         openFeatureModal(index) {
             this.selectedFeatureIndex = index;
@@ -1706,28 +1728,6 @@ export default {
                     container.scrollWidth - container.clientWidth - 10;
             }
         },
-    },
-
-    mounted() {
-        axios.get(route("bioschemas.datacatalog")).then((response) => {
-            this.schema = response.data;
-        });
-
-        // Setup scroll listener
-        this.$nextTick(() => {
-            const container = this.$refs.scrollContainer;
-            if (container) {
-                container.addEventListener("scroll", this.updateScrollButtons);
-                this.updateScrollButtons();
-            }
-        });
-    },
-
-    beforeUnmount() {
-        const container = this.$refs.scrollContainer;
-        if (container) {
-            container.removeEventListener("scroll", this.updateScrollButtons);
-        }
     },
 };
 </script>

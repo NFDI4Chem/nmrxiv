@@ -199,6 +199,7 @@ class StudyModelTest extends TestCase
             'citations', 'molecules', 'submitted_through', 'external_id',
             'external_url', 'processing_logs', 'tracking_item_name',
             'doi', 'identifier', 'validation_id',
+            'metadata_bagit_generation_status', 'metadata_bagit_generation_logs',
         ];
 
         $study = new Study;
