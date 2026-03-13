@@ -2499,6 +2499,9 @@ export default {
         primed() {
             return this.$page.props.auth.user?.primed;
         },
+        chemistryStandardizeUrl() {
+            return this.$page.props.chemistryStandardizeUrl;
+        },
         importPendingSamples() {
             return this.studiesToImport.filter((f) => f.status == false);
         },
@@ -3184,10 +3187,7 @@ export default {
                 });
         },
         standardizeMolecules(mol) {
-            return axios.post(
-                "https://api.naturalproducts.net/latest/chem/standardize",
-                mol
-            );
+            return axios.post(this.chemistryStandardizeUrl, mol);
         },
         autoImportMolecularData(study) {
             axios
@@ -3213,7 +3213,7 @@ export default {
                             // convert to smiles
                             axios
                                 .post(
-                                    "https://api.naturalproducts.net/latest/latest/chem/standardize",
+                                    this.chemistryStandardizeUrl,
                                     response.data
                                 )
                                 .then((res) => {

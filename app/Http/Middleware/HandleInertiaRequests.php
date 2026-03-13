@@ -76,6 +76,7 @@ class HandleInertiaRequests extends Middleware
             'dataciteURL' => config('doi.datacite.endpoint'),
             'coolOffPeriod' => config('nmrxiv.cool_off_period'),
             'mailFromAddress' => config('mail.from.address'),
+            'chemistryStandardizeUrl' => config('services.chemistry_standardize.url'),
             'orcidSearchApi' => config('orcid.search_api'),
             'orcidPersonApi' => config('orcid.person_api'),
             'michiStandardsUrl' => config('external-links.michi_standards_url'),
