@@ -708,6 +708,9 @@ export default {
                 ? this.studyPermissions.canUpdateStudy
                 : false;
         },
+        chemistryStandardizeUrl() {
+            return this.$page.props.chemistryStandardizeUrl;
+        },
     },
     mounted() {
         this.$nextTick(() => {
@@ -783,10 +786,7 @@ export default {
             }
         },
         standardizeMolecules(mol) {
-            return axios.post(
-                "https://api.naturalproducts.net/latest/chem/standardize",
-                mol
-            );
+            return axios.post(this.chemistryStandardizeUrl, mol);
         },
         associateMoleculeToStudy(mol, study) {
             axios

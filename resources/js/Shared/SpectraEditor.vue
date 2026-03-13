@@ -126,6 +126,9 @@ export default {
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
         },
+        chemistryStandardizeUrl() {
+            return this.$page.props.chemistryStandardizeUrl;
+        },
     },
     watch: {
         // dataset: {
@@ -388,10 +391,7 @@ export default {
                 molecules.forEach((mol) => {
                     mol = this.fixLineError(mol);
                     axios
-                        .post(
-                            "https://api.naturalproducts.net/latest/chem/standardize",
-                            mol.molfile
-                        )
+                        .post(this.chemistryStandardizeUrl, mol.molfile)
                         .then((res) => {
                             let _mol = res.data;
                             axios
