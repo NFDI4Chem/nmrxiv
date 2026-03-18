@@ -2581,14 +2581,23 @@ export default {
                             (d) => d.id == this.draft_id
                         );
                     }
+                    if (!selectedDraft && response.data.default.id == this.draft_id) {
+                        selectedDraft = response.data.default;
+                    }
                     if (selectedDraft) {
                         this.selectDraft(selectedDraft);
+                        this.loading = false;
                     } else {
-                        if (response.data.default.id == this.draft_id) {
-                            this.selectDraft(response.data.default);
-                        }
+                        this.fetchDraftById(this.draft_id).then(
+                            (draftResponse) => {
+                                this.selectDraft(draftResponse.data.draft);
+                                this.loading = false;
+                            },
+                            () => {
+                                this.loading = false;
+                            }
+                        );
                     }
-                    this.loading = false;
                 } else {
                     alert(
                         "Could not find the draft. Redirecting to the upload page."
@@ -2642,6 +2651,9 @@ export default {
         fetchDrafts() {
             this.loading = true;
             return axios.get("/dashboard/drafts");
+        },
+        fetchDraftById(draftId) {
+            return axios.get("/dashboard/drafts/" + draftId + "/show");
         },
         formatStatus(status) {
             if (!status) return "";
@@ -2800,9 +2812,10 @@ export default {
             } else if (id == 2) {
                 this.updateDraft(null, 2);
                 this.$nextTick(function () {
-                    // if (this.$refs.spectraEditorREF) {
-                    //     this.$refs.spectraEditorREF.registerEvents();
-                    // }
+                    this.setQueryStringParameter(
+                        "draft_id",
+                        this.currentDraft.id
+                    );
                     this.setQueryStringParameter("step", 2);
                     this.step = "2";
                     this.fetchValidations();
