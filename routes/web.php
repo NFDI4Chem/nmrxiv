@@ -295,6 +295,8 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::post('datasets/{dataset}/snapshot', [DatasetController::class, 'snapshot'])
             ->name('dashboard.dataset.snapshot');
 
+        Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
+            ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
