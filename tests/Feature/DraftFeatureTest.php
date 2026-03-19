@@ -285,6 +285,35 @@ class DraftFeatureTest extends TestCase
         $response->assertStatus(404);
     }
 
+    public function test_owner_can_show_draft(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->get("/dashboard/drafts/{$this->draft->id}/show");
+
+        $response->assertStatus(200);
+
+        $responseData = $response->json();
+        $this->assertArrayHasKey('draft', $responseData);
+        $this->assertEquals($this->draft->id, $responseData['draft']['id']);
+    }
+
+    public function test_show_draft_returns_403_for_non_owner(): void
+    {
+        $otherUser = User::factory()->withPersonalTeam()->create();
+
+        $response = $this->actingAs($otherUser)
+            ->get("/dashboard/drafts/{$this->draft->id}/show");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_show_draft_requires_authentication(): void
+    {
+        $response = $this->get("/dashboard/drafts/{$this->draft->id}/show");
+
+        $response->assertStatus(302);
+    }
+
     public function test_draft_processed_mail_can_be_rendered(): void
     {
         $project = Project::factory()->create([
