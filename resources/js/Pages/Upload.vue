@@ -2581,7 +2581,10 @@ export default {
                             (d) => d.id == this.draft_id
                         );
                     }
-                    if (!selectedDraft && response.data.default.id == this.draft_id) {
+                    if (
+                        !selectedDraft &&
+                        response.data.default.id == this.draft_id
+                    ) {
                         selectedDraft = response.data.default;
                     }
                     if (selectedDraft) {
