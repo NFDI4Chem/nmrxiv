@@ -117,6 +117,55 @@ class PublishProjectTest extends TestCase
         $this->assertNotNull($this->project->validation);
     }
 
+    #[Test]
+    public function citations_without_doi_fail_validation(): void
+    {
+        $citation = \App\Models\Citation::factory()->create([
+            'doi' => null,
+        ]);
+
+        $this->project->citations()->attach($citation->id, [
+            'user' => $this->user->id,
+        ]);
+
+        $validation = Validation::factory()->create();
+        $this->project->validation_id = $validation->id;
+        $this->project->save();
+
+        $validation->process();
+
+        // Check that validation report shows citation without DOI
+        $this->assertFalse($validation->report['project']['status']);
+        $this->assertEquals('false|required', $validation->report['project']['citations']);
+        $this->assertNotEmpty($validation->report['project']['citations_detail']);
+        $this->assertEquals(false, $validation->report['project']['citations_detail'][0]['status']);
+        $this->assertEquals('false|required', $validation->report['project']['citations_detail'][0]['doi']);
+    }
+
+    #[Test]
+    public function citations_with_doi_pass_validation(): void
+    {
+        $citation = \App\Models\Citation::factory()->create([
+            'doi' => '10.1234/test.doi',
+        ]);
+
+        $this->project->citations()->attach($citation->id, [
+            'user' => $this->user->id,
+        ]);
+
+        $validation = Validation::factory()->create();
+        $this->project->validation_id = $validation->id;
+        $this->project->save();
+
+        $validation->process();
+
+        // Check that validation report shows citation with valid DOI
+        $this->assertEquals('true|required', $validation->report['project']['citations']);
+        $this->assertNotEmpty($validation->report['project']['citations_detail']);
+        $this->assertEquals(true, $validation->report['project']['citations_detail'][0]['status']);
+        $this->assertEquals('true|required', $validation->report['project']['citations_detail'][0]['doi']);
+    }
+
     public function test_unauthorized_user_cannot_publish_project()
     {
         $unauthorizedUser = User::factory()->create();

@@ -27,6 +27,33 @@
         </template>
         <template #content>
             <div>
+                <div class="mb-4 rounded-md bg-blue-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg
+                                class="h-5 w-5 text-blue-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-blue-800">
+                                Note: Citation details can be updated during the
+                                embargo period. A DOI is not required for
+                                embargoed publication, but we recommend
+                                reviewing this section and adding any missing
+                                DOIs before making the project public.
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 <div v-if="displayAddCitationForms">
                     <div
                         class="relative grid grid-cols-1 gap-x-4 max-w-7xl mx-auto lg:grid-cols-2"
@@ -48,7 +75,7 @@
                                     <div class="sm:col-span-1">
                                         <label
                                             for="doi"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            class="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-red-500"
                                         >
                                             DOI
                                         </label>
@@ -180,9 +207,7 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="
-                                                !isFormValid || form.processing
-                                            "
+                                            :disabled="form.processing"
                                             @click="save('addManually')"
                                         >
                                             Update
@@ -460,8 +485,6 @@ export default {
         /*Check if form has valid required fields*/
         isFormValid() {
             return (
-                this.form.doi &&
-                this.form.doi.trim() !== "" &&
                 this.form.title &&
                 this.form.title.trim() !== "" &&
                 this.form.authors &&
@@ -649,8 +672,12 @@ export default {
          */
         edit(citation) {
             this.selectedCitation = citation;
-            this.citations = this.citations.filter((citation) => {
-                return citation.title != this.selectedCitation.title;
+            this.citations = this.citations.filter((existingCitation) => {
+                if (this.selectedCitation?.id && existingCitation?.id) {
+                    return existingCitation.id !== this.selectedCitation.id;
+                }
+
+                return existingCitation !== this.selectedCitation;
             });
             for (var key in citation) {
                 this.form[key] = Object.prototype.hasOwnProperty.call(
@@ -764,13 +791,42 @@ export default {
          * Remove duplicate citations based on DOI
          */
         deduplicateCitations() {
-            const keys = ["doi"];
+            const seen = new Set();
+
             this.citationsForm.citations = this.citationsForm.citations.filter(
-                (value, index, self) =>
-                    self.findIndex((v) =>
-                        keys.every((k) => v[k] === value[k])
-                    ) === index
+                (citation) => {
+                    const key = this.getCitationIdentityKey(citation);
+
+                    if (seen.has(key)) {
+                        return false;
+                    }
+
+                    seen.add(key);
+
+                    return true;
+                }
             );
+        },
+
+        getCitationIdentityKey(citation) {
+            const normalizedId = citation?.id ? String(citation.id) : "";
+            const normalizedDoi = citation?.doi ? citation.doi.trim() : "";
+            const normalizedTitle = citation?.title
+                ? citation.title.trim().toLowerCase()
+                : "";
+            const normalizedAuthors = citation?.authors
+                ? citation.authors.trim().toLowerCase()
+                : "";
+
+            if (normalizedId !== "") {
+                return `id:${normalizedId}`;
+            }
+
+            if (normalizedDoi !== "") {
+                return `doi:${normalizedDoi}`;
+            }
+
+            return `meta:${normalizedTitle}|${normalizedAuthors}`;
         },
 
         /**
@@ -794,6 +850,7 @@ export default {
             this.form.reset();
             this.displayAddCitationForms = false;
             this.isEdit = false;
+            this.selectedCitation = null;
         },
 
         /**
@@ -816,7 +873,10 @@ export default {
             hasErrors = this.validateTitle() || hasErrors;
             hasErrors = this.validateAuthors() || hasErrors;
             hasErrors = this.validateDoi() || hasErrors;
-            hasErrors = this.validateCitationText() || hasErrors;
+
+            if (!this.isEdit) {
+                hasErrors = this.validateCitationText() || hasErrors;
+            }
 
             if (hasErrors) {
                 this.form.hasErrors = true;
@@ -870,16 +930,11 @@ export default {
          * @returns {boolean} True if validation failed
          */
         validateDoi() {
-            if (!this.form.doi || this.form.doi.trim() === "") {
-                this.form.errors.doi = "The DOI field is required.";
+            const doiRegex = /^10\.[\d]{4,}(?:\.[\d]+)*\/[^\s]+$/;
+            if (this.form.doi && !doiRegex.test(this.form.doi.trim())) {
+                this.form.errors.doi =
+                    "Please enter a valid DOI format (e.g., 10.1000/journal.2023.0001).";
                 return true;
-            } else {
-                const doiRegex = /^10\.[\d]{4,}(?:\.[\d]+)*\/[^\s]+$/;
-                if (!doiRegex.test(this.form.doi.trim())) {
-                    this.form.errors.doi =
-                        "Please enter a valid DOI format (e.g., 10.1000/journal.2023.0001).";
-                    return true;
-                }
             }
             return false;
         },
@@ -996,6 +1051,7 @@ export default {
             }
             this.displayAddCitationForms = false;
             this.isEdit = false;
+            this.selectedCitation = null;
             this.resetForm();
         },
 
@@ -1003,11 +1059,12 @@ export default {
          * Go back from add/import forms to main view
          */
         onBack() {
-            if (this.selectedCitation) {
+            if (this.isEdit && this.selectedCitation) {
                 this.citations.push(this.selectedCitation);
             }
             this.displayAddCitationForms = false;
             this.isEdit = false;
+            this.selectedCitation = null;
             this.clearImportData();
         },
 

@@ -134,7 +134,7 @@ class ManageCitationsTest extends TestCase
      *
      * @return void
      */
-    public function test_citation_validation_requires_title_doi_and_authors()
+    public function test_citation_validation_requires_title_and_authors()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -155,7 +155,7 @@ class ManageCitationsTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['title']);
 
-        // Test missing DOI
+        // Test missing DOI (DOI is optional)
         $body = [
             'citations' => [[
                 'title' => 'Test Title',
@@ -165,8 +165,12 @@ class ManageCitationsTest extends TestCase
         ];
 
         $response = $this->updateCitation($body, $project->id);
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['doi']);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $citation = $project->citations()->first();
+        $this->assertNotNull($citation);
+        $this->assertNull($citation->doi);
 
         // Test missing authors
         $body = [
@@ -265,6 +269,50 @@ class ManageCitationsTest extends TestCase
     }
 
     /**
+     * Test duplicate citation prevention when DOI is missing.
+     *
+     * @return void
+     */
+    public function test_citation_duplicate_prevention_without_doi()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'citations' => [
+                [
+                    'title' => 'Fallback Match Title',
+                    'doi' => null,
+                    'authors' => 'Fallback Author',
+                    'citation_text' => 'Initial citation text',
+                ],
+                [
+                    'title' => 'Fallback Match Title',
+                    'doi' => '',
+                    'authors' => 'Fallback Author',
+                    'citation_text' => 'Updated citation text',
+                ],
+            ],
+        ];
+
+        $response = $this->updateCitation($body, $project->id);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $this->assertEquals(1, $project->citations()->count());
+
+        $citation = $project->citations()->first();
+        $this->assertNotNull($citation);
+        $this->assertNull($citation->doi);
+        $this->assertEquals('Fallback Match Title', $citation->title);
+        $this->assertEquals('Fallback Author', $citation->authors);
+        $this->assertEquals('Updated citation text', $citation->citation_text);
+    }
+
+    /**
      * Test empty citations array handling
      *
      * @return void
@@ -358,7 +406,7 @@ class ManageCitationsTest extends TestCase
      *
      * @return void
      */
-    public function test_citation_with_null_doi_is_skipped()
+    public function test_citation_with_null_doi_is_processed()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -381,10 +429,15 @@ class ManageCitationsTest extends TestCase
             ],
         ];
 
-        // This will fail validation because DOI is required
         $response = $this->updateCitation($body, $project->id);
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['doi']);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $this->assertEquals(2, $project->citations()->count());
+
+        $invalidCitation = $project->citations()->where('title', 'Invalid Citation')->first();
+        $this->assertNotNull($invalidCitation);
+        $this->assertNull($invalidCitation->doi);
     }
 
     /**
