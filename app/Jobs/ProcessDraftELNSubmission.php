@@ -430,7 +430,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                 $this->attachAuthorsToStudy($study, $studyMetadata['authors'], $logger);
 
-                // $this->attachCitationsToStudy($study, $studyMetadata['citation'] ?? [], $logger);
+                $this->attachCitationsToStudy($study, $studyMetadata['citation'] ?? [], $logger);
 
                 if (isset($studyMetadata['chemical_substance']['molecule'])) {
                     $this->attachMoleculesToStudy($study, [$studyMetadata['chemical_substance']['molecule']], $logger);
@@ -557,28 +557,23 @@ class ProcessDraftELNSubmission implements ShouldQueue
     /**
      * Attach citations to study.
      */
-    private function attachCitationsToStudy($study, array $citations): void
+    private function attachCitationsToStudy($study, array $citations, DraftProcessingLogger $logger): void
     {
         if (empty($citations)) {
+            $logger->log($study->project->draft, 'info', 'No citations found for study: '.$study->name);
+
             return;
         }
 
         try {
-            // Store citations as JSON in study metadata
             $study->update([
-                'citations' => json_encode($citations),
+                'citations' => $citations,
             ]);
 
-            Log::info('Attached citations to study', [
-                'study_id' => $study->id,
-                'citations_count' => count($citations),
-            ]);
+            $logger->log($study->project->draft, 'info', 'Attached '.count($citations).' citations to study: '.$study->name);
 
         } catch (\Exception $e) {
-            Log::error('Failed to attach citations to study', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to attach citations to study: '.$e->getMessage());
         }
     }
 
