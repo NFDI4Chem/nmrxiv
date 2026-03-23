@@ -28,7 +28,7 @@ class UserDrafts
     }
 
     /**
-     * Find existing default draft without files.
+     * Find existing default draft without files for the user's current team.
      */
     public function findDefaultDraft(User $user): ?Draft
     {
@@ -36,6 +36,7 @@ class UserDrafts
 
         return Draft::doesntHave('files')
             ->where('owner_id', $user_id)
+            ->where('team_id', $team_id)
             ->first();
     }
 
