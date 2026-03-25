@@ -242,6 +242,42 @@ class Validation extends Model
                 array_push($studiesValidation, $studyReport);
             }
 
+            // Validate citations
+            $citations = $project->citations;
+            $citationsValidation = [];
+            $citationsStatus = true;
+
+            foreach ($citations as $citation) {
+                $citationReport = [
+                    'name' => $citation->title ?? 'Untitled',
+                    'id' => $citation->id,
+                ];
+
+                // Check if DOI is present
+                $hasDoi = is_string($citation->doi) && trim($citation->doi) !== '';
+
+                if ($hasDoi) {
+                    $citationReport['doi'] = 'true|required';
+                } else {
+                    $citationReport['doi'] = 'false|required';
+                    $citationsStatus = false; // Citation validation failed
+                }
+
+                $citationReport['status'] = $hasDoi;
+                array_push($citationsValidation, $citationReport);
+            }
+
+            // Set overall citations validation status and store detailed report
+            if ($citationsStatus) {
+                $report['project']['citations'] = 'true|required';
+            } else {
+                $report['project']['citations'] = 'false|required';
+                $status = false; // Propagate to project status
+            }
+
+            // Store detailed citations validation data separately
+            $report['project']['citations_detail'] = $citationsValidation;
+
             $report['project']['studies'] = $studiesValidation;
             $report['project']['status'] = $status;
             $project->validation_status = $status;
