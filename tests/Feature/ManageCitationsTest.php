@@ -313,6 +313,54 @@ class ManageCitationsTest extends TestCase
     }
 
     /**
+     * Test duplicate citation prevention without DOI when title/authors have extra spaces.
+     *
+     * @return void
+     */
+    public function test_citation_duplicate_prevention_without_doi_with_normalized_content()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $firstPayload = [
+            'citations' => [[
+                'title' => '  Trim Match Title  ',
+                'doi' => null,
+                'authors' => '  Trim Match Author  ',
+                'citation_text' => 'Initial text',
+            ]],
+        ];
+
+        $response = $this->updateCitation($firstPayload, $project->id);
+        $response->assertStatus(200);
+
+        $secondPayload = [
+            'citations' => [[
+                'title' => 'Trim Match Title',
+                'doi' => '',
+                'authors' => 'Trim Match Author',
+                'citation_text' => 'Updated text',
+            ]],
+        ];
+
+        $response = $this->updateCitation($secondPayload, $project->id);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $this->assertEquals(1, $project->citations()->count());
+
+        $citation = $project->citations()->first();
+        $this->assertNotNull($citation);
+        $this->assertNull($citation->doi);
+        $this->assertEquals('Trim Match Title', $citation->title);
+        $this->assertEquals('Trim Match Author', $citation->authors);
+        $this->assertEquals('Updated text', $citation->citation_text);
+    }
+
+    /**
      * Test empty citations array handling
      *
      * @return void

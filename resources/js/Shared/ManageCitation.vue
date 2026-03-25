@@ -482,18 +482,6 @@ export default {
     },
 
     computed: {
-        /*Check if form has valid required fields*/
-        isFormValid() {
-            return (
-                this.form.title &&
-                this.form.title.trim() !== "" &&
-                this.form.authors &&
-                this.form.authors.trim() !== "" &&
-                !this.form.hasErrors &&
-                Object.keys(this.form.errors || {}).length === 0
-            );
-        },
-
         /*Check if query is valid for import*/
         isQueryValid() {
             if (!this.query || this.query.trim() === "") {
