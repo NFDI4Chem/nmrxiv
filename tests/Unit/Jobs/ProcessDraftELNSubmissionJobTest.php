@@ -2,11 +2,17 @@
 
 namespace Tests\Unit\Jobs;
 
+use App\Actions\Draft\DraftProcessingLogger;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
+use App\Models\License;
+use App\Models\Project;
+use App\Models\Study;
+use App\Models\Validation;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use ReflectionMethod;
 use Tests\TestCase;
 
 class ProcessDraftELNSubmissionJobTest extends TestCase
@@ -89,5 +95,138 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
         ProcessDraftELNSubmission::dispatch($this->draft->id)->onConnection('redis');
 
         Queue::assertPushed(ProcessDraftELNSubmission::class);
+    }
+
+    public function test_attach_citations_to_study_with_valid_citations(): void
+    {
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+
+        $draft = Draft::factory()->create([
+            'eln' => 'chemotion',
+            'processing_logs' => [],
+        ]);
+
+        $project = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $citations = [
+            ['doi' => '10.1234/test', 'title' => 'Test Citation'],
+            ['doi' => '10.5678/test2', 'title' => 'Another Citation'],
+        ];
+
+        $logger = new DraftProcessingLogger;
+        $job = new ProcessDraftELNSubmission($draft->id);
+
+        $method = new ReflectionMethod($job, 'attachCitationsToStudy');
+        $method->invoke($job, $study, $citations, $logger);
+
+        $study->refresh();
+        $this->assertEquals($citations, $study->citations);
+    }
+
+    public function test_attach_citations_to_study_with_empty_citations(): void
+    {
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+
+        $draft = Draft::factory()->create([
+            'eln' => 'chemotion',
+            'processing_logs' => [],
+        ]);
+
+        $project = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+            'citations' => null,
+        ]);
+
+        $logger = new DraftProcessingLogger;
+        $job = new ProcessDraftELNSubmission($draft->id);
+
+        $method = new ReflectionMethod($job, 'attachCitationsToStudy');
+        $method->invoke($job, $study, [], $logger);
+
+        $study->refresh();
+        $this->assertNull($study->citations);
+
+        $draft->refresh();
+        $logs = $draft->processing_logs;
+        $lastLog = end($logs);
+        $this->assertStringContainsString('No citations found for study', $lastLog['message']);
+    }
+
+    public function test_attach_citations_to_study_logs_error_on_exception(): void
+    {
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+
+        $draft = Draft::factory()->create([
+            'eln' => 'chemotion',
+            'processing_logs' => [],
+        ]);
+
+        $project = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $logger = $this->createMock(DraftProcessingLogger::class);
+        $logger->expects($this->once())
+            ->method('log')
+            ->with(
+                $this->anything(),
+                'error',
+                $this->stringContains('Failed to attach citations to study')
+            );
+
+        $studyMock = $this->createPartialMock(Study::class, ['update']);
+        $studyMock->setRawAttributes($study->getAttributes());
+        $studyMock->exists = true;
+        $studyMock->setRelation('project', $project);
+        $studyMock->method('update')->willThrowException(new \Exception('DB error'));
+
+        $job = new ProcessDraftELNSubmission($draft->id);
+
+        $method = new ReflectionMethod($job, 'attachCitationsToStudy');
+        $method->invoke($job, $studyMock, [['doi' => '10.1234/test']], $logger);
     }
 }
