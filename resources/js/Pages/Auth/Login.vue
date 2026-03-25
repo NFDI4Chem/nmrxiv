@@ -8,8 +8,12 @@
         </template>
         <jet-validation-errors class="mb-4" />
 
-        <div v-if="$page.props.flash.message" class="alert">
-            {{ $page.props.flash.message }}
+        <div
+            v-if="$page.props.flash.message || $page.props.flash.error"
+            class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+        >
+            {{ $page.props.flash.message || $page.props.flash.error }}
         </div>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">

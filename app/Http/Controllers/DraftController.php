@@ -82,6 +82,24 @@ class DraftController extends Controller
     }
 
     /**
+     * Get a single draft by ID with ownership verification.
+     */
+    public function show(Request $request, Draft $draft): JsonResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
+
+        return response()->json([
+            'draft' => $draft->load('Tags'),
+        ]);
+    }
+
+    /**
      * Update draft properties.
      */
     public function update(Request $request, Draft $draft): JsonResponse
