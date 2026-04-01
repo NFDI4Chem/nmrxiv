@@ -5,6 +5,7 @@ namespace Tests\Feature\ExternalServices\ELN;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Services\ELN\ChemotionMetadataService;
+use App\Services\ELN\ELNMetadataExtractorInterface;
 use App\Services\FileIntegrityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,7 @@ class ChemotionMetadataServiceTest extends TestCase
 
     public function test_service_implements_interface(): void
     {
-        $this->assertInstanceOf(\App\Services\ELN\ELNMetadataExtractorInterface::class, $this->service);
+        $this->assertInstanceOf(ELNMetadataExtractorInterface::class, $this->service);
     }
 
     public function test_get_eln_type_returns_chemotion(): void

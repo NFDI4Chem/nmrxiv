@@ -9,6 +9,7 @@ use App\Jobs\ProcessProject;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Models\User;
 use App\Notifications\DraftProcessedNotification;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,7 +31,7 @@ class ProcessProjectJobTest extends TestCase
     {
         parent::setUp();
 
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $this->project = Project::factory()->create([
             'owner_id' => $user->id,
             'status' => 'pending',

@@ -2,13 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Announcement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Announcement>
+ * @extends Factory<Announcement>
  */
 class AnnouncementFactory extends Factory
 {

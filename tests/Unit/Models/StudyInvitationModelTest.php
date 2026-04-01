@@ -5,6 +5,7 @@ namespace Tests\Unit\Models;
 use App\Models\Study;
 use App\Models\StudyInvitation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class StudyInvitationModelTest extends TestCase
@@ -199,8 +200,8 @@ class StudyInvitationModelTest extends TestCase
 
         $this->assertNotNull($invitation->created_at);
         $this->assertNotNull($invitation->updated_at);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $invitation->created_at);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $invitation->updated_at);
+        $this->assertInstanceOf(Carbon::class, $invitation->created_at);
+        $this->assertInstanceOf(Carbon::class, $invitation->updated_at);
     }
 
     public function test_it_can_be_updated(): void

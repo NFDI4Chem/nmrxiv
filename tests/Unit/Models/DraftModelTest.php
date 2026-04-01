@@ -6,6 +6,11 @@ use App\Models\Draft;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -46,10 +51,10 @@ class DraftModelTest extends TestCase
 
         // Test the relationship exists and is correct type
         $relationship = $draft->files();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $relationship);
+        $this->assertInstanceOf(HasMany::class, $relationship);
 
         // Test initial empty collection
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $draft->files);
+        $this->assertInstanceOf(Collection::class, $draft->files);
         $this->assertCount(0, $draft->files);
     }
 
@@ -114,7 +119,7 @@ class DraftModelTest extends TestCase
     {
         $draft = Draft::factory()->create(['release_date' => '2023-12-25']);
 
-        $this->assertInstanceOf(\Carbon\Carbon::class, $draft->release_date);
+        $this->assertInstanceOf(Carbon::class, $draft->release_date);
         $this->assertEquals('2023-12-25', $draft->release_date->format('Y-m-d'));
     }
 
@@ -123,7 +128,7 @@ class DraftModelTest extends TestCase
         $draft = Draft::factory()->create();
         $relationship = $draft->owner();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relationship);
+        $this->assertInstanceOf(BelongsTo::class, $relationship);
     }
 
     public function test_team_relationship_is_belongs_to()
@@ -131,7 +136,7 @@ class DraftModelTest extends TestCase
         $draft = Draft::factory()->create();
         $relationship = $draft->team();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relationship);
+        $this->assertInstanceOf(BelongsTo::class, $relationship);
     }
 
     public function test_project_relationship_is_has_one()
@@ -139,7 +144,7 @@ class DraftModelTest extends TestCase
         $draft = Draft::factory()->create();
         $relationship = $draft->project();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasOne::class, $relationship);
+        $this->assertInstanceOf(HasOne::class, $relationship);
     }
 
     public function test_files_relationship_is_has_many()
@@ -147,7 +152,7 @@ class DraftModelTest extends TestCase
         $draft = Draft::factory()->create();
         $relationship = $draft->files();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $relationship);
+        $this->assertInstanceOf(HasMany::class, $relationship);
     }
 
     public function test_it_uses_has_factory_trait()

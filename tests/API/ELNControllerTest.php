@@ -450,7 +450,7 @@ class ELNControllerTest extends TestCase
 
         $draft = Draft::where('external_id', 'CHEM-FUTURE-001')->first();
         // Database stores as date, compare date strings
-        $this->assertEquals($futureDate, $draft->release_date instanceof \Carbon\Carbon ? $draft->release_date->toDateString() : $draft->release_date);
+        $this->assertEquals($futureDate, $draft->release_date instanceof Carbon ? $draft->release_date->toDateString() : $draft->release_date);
     }
 
     /**

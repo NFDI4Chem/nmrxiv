@@ -6,6 +6,7 @@ use App\Models\License;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -251,7 +252,7 @@ class BasicProjectWorkflowTest extends TestCase
         $project->users()->attach($this->user, ['role' => 'creator']);
 
         // Check that project has studies relationship
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $project->studies);
+        $this->assertInstanceOf(Collection::class, $project->studies);
         $this->assertEquals(0, $project->studies->count());
     }
 
@@ -269,7 +270,7 @@ class BasicProjectWorkflowTest extends TestCase
         $this->assertInstanceOf(User::class, $project->owner);
         $this->assertInstanceOf(Team::class, $project->team);
         $this->assertInstanceOf(License::class, $project->license);
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $project->users);
+        $this->assertInstanceOf(Collection::class, $project->users);
         $this->assertTrue($project->users->contains($this->user));
     }
 }

@@ -13,7 +13,7 @@ class Author extends Model
     /**
      * Projects that belongs to authors.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
+     * @return BelongsToMany
      */
     protected $fillable = [
         'title',
