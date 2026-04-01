@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -246,6 +247,11 @@ class Validation extends Model
             $citations = $project->citations;
             $citationsValidation = [];
             $citationsStatus = true;
+            $shouldValidateCitationDoi = true;
+
+            if ($project->release_date) {
+                $shouldValidateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
+            }
 
             foreach ($citations as $citation) {
                 $citationReport = [
@@ -253,17 +259,23 @@ class Validation extends Model
                     'id' => $citation->id,
                 ];
 
-                // Check if DOI is present
-                $hasDoi = is_string($citation->doi) && trim($citation->doi) !== '';
+                if ($shouldValidateCitationDoi) {
+                    // Check if DOI is present only for current/past release date projects.
+                    $hasDoi = is_string($citation->doi) && trim($citation->doi) !== '';
 
-                if ($hasDoi) {
-                    $citationReport['doi'] = 'true|required';
+                    if ($hasDoi) {
+                        $citationReport['doi'] = 'true|required';
+                    } else {
+                        $citationReport['doi'] = 'false|required';
+                        $citationsStatus = false; // Citation validation failed
+                    }
+
+                    $citationReport['status'] = $hasDoi;
                 } else {
-                    $citationReport['doi'] = 'false|required';
-                    $citationsStatus = false; // Citation validation failed
+                    $citationReport['doi'] = 'true|skipped-future-release';
+                    $citationReport['status'] = true;
                 }
 
-                $citationReport['status'] = $hasDoi;
                 array_push($citationsValidation, $citationReport);
             }
 
