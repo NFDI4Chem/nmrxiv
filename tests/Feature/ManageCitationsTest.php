@@ -6,6 +6,7 @@ use App\Models\Citation;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class ManageCitationsTest extends TestCase
@@ -266,6 +267,53 @@ class ManageCitationsTest extends TestCase
         $citation = $project->citations()->first();
         $this->assertEquals('Updated Title', $citation->title);
         $this->assertEquals('Updated Author', $citation->authors);
+    }
+
+    /**
+     * Test citation update uses the existing citation ID when it is already attached.
+     *
+     * @return void
+     */
+    public function test_citation_update_prevention_by_id()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $citation = Citation::factory()->create([
+            'title' => 'Original Title',
+            'doi' => '10.1000/original',
+            'authors' => 'Original Author',
+            'citation_text' => 'Original citation text',
+        ]);
+
+        $project->citations()->sync([$citation->id => ['user' => $user->id]]);
+
+        $body = [
+            'citations' => [[
+                'id' => $citation->id,
+                'title' => 'Updated Title',
+                'doi' => '10.1000/updated',
+                'authors' => 'Updated Author',
+                'citation_text' => 'Updated citation text',
+            ]],
+        ];
+
+        $response = $this->updateCitation($body, $project->id);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $this->assertEquals(1, $project->citations()->count());
+
+        $updatedCitation = $project->citations()->first();
+        $this->assertNotNull($updatedCitation);
+        $this->assertEquals($citation->id, $updatedCitation->id);
+        $this->assertEquals('Updated Title', $updatedCitation->title);
+        $this->assertEquals('10.1000/updated', $updatedCitation->doi);
+        $this->assertEquals('Updated Author', $updatedCitation->authors);
+        $this->assertEquals('Updated citation text', $updatedCitation->citation_text);
     }
 
     /**
@@ -930,7 +978,7 @@ class ManageCitationsTest extends TestCase
     /**
      * Prepare request body for citation
      *
-     * @param  \App\Models\Citation  $citation
+     * @param  Citation  $citation
      * @return array $body
      */
     public function prepareBody($citation)
@@ -954,9 +1002,9 @@ class ManageCitationsTest extends TestCase
     /**
      * Make Request to update citation
      *
-     * @param  \App\Models\Citation  $citation
+     * @param  Citation  $citation
      * @param  int  $projectId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function updateCitation($body, $projectId)
     {
@@ -968,9 +1016,9 @@ class ManageCitationsTest extends TestCase
     /**
      * Make Request to detach citation
      *
-     * @param  \App\Models\Citation  $citation
+     * @param  Citation  $citation
      * @param  int  $projectId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function detachCitation($body, $projectId)
     {
