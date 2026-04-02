@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\FileIntegrityService;
+use App\Services\FileSystemObjectService;
+use App\Services\PathGeneratorService;
+use App\Services\StorageSignedUrlService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -42,10 +46,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Register filesystem services
-        $this->app->singleton(\App\Services\PathGeneratorService::class);
-        $this->app->singleton(\App\Services\StorageSignedUrlService::class);
-        $this->app->singleton(\App\Services\FileIntegrityService::class);
-        $this->app->bind(\App\Services\FileSystemObjectService::class);
+        $this->app->singleton(PathGeneratorService::class);
+        $this->app->singleton(StorageSignedUrlService::class);
+        $this->app->singleton(FileIntegrityService::class);
+        $this->app->bind(FileSystemObjectService::class);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Jobs\ProcessELNSpectra;
 use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Study;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -25,7 +26,7 @@ class ProcessELNSpectraTest extends TestCase
     {
         parent::setUp();
 
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $this->project = Project::factory()->create([
             'owner_id' => $user->id,
         ]);

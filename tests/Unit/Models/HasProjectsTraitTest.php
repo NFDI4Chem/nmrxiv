@@ -2,9 +2,12 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Draft;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,7 +26,7 @@ class HasProjectsTraitTest extends TestCase
         $user = User::factory()->create();
 
         $this->assertTrue(method_exists($user, 'projects'));
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->projects());
+        $this->assertInstanceOf(BelongsToMany::class, $user->projects());
     }
 
     public function test_active_projects_relationship_exists(): void
@@ -31,7 +34,7 @@ class HasProjectsTraitTest extends TestCase
         $user = User::factory()->create();
 
         $this->assertTrue(method_exists($user, 'activeProjects'));
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->activeProjects());
+        $this->assertInstanceOf(BelongsToMany::class, $user->activeProjects());
     }
 
     public function test_active_projects_filters_deleted_projects(): void
@@ -75,7 +78,7 @@ class HasProjectsTraitTest extends TestCase
 
         // Test with no shared projects - should return empty collection
         $sharedDrafts = $user->sharedDrafts();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $sharedDrafts);
+        $this->assertInstanceOf(Collection::class, $sharedDrafts);
     }
 
     public function test_recent_projects_orders_by_updated_at(): void
@@ -83,7 +86,7 @@ class HasProjectsTraitTest extends TestCase
         $user = User::factory()->create();
 
         $this->assertTrue(method_exists($user, 'recentProjects'));
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->recentProjects());
+        $this->assertInstanceOf(BelongsToMany::class, $user->recentProjects());
     }
 
     public function test_belongs_to_project_returns_false_for_null_project(): void
@@ -236,7 +239,7 @@ class HasProjectsTraitTest extends TestCase
     {
         $user = User::factory()->create();
         $sharedProject = Project::factory()->create();
-        $draft = \App\Models\Draft::factory()->create();
+        $draft = Draft::factory()->create();
 
         // Set the draft_id on the project
         $sharedProject->draft_id = $draft->id;
@@ -248,7 +251,7 @@ class HasProjectsTraitTest extends TestCase
         $sharedDrafts = $user->sharedDrafts();
 
         // Should return collection containing drafts from shared projects
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $sharedDrafts);
+        $this->assertInstanceOf(Collection::class, $sharedDrafts);
     }
 
     public function test_has_project_role_returns_false_for_null_role(): void
@@ -307,9 +310,9 @@ class HasProjectsTraitTest extends TestCase
         $user = User::factory()->create();
 
         // Test relationship methods return correct Eloquent relationship types
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->projects());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->activeProjects());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->recentProjects());
+        $this->assertInstanceOf(BelongsToMany::class, $user->projects());
+        $this->assertInstanceOf(BelongsToMany::class, $user->activeProjects());
+        $this->assertInstanceOf(BelongsToMany::class, $user->recentProjects());
     }
 
     public function test_trait_query_methods_return_correct_types(): void
@@ -317,8 +320,8 @@ class HasProjectsTraitTest extends TestCase
         $user = User::factory()->create();
 
         // Test query methods return Builder or Collection
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->sharedProjects());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $user->sharedDrafts());
+        $this->assertInstanceOf(BelongsToMany::class, $user->sharedProjects());
+        $this->assertInstanceOf(Collection::class, $user->sharedDrafts());
     }
 
     public function test_trait_boolean_methods_return_boolean(): void

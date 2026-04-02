@@ -4,6 +4,9 @@ namespace Tests\Feature;
 
 use App\Support\Csp\Policies\NmrxivPolicy;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Spatie\Csp\AddCspHeaders;
+use Spatie\Csp\Policy;
+use Spatie\Csp\Preset;
 use Tests\TestCase;
 
 class CspTest extends TestCase
@@ -16,25 +19,25 @@ class CspTest extends TestCase
 
         // Test that the policy class exists and implements the correct interface
         $this->assertInstanceOf(NmrxivPolicy::class, $nmrxivPolicy);
-        $this->assertInstanceOf(\Spatie\Csp\Preset::class, $nmrxivPolicy);
+        $this->assertInstanceOf(Preset::class, $nmrxivPolicy);
 
         // Test that the configure method exists and can be called
-        $policy = new \Spatie\Csp\Policy;
+        $policy = new Policy;
 
         // Should not throw any exceptions
         $nmrxivPolicy->configure($policy);
 
         // Test that the policy object exists after configuration
-        $this->assertInstanceOf(\Spatie\Csp\Policy::class, $policy);
+        $this->assertInstanceOf(Policy::class, $policy);
     }
 
     public function test_csp_middleware_is_registered(): void
     {
         // Test that the CSP middleware class exists
-        $this->assertTrue(class_exists(\Spatie\Csp\AddCspHeaders::class));
+        $this->assertTrue(class_exists(AddCspHeaders::class));
 
         // Test that the policy class exists and is properly configured
-        $this->assertTrue(class_exists(\App\Support\Csp\Policies\NmrxivPolicy::class));
+        $this->assertTrue(class_exists(NmrxivPolicy::class));
     }
 
     public function test_csp_uses_unsafe_inline_for_compatibility(): void
@@ -43,7 +46,7 @@ class CspTest extends TestCase
         app()->detectEnvironment(fn () => 'production');
         config(['app.env' => 'production']);
 
-        $policy = new \Spatie\Csp\Policy;
+        $policy = new Policy;
         (new NmrxivPolicy)->configure($policy);
 
         $policyString = $policy->getContents();
@@ -62,7 +65,7 @@ class CspTest extends TestCase
         app()->detectEnvironment(fn () => 'local');
         config(['app.env' => 'local']);
 
-        $policy = new \Spatie\Csp\Policy;
+        $policy = new Policy;
         (new NmrxivPolicy)->configure($policy);
 
         $policyString = $policy->getContents();

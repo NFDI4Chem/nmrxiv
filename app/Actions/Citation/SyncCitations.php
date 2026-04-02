@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class SyncCitations
 {
@@ -19,7 +20,7 @@ class SyncCitations
      * @param  array<int, array<string, mixed>>  $citations
      * @return array<int, Citation>
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function sync(Project $project, array $citations, User $user): array
     {
@@ -52,7 +53,7 @@ class SyncCitations
      *
      * @param  array<string, mixed>  $citationData
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     private function validateCitationData(array $citationData): void
     {

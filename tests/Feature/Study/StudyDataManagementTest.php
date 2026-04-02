@@ -13,6 +13,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class StudyDataManagementTest extends TestCase
@@ -218,7 +219,7 @@ class StudyDataManagementTest extends TestCase
         // Manually create sample to simulate the action behavior
         $sample = Sample::create([
             'name' => $newStudy->name.'_sample',
-            'slug' => \Illuminate\Support\Str::slug($newStudy->name.'_sample', '-'),
+            'slug' => Str::slug($newStudy->name.'_sample', '-'),
             'study_id' => $newStudy->id,
             'project_id' => $newStudy->project->id,
         ]);

@@ -6,11 +6,14 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Maize\Markable\Models\Bookmark;
+use Maize\Markable\Models\Like;
 use Tests\TestCase;
 
 class StudyIntegrationTest extends TestCase
@@ -179,7 +182,7 @@ class StudyIntegrationTest extends TestCase
         ]);
 
         // Associate molecule with first study through sample
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $studyWithMolecule->id]);
+        $sample = Sample::factory()->create(['study_id' => $studyWithMolecule->id]);
         $sample->molecules()->attach($molecule);
 
         $this->get(route('public.spectra', ['compound' => '123']))
@@ -398,16 +401,16 @@ class StudyIntegrationTest extends TestCase
         $this->actingAs($this->user);
 
         // Test bookmarking
-        \Maize\Markable\Models\Bookmark::add($study, $this->user);
-        $this->assertTrue(\Maize\Markable\Models\Bookmark::has($study, $this->user));
+        Bookmark::add($study, $this->user);
+        $this->assertTrue(Bookmark::has($study, $this->user));
 
         // Test liking
-        \Maize\Markable\Models\Like::add($study, $this->user);
-        $this->assertTrue(\Maize\Markable\Models\Like::has($study, $this->user));
+        Like::add($study, $this->user);
+        $this->assertTrue(Like::has($study, $this->user));
 
         // Test unmarking
-        \Maize\Markable\Models\Bookmark::remove($study, $this->user);
-        $this->assertFalse(\Maize\Markable\Models\Bookmark::has($study, $this->user));
+        Bookmark::remove($study, $this->user);
+        $this->assertFalse(Bookmark::has($study, $this->user));
     }
 
     public function test_study_cross_model_relationships(): void
@@ -419,7 +422,7 @@ class StudyIntegrationTest extends TestCase
         ]);
 
         // Create related models
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
         $datasets = Dataset::factory(2)->create(['study_id' => $study->id]);
         $molecules = Molecule::factory(2)->create();
         $sample->molecules()->attach($molecules);

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
@@ -170,7 +171,7 @@ class RorControllerTest extends TestCase
     {
         Http::fake([
             config('ror.api_url').'*' => function () {
-                throw new \Illuminate\Http\Client\ConnectionException('Connection timeout');
+                throw new ConnectionException('Connection timeout');
             },
         ]);
 

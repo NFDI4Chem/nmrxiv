@@ -4,6 +4,8 @@ namespace Tests\Unit\Models;
 
 use App\Models\Citation;
 use App\Models\Project;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,7 +21,7 @@ class CitationModelTest extends TestCase
 
         $citation->projects()->attach([$project1->id, $project2->id]);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $citation->projects);
+        $this->assertInstanceOf(Collection::class, $citation->projects);
         $this->assertCount(2, $citation->projects);
         $this->assertTrue($citation->projects->contains($project1));
         $this->assertTrue($citation->projects->contains($project2));
@@ -71,7 +73,7 @@ class CitationModelTest extends TestCase
         $citation = Citation::factory()->create();
         $relationship = $citation->projects();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
     }
 
     public function test_citation_can_be_attached_to_project()

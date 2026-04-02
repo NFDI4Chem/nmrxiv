@@ -4,6 +4,9 @@ namespace Tests\Unit\Models;
 
 use App\Models\Sample;
 use App\Models\Study;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -26,10 +29,10 @@ class SampleModelTest extends TestCase
 
         // Test the relationship method exists and is correct type
         $relationship = $sample->molecules();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
 
         // Test initial empty collection
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $sample->molecules);
+        $this->assertInstanceOf(Collection::class, $sample->molecules);
         $this->assertCount(0, $sample->molecules);
     }
 
@@ -39,7 +42,7 @@ class SampleModelTest extends TestCase
 
         // Test pivot relationship configuration
         $relationship = $sample->molecules();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
 
         // Test pivot columns are configured
         $pivotColumns = $relationship->getPivotColumns();
@@ -105,7 +108,7 @@ class SampleModelTest extends TestCase
         $sample = Sample::factory()->create();
         $relationship = $sample->study();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relationship);
+        $this->assertInstanceOf(BelongsTo::class, $relationship);
     }
 
     public function test_molecules_relationship_is_many_to_many()
@@ -113,7 +116,7 @@ class SampleModelTest extends TestCase
         $sample = Sample::factory()->create();
         $relationship = $sample->molecules();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
     }
 
     public function test_all_required_fields_are_fillable()
@@ -145,7 +148,7 @@ class SampleModelTest extends TestCase
         // Test that molecules relationship supports pivot data
         $relationship = $sample->molecules();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
 
         // Check that withPivot includes percentage_composition
         $pivotColumns = $relationship->getPivotColumns();

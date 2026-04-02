@@ -7,6 +7,8 @@ use App\Models\FileSystemObject;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\DirectoryAttributes;
+use League\Flysystem\FileAttributes;
 
 class ManageFiles extends Command
 {
@@ -46,7 +48,7 @@ class ManageFiles extends Command
         $listing = Storage::disk(config('filesystems.default'))->listContents($path, true);
         foreach ($listing as $item) {
             $path = $item->path();
-            if ($item instanceof \League\Flysystem\FileAttributes) {
+            if ($item instanceof FileAttributes) {
                 $fsObject = FileSystemObject::where([
                     ['path', '/'.$path],
                 ])->first();
@@ -57,7 +59,7 @@ class ManageFiles extends Command
                     $fsObject->info = $fsInfo;
                     $fsObject->save();
                 }
-            } elseif ($item instanceof \League\Flysystem\DirectoryAttributes) {
+            } elseif ($item instanceof DirectoryAttributes) {
                 // echo $item->study_id;
             }
         }

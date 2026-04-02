@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Draft;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -115,7 +116,7 @@ class UploadTest extends TestCase
 
     public function test_publish_renders_for_authorized_user(): void
     {
-        $validation = \App\Models\Validation::factory()->create();
+        $validation = Validation::factory()->create();
         $draft = Draft::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $this->user->currentTeam->id,
@@ -136,7 +137,7 @@ class UploadTest extends TestCase
 
     public function test_publish_processes_project_validation(): void
     {
-        $validation = \App\Models\Validation::factory()->create();
+        $validation = Validation::factory()->create();
         $draft = Draft::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $this->user->currentTeam->id,
@@ -157,7 +158,7 @@ class UploadTest extends TestCase
 
     public function test_publish_queries_project_by_draft_id(): void
     {
-        $validation = \App\Models\Validation::factory()->create();
+        $validation = Validation::factory()->create();
         $draft = Draft::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $this->user->currentTeam->id,
@@ -179,7 +180,7 @@ class UploadTest extends TestCase
 
     public function test_publish_checks_gate_for_user(): void
     {
-        $validation = \App\Models\Validation::factory()->create();
+        $validation = Validation::factory()->create();
         $draft = Draft::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $this->user->currentTeam->id,
@@ -261,7 +262,7 @@ class UploadTest extends TestCase
 
     public function test_publish_loads_project_with_relationships(): void
     {
-        $validation = \App\Models\Validation::factory()->create();
+        $validation = Validation::factory()->create();
         $draft = Draft::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $this->user->currentTeam->id,

@@ -16,7 +16,7 @@ class ProjectInvitation extends Mailable implements ShouldQueue
     /**
      * The project invitation instance.
      *
-     * @var \App\Models\ProjectInvitation
+     * @var ProjectInvitationModel
      */
     public $invitation;
 
