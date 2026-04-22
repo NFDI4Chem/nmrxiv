@@ -3,9 +3,12 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Dataset;
+use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Validation;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -32,7 +35,7 @@ class ValidationModelTest extends TestCase
         $study1 = Study::factory()->create(['validation_id' => $validation->id]);
         $study2 = Study::factory()->create(['validation_id' => $validation->id]);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $validation->studies);
+        $this->assertInstanceOf(Collection::class, $validation->studies);
         $this->assertCount(2, $validation->studies);
         $this->assertTrue($validation->studies->contains($study1));
         $this->assertTrue($validation->studies->contains($study2));
@@ -46,7 +49,7 @@ class ValidationModelTest extends TestCase
         $dataset1 = Dataset::factory()->create(['validation_id' => $validation->id]);
         $dataset2 = Dataset::factory()->create(['validation_id' => $validation->id]);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $validation->datasets);
+        $this->assertInstanceOf(Collection::class, $validation->datasets);
         $this->assertCount(2, $validation->datasets);
         $this->assertTrue($validation->datasets->contains($dataset1));
         $this->assertTrue($validation->datasets->contains($dataset2));
@@ -515,7 +518,7 @@ class ValidationModelTest extends TestCase
             'name' => 'Valid Study',
         ]);
 
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         config(['validations.default' => 'v1']);
         config(['validations.v1.project' => ['title' => 'required|string']]);
@@ -549,7 +552,7 @@ class ValidationModelTest extends TestCase
             'name' => '', // Invalid empty name
         ]);
 
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         config(['validations.default' => 'v1']);
         config(['validations.v1.project' => ['title' => 'required|string']]);
@@ -582,7 +585,7 @@ class ValidationModelTest extends TestCase
             'validation_id' => $validation->id,
             'project_id' => $project->id,
         ]);
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         $dataset = Dataset::factory()->create([
             'validation_id' => $validation->id,
@@ -590,7 +593,7 @@ class ValidationModelTest extends TestCase
         ]);
 
         // Create fsObject with instrument_type
-        $fsObject = \App\Models\FileSystemObject::create([
+        $fsObject = FileSystemObject::create([
             'name' => 'test-file.txt',
             'slug' => 'test-file',
             'key' => 'test-key',
@@ -628,7 +631,7 @@ class ValidationModelTest extends TestCase
             'validation_id' => $validation->id,
             'project_id' => $project->id,
         ]);
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         $dataset = Dataset::factory()->create([
             'validation_id' => $validation->id,
@@ -636,7 +639,7 @@ class ValidationModelTest extends TestCase
         ]);
 
         // Create parent fsObject without instrument_type
-        $parentFsObject = \App\Models\FileSystemObject::create([
+        $parentFsObject = FileSystemObject::create([
             'name' => 'parent-file.txt',
             'slug' => 'parent-file',
             'key' => 'parent-key',
@@ -646,7 +649,7 @@ class ValidationModelTest extends TestCase
         ]);
 
         // Create child fsObject with instrument_type
-        $childFsObject = \App\Models\FileSystemObject::create([
+        $childFsObject = FileSystemObject::create([
             'name' => 'child-file.txt',
             'slug' => 'child-file',
             'key' => 'child-key',
@@ -677,7 +680,7 @@ class ValidationModelTest extends TestCase
             'validation_id' => $validation->id,
             'project_id' => $project->id,
         ]);
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         $dataset = Dataset::factory()->create([
             'validation_id' => $validation->id,
@@ -718,7 +721,7 @@ class ValidationModelTest extends TestCase
             'validation_id' => $validation->id,
             'project_id' => $project->id,
         ]);
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         $dataset = Dataset::factory()->create([
             'validation_id' => $validation->id,
@@ -727,7 +730,7 @@ class ValidationModelTest extends TestCase
         ]);
 
         // Create fsObject with all required data
-        $fsObject = \App\Models\FileSystemObject::create([
+        $fsObject = FileSystemObject::create([
             'name' => 'valid-file.txt',
             'slug' => 'valid-file',
             'key' => 'valid-key',
@@ -886,7 +889,7 @@ class ValidationModelTest extends TestCase
             'name' => 'Complete Study',
         ]);
 
-        $sample = \App\Models\Sample::factory()->create(['study_id' => $study->id]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
 
         $dataset = Dataset::factory()->create([
             'validation_id' => $validation->id,
@@ -937,7 +940,7 @@ class ValidationModelTest extends TestCase
             'project_id' => $project->id,
         ]);
 
-        $sample = \App\Models\Sample::factory()->create([
+        $sample = Sample::factory()->create([
             'study_id' => $study->id,
         ]);
 

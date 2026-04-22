@@ -1,16 +1,29 @@
 <?php
 
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\XFrameOptions;
 use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
+use L5Swagger\L5SwaggerServiceProvider;
+use Lab404\Impersonate\ImpersonateServiceProvider;
+use Laravel\Jetstream\Http\Middleware\AuthenticateSession;
+use OwenIt\Auditing\AuditingServiceProvider;
+use SocialiteProviders\Manager\ServiceProvider;
+use Spatie\CookieConsent\CookieConsentMiddleware;
+use Spatie\Csp\AddCspHeaders;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
-        \SocialiteProviders\Manager\ServiceProvider::class,
-        \OwenIt\Auditing\AuditingServiceProvider::class,
-        \Lab404\Impersonate\ImpersonateServiceProvider::class,
-        \L5Swagger\L5SwaggerServiceProvider::class,
+        ServiceProvider::class,
+        AuditingServiceProvider::class,
+        ImpersonateServiceProvider::class,
+        L5SwaggerServiceProvider::class,
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -28,13 +41,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'support-bubble',
         ]);
 
-        $middleware->append(\Spatie\CookieConsent\CookieConsentMiddleware::class);
+        $middleware->append(CookieConsentMiddleware::class);
 
         $middleware->web([
-            \Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \App\Http\Middleware\XFrameOptions::class,
-            \Spatie\Csp\AddCspHeaders::class,
+            AuthenticateSession::class,
+            HandleInertiaRequests::class,
+            XFrameOptions::class,
+            AddCspHeaders::class,
         ]);
 
         // Disable API throttling in testing environment to allow test suite to run
@@ -42,12 +55,12 @@ return Application::configure(basePath: dirname(__DIR__))
             $middleware->throttleApi();
         }
 
-        $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
+        $middleware->replace(TrustProxies::class, App\Http\Middleware\TrustProxies::class);
 
         $middleware->alias([
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role' => RoleMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

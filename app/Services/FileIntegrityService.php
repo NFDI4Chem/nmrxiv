@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\FileSystemObject;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -178,7 +179,7 @@ class FileIntegrityService
     /**
      * Get files pending integrity verification.
      */
-    public function getFilesPendingVerification(int $limit = 100): \Illuminate\Database\Eloquent\Collection
+    public function getFilesPendingVerification(int $limit = 100): Collection
     {
         return FileSystemObject::where('type', 'file')
             ->where('integrity_status', 'pending')
@@ -191,7 +192,7 @@ class FileIntegrityService
     /**
      * Get files with failed integrity verification.
      */
-    public function getFilesWithFailedIntegrity(int $limit = 100): \Illuminate\Database\Eloquent\Collection
+    public function getFilesWithFailedIntegrity(int $limit = 100): Collection
     {
         return FileSystemObject::where('type', 'file')
             ->where('integrity_status', 'failed')

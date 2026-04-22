@@ -1,5 +1,9 @@
 <?php
 
+use App\Support\Csp\Policies\NmrxivPolicy;
+use Spatie\Csp\Directive;
+use Spatie\Csp\Nonce\RandomString;
+
 // use Spatie\Csp\Directive;
 // use Spatie\Csp\Keyword;
 
@@ -11,7 +15,7 @@ return [
      */
     'presets' => [
         // Enforcement mode - now using secure CSP policy
-        App\Support\Csp\Policies\NmrxivPolicy::class,
+        NmrxivPolicy::class,
     ],
 
     /**
@@ -21,22 +25,22 @@ return [
     'directives' => [
         // Additional connect-src domains (configurable via env)
         ...(env('CSP_ADDITIONAL_CONNECT_SRC') ? [
-            [Spatie\Csp\Directive::CONNECT, array_filter(explode(',', env('CSP_ADDITIONAL_CONNECT_SRC')))],
+            [Directive::CONNECT, array_filter(explode(',', env('CSP_ADDITIONAL_CONNECT_SRC')))],
         ] : []),
 
         // Additional img-src domains (configurable via env)
         ...(env('CSP_ADDITIONAL_IMG_SRC') ? [
-            [Spatie\Csp\Directive::IMG, array_filter(explode(',', env('CSP_ADDITIONAL_IMG_SRC')))],
+            [Directive::IMG, array_filter(explode(',', env('CSP_ADDITIONAL_IMG_SRC')))],
         ] : []),
 
         // Additional script-src domains (configurable via env)
         ...(env('CSP_ADDITIONAL_SCRIPT_SRC') ? [
-            [Spatie\Csp\Directive::SCRIPT, array_filter(explode(',', env('CSP_ADDITIONAL_SCRIPT_SRC')))],
+            [Directive::SCRIPT, array_filter(explode(',', env('CSP_ADDITIONAL_SCRIPT_SRC')))],
         ] : []),
 
         // Additional style-src domains (configurable via env)
         ...(env('CSP_ADDITIONAL_STYLE_SRC') ? [
-            [Spatie\Csp\Directive::STYLE, array_filter(explode(',', env('CSP_ADDITIONAL_STYLE_SRC')))],
+            [Directive::STYLE, array_filter(explode(',', env('CSP_ADDITIONAL_STYLE_SRC')))],
         ] : []),
     ],
 
@@ -74,7 +78,7 @@ return [
     /*
      * The class responsible for generating the nonces used in inline tags and headers.
      */
-    'nonce_generator' => Spatie\Csp\Nonce\RandomString::class,
+    'nonce_generator' => RandomString::class,
 
     /*
      * Set false to disable automatic nonce generation and handling.

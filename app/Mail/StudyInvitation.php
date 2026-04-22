@@ -16,7 +16,7 @@ class StudyInvitation extends Mailable implements ShouldQueue
     /**
      * The study invitation instance.
      *
-     * @var \App\Models\StudyInvitation
+     * @var StudyInvitationModel
      */
     public $invitation;
 

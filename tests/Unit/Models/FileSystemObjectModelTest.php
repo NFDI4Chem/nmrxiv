@@ -6,6 +6,9 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -80,7 +83,7 @@ class FileSystemObjectModelTest extends TestCase
         $this->assertInstanceOf(FileSystemObject::class, $child->parent);
         $this->assertEquals($parent->id, $child->parent->id);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $parent->children);
+        $this->assertInstanceOf(Collection::class, $parent->children);
         $this->assertCount(1, $parent->children);
         $this->assertTrue($parent->children->contains($child));
     }
@@ -246,11 +249,11 @@ class FileSystemObjectModelTest extends TestCase
     {
         $fsObject = new FileSystemObject;
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $fsObject->children());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $fsObject->parent());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $fsObject->project());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $fsObject->draft());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $fsObject->study());
+        $this->assertInstanceOf(HasMany::class, $fsObject->children());
+        $this->assertInstanceOf(BelongsTo::class, $fsObject->parent());
+        $this->assertInstanceOf(BelongsTo::class, $fsObject->project());
+        $this->assertInstanceOf(BelongsTo::class, $fsObject->draft());
+        $this->assertInstanceOf(BelongsTo::class, $fsObject->study());
     }
 
     public function test_boolean_fields_work_correctly()

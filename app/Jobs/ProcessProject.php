@@ -27,7 +27,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
     /**
      * The project instance.
      *
-     * @var \App\Models\Project
+     * @var Project
      */
     public $project;
 

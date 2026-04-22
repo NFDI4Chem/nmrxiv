@@ -6,6 +6,7 @@ use App\Models\License;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -435,7 +436,7 @@ class UpdateProjectTest extends TestCase
 
         $this->project->refresh();
         $this->assertEquals($releaseDate, $this->project->release_date ?
-            \Carbon\Carbon::parse($this->project->release_date)->format('Y-m-d') : null);
+            Carbon::parse($this->project->release_date)->format('Y-m-d') : null);
     }
 
     public function test_project_release_date_update_requires_authorization()
@@ -495,6 +496,6 @@ class UpdateProjectTest extends TestCase
 
         $this->project->refresh();
         $this->assertEquals($releaseDate, $this->project->release_date ?
-            \Carbon\Carbon::parse($this->project->release_date)->format('Y-m-d H:i:s') : null);
+            Carbon::parse($this->project->release_date)->format('Y-m-d H:i:s') : null);
     }
 }

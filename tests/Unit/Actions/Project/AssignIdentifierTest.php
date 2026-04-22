@@ -3,6 +3,7 @@
 namespace Tests\Unit\Actions\Project;
 
 use App\Actions\Project\AssignIdentifier;
+use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Ticker;
@@ -49,7 +50,7 @@ class AssignIdentifierTest extends TestCase
 
     public function test_assign_creates_project_identifier_when_missing()
     {
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
         $project = Project::factory()->create(['identifier' => null, 'license_id' => $license->id]);
 
         $this->action->assign($project);
@@ -66,7 +67,7 @@ class AssignIdentifierTest extends TestCase
 
     public function test_assign_does_not_overwrite_existing_project_identifier()
     {
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
         $project = Project::factory()->create(['identifier' => 999, 'license_id' => $license->id]);
 
         $this->action->assign($project);
@@ -82,7 +83,7 @@ class AssignIdentifierTest extends TestCase
 
     public function test_assign_processes_tickers_correctly()
     {
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
 
         // Create first project
         $project1 = Project::factory()->create(['identifier' => null, 'license_id' => $license->id]);
@@ -159,7 +160,7 @@ class AssignIdentifierTest extends TestCase
 
     public function test_assign_handles_mixed_existing_and_new_identifiers()
     {
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
 
         // Test with existing identifier
         $existingProject = Project::factory()->create(['identifier' => 100, 'license_id' => $license->id]);

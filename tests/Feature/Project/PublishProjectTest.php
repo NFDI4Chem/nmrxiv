@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Project;
 
+use App\Models\Citation;
+use App\Models\Dataset;
+use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Sample;
@@ -120,9 +123,7 @@ class PublishProjectTest extends TestCase
     #[Test]
     public function citations_without_doi_fail_validation(): void
     {
-        $this->project->update(['release_date' => now()->subMinute()]);
-
-        $citation = \App\Models\Citation::factory()->create([
+        $citation = Citation::factory()->create([
             'doi' => null,
         ]);
 
@@ -147,9 +148,7 @@ class PublishProjectTest extends TestCase
     #[Test]
     public function citations_with_doi_pass_validation(): void
     {
-        $this->project->update(['release_date' => now()->subMinute()]);
-
-        $citation = \App\Models\Citation::factory()->create([
+        $citation = Citation::factory()->create([
             'doi' => '10.1234/test.doi',
         ]);
 
@@ -175,7 +174,7 @@ class PublishProjectTest extends TestCase
     {
         $this->project->update(['release_date' => now()->addDay()]);
 
-        $citation = \App\Models\Citation::factory()->create([
+        $citation = Citation::factory()->create([
             'doi' => null,
         ]);
 
@@ -453,7 +452,7 @@ class PublishProjectTest extends TestCase
             'project_id' => $this->project->id,
         ]);
 
-        $draft = \App\Models\Draft::factory()->create([
+        $draft = Draft::factory()->create([
             'name' => 'Test Draft',
             'owner_id' => $this->user->id,
             'project_enabled' => true,
@@ -517,7 +516,7 @@ class PublishProjectTest extends TestCase
         Queue::fake();
 
         // Create a draft with project mode enabled
-        $draft = \App\Models\Draft::factory()->create([
+        $draft = Draft::factory()->create([
             'name' => 'Test Draft',
             'owner_id' => $this->user->id,
             'project_enabled' => true,
@@ -559,7 +558,7 @@ class PublishProjectTest extends TestCase
             'project_id' => $this->project->id,
             'license_id' => null,
         ]);
-        $dataset = \App\Models\Dataset::factory()->create([
+        $dataset = Dataset::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->project->id,
             'license_id' => null,

@@ -15,6 +15,8 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\Validation;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -621,7 +623,7 @@ class StudyModelTest extends TestCase
 
         // Test that the relationship exists and returns correct type
         $relationship = $study->nmrium();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphOne::class, $relationship);
+        $this->assertInstanceOf(MorphOne::class, $relationship);
 
         // Test the relationship configuration
         $this->assertEquals(NMRium::class, $relationship->getRelated()::class);
@@ -679,7 +681,7 @@ class StudyModelTest extends TestCase
 
         // Test the relationship chain exists
         $sampleRelation = $study->sample();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasOne::class, $sampleRelation);
+        $this->assertInstanceOf(HasOne::class, $sampleRelation);
 
         // Test that the molecules method exists and can be called without throwing an error
         // The actual implementation delegates to sample()->molecules() but we just need to cover the line

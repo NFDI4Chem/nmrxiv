@@ -2,12 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\FileSystemController;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
+use App\Services\FileIntegrityService;
+use App\Services\FileSystemObjectService;
+use App\Services\PathGeneratorService;
+use App\Services\StorageSignedUrlService;
+use Aws\S3\S3Client;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -303,7 +309,7 @@ class FileSystemTest extends TestCase
 
         $directory->load('children');
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isBruker($directory);
 
         $this->assertTrue($result);
@@ -323,7 +329,7 @@ class FileSystemTest extends TestCase
 
         $directory->load('children');
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isBruker($directory);
 
         $this->assertFalse($result);
@@ -361,7 +367,7 @@ class FileSystemTest extends TestCase
 
         $directory->load('children');
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isVarian($directory);
 
         $this->assertTrue($result);
@@ -374,7 +380,7 @@ class FileSystemTest extends TestCase
             'name' => 'spectrum.jdx',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isJcampDX($file);
 
         $this->assertTrue($result);
@@ -387,7 +393,7 @@ class FileSystemTest extends TestCase
             'name' => 'spectrum.dx',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isJcampDX($file);
 
         $this->assertTrue($result);
@@ -400,7 +406,7 @@ class FileSystemTest extends TestCase
             'name' => 'spectrum.jcamp',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isJcampDX($file);
 
         $this->assertTrue($result);
@@ -413,7 +419,7 @@ class FileSystemTest extends TestCase
             'name' => 'molecule.sdf',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isNMReData($file);
 
         $this->assertTrue($result);
@@ -426,7 +432,7 @@ class FileSystemTest extends TestCase
             'name' => 'molecule.mol',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isMolData($file);
 
         $this->assertTrue($result);
@@ -439,7 +445,7 @@ class FileSystemTest extends TestCase
             'name' => 'spectrum.jdf',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isJOEL($file);
 
         $this->assertTrue($result);
@@ -452,7 +458,7 @@ class FileSystemTest extends TestCase
             'instrument_type' => null,
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->saveInstrumentType($folder, 'bruker');
 
         $folder->refresh();
@@ -466,7 +472,7 @@ class FileSystemTest extends TestCase
             'model_type' => null,
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->saveModelType($folder, 'study');
 
         $folder->refresh();
@@ -481,7 +487,7 @@ class FileSystemTest extends TestCase
             'external_url' => null,
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->saveModelType($folder, 'analysis', 'https://example.com/analysis/123');
 
         $folder->refresh();
@@ -561,7 +567,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = null;
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder($parentFolder->children);
 
         $brukerFolder->refresh();
@@ -600,7 +606,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$brukerFolder]), $this->draft, false, null);
 
         $brukerFolder->refresh();
@@ -648,7 +654,7 @@ class FileSystemTest extends TestCase
         $varianFolder->load('children');
         $parentFolder->load('children');
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder($parentFolder->children);
 
         $varianFolder->refresh();
@@ -672,7 +678,7 @@ class FileSystemTest extends TestCase
             'name' => 'spectrum.jdf',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$joelFile]));
 
         $joelFile->refresh();
@@ -696,7 +702,7 @@ class FileSystemTest extends TestCase
             'name' => 'spectrum.jdx',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$jcampFile]));
 
         $jcampFile->refresh();
@@ -722,7 +728,7 @@ class FileSystemTest extends TestCase
             'study_id' => $this->study->id,
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$nmredataFile]));
 
         $nmredataFile->refresh();
@@ -739,7 +745,7 @@ class FileSystemTest extends TestCase
             'name' => 'molecule.mol',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$molFile]));
 
         $molFile->refresh();
@@ -761,7 +767,7 @@ class FileSystemTest extends TestCase
 
         $folder->load('children');
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$folder]));
 
         $folder->refresh();
@@ -804,7 +810,7 @@ class FileSystemTest extends TestCase
         $rootFolder->load('children.children');
         $subFolder->load('children');
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder($rootFolder->children);
 
         $subFolder->refresh();
@@ -821,7 +827,7 @@ class FileSystemTest extends TestCase
         $this->study->has_nmredata = false;
         $this->study->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->saveAnnotationsDetected($folder);
 
         $this->study->refresh();
@@ -835,7 +841,7 @@ class FileSystemTest extends TestCase
             'study_id' => null,
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->saveAnnotationsDetected($folder);
 
         // Should not throw exception
@@ -844,7 +850,7 @@ class FileSystemTest extends TestCase
 
     public function test_save_annotations_detected_with_null_folder(): void
     {
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->saveAnnotationsDetected(null);
 
         // Should handle null gracefully
@@ -854,11 +860,11 @@ class FileSystemTest extends TestCase
     public function test_delete_fso_with_actual_exception(): void
     {
         // Create a mock service that throws exception
-        $mockService = \Mockery::mock(\App\Services\FileSystemObjectService::class);
+        $mockService = \Mockery::mock(FileSystemObjectService::class);
         $mockService->shouldReceive('deleteFileSystemObject')
             ->andThrow(new \Exception('Database error'));
 
-        $this->app->instance(\App\Services\FileSystemObjectService::class, $mockService);
+        $this->app->instance(FileSystemObjectService::class, $mockService);
 
         $fso = FileSystemObject::factory()->file()->create([
             'draft_id' => $this->draft->id,
@@ -892,7 +898,7 @@ class FileSystemTest extends TestCase
             'draft_id' => $this->draft->id,
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$folder]), $this->draft, true, $mockLogger);
 
         // Should process without errors
@@ -917,7 +923,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$nmredataFile]), $this->draft, false, null);
 
         $nmredataFile->refresh();
@@ -934,7 +940,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$molFile]), $this->draft, false, null);
 
         $molFile->refresh();
@@ -951,7 +957,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$joelFile]), $this->draft, false, null);
 
         $joelFile->refresh();
@@ -968,7 +974,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$jcampFile]), $this->draft, false, null);
 
         $jcampFile->refresh();
@@ -1012,7 +1018,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$parentFolder]), $this->draft, false, null);
 
         $childFolder->refresh();
@@ -1026,7 +1032,7 @@ class FileSystemTest extends TestCase
             'name' => 'test.txt',
         ]);
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $result = $controller->isMolData($file);
 
         $this->assertFalse($result);
@@ -1075,7 +1081,7 @@ class FileSystemTest extends TestCase
         $this->draft->eln = 'chemotion';
         $this->draft->save();
 
-        $controller = app(\App\Http\Controllers\FileSystemController::class);
+        $controller = app(FileSystemController::class);
         $controller->processFolder(collect([$parentFolder]), $this->draft, false, null);
 
         $varianFolder->refresh();
@@ -1091,7 +1097,7 @@ class FileSystemTest extends TestCase
             'name' => 'test.txt',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $checksums = ['md5' => 'abc123def456'];
         $fileSize = 1024;
 
@@ -1111,7 +1117,7 @@ class FileSystemTest extends TestCase
             'name' => 'test.txt',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $checksums = ['sha256' => 'abc123def456789'];
         $fileSize = 2048;
 
@@ -1131,7 +1137,7 @@ class FileSystemTest extends TestCase
             'name' => 'test.txt',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $checksums = [
             'md5' => 'md5hash',
             'sha256' => 'sha256hash',
@@ -1156,7 +1162,7 @@ class FileSystemTest extends TestCase
         $originalChecksum = $folder->checksum_md5;
         $originalAlgorithm = $folder->checksum_algorithm;
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $checksums = ['md5' => 'abc123'];
 
         $service->storeChecksums($folder, $checksums, 1024);
@@ -1169,7 +1175,7 @@ class FileSystemTest extends TestCase
 
     public function test_verify_file_integrity_succeeds_with_matching_checksum(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $fileContent = 'test file content';
         $sha256 = hash('sha256', $fileContent);
@@ -1184,9 +1190,9 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'pending',
         ]);
 
-        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+        Storage::disk('local')->put('drafts/test.txt', $fileContent);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->verifyFileIntegrity($file);
 
         $this->assertTrue($result);
@@ -1198,7 +1204,7 @@ class FileSystemTest extends TestCase
 
     public function test_verify_file_integrity_fails_with_mismatched_checksum(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $fileContent = 'test file content';
         $wrongChecksum = 'wrongchecksumvalue';
@@ -1213,9 +1219,9 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'pending',
         ]);
 
-        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+        Storage::disk('local')->put('drafts/test.txt', $fileContent);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->verifyFileIntegrity($file);
 
         $this->assertFalse($result);
@@ -1227,7 +1233,7 @@ class FileSystemTest extends TestCase
 
     public function test_verify_file_integrity_fails_with_size_mismatch(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $fileContent = 'test file content';
         $sha256 = hash('sha256', $fileContent);
@@ -1242,9 +1248,9 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'pending',
         ]);
 
-        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+        Storage::disk('local')->put('drafts/test.txt', $fileContent);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->verifyFileIntegrity($file);
 
         $this->assertFalse($result);
@@ -1255,7 +1261,7 @@ class FileSystemTest extends TestCase
 
     public function test_verify_file_integrity_fails_when_file_not_in_storage(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $file = FileSystemObject::factory()->file()->create([
             'draft_id' => $this->draft->id,
@@ -1266,7 +1272,7 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'pending',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->verifyFileIntegrity($file);
 
         $this->assertFalse($result);
@@ -1286,7 +1292,7 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'pending',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->verifyFileIntegrity($file);
 
         $this->assertFalse($result);
@@ -1305,13 +1311,13 @@ class FileSystemTest extends TestCase
             'name' => 'folder',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $service->verifyFileIntegrity($folder);
     }
 
     public function test_download_file_from_storage_returns_content(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $fileContent = 'test file content';
         $file = FileSystemObject::factory()->file()->create([
@@ -1320,9 +1326,9 @@ class FileSystemTest extends TestCase
             'path' => '/drafts/test.txt',
         ]);
 
-        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+        Storage::disk('local')->put('drafts/test.txt', $fileContent);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->downloadFileFromStorage($file);
 
         $this->assertEquals($fileContent, $result);
@@ -1330,7 +1336,7 @@ class FileSystemTest extends TestCase
 
     public function test_download_file_from_storage_returns_null_when_missing(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $file = FileSystemObject::factory()->file()->create([
             'draft_id' => $this->draft->id,
@@ -1338,7 +1344,7 @@ class FileSystemTest extends TestCase
             'path' => '/drafts/missing.txt',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $result = $service->downloadFileFromStorage($file);
 
         $this->assertNull($result);
@@ -1370,7 +1376,7 @@ class FileSystemTest extends TestCase
             'type' => 'file',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $pending = $service->getFilesPendingVerification();
 
         $this->assertGreaterThanOrEqual(2, $pending->count());
@@ -1395,7 +1401,7 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'verified',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $failed = $service->getFilesWithFailedIntegrity();
 
         $this->assertCount(2, $failed);
@@ -1406,7 +1412,7 @@ class FileSystemTest extends TestCase
         $content = 'test content';
         $expected = hash('sha256', $content);
 
-        $result = \App\Services\FileIntegrityService::calculateChecksum($content, 'sha256');
+        $result = FileIntegrityService::calculateChecksum($content, 'sha256');
 
         $this->assertEquals($expected, $result);
     }
@@ -1416,7 +1422,7 @@ class FileSystemTest extends TestCase
         $content = 'test content';
         $expected = md5($content);
 
-        $result = \App\Services\FileIntegrityService::calculateChecksum($content, 'md5');
+        $result = FileIntegrityService::calculateChecksum($content, 'md5');
 
         $this->assertEquals($expected, $result);
     }
@@ -1426,7 +1432,7 @@ class FileSystemTest extends TestCase
         $content = 'test content';
         $expected = sha1($content);
 
-        $result = \App\Services\FileIntegrityService::calculateChecksum($content, 'sha1');
+        $result = FileIntegrityService::calculateChecksum($content, 'sha1');
 
         $this->assertEquals($expected, $result);
     }
@@ -1436,7 +1442,7 @@ class FileSystemTest extends TestCase
         $content = 'test content';
         $expected = hash('sha256', $content);
 
-        $result = \App\Services\FileIntegrityService::calculateChecksum($content);
+        $result = FileIntegrityService::calculateChecksum($content);
 
         $this->assertEquals($expected, $result);
     }
@@ -1459,7 +1465,7 @@ class FileSystemTest extends TestCase
             'integrity_status' => 'failed',
         ]);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $stats = $service->getIntegrityStatistics();
 
         $this->assertEquals(1, $stats['pending']);
@@ -1470,7 +1476,7 @@ class FileSystemTest extends TestCase
 
     public function test_retry_failed_verifications(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
 
         $fileContent = 'test file content';
         $correctChecksum = hash('sha256', $fileContent);
@@ -1487,9 +1493,9 @@ class FileSystemTest extends TestCase
             'verification_attempts' => 1,
         ]);
 
-        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+        Storage::disk('local')->put('drafts/test.txt', $fileContent);
 
-        $service = app(\App\Services\FileIntegrityService::class);
+        $service = app(FileIntegrityService::class);
         $results = $service->retryFailedVerifications();
 
         $this->assertEquals(1, $results['total']);
@@ -1595,7 +1601,7 @@ class FileSystemTest extends TestCase
 
     public function test_storage_signed_url_service_generate_multiple_signed_urls(): void
     {
-        $service = new \App\Services\StorageSignedUrlService;
+        $service = new StorageSignedUrlService;
 
         $filePaths = [
             'test/file1.txt' => ['size' => 1000, 'type' => 'text/plain'],
@@ -1620,7 +1626,7 @@ class FileSystemTest extends TestCase
 
     public function test_storage_signed_url_service_generate_multiple_signed_urls_with_custom_bucket(): void
     {
-        $service = new \App\Services\StorageSignedUrlService;
+        $service = new StorageSignedUrlService;
 
         $customBucket = 'custom-bucket';
         $filePaths = [
@@ -1637,16 +1643,16 @@ class FileSystemTest extends TestCase
 
     public function test_storage_signed_url_service_get_client(): void
     {
-        $service = new \App\Services\StorageSignedUrlService;
+        $service = new StorageSignedUrlService;
 
         $client = $service->getClient();
 
-        $this->assertInstanceOf(\Aws\S3\S3Client::class, $client);
+        $this->assertInstanceOf(S3Client::class, $client);
     }
 
     public function test_path_generator_service_parse_directories(): void
     {
-        $service = new \App\Services\PathGeneratorService;
+        $service = new PathGeneratorService;
 
         $path = '/folder1/folder2/folder3/file.txt';
         $filename = 'file.txt';
@@ -1660,7 +1666,7 @@ class FileSystemTest extends TestCase
 
     public function test_path_generator_service_parse_directories_with_no_folders(): void
     {
-        $service = new \App\Services\PathGeneratorService;
+        $service = new PathGeneratorService;
 
         $path = '/file.txt';
         $filename = 'file.txt';
@@ -1673,7 +1679,7 @@ class FileSystemTest extends TestCase
 
     public function test_path_generator_service_has_directories_with_path(): void
     {
-        $service = new \App\Services\PathGeneratorService;
+        $service = new PathGeneratorService;
 
         $result = $service->hasDirectories('folder/file.txt', '/');
 
@@ -1682,7 +1688,7 @@ class FileSystemTest extends TestCase
 
     public function test_path_generator_service_has_directories_with_non_root_destination(): void
     {
-        $service = new \App\Services\PathGeneratorService;
+        $service = new PathGeneratorService;
 
         $result = $service->hasDirectories(null, '/folder');
 
@@ -1691,7 +1697,7 @@ class FileSystemTest extends TestCase
 
     public function test_path_generator_service_has_directories_returns_false(): void
     {
-        $service = new \App\Services\PathGeneratorService;
+        $service = new PathGeneratorService;
 
         $result = $service->hasDirectories(null, '/');
 
