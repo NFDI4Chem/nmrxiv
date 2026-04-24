@@ -1173,9 +1173,7 @@ export default {
                 project_enabled: this.publishForm.enableProjectMode ? 1 : 0,
             });
         },
-        updateProject(callbacks = {}) {
-            const { onSuccess = null, onError = null } = callbacks;
-
+        updateProject() {
             // Reset draft warning when name changes
             this.draftWarningConfirmed = false;
 
@@ -1211,16 +1209,8 @@ export default {
                 route("dashboard.project.update", this.project.id),
                 {
                     preserveScroll: true,
-                    onSuccess: () => {
-                        if (onSuccess) {
-                            onSuccess();
-                        }
-                    },
-                    onError: () => {
-                        if (onError) {
-                            onError();
-                        }
-                    },
+                    onSuccess: () => {},
+                    onError: () => {},
                 }
             );
         },
@@ -1327,31 +1317,19 @@ export default {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
                 this.errors = null;
-                this.updateProject({
-                    onSuccess: () => {
-                        axios
-                            .post(
-                                route(
-                                    "dashboard.project.publish",
-                                    this.project.id
-                                ),
-                                this.publishForm
-                            )
-                            .catch((err) => {
-                                this.errors = err.response.data.errors;
-                                this.validation =
-                                    err.response.data.validation.report;
-                            })
-                            .then((response) => {
-                                this.status = response.data.project.status;
-                                // this.trackProject();
-                            });
-                    },
-                    onError: () => {
-                        this.errors =
-                            "Please resolve the highlighted form errors before publishing.";
-                    },
-                });
+                axios
+                    .post(
+                        route("dashboard.project.publish", this.project.id),
+                        this.publishForm
+                    )
+                    .catch((err) => {
+                        this.errors = err.response.data.errors;
+                        this.validation = err.response.data.validation.report;
+                    })
+                    .then((response) => {
+                        this.status = response.data.project.status;
+                        // this.trackProject();
+                    });
             }
         },
         isReleasedToday() {
