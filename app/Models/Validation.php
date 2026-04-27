@@ -247,6 +247,7 @@ class Validation extends Model
             $citations = $project->citations;
             $citationsValidation = [];
             $citationsStatus = $citations && $citations->isNotEmpty();
+            $shouldValidateCitationDoi = true;
 
             if ($project->release_date) {
                 $shouldValidateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
