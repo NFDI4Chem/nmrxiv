@@ -29,7 +29,7 @@ class CitationModelTest extends TestCase
 
     public function test_it_has_correct_fillable_attributes()
     {
-        $fillable = ['doi', 'title', 'authors', 'citation_text'];
+        $fillable = ['doi', 'title', 'title_slug', 'authors', 'citation_text'];
         $citation = new Citation;
 
         $this->assertEquals($fillable, $citation->getFillable());

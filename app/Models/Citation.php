@@ -13,6 +13,7 @@ class Citation extends Model
     protected $fillable = [
         'doi',
         'title',
+        'title_slug',
         'authors',
         'citation_text',
     ];

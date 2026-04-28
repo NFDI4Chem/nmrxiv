@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class SyncCitations
@@ -74,7 +75,7 @@ class SyncCitations
     {
         $doi = $this->normalizeDoi($citationData['doi'] ?? null);
         $title = $this->normalizeText($citationData['title'] ?? null);
-        $authors = $this->normalizeText($citationData['authors'] ?? null);
+        $titleSlug = $this->normalizeTitleSlug($citationData['title'] ?? null);
 
         $existingCitation = null;
 
@@ -88,11 +89,12 @@ class SyncCitations
             $existingCitation = $project->citations->firstWhere('doi', $doi);
         }
 
-        // 3. Try to match by title + authors (content-based matching for missing DOI)
-        if (! $existingCitation && ! is_null($title) && ! is_null($authors)) {
-            $existingCitation = $project->citations->first(function ($citation) use ($title, $authors): bool {
-                return $this->normalizeText($citation->title) === $title
-                    && $this->normalizeText($citation->authors) === $authors;
+        // 3. Try to match by title slug (content-based matching for missing DOI)
+        if (! $existingCitation && ! is_null($titleSlug)) {
+            $existingCitation = $project->citations->first(function ($citation) use ($titleSlug): bool {
+                $citationSlug = $this->normalizeTitleSlug($citation->title_slug ?? $citation->title);
+
+                return $citationSlug === $titleSlug;
             });
         }
 
@@ -116,9 +118,27 @@ class SyncCitations
         return [
             'doi' => $this->normalizeDoi($citationData['doi'] ?? null),
             'title' => $this->normalizeText($citationData['title'] ?? null),
+            'title_slug' => $this->normalizeTitleSlug($citationData['title'] ?? null),
             'authors' => $this->normalizeText($citationData['authors'] ?? null),
             'citation_text' => $this->normalizeText($citationData['citation_text'] ?? null),
         ];
+    }
+
+    private function normalizeTitleSlug(mixed $title): ?string
+    {
+        $normalizedTitle = $this->normalizeText($title);
+
+        if (is_null($normalizedTitle)) {
+            return null;
+        }
+
+        $slug = Str::slug($normalizedTitle);
+
+        if ($slug === '') {
+            return null;
+        }
+
+        return $slug;
     }
 
     private function rememberCitation(Project $project, Citation $citation): void
