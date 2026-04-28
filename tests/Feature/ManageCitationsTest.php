@@ -270,6 +270,53 @@ class ManageCitationsTest extends TestCase
     }
 
     /**
+     * Test citation update uses the existing citation ID when it is already attached.
+     *
+     * @return void
+     */
+    public function test_citation_update_prevention_by_id()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $citation = Citation::factory()->create([
+            'title' => 'Original Title',
+            'doi' => '10.1000/original',
+            'authors' => 'Original Author',
+            'citation_text' => 'Original citation text',
+        ]);
+
+        $project->citations()->sync([$citation->id => ['user' => $user->id]]);
+
+        $body = [
+            'citations' => [[
+                'id' => $citation->id,
+                'title' => 'Updated Title',
+                'doi' => '10.1000/updated',
+                'authors' => 'Updated Author',
+                'citation_text' => 'Updated citation text',
+            ]],
+        ];
+
+        $response = $this->updateCitation($body, $project->id);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $this->assertEquals(1, $project->citations()->count());
+
+        $updatedCitation = $project->citations()->first();
+        $this->assertNotNull($updatedCitation);
+        $this->assertEquals($citation->id, $updatedCitation->id);
+        $this->assertEquals('Updated Title', $updatedCitation->title);
+        $this->assertEquals('10.1000/updated', $updatedCitation->doi);
+        $this->assertEquals('Updated Author', $updatedCitation->authors);
+        $this->assertEquals('Updated citation text', $updatedCitation->citation_text);
+    }
+
+    /**
      * Test duplicate citation prevention when DOI is missing.
      *
      * @return void
@@ -358,6 +405,53 @@ class ManageCitationsTest extends TestCase
         $this->assertNull($citation->doi);
         $this->assertEquals('Trim Match Title', $citation->title);
         $this->assertEquals('Trim Match Author', $citation->authors);
+        $this->assertEquals('Updated text', $citation->citation_text);
+    }
+
+    /**
+     * Test duplicate citation prevention without DOI by slugified title.
+     *
+     * @return void
+     */
+    public function test_citation_duplicate_prevention_without_doi_by_title_slug()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $firstPayload = [
+            'citations' => [[
+                'title' => 'NMR Study: Alpha/Beta',
+                'doi' => null,
+                'authors' => 'Author One',
+                'citation_text' => 'Initial text',
+            ]],
+        ];
+
+        $response = $this->updateCitation($firstPayload, $project->id);
+        $response->assertStatus(200);
+
+        $secondPayload = [
+            'citations' => [[
+                'title' => 'nmr study alpha beta',
+                'doi' => '',
+                'authors' => 'Completely Different Author',
+                'citation_text' => 'Updated text',
+            ]],
+        ];
+
+        $response = $this->updateCitation($secondPayload, $project->id);
+        $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $this->assertEquals(1, $project->citations()->count());
+
+        $citation = $project->citations()->first();
+        $this->assertNotNull($citation);
+        $this->assertEquals('nmr-study-alpha-beta', $citation->title_slug);
+        $this->assertEquals('Completely Different Author', $citation->authors);
         $this->assertEquals('Updated text', $citation->citation_text);
     }
 
