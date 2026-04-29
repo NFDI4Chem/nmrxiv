@@ -110,7 +110,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                 $assigner->assign($project->fresh());
 
-                if ($release_date->isPast()) {
+                if ($release_date->isPast() || $release_date->isCurrent()) {
                     $projectPublisher->publish($project);
                 }
                 $updater->update($project->fresh());
