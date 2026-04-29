@@ -1242,9 +1242,38 @@
                                                                     <h1
                                                                         class="text-2xl font-extrabold text-gray-900"
                                                                     >
-                                                                        {{
-                                                                            selectedStudy.name
-                                                                        }}
+                                                                        <span
+                                                                            v-if="
+                                                                                !isEditingStudyName
+                                                                            "
+                                                                            class="cursor-text"
+                                                                            @click="
+                                                                                startEditingStudyName
+                                                                            "
+                                                                        >
+                                                                            {{
+                                                                                selectedStudy.name
+                                                                            }}
+                                                                        </span>
+                                                                        <span
+                                                                            v-else
+                                                                            ref="studyNameEditor"
+                                                                            class="inline-block min-w-[8rem] rounded px-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                                                            contenteditable
+                                                                            @keydown.enter.prevent="
+                                                                                saveStudyNameEdit
+                                                                            "
+                                                                            @keydown.esc.prevent="
+                                                                                cancelStudyNameEdit
+                                                                            "
+                                                                            @blur="
+                                                                                saveStudyNameEdit
+                                                                            "
+                                                                        >
+                                                                            {{
+                                                                                studyNameDraft
+                                                                            }}
+                                                                        </span>
                                                                     </h1>
                                                                 </div>
 
@@ -2383,6 +2412,8 @@ export default {
             studySpecies: null,
             inprogressStudies: [],
             selectedStudy: null,
+            isEditingStudyName: false,
+            studyNameDraft: "",
 
             studyForm: this.$inertia.form({
                 _method: "POST",
@@ -2644,6 +2675,62 @@ export default {
                 "show_compound_details",
                 this.showCompoundDetails
             );
+        },
+        startEditingStudyName() {
+            if (!this.selectedStudy || this.busy) {
+                return;
+            }
+
+            this.studyNameDraft = this.selectedStudy.name || "";
+            this.isEditingStudyName = true;
+
+            this.$nextTick(() => {
+                const editor = this.$refs.studyNameEditor;
+                if (!editor) {
+                    return;
+                }
+
+                editor.focus();
+
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
+        },
+        cancelStudyNameEdit() {
+            this.isEditingStudyName = false;
+            this.studyNameDraft = this.selectedStudy?.name || "";
+        },
+        saveStudyNameEdit() {
+            if (!this.isEditingStudyName || !this.selectedStudy) {
+                return;
+            }
+
+            const editor = this.$refs.studyNameEditor;
+            const nextName = (editor?.innerText || this.studyNameDraft || "")
+                .trim()
+                .replace(/\n+/g, " ");
+
+            this.isEditingStudyName = false;
+
+            if (!nextName) {
+                this.studyNameDraft = this.selectedStudy.name || "";
+                return;
+            }
+
+            if (nextName === this.selectedStudy.name) {
+                this.studyNameDraft = nextName;
+                return;
+            }
+
+            this.studyNameDraft = nextName;
+            this.studyForm.name = nextName;
+            this.selectedStudy.name = nextName;
+            this.saveStudyDetails();
         },
         showSamplesSummary() {
             this.spectraLoadingStatus = false;
@@ -3009,6 +3096,8 @@ export default {
                     this.selectedStudyIndex = index;
                     this.selectedStudy = study;
                     this.setQueryStringParameter("sample", study.id);
+                    this.isEditingStudyName = false;
+                    this.studyNameDraft = this.selectedStudy.name;
                     this.studyForm.name = this.selectedStudy.name;
                     this.studyForm.description =
                         this.selectedStudy.description.replace(/<\/br>/g, " ");
@@ -3139,6 +3228,8 @@ export default {
                         });
                         this.loadingStep = false;
                         this.studies[this.selectedStudyIndex] = response.data;
+                        this.selectedStudy = response.data;
+                        this.studyNameDraft = response.data.name;
                         this.studyForm.hasErrors = false;
                     }
                 });
