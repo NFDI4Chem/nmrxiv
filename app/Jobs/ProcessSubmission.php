@@ -166,13 +166,23 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                             $dataset->save();
                         }
 
-                        $study->status = 'complete';
                         $study->save();
                     }
                 }
                 $assigner->assign($_studies);
                 $release_date = Carbon::parse($project->release_date);
 
+                // Set embargo status for studies if release date is in the future
+                foreach ($_studies as $study) {
+                    if ($release_date->isFuture()) {
+                        $study->status = 'embargo';
+                    } else {
+                        $study->status = 'published';
+                    }
+                    $study->save();
+                }
+
+                // Only publish studies if release date is in the past
                 if ($release_date->isPast()) {
                     foreach ($_studies as $study) {
                         $studyPublisher->publish($study);
