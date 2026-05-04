@@ -32,45 +32,66 @@
                     <!-- Help and documentation section (only shown in edit mode) -->
                     <div
                         v-if="!readonly"
-                        class="text-sm cursor-pointer hover:text-blue-700 my-2 mr-10"
+                        class="my-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pr-2 sm:pr-5"
                     >
                         <!-- Documentation link with tooltip -->
-                        <i>
-                            <a
-                                href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
-                                target="_blank"
-                            >
-                                <ToolTip
-                                    class="w-3.5 h-3.5"
-                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
-                                />
-                                <span class="ml-4">
-                                    Learn more about folder structuring
-                                </span>
-                            </a>
-                        </i>
-
-                        <!-- Missing files warning (shown when files are missing) -->
-                        <a
-                            v-if="missing_files > 0"
-                            class="text-red-900 text-strong float-right"
-                            @click="showMissingFilesDetailsModal()"
+                        <div
+                            class="min-w-0 flex-1 text-sm text-gray-700 hover:text-blue-700"
                         >
-                            <!-- Warning triangle icon -->
-                            <svg
-                                class="h-5 w-5 text-red-400 inline"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
+                            <i class="not-italic">
+                                <a
+                                    class="inline-flex cursor-pointer items-center"
+                                    href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <ToolTip
+                                        class="w-3.5 h-3.5 shrink-0"
+                                        text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                                    />
+                                    <span class="ml-2 sm:ml-4">
+                                        Learn more about folder structuring
+                                    </span>
+                                </a>
+                            </i>
+                        </div>
+
+                        <div
+                            class="flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-1"
+                        >
+                            <span
+                                v-if="draft && draft.key"
+                                class="cursor-default select-all text-xs font-medium tabular-nums text-gray-500"
+                                title="Draft reference"
                             >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
-                            {{ missing_files }} files missing
-                        </a>
+                                Draft ID:
+                                <span class="font-mono text-gray-700">{{
+                                    draft.key
+                                }}</span>
+                            </span>
+
+                            <!-- Missing files warning (shown when files are missing) -->
+                            <a
+                                v-if="missing_files > 0"
+                                class="cursor-pointer text-sm font-semibold text-red-900"
+                                @click="showMissingFilesDetailsModal()"
+                            >
+                                <!-- Warning triangle icon -->
+                                <svg
+                                    class="inline h-5 w-5 text-red-400"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                                {{ missing_files }} files missing
+                            </a>
+                        </div>
                     </div>
                     <!-- <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">

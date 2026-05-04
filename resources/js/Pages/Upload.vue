@@ -634,10 +634,6 @@
                                     class="border-gray-100"
                                 >
                                     <div class="mx-5 pt-4">
-                                        <small class="cursor-pointer"
-                                            >Draft ID:
-                                            {{ currentDraft.key }}</small
-                                        >
                                         <div
                                             class="text-red-600"
                                             v-html="
