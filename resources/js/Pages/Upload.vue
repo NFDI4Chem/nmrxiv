@@ -23,7 +23,7 @@
                     <div
                         class="w-full sm:flex sm:items-center sm:justify-between"
                     >
-                        <div>
+                        <div class="min-w-0 flex-1">
                             <span
                                 v-if="currentStep"
                                 class="ml-14 text-sm font-bold text-teal-600 group-hover:text-teal-800"
@@ -74,7 +74,7 @@
 
                                 <span
                                     v-if="currentStep && currentDraft"
-                                    class="mt-2 inline-flex max-w-xl flex-col gap-1.5 sm:ml-2"
+                                    class="mt-2 flex w-full min-w-0 flex-col gap-1.5 sm:ml-2"
                                 >
                                     <span
                                         id="upload-draft-name-label"
@@ -83,7 +83,7 @@
                                         Project name
                                     </span>
                                     <div
-                                        class="group flex min-w-0 items-stretch overflow-hidden rounded-lg border border-gray-300 bg-white/95 shadow-sm transition-colors hover:border-teal-400/90 hover:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/25 focus-within:ring-offset-2 focus-within:ring-offset-white"
+                                        class="group flex w-full min-w-0 items-stretch overflow-hidden rounded-lg border border-gray-300 bg-white/95 shadow-sm transition-colors hover:border-teal-400/90 hover:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/25 focus-within:ring-offset-2 focus-within:ring-offset-white"
                                     >
                                         <p
                                             ref="draftNameEditor"
@@ -128,7 +128,7 @@
                                 <span v-else> Submit data to nmrXiv </span>
                             </h3>
                         </div>
-                        <div class="mt-3 sm:ml-4 sm:mt-0">
+                        <div class="mt-3 shrink-0 sm:ml-4 sm:mt-0">
                             <div v-if="showPrimer && currentDraft">
                                 <div class="float-left">
                                     <div
