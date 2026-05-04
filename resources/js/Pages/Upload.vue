@@ -605,13 +605,13 @@
                                             "
                                         ></div>
                                     </div>
-                                    <div class="relative border bg-white mt-3">
+                                    <div class="relative bg-white mt-3">
                                         <div id="tour-step-upload-spectra">
                                             <file-system-browser
                                                 ref="fsbRef"
                                                 :readonly="false"
                                                 :draft="currentDraft"
-                                                :height="'h-[calc(100vh-385px)]'"
+                                                :height="'h-[calc(100vh-285px)]'"
                                                 @loading="filesLoading"
                                             ></file-system-browser>
                                         </div>

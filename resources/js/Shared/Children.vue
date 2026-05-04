@@ -36,7 +36,7 @@
                 >
                     <!-- Disclosure button for expanding/collapsing -->
                     <DisclosureButton
-                        class="w-full text-left truncate ..."
+                        class="w-full text-left truncate flex items-center"
                         @click="() => handleDisclosureButtonClick(file.id)"
                     >
                         <!-- Loading spinner when fetching children -->
@@ -54,7 +54,7 @@
                                     open
                                         ? 'text-gray-700 rotate-90'
                                         : 'text-gray-300',
-                                    'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                    'mr-2 flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                 ]"
                                 aria-hidden="true"
                             />
@@ -64,7 +64,7 @@
                         <span
                             :class="[
                                 file.status == 'missing' ? 'text-red-800' : '',
-                                'break-all',
+                                'inline-flex items-center gap-1 min-w-0',
                             ]"
                         >
                             <!-- Dynamic icon for directories (instrument-specific or generic) -->
@@ -72,35 +72,35 @@
                                 <!-- Instrument-specific icons -->
                                 <img
                                     v-if="file.instrument_type == 'bruker'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/bruker.jpg"
                                     alt="Bruker"
                                 />
                                 <img
                                     v-else-if="file.instrument_type == 'varian'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/varian.jpeg"
                                     alt="Varian"
                                 />
                                 <img
                                     v-else-if="file.instrument_type == 'joel'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/joel.jpg"
                                     alt="JOEL"
                                 />
                                 <img
                                     v-else-if="file.instrument_type == 'jcamp'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                     src="/img/jcamp.png"
                                     alt="JCAMP"
                                 />
                                 <!-- Study folder with notification indicator -->
                                 <span
                                     v-else-if="file.model_type == 'study'"
-                                    class="relative inline-flex"
+                                    class="relative inline-flex flex-shrink-0"
                                 >
                                     <FolderIcon
-                                        class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                        class="h-5 w-5 text-gray-700"
                                         aria-hidden="true"
                                     />
                                     <span
@@ -117,18 +117,18 @@
                                 <!-- Default folder icon -->
                                 <FolderIcon
                                     v-else
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                     aria-hidden="true"
                                 />
                             </span>
                             <!-- Generic folder icon for non-directories -->
                             <span v-else>
                                 <FolderIcon
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                     aria-hidden="true"
                                 />
                             </span>
-                            <span :title="file.name">{{
+                            <span class="truncate" :title="file.name">{{
                                 truncateMiddle(file.name, 25)
                             }}</span>
                         </span>
@@ -186,7 +186,7 @@
                                             >
                                                 <!-- Nested disclosure button -->
                                                 <DisclosureButton
-                                                    class="w-full text-left truncate ..."
+                                                    class="w-full text-left truncate flex items-center"
                                                     @click="
                                                         () =>
                                                             handleDisclosureButtonClick(
@@ -209,7 +209,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'mr-2 flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             aria-hidden="true"
                                                         />
@@ -223,7 +223,7 @@
                                                                 'missing'
                                                                     ? 'text-red-800'
                                                                     : '',
-                                                                '',
+                                                                'inline-flex items-center gap-1 min-w-0',
                                                             ]"
                                                             style="
                                                                 user-select: none;
@@ -242,7 +242,7 @@
                                                                         sfile.instrument_type ==
                                                                         'bruker'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/bruker.jpg"
                                                                     alt="Bruker"
                                                                 />
@@ -251,7 +251,7 @@
                                                                         sfile.instrument_type ==
                                                                         'varian'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/varian.jpeg"
                                                                     alt="Varian"
                                                                 />
@@ -260,7 +260,7 @@
                                                                         sfile.instrument_type ==
                                                                         'joel'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/joel.jpg"
                                                                     alt="JOEL"
                                                                 />
@@ -269,7 +269,7 @@
                                                                         sfile.instrument_type ==
                                                                         'jcamp'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                                                     src="/img/jcamp.png"
                                                                     alt="JCAMP"
                                                                 />
@@ -279,10 +279,10 @@
                                                                         sfile.model_type ==
                                                                         'study'
                                                                     "
-                                                                    class="relative inline-flex"
+                                                                    class="relative inline-flex flex-shrink-0"
                                                                 >
                                                                     <FolderIcon
-                                                                        class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                        class="h-5 w-5 text-gray-700"
                                                                         aria-hidden="true"
                                                                     />
                                                                     <span
@@ -299,18 +299,19 @@
                                                                 <!-- Default folder icon -->
                                                                 <FolderIcon
                                                                     v-else
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                                                     aria-hidden="true"
                                                                 />
                                                             </span>
                                                             <!-- Document icon for files -->
                                                             <span v-else>
                                                                 <DocumentTextIcon
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                                                     aria-hidden="true"
                                                                 />
                                                             </span>
                                                             <span
+                                                                class="truncate"
                                                                 :title="
                                                                     sfile.name
                                                                 "

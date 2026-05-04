@@ -17,25 +17,28 @@
         :class="[
             fullScreen
                 ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
-                : 'h-screen',
+                : hasProjectFiles
+                  ? 'h-screen'
+                  : height
+                    ? `${height} overflow-hidden`
+                    : 'h-screen overflow-hidden',
             'bg-white rounded-lg',
         ]"
     >
-        <div>
+        <div :class="[hasProjectFiles ? '' : 'h-full flex flex-col']">
             <!-- Header section with help links and missing files indicator -->
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
                 <div class="w-full px-5">
                     <!-- Help and documentation section (only shown in edit mode) -->
                     <div
                         v-if="!readonly"
-                        class="text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
+                        class="text-sm cursor-pointer hover:text-blue-700 my-2 mr-10"
                     >
                         <!-- Documentation link with tooltip -->
                         <i>
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
                                 target="_blank"
-                                class="mb-4"
                             >
                                 <ToolTip
                                     class="w-3.5 h-3.5"
@@ -130,81 +133,113 @@
             <!-- File upload dropzone section (only shown in edit mode) -->
             <div
                 v-if="!readonly"
-                :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
+                :class="[
+                    hasProjectFiles
+                        ? fullScreen
+                            ? 'px-6 py-4'
+                            : 'px-5'
+                        : 'h-full flex flex-col flex-1 min-h-0 p-5',
+                ]"
             >
-                <div class="py-2 mb-3">
+                <div
+                    :class="[
+                        hasProjectFiles
+                            ? 'py-2 mb-3'
+                            : 'h-full overflow-hidden flex-1 flex items-center justify-center',
+                    ]"
+                >
                     <!-- Dropzone message container -->
-                    <div id="fs-dropzone-message" class="text-center">
+                    <div
+                        id="fs-dropzone-message"
+                        :class="[
+                            'text-center',
+                            hasProjectFiles ? 'w-full' : 'w-full h-full',
+                        ]"
+                    >
                         <!-- Main dropzone area with dashed border -->
                         <div
                             type="button"
-                            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-4 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                            :class="[
+                                'relative block w-full border-2 border-gray-300 border-dashed rounded-lg text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500',
+                                hasProjectFiles
+                                    ? 'p-4'
+                                    : 'h-full flex flex-col items-center justify-center p-8',
+                            ]"
                         >
-                            <!-- Database/storage icon for dropzone -->
-                            <svg
-                                class="mx-auto h-12 w-12 text-gray-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 48 48"
-                                aria-hidden="true"
+                            <div
+                                :class="[
+                                    hasProjectFiles
+                                        ? ''
+                                        : 'h-full w-full flex flex-col items-center justify-center',
+                                ]"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
-                                />
-                            </svg>
-
-                            <!-- Dropzone instructions and controls -->
-                            <span
-                                class="mt-2 block text-lg font-bold text-blue-600"
-                            >
-                                Drop Files or Folders
-                                <!-- Dynamic destination folder indicator -->
-                                <span
-                                    v-if="
-                                        $page.props.selectedFolder &&
-                                        $page.props.selectedFolder != '/'
-                                    "
+                                <!-- Database/storage icon for dropzone -->
+                                <svg
+                                    class="mx-auto h-12 w-12 text-gray-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    viewBox="0 0 48 48"
+                                    aria-hidden="true"
                                 >
-                                    to "{{ $page.props.selectedFolder }}" folder
-                                </span>
-
-                                <!-- File selection form -->
-                                <form
-                                    class="inline"
-                                    enctype="multipart/form-data"
-                                >
-                                    or
-                                    <!-- Folder selection button -->
-                                    <button
-                                        id="fs-dropzone-click-target"
-                                        type="button"
-                                        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
-                                    >
-                                        Select folders
-                                    </button>
-                                    to upload
-                                    <!-- Hidden input container for Dropzone.js -->
-                                    <div
-                                        id="fs-dropzone-hidden-input-container"
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
                                     />
-                                </form>
+                                </svg>
 
-                                <!-- Help link to submission guides -->
-                                <div class="text-sm text-gray-400">
-                                    Need help? Check out our
-                                    <a
-                                        class="text-blue-800 hover:underline"
-                                        href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
-                                        target="_blank"
+                                <!-- Dropzone instructions and controls -->
+                                <span
+                                    class="mt-2 block text-lg font-bold text-blue-600"
+                                >
+                                    Drop Files or Folders
+                                    <!-- Dynamic destination folder indicator -->
+                                    <span
+                                        v-if="
+                                            $page.props.selectedFolder &&
+                                            $page.props.selectedFolder != '/'
+                                        "
                                     >
-                                        submission guides
-                                    </a>
-                                </div>
-                            </span>
+                                        to "{{ $page.props.selectedFolder }}"
+                                        folder
+                                    </span>
+
+                                    <!-- File selection form -->
+                                    <form
+                                        class="inline"
+                                        enctype="multipart/form-data"
+                                    >
+                                        or
+                                        <!-- Folder selection button -->
+                                        <button
+                                            id="fs-dropzone-click-target"
+                                            type="button"
+                                            class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
+                                        >
+                                            Select folders
+                                        </button>
+                                        to upload
+                                        <!-- Hidden input container for Dropzone.js -->
+                                        <div
+                                            id="fs-dropzone-hidden-input-container"
+                                        />
+                                    </form>
+
+                                    <!-- Help link to submission guides -->
+                                    <div class="text-sm text-gray-400">
+                                        Need help? Check out our
+                                        <a
+                                            class="text-blue-800 hover:underline"
+                                            href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
+                                            target="_blank"
+                                        >
+                                            submission guides
+                                        </a>
+                                    </div>
+                                </span>
+                            </div>
 
                             <!-- Upload progress section (shown during upload) -->
                             <div v-if="dropzone" class="relative mt-5">
@@ -290,41 +325,63 @@
 
             <!-- Main content area with file tree and details panel -->
             <div
-                v-else
+                v-else-if="hasProjectFiles"
                 :class="[
                     fullScreen
-                        ? 'overflow-scroll h-full relative px-6'
-                        : 'px-1',
-                    'min-w-0 flex-1 lg:flex max-xs-full',
+                        ? 'overflow-hidden h-full relative px-6'
+                        : '',
+                    'min-w-0 flex-1 flex',
                 ]"
             >
                 <!-- Left sidebar with file tree -->
                 <aside
+                    ref="sidebarRef"
                     :class="[
                         height ? height : '',
-                        'py-2 lg:inset-y-0 lg:z-50 lg:flex md:w-96 lg:flex-col h-screen overflow-y-scroll overflow-x-scroll md:border-r md:border-gray-200 p-2',
+                        'flex-shrink-0 flex flex-col bg-white border-r border-gray-200 overflow-hidden',
                     ]"
+                    :style="{ width: sidebarWidth + 'px' }"
                 >
-                    <!-- Recursive file tree component -->
-                    <children
-                        :file="file"
-                        :expanded-folders="expandedFolders"
-                        @toggle-expansion="
-                            (fsoId, isExpanded) =>
-                                toggleFolderExpansion(fsoId, isExpanded)
-                        "
-                    />
+                    <!-- Sidebar header -->
+                    <div
+                        class="flex items-center justify-between px-3 py-2 border-b border-gray-100 bg-gray-50"
+                    >
+                        <span
+                            class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                            >Files</span
+                        >
+                        <span
+                            v-if="file && file.children"
+                            class="text-xs text-gray-400"
+                            >{{ file.children.length }} items</span
+                        >
+                    </div>
+
+                    <!-- Scrollable file tree -->
+                    <div class="flex-1 overflow-y-auto overflow-x-hidden p-2">
+                        <!-- Recursive file tree component -->
+                        <children
+                            :file="file"
+                            :expanded-folders="expandedFolders"
+                            @toggle-expansion="
+                                (fsoId, isExpanded) =>
+                                    toggleFolderExpansion(fsoId, isExpanded)
+                            "
+                        />
+                    </div>
+
+                    <!-- Sidebar footer with logs -->
                     <div
                         v-if="
                             Object.keys(logs).length > 0 &&
                             !readonly &&
                             !isDeletingFiles
                         "
-                        class="mt-4 text-sm cursor-pointer text-gray-400"
+                        class="flex-shrink-0 px-3 py-2 border-t border-gray-100 bg-gray-50 text-sm cursor-pointer text-gray-500 hover:text-gray-700 transition-colors"
                         @click="showLogsDialog = true"
                     >
                         <InformationCircleIcon
-                            class="h-5 w-5 inline text-gray-400 flex-shrink-0 mx-auto"
+                            class="h-4 w-4 inline mr-1"
                             aria-hidden="true"
                         />
                         View logs
@@ -355,7 +412,7 @@
 
                         <template #content>
                             <div
-                                class="relative h-[74vh] overflow-x-scroll z-0 mt-1 rounded-lg cursor-pointer"
+                                class="relative h-[74vh] overflow-x-auto z-0 mt-1 rounded-lg"
                             >
                                 <ul
                                     v-if="Object.keys(filteredLogs).length > 0"
@@ -367,7 +424,7 @@
                                             filteredLogs
                                         )"
                                         :key="file"
-                                        class="py-4 flex"
+                                        class="py-4 flex items-start"
                                     >
                                         <CheckIcon
                                             v-if="
@@ -433,10 +490,22 @@
                         </template>
                     </jet-dialog-modal>
                 </aside>
+
+                <!-- Resize handle -->
+                <div
+                    class="flex-shrink-0 w-1 cursor-col-resize bg-transparent hover:bg-teal-400 active:bg-teal-500 transition-colors group relative"
+                    @mousedown="startResize"
+                >
+                    <div
+                        class="absolute inset-y-0 -left-1 -right-1 group-hover:bg-teal-400/10"
+                    ></div>
+                </div>
+
+                <!-- Details panel -->
                 <section
                     :class="[
                         height ? height : '',
-                        'h-screen p-6 flex-1 flex flex-col lg:order-last overflow-y-scroll hidden md:flex',
+                        'flex-1 flex flex-col overflow-y-auto overflow-x-hidden bg-white hidden md:flex',
                     ]"
                 >
                     <div
@@ -444,12 +513,15 @@
                             $page.props.selectedFileSystemObject &&
                             $page.props.selectedFileSystemObject.has_children
                         "
-                        class="mb-3"
+                        class="flex-1 flex flex-col overflow-hidden"
                     >
-                        <div class="py-2 mb-2 block border-b pb-4">
+                        <!-- Panel header -->
+                        <div
+                            class="flex-shrink-0 px-5 py-3 border-b border-gray-100 bg-gray-50"
+                        >
                             <div class="flex justify-between items-center">
                                 <p
-                                    class="font-bold text-xl"
+                                    class="font-semibold text-sm text-gray-800 truncate"
                                     :title="
                                         $page.props.selectedFileSystemObject
                                             .relative_url
@@ -463,48 +535,50 @@
                                         )
                                     }}
                                 </p>
-                                <div class="flex items-center space-x-3">
+                                <div class="flex items-center space-x-2 flex-shrink-0 ml-3">
                                     <!-- View Toggle -->
-                                    <div class="flex space-x-1">
+                                    <div
+                                        class="flex rounded-md border border-gray-200 overflow-hidden"
+                                    >
                                         <button
                                             :class="[
                                                 viewMode === 'grid'
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-400 hover:text-gray-600',
-                                                'p-1',
+                                                    ? 'bg-gray-100 text-gray-900'
+                                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50',
+                                                'p-1.5 transition-colors',
                                             ]"
                                             title="Grid View"
                                             @click="setViewMode('grid')"
                                         >
-                                            <Squares2X2Icon class="h-5 w-5" />
+                                            <Squares2X2Icon class="h-4 w-4" />
                                         </button>
                                         <button
                                             :class="[
                                                 viewMode === 'list'
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-400 hover:text-gray-600',
-                                                'p-1',
+                                                    ? 'bg-gray-100 text-gray-900'
+                                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50',
+                                                'p-1.5 transition-colors border-l border-gray-200',
                                             ]"
                                             title="List View"
                                             @click="setViewMode('list')"
                                         >
-                                            <ListBulletIcon class="h-5 w-5" />
+                                            <ListBulletIcon class="h-4 w-4" />
                                         </button>
                                     </div>
-                                    <a
+                                    <button
                                         v-if="
                                             $page.props.selectedFileSystemObject
                                                 .id && !readonly
                                         "
-                                        class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
                                         @click="confirmFSODeletion"
                                     >
                                         <TrashIcon
-                                            class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
+                                            class="h-3.5 w-3.5 mr-1.5"
                                             aria-hidden="true"
                                         />
                                         Delete
-                                    </a>
+                                    </button>
                                     <a
                                         v-if="
                                             $page.props.selectedFileSystemObject
@@ -513,15 +587,18 @@
                                             downloadURL
                                         "
                                         :href="downloadURL"
-                                        class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                                     >
                                         Download
                                     </a>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Scrollable content area -->
+                        <div class="flex-1 overflow-y-auto px-5 py-3">
                         <!-- List View Table Header -->
-                        <div v-if="viewMode === 'list'" class="mt-6">
+                        <div v-if="viewMode === 'list'" class="mt-2">
                             <div
                                 class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
                             >
@@ -823,50 +900,68 @@
                                 </template>
                             </li>
                         </ul>
+                        </div>
                     </div>
-                    <div v-else>
-                        <p
+                    <div v-else class="flex-1 flex flex-col overflow-hidden">
+                        <!-- File detail header -->
+                        <div
                             v-if="$page.props.selectedFileSystemObject"
-                            class="font-bold text-xl"
-                            :title="
-                                $page.props.selectedFileSystemObject
-                                    .relative_url
-                            "
+                            class="flex-shrink-0 px-5 py-3 border-b border-gray-100 bg-gray-50"
                         >
-                            {{
-                                truncateMiddle(
-                                    $page.props.selectedFileSystemObject
-                                        .relative_url,
-                                    50
-                                )
-                            }}
-                            <a
-                                v-if="
-                                    $page.props.selectedFileSystemObject.id &&
-                                    !readonly
-                                "
-                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                @click="confirmFSODeletion"
+                            <div
+                                class="flex items-center justify-between"
                             >
-                                <TrashIcon
-                                    class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
-                                    aria-hidden="true"
-                                />
-                                Delete
-                            </a>
-                            <a
-                                v-if="
-                                    $page.props.selectedFileSystemObject.id &&
-                                    readonly &&
-                                    downloadURL
-                                "
-                                :href="downloadURL"
-                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                            >
-                                Download
-                            </a>
-                        </p>
-                        <div class="pt-5">
+                                <p
+                                    class="font-semibold text-sm text-gray-800 truncate"
+                                    :title="
+                                        $page.props.selectedFileSystemObject
+                                            .relative_url
+                                    "
+                                >
+                                    {{
+                                        truncateMiddle(
+                                            $page.props
+                                                .selectedFileSystemObject
+                                                .relative_url,
+                                            50
+                                        )
+                                    }}
+                                </p>
+                                <div
+                                    class="flex items-center space-x-2 flex-shrink-0 ml-3"
+                                >
+                                    <button
+                                        v-if="
+                                            $page.props
+                                                .selectedFileSystemObject.id &&
+                                            !readonly
+                                        "
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                                        @click="confirmFSODeletion"
+                                    >
+                                        <TrashIcon
+                                            class="h-3.5 w-3.5 mr-1.5"
+                                            aria-hidden="true"
+                                        />
+                                        Delete
+                                    </button>
+                                    <a
+                                        v-if="
+                                            $page.props
+                                                .selectedFileSystemObject.id &&
+                                            readonly &&
+                                            downloadURL
+                                        "
+                                        :href="downloadURL"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- File details content -->
+                        <div class="flex-1 overflow-y-auto px-5 py-4">
                             <span
                                 v-if="
                                     $page.props.selectedFileSystemObject &&
@@ -1179,6 +1274,10 @@ export default {
             viewMode: "grid", // 'grid' or 'list'
             sortBy: "name", // 'name', 'date', 'size', 'kind'
             sortOrder: "asc", // 'asc' or 'desc'
+
+            // Resizable sidebar
+            sidebarWidth: 320, // Default sidebar width in pixels
+            isResizing: false, // Whether sidebar is being resized
         };
     },
     /**
@@ -1208,6 +1307,13 @@ export default {
                     delete logsClone[key];
             });
             return logsClone;
+        },
+        hasProjectFiles() {
+            return Boolean(
+                this.file &&
+                    Array.isArray(this.file.children) &&
+                    this.file.children.length > 0
+            );
         },
 
         /**
@@ -1341,6 +1447,15 @@ export default {
             this.viewMode = savedViewMode;
         }
 
+        // Load sidebar width from localStorage
+        const savedWidth = localStorage.getItem("nmrxiv-sidebar-width");
+        if (savedWidth) {
+            const parsed = parseInt(savedWidth, 10);
+            if (!isNaN(parsed) && parsed >= 180 && parsed <= 600) {
+                this.sidebarWidth = parsed;
+            }
+        }
+
         if (this.draft) {
             this.url =
                 this.baseURL + "/dashboard/drafts/" + this.draft.id + "/files";
@@ -1358,6 +1473,9 @@ export default {
 
         // Listen for global proceed events
         window.addEventListener("file-browser-proceed", this.handleProceed);
+
+        // Prevent page refresh/navigation during upload
+        window.addEventListener("beforeunload", this.handleBeforeUnload);
     },
 
     beforeUnmount() {
@@ -1367,6 +1485,11 @@ export default {
         // Clean up event listeners
         window.removeEventListener("popstate", this.handleURLChange);
         window.removeEventListener("file-browser-proceed", this.handleProceed);
+        window.removeEventListener("beforeunload", this.handleBeforeUnload);
+
+        // Clean up resize listeners
+        document.removeEventListener("mousemove", this.onResize);
+        document.removeEventListener("mouseup", this.stopResize);
     },
     /**
      * Component methods
@@ -1480,6 +1603,36 @@ export default {
         handleProceed() {
             this.clearFileTreeState();
             this.$emit("proceed");
+        },
+
+        /**
+         * Prevent page navigation/refresh during active uploads
+         *
+         * Shows a browser confirmation dialog when the user attempts to
+         * navigate away or refresh the page while files are being uploaded.
+         *
+         * @param {Event} event - The beforeunload event
+         */
+        handleBeforeUnload(event) {
+            // Check if upload is in progress
+            const uploadInProgress = this.dropzone && this.status && this.precentageUpload < 100;
+            
+            // Check if deletion is in progress
+            const deletionInProgress = this.isDeletingFiles;
+            
+            if (uploadInProgress || deletionInProgress) {
+                // Standard way to trigger confirmation dialog
+                event.preventDefault();
+                
+                // Set appropriate message based on operation
+                const message = uploadInProgress 
+                    ? "Files are being uploaded. Are you sure you want to leave?"
+                    : "Files are being deleted. Are you sure you want to leave?";
+                
+                // Chrome requires returnValue to be set
+                event.returnValue = message;
+                return event.returnValue;
+            }
         },
 
         /**
@@ -1860,6 +2013,49 @@ export default {
          */
         toggleShowLogsDialog() {
             this.showLogsDialog = !this.showLogsDialog;
+        },
+
+        /**
+         * Start resizing the sidebar via mouse drag
+         * @param {MouseEvent} event - The mousedown event on the resize handle
+         */
+        startResize(event) {
+            event.preventDefault();
+            this.isResizing = true;
+            document.addEventListener("mousemove", this.onResize);
+            document.addEventListener("mouseup", this.stopResize);
+            document.body.style.cursor = "col-resize";
+            document.body.style.userSelect = "none";
+        },
+
+        /**
+         * Handle mousemove during sidebar resize
+         * @param {MouseEvent} event - The mousemove event
+         */
+        onResize(event) {
+            if (!this.isResizing || !this.$refs.sidebarRef) return;
+            const containerLeft =
+                this.$refs.sidebarRef.parentElement.getBoundingClientRect().left;
+            let newWidth = event.clientX - containerLeft;
+            // Clamp between min 180px and max 600px
+            newWidth = Math.max(180, Math.min(600, newWidth));
+            this.sidebarWidth = newWidth;
+        },
+
+        /**
+         * Stop resizing the sidebar and persist width
+         */
+        stopResize() {
+            this.isResizing = false;
+            document.removeEventListener("mousemove", this.onResize);
+            document.removeEventListener("mouseup", this.stopResize);
+            document.body.style.cursor = "";
+            document.body.style.userSelect = "";
+            // Persist sidebar width preference
+            localStorage.setItem(
+                "nmrxiv-sidebar-width",
+                String(this.sidebarWidth)
+            );
         },
 
         /**

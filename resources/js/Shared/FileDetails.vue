@@ -1,29 +1,19 @@
-<!--
-  File Details Component
-  
-  Displays detailed information about a selected file including metadata,
-  upload timestamp, file size, ETag, and download functionality. Used in
-  file browser interfaces to show file properties in a structured format.
--->
 <template>
-    <!-- Main container with shadow and rounded corners -->
-    <div
-        class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200"
-    >
-        <!-- Header section with file name and status indicator -->
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 text-xl font-bold text-gray-900">
+    <!-- Main container with modern card styling -->
+    <div class="bg-white rounded-lg border border-gray-200">
+        <!-- Header section with file name and status -->
+        <div class="px-5 py-4 border-b border-gray-100">
+            <div class="flex items-start space-x-3">
                 <!-- Missing file warning indicator -->
                 <span
                     v-if="file.status == 'missing'"
-                    class="float-left inline pr-4 pt-1 text-sm font-medium pointer-events-none"
+                    class="flex-shrink-0"
                 >
-                    <!-- Red warning icon for missing files -->
                     <span
-                        class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"
                     >
                         <svg
-                            class="h-6 w-6 text-red-600"
+                            class="h-5 w-5 text-red-600"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
@@ -38,113 +28,285 @@
                         </svg>
                     </span>
                 </span>
-                <!-- File name display -->
-                {{ file.name }}
-            </h3>
-            <!-- Subtitle describing the content -->
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">File information</p>
+
+                <!-- Integrity status badge -->
+                <span
+                    v-else-if="file.integrity_status"
+                    class="flex-shrink-0"
+                >
+                    <span
+                        v-if="file.integrity_status === 'verified'"
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100"
+                    >
+                        <svg
+                            class="h-5 w-5 text-green-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                    </span>
+                    <span
+                        v-else-if="file.integrity_status === 'failed'"
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"
+                    >
+                        <svg
+                            class="h-5 w-5 text-red-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                    </span>
+                    <span
+                        v-else
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100"
+                    >
+                        <svg
+                            class="h-5 w-5 text-yellow-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                    </span>
+                </span>
+
+                <div class="flex-1 min-w-0">
+                    <h3
+                        class="text-base font-semibold text-gray-900 truncate"
+                        :title="file.name"
+                    >
+                        {{ file.name }}
+                    </h3>
+                    <p class="text-sm text-gray-500">File information</p>
+                </div>
+            </div>
         </div>
 
         <!-- File details section with structured data -->
-        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
-            <!-- Definition list for file metadata -->
-            <dl class="sm:divide-y sm:divide-gray-200">
-                <!-- File metadata grid -->
-                <div
-                    class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                >
-                    <!-- Upload timestamp -->
-                    <dt class="text-sm font-medium text-gray-500">
-                        Uploaded at
+        <div class="px-5 py-4 space-y-4">
+            <!-- Basic file properties -->
+            <dl class="grid grid-cols-1 gap-3">
+                <!-- Upload timestamp -->
+                <div class="flex justify-between items-center">
+                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Uploaded
                     </dt>
-                    <dd
-                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
-                    >
+                    <dd class="text-sm text-gray-900 font-medium">
                         {{ formatDateTime(file.created_at) }}
-                    </dd>
-
-                    <!-- File size information -->
-                    <dt class="text-sm font-medium text-gray-500">File size</dt>
-                    <dd
-                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
-                    >
-                        {{ bytesToSize(fileInfo.size) }}
-                    </dd>
-
-                    <!-- ETag for file integrity verification -->
-                    <dt class="text-sm font-medium text-gray-500">ETag</dt>
-                    <dd
-                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
-                    >
-                        <!-- Display ETag without quotes if available -->
-                        <div v-if="fileInfo.ETag">
-                            {{ fileInfo.ETag.replace(/"/g, "") }}
-                        </div>
-                        <!-- Placeholder when ETag is not available -->
-                        <div v-else>-</div>
                     </dd>
                 </div>
 
-                <!-- Spacer element -->
-                <div></div>
-
-                <!-- File content and download section -->
+                <!-- Last modified -->
                 <div
-                    class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                    v-if="file.updated_at && file.updated_at !== file.created_at"
+                    class="flex justify-between items-center"
                 >
-                    <dt class="text-sm font-medium text-gray-500">Content</dt>
-                    <dd
-                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
-                    >
-                        <!-- File attachment list -->
-                        <ul
-                            role="list"
-                            class="border border-gray-200 rounded-md divide-y divide-gray-200"
-                        >
-                            <!-- Single file item with download option -->
-                            <li
-                                class="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
-                            >
-                                <!-- File icon and name -->
-                                <div class="w-0 flex-1 flex items-center">
-                                    <!-- Paper clip icon indicating attachment -->
-                                    <svg
-                                        class="flex-shrink-0 h-5 w-5 text-gray-400"
-                                        x-description="Heroicon name: solid/paper-clip"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
-                                    <!-- Truncated file name -->
-                                    <span class="ml-2 flex-1 w-0 truncate">
-                                        {{ file.name }}
-                                    </span>
-                                </div>
+                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Modified
+                    </dt>
+                    <dd class="text-sm text-gray-900 font-medium">
+                        {{ formatDateTime(file.updated_at) }}
+                    </dd>
+                </div>
 
-                                <!-- Download link (only shown if download URL is available) -->
-                                <div
-                                    v-if="downloadURL"
-                                    class="ml-4 flex-shrink-0"
-                                >
-                                    <a
-                                        :href="downloadURL"
-                                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                                    >
-                                        Download
-                                    </a>
-                                </div>
-                            </li>
-                        </ul>
+                <!-- File size -->
+                <div class="flex justify-between items-center">
+                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Size
+                    </dt>
+                    <dd class="text-sm text-gray-900 font-medium">
+                        {{ formatFileSize() }}
+                    </dd>
+                </div>
+
+                <!-- File type/extension -->
+                <div
+                    v-if="fileExtension"
+                    class="flex justify-between items-center"
+                >
+                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                    </dt>
+                    <dd class="text-sm text-gray-900 font-medium">
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                        >
+                            {{ fileExtension.toUpperCase() }}
+                        </span>
                     </dd>
                 </div>
             </dl>
+
+            <!-- Integrity section (if available) -->
+            <div
+                v-if="
+                    file.integrity_status ||
+                    file.checksum_sha256 ||
+                    file.checksum_md5
+                "
+                class="pt-3 border-t border-gray-100"
+            >
+                <h4
+                    class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3"
+                >
+                    Integrity
+                </h4>
+                <dl class="space-y-3">
+                    <!-- Integrity status -->
+                    <div
+                        v-if="file.integrity_status"
+                        class="flex justify-between items-center"
+                    >
+                        <dt
+                            class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                            Status
+                        </dt>
+                        <dd>
+                            <span
+                                :class="[
+                                    file.integrity_status === 'verified'
+                                        ? 'bg-green-100 text-green-800'
+                                        : file.integrity_status === 'failed'
+                                          ? 'bg-red-100 text-red-800'
+                                          : 'bg-yellow-100 text-yellow-800',
+                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                                ]"
+                            >
+                                {{ formatIntegrityStatus(file.integrity_status) }}
+                            </span>
+                        </dd>
+                    </div>
+
+                    <!-- Verification time -->
+                    <div
+                        v-if="file.integrity_verified_at"
+                        class="flex justify-between items-center"
+                    >
+                        <dt
+                            class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                            Verified
+                        </dt>
+                        <dd class="text-sm text-gray-900 font-medium">
+                            {{ formatDateTime(file.integrity_verified_at) }}
+                        </dd>
+                    </div>
+
+                    <!-- SHA256 checksum -->
+                    <div v-if="file.checksum_sha256">
+                        <dt
+                            class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5"
+                        >
+                            SHA-256
+                        </dt>
+                        <dd
+                            class="text-xs font-mono text-gray-600 bg-gray-50 px-3 py-2 rounded border border-gray-200 break-all"
+                        >
+                            {{ file.checksum_sha256 }}
+                        </dd>
+                    </div>
+
+                    <!-- MD5 checksum -->
+                    <div v-if="file.checksum_md5">
+                        <dt
+                            class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5"
+                        >
+                            MD5
+                        </dt>
+                        <dd
+                            class="text-xs font-mono text-gray-600 bg-gray-50 px-3 py-2 rounded border border-gray-200 break-all"
+                        >
+                            {{ file.checksum_md5 }}
+                        </dd>
+                    </div>
+
+                    <!-- Integrity error (if failed) -->
+                    <div
+                        v-if="
+                            file.integrity_status === 'failed' &&
+                            file.integrity_error
+                        "
+                        class="mt-2"
+                    >
+                        <div
+                            class="bg-red-50 border border-red-200 rounded-md p-3"
+                        >
+                            <p class="text-xs text-red-800">
+                                {{ file.integrity_error }}
+                            </p>
+                        </div>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Legacy ETag (if available and no checksums) -->
+            <div
+                v-if="
+                    fileInfo.ETag &&
+                    !file.checksum_sha256 &&
+                    !file.checksum_md5
+                "
+                class="pt-3 border-t border-gray-100"
+            >
+                <dl class="space-y-3">
+                    <div>
+                        <dt
+                            class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5"
+                        >
+                            ETag
+                        </dt>
+                        <dd
+                            class="text-xs font-mono text-gray-600 bg-gray-50 px-3 py-2 rounded border border-gray-200 break-all"
+                        >
+                            {{ fileInfo.ETag.replace(/"/g, "") }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Download section -->
+            <div v-if="downloadURL" class="pt-3 border-t border-gray-100">
+                <a
+                    :href="downloadURL"
+                    class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors"
+                >
+                    <svg
+                        class="h-4 w-4 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                        />
+                    </svg>
+                    Download File
+                </a>
+            </div>
         </div>
     </div>
 </template>
@@ -261,7 +423,28 @@ export default {
          * @returns {Object} Parsed file information object
          */
         fileInfo() {
-            return JSON.parse(this.file.info);
+            if (this.file.info) {
+                try {
+                    return JSON.parse(this.file.info);
+                } catch (e) {
+                    return {};
+                }
+            }
+            return {};
+        },
+
+        /**
+         * Extract file extension from filename
+         *
+         * @returns {String|null} File extension without dot, or null if no extension
+         */
+        fileExtension() {
+            if (!this.file.name) return null;
+            const parts = this.file.name.split(".");
+            if (parts.length > 1) {
+                return parts.pop().toLowerCase();
+            }
+            return null;
         },
     },
 
@@ -322,6 +505,44 @@ export default {
             return date
                 .toLocaleDateString("en-US", options)
                 .replace(",", " at");
+        },
+
+        /**
+         * Format file size for display
+         *
+         * Uses file_size from the model if available, otherwise falls back
+         * to the info.ContentLength property.
+         *
+         * @returns {String} Formatted file size string
+         */
+        formatFileSize() {
+            // Prefer the file_size attribute from the model
+            if (this.file.file_size) {
+                return this.bytesToSize(this.file.file_size);
+            }
+            // Fall back to ContentLength from info JSON
+            if (this.fileInfo.ContentLength) {
+                return this.bytesToSize(this.fileInfo.ContentLength);
+            }
+            return "-";
+        },
+
+        /**
+         * Format integrity status for display
+         *
+         * Converts internal status values to human-readable labels.
+         *
+         * @param {String} status - Internal integrity status value
+         * @returns {String} Human-readable status label
+         */
+        formatIntegrityStatus(status) {
+            const statusMap = {
+                verified: "Verified",
+                failed: "Failed",
+                pending: "Pending",
+                not_verified: "Not Verified",
+            };
+            return statusMap[status] || status;
         },
     },
 };
