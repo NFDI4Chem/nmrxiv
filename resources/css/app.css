@@ -5,21 +5,28 @@
 
 .tooltip {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.8em;
 }
 
 .tooltip .tooltiptext {
   visibility: hidden;
+  opacity: 0;
   position: absolute;
   z-index: 100;
-  bottom: 100%;
+  bottom: calc(100% + 0.25rem);
   left: 50%;
-  margin-left: -60px;
+  transform: translateX(-50%);
+  margin-left: 0;
+  transition: opacity 0.12s ease-out, visibility 0.12s ease-out;
 }
 
-.tooltip:hover .tooltiptext {
+.tooltip:hover .tooltiptext,
+.tooltip:focus-within .tooltiptext {
   visibility: visible;
+  opacity: 1;
 }
 
 @layer utilities {

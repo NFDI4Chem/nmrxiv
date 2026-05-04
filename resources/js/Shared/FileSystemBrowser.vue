@@ -36,24 +36,24 @@
                     >
                         <!-- Documentation link with tooltip -->
                         <div
-                            class="min-w-0 flex-1 text-sm text-gray-700 hover:text-blue-700"
+                            class="min-w-0 flex-1 text-sm text-gray-700"
                         >
-                            <i class="not-italic">
+                            <div
+                                class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3"
+                            >
+                                <ToolTip
+                                    class="text-blue-600"
+                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                                />
                                 <a
-                                    class="inline-flex cursor-pointer items-center"
+                                    class="text-blue-600 underline decoration-blue-300/70 underline-offset-2 transition hover:text-blue-800 hover:decoration-blue-500"
                                     href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <ToolTip
-                                        class="w-3.5 h-3.5 shrink-0"
-                                        text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
-                                    />
-                                    <span class="ml-2 sm:ml-4">
-                                        Learn more about folder structuring
-                                    </span>
+                                    Learn more about folder structuring
                                 </a>
-                            </i>
+                            </div>
                         </div>
 
                         <div
