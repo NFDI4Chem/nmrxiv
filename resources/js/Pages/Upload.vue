@@ -72,17 +72,57 @@
                                     </Link>
                                 </span>
 
-                                <span v-if="currentStep && currentDraft">
-                                    <p
-                                        class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
-                                        contenteditable
-                                        @blur="updateDraft($event)"
+                                <span
+                                    v-if="currentStep && currentDraft"
+                                    class="mt-2 inline-flex max-w-xl flex-col gap-1.5 sm:ml-2"
+                                >
+                                    <span
+                                        id="upload-draft-name-label"
+                                        class="text-xs font-medium normal-case tracking-normal text-gray-600"
                                     >
-                                        {{ currentDraft.name }}
+                                        Project name
+                                    </span>
+                                    <div
+                                        class="group flex min-w-0 items-stretch rounded-lg border border-gray-300 bg-white/95 shadow-sm transition-colors hover:border-teal-400/90 hover:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/25 focus-within:ring-offset-2 focus-within:ring-offset-white"
+                                    >
+                                        <p
+                                            ref="draftNameEditor"
+                                            class="min-w-[12rem] flex-1 cursor-text px-3 py-2 text-base font-semibold normal-case tracking-normal text-gray-900 outline-none"
+                                            contenteditable="true"
+                                            role="textbox"
+                                            tabindex="0"
+                                            spellcheck="true"
+                                            aria-labelledby="upload-draft-name-label"
+                                            aria-describedby="upload-draft-name-hint"
+                                            @blur="updateDraft($event)"
+                                            @keydown.enter.prevent="
+                                                $event.target.blur()
+                                            "
+                                        >
+                                            {{ currentDraft.name }}
+                                        </p>
+                                        <button
+                                            type="button"
+                                            class="flex shrink-0 items-center border-l border-gray-200 px-3 text-gray-400 transition-colors hover:bg-gray-50 hover:text-teal-600 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
+                                            aria-label="Focus project name field"
+                                            @click="focusDraftName"
+                                        >
+                                            <PencilIcon
+                                                class="h-4 w-4"
+                                                aria-hidden="true"
+                                            />
+                                        </button>
+                                    </div>
+                                    <p
+                                        id="upload-draft-name-hint"
+                                        class="text-xs font-normal normal-case tracking-normal text-gray-500"
+                                    >
+                                        Click the name or pencil to edit. Press
+                                        Enter to save.
                                     </p>
                                     <jet-input-error
                                         :message="draftForm.errors.name"
-                                        class="mt-2"
+                                        class="mt-0.5 normal-case"
                                     />
                                 </span>
                                 <span v-else> Submit data to nmrXiv </span>
@@ -2664,6 +2704,15 @@ export default {
         }
     },
     methods: {
+        focusDraftName() {
+            this.$nextTick(() => {
+                const editor = this.$refs.draftNameEditor;
+                if (!editor || typeof editor.focus !== "function") {
+                    return;
+                }
+                editor.focus();
+            });
+        },
         onScroll() {
             this.hideDownArrow = true;
         },
