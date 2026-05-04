@@ -321,6 +321,94 @@
                                     :message="draftForm.errors.name"
                                     class="mt-0.5 normal-case"
                                 />
+
+                                <div
+                                    class="mt-4 border-t border-gray-100 pt-4"
+                                >
+                                    <SwitchGroup
+                                        as="div"
+                                        class="flex items-start gap-3"
+                                    >
+                                        <HeadlessSwitch
+                                            v-model="needsReservedDoi"
+                                            :class="[
+                                                needsReservedDoi
+                                                    ? 'bg-teal-600'
+                                                    : 'bg-gray-200',
+                                                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+                                            ]"
+                                        >
+                                            <span class="sr-only"
+                                                >I need a DOI</span
+                                            >
+                                            <span
+                                                aria-hidden="true"
+                                                :class="[
+                                                    needsReservedDoi
+                                                        ? 'translate-x-5'
+                                                        : 'translate-x-0',
+                                                    'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                                ]"
+                                            />
+                                        </HeadlessSwitch>
+                                        <SwitchLabel
+                                            as="span"
+                                            class="cursor-pointer select-none text-sm font-medium leading-6 text-gray-900"
+                                            passive
+                                        >
+                                            I need a DOI
+                                        </SwitchLabel>
+                                    </SwitchGroup>
+
+                                    <div
+                                        v-if="needsReservedDoi"
+                                        class="mt-3 space-y-2"
+                                    >
+                                        <div
+                                            class="flex w-full min-w-0 overflow-hidden rounded-lg border border-gray-300 bg-gray-50 shadow-sm"
+                                        >
+                                            <input
+                                                id="upload-reserved-doi-preview"
+                                                type="text"
+                                                readonly
+                                                tabindex="-1"
+                                                class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 font-mono text-sm text-gray-800 outline-none"
+                                                :value="reservedDoiPreview"
+                                                aria-describedby="upload-reserved-doi-hint"
+                                            />
+                                            <button
+                                                type="button"
+                                                class="inline-flex shrink-0 items-center gap-1.5 border-l border-gray-200 bg-white px-3 py-2 text-sm font-medium text-teal-700 transition hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
+                                                @click="
+                                                    copyReservedDoiToClipboard()
+                                                "
+                                            >
+                                                <ClipboardDocumentIcon
+                                                    class="h-4 w-4 shrink-0"
+                                                    aria-hidden="true"
+                                                />
+                                                Copy
+                                            </button>
+                                        </div>
+                                        <p
+                                            id="upload-reserved-doi-hint"
+                                            class="text-xs leading-relaxed text-gray-500"
+                                        >
+                                            Reserve a DOI by pressing the button
+                                            (so it can be included in files prior
+                                            to upload). The DOI is registered
+                                            when your upload is published.
+                                        </p>
+                                        <p
+                                            v-if="doiCopySucceeded"
+                                            class="text-xs font-medium text-teal-600"
+                                            role="status"
+                                            aria-live="polite"
+                                        >
+                                            Copied to clipboard.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2412,7 +2500,15 @@ import {
     CheckIcon,
     ExclamationCircleIcon,
 } from "@heroicons/vue/24/solid";
-import { ArrowLeftIcon } from "@heroicons/vue/24/outline";
+import {
+    ArrowLeftIcon,
+    ClipboardDocumentIcon,
+} from "@heroicons/vue/24/outline";
+import {
+    Switch as HeadlessSwitch,
+    SwitchGroup,
+    SwitchLabel,
+} from "@headlessui/vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
@@ -2449,6 +2545,10 @@ export default {
         CheckIcon,
         ExclamationCircleIcon,
         ArrowLeftIcon,
+        ClipboardDocumentIcon,
+        HeadlessSwitch,
+        SwitchGroup,
+        SwitchLabel,
     },
     mixins: [Global],
     props: ["draft_id"],
@@ -2571,6 +2671,10 @@ export default {
             showSummary: true,
             showLogsDialog: false,
             selectedDraftForLogs: null,
+
+            needsReservedDoi: false,
+            doiCopySucceeded: false,
+            doiCopyResetTimer: null,
         };
     },
     computed: {
@@ -2604,6 +2708,13 @@ export default {
         },
         currentStep() {
             return this.steps.filter((s) => s.status == "current")[0];
+        },
+        reservedDoiPreview() {
+            if (!this.currentDraft?.id) {
+                return "https://doi.org/10.5281/nmrxiv.preview.pending";
+            }
+
+            return `https://doi.org/10.5281/nmrxiv.preview.draft-${this.currentDraft.id}`;
         },
         primed() {
             return this.$page.props.auth.user?.primed;
@@ -2738,6 +2849,9 @@ export default {
         if (this.searchDebounceTimer) {
             clearTimeout(this.searchDebounceTimer);
         }
+        if (this.doiCopyResetTimer) {
+            clearTimeout(this.doiCopyResetTimer);
+        }
     },
     methods: {
         focusDraftName() {
@@ -2748,6 +2862,21 @@ export default {
                 }
                 editor.focus();
             });
+        },
+        async copyReservedDoiToClipboard() {
+            try {
+                await navigator.clipboard.writeText(this.reservedDoiPreview);
+                this.doiCopySucceeded = true;
+                if (this.doiCopyResetTimer) {
+                    clearTimeout(this.doiCopyResetTimer);
+                }
+                this.doiCopyResetTimer = setTimeout(() => {
+                    this.doiCopySucceeded = false;
+                    this.doiCopyResetTimer = null;
+                }, 2500);
+            } catch {
+                this.doiCopySucceeded = false;
+            }
         },
         onScroll() {
             this.hideDownArrow = true;
@@ -2856,6 +2985,12 @@ export default {
             );
         },
         selectDraft(draft) {
+            this.needsReservedDoi = false;
+            this.doiCopySucceeded = false;
+            if (this.doiCopyResetTimer) {
+                clearTimeout(this.doiCopyResetTimer);
+                this.doiCopyResetTimer = null;
+            }
             this.currentDraft = draft;
             this.draftForm.name = this.currentDraft.name;
             this.draftForm.description = this.currentDraft.description;
