@@ -2,9 +2,14 @@
 
 namespace Tests\Feature\ExternalServices;
 
+use App\Services\Socialite\NFDIAAI\Provider;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Mockery;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Tests\TestCase;
 
 class NFDIAAIProviderTest extends TestCase
@@ -32,7 +37,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_get_auth_url(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             config('services.regapp.client_id', 'test-client'),
             config('services.regapp.client_secret', 'test-secret'),
@@ -52,7 +57,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_get_token_url(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             config('services.regapp.client_id', 'test-client'),
             config('services.regapp.client_secret', 'test-secret'),
@@ -70,7 +75,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_map_user_to_object_with_full_data(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             'test-client',
             'test-secret',
@@ -100,7 +105,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_map_user_to_object_with_fallback_fields(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             'test-client',
             'test-secret',
@@ -129,7 +134,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_map_user_to_object_with_minimal_data(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             'test-client',
             'test-secret',
@@ -155,24 +160,24 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_get_user_by_token(): void
     {
-        $provider = Mockery::mock(\App\Services\Socialite\NFDIAAI\Provider::class)
+        $provider = Mockery::mock(Provider::class)
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
 
-        $mockBody = Mockery::mock(\Psr\Http\Message\StreamInterface::class);
+        $mockBody = Mockery::mock(StreamInterface::class);
         $mockBody->shouldReceive('__toString')
             ->once()
             ->andReturn('{"sub":"test-user-id","email":"test@example.com","name":"Test User"}');
 
-        $mockResponse = Mockery::mock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse = Mockery::mock(ResponseInterface::class);
         $mockResponse->shouldReceive('getBody')->andReturn($mockBody);
 
-        $mockClient = Mockery::mock(\GuzzleHttp\Client::class);
+        $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('get')
             ->with('https://regapp.nfdi-aai.de/oidc/realms/nfdi/protocol/openid-connect/userinfo', Mockery::on(function ($arg) {
-                return isset($arg[\GuzzleHttp\RequestOptions::HEADERS]['Authorization']) &&
-                       $arg[\GuzzleHttp\RequestOptions::HEADERS]['Authorization'] === 'Bearer test-token' &&
-                       $arg[\GuzzleHttp\RequestOptions::HEADERS]['Accept'] === 'application/json';
+                return isset($arg[RequestOptions::HEADERS]['Authorization']) &&
+                       $arg[RequestOptions::HEADERS]['Authorization'] === 'Bearer test-token' &&
+                       $arg[RequestOptions::HEADERS]['Accept'] === 'application/json';
             }))
             ->once()
             ->andReturn($mockResponse);
@@ -193,7 +198,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_map_user_handles_null_values(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             'test-client',
             'test-secret',
@@ -217,7 +222,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_map_user_trims_name_from_parts(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             'test-client',
             'test-secret',
@@ -242,7 +247,7 @@ class NFDIAAIProviderTest extends TestCase
 
     public function test_provider_map_user_with_only_given_name(): void
     {
-        $provider = new \App\Services\Socialite\NFDIAAI\Provider(
+        $provider = new Provider(
             request(),
             'test-client',
             'test-secret',

@@ -4,6 +4,7 @@ namespace Tests\Unit\Actions\Project;
 
 use App\Actions\Project\UpdateDOI;
 use App\Models\Dataset;
+use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
 use App\Services\DOI\DOIService;
@@ -301,7 +302,7 @@ class UpdateDOITest extends TestCase
     public function test_update_handles_project_without_studies()
     {
         // Create license first
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
         $project = Project::factory()->create(['license_id' => $license->id]);
         $project->studies()->delete(); // Ensure no studies exist
 
@@ -313,7 +314,7 @@ class UpdateDOITest extends TestCase
     public function test_update_handles_study_without_datasets()
     {
         // Create license and project first
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
         $project = Project::factory()->create(['license_id' => $license->id]);
         $study = Study::factory()->create(['project_id' => $project->id, 'license_id' => $license->id]);
         $study->datasets()->delete(); // Ensure no datasets exist
@@ -327,7 +328,7 @@ class UpdateDOITest extends TestCase
     public function test_update_with_mock_doi_service_completes_successfully()
     {
         // Create license first
-        $license = \App\Models\License::factory()->create();
+        $license = License::factory()->create();
 
         // Create a project with nested relationships
         $project = Project::factory()->create(['license_id' => $license->id]);

@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Maize\Markable\Models\Bookmark;
 use Tests\TestCase;
 
 class StudyRelationshipsTest extends TestCase
@@ -312,7 +313,7 @@ class StudyRelationshipsTest extends TestCase
         $this->assertFalse($this->study->is_bookmarked);
 
         // Bookmark the study
-        \Maize\Markable\Models\Bookmark::add($this->study, $this->user);
+        Bookmark::add($this->study, $this->user);
         $this->study->refresh();
 
         $this->assertTrue($this->study->is_bookmarked);

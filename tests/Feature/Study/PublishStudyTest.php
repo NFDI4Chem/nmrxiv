@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class PublishStudyTest extends TestCase
@@ -81,7 +82,7 @@ class PublishStudyTest extends TestCase
 
         $updater = new UpdateStudy;
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         $updater->update($study, [
             'name' => $study->name,

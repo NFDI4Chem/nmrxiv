@@ -5,7 +5,11 @@ namespace Tests\Unit\Models;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Jetstream\Events\TeamCreated;
+use Laravel\Jetstream\Events\TeamDeleted;
+use Laravel\Jetstream\Events\TeamUpdated;
 use Laravel\Jetstream\Team as JetstreamTeam;
 use Tests\TestCase;
 
@@ -141,14 +145,14 @@ class TeamModelTest extends TestCase
     {
         $team = Team::factory()->create();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $team->projects());
+        $this->assertInstanceOf(HasMany::class, $team->projects());
     }
 
     public function test_active_projects_relationship_is_has_many(): void
     {
         $team = Team::factory()->create();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $team->activeProjects());
+        $this->assertInstanceOf(HasMany::class, $team->activeProjects());
     }
 
     public function test_factory_creates_unique_team_names(): void
@@ -238,9 +242,9 @@ class TeamModelTest extends TestCase
         $events = $property->getValue($team);
 
         $expectedEvents = [
-            'created' => \Laravel\Jetstream\Events\TeamCreated::class,
-            'updated' => \Laravel\Jetstream\Events\TeamUpdated::class,
-            'deleted' => \Laravel\Jetstream\Events\TeamDeleted::class,
+            'created' => TeamCreated::class,
+            'updated' => TeamUpdated::class,
+            'deleted' => TeamDeleted::class,
         ];
 
         $this->assertEquals($expectedEvents, $events);
