@@ -27,12 +27,12 @@
     >
         <div :class="[hasProjectFiles ? '' : 'h-full flex flex-col']">
             <!-- Header section with help links and missing files indicator -->
-            <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
+            <div :class="[fullScreen ? 'px-6 py-2' : '', 'flex']">
                 <div class="w-full px-5">
                     <!-- Help and documentation section (only shown in edit mode) -->
                     <div
                         v-if="!readonly"
-                        class="my-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pr-2 sm:pr-5"
+                        class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 pr-2 sm:pr-5"
                     >
                         <!-- Documentation link with tooltip -->
                         <div
@@ -157,7 +157,7 @@
                 :class="[
                     hasProjectFiles
                         ? fullScreen
-                            ? 'px-6 py-4'
+                            ? 'px-6 py-2'
                             : 'px-5'
                         : 'h-full flex flex-col flex-1 min-h-0 p-5',
                 ]"
@@ -165,7 +165,7 @@
                 <div
                     :class="[
                         hasProjectFiles
-                            ? 'py-2 mb-3'
+                            ? 'py-1 mb-2'
                             : 'h-full overflow-hidden flex-1 flex items-center justify-center',
                     ]"
                 >
