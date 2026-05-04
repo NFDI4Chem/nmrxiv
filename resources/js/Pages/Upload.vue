@@ -83,7 +83,7 @@
                                         Project name
                                     </span>
                                     <div
-                                        class="group flex min-w-0 items-stretch rounded-lg border border-gray-300 bg-white/95 shadow-sm transition-colors hover:border-teal-400/90 hover:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/25 focus-within:ring-offset-2 focus-within:ring-offset-white"
+                                        class="group flex min-w-0 items-stretch overflow-hidden rounded-lg border border-gray-300 bg-white/95 shadow-sm transition-colors hover:border-teal-400/90 hover:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/25 focus-within:ring-offset-2 focus-within:ring-offset-white"
                                     >
                                         <p
                                             ref="draftNameEditor"
@@ -103,7 +103,7 @@
                                         </p>
                                         <button
                                             type="button"
-                                            class="flex shrink-0 items-center border-l border-gray-200 px-3 text-gray-400 transition-colors hover:bg-gray-50 hover:text-teal-600 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
+                                            class="flex shrink-0 items-center rounded-r-lg border-l border-gray-200 px-3 text-gray-400 transition-colors hover:bg-gray-50 hover:text-teal-600 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
                                             aria-label="Focus project name field"
                                             @click="focusDraftName"
                                         >
