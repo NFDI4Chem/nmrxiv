@@ -580,8 +580,10 @@
                     </div>
                     <div v-else>
                         <div v-if="showPrimer">
-                            <div class="h-[calc(100vh-235px)] overflow-scroll">
-                                <primer />
+                            <div
+                                class="h-[calc(100vh-235px)] overflow-y-auto px-4 sm:px-6 py-4"
+                            >
+                                <Primer />
                             </div>
                         </div>
                         <div v-else>

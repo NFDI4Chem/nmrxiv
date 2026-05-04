@@ -271,129 +271,10 @@
                 </div>
                 <div v-else>
                     <div v-if="showPrimer" class="-mx-6 -my-4">
-                        <div>
-                            <section
-                                class="h-1/2 overflow-hidden bg-white overflow-hidden py-12"
-                            >
-                                <div
-                                    class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-                                >
-                                    <svg
-                                        class="absolute top-full right-full transform translate-x-1/3 -translate-y-1/4 lg:translate-x-1/2 xl:-translate-y-1/2"
-                                        width="404"
-                                        height="404"
-                                        fill="none"
-                                        viewBox="0 0 404 404"
-                                        role="img"
-                                        aria-labelledby="svg-nmrxiv"
-                                    >
-                                        <title id="svg-nmrxiv">nmrxiv</title>
-                                        <defs>
-                                            <pattern
-                                                id="ad119f34-7694-4c31-947f-5c9d249b21f3"
-                                                x="0"
-                                                y="0"
-                                                width="20"
-                                                height="20"
-                                                patternUnits="userSpaceOnUse"
-                                            >
-                                                <rect
-                                                    x="0"
-                                                    y="0"
-                                                    width="4"
-                                                    height="4"
-                                                    class="text-gray-200"
-                                                    fill="currentColor"
-                                                ></rect>
-                                            </pattern>
-                                        </defs>
-                                        <rect
-                                            width="404"
-                                            height="404"
-                                            fill="url(#ad119f34-7694-4c31-947f-5c9d249b21f3)"
-                                        ></rect>
-                                    </svg>
-                                    <div class="relative">
-                                        <blockquote>
-                                            <div
-                                                class="max-w-3xl mx-auto text-left text-xl leading-9 font-medium text-gray-900"
-                                            >
-                                                <p
-                                                    class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
-                                                >
-                                                    Basic Concepts
-                                                </p>
-                                                <p class="mt-3 text-lg">
-                                                    In nmrXiv, data is organised
-                                                    as
-                                                    <b class="text-teal-700"
-                                                        >projects</b
-                                                    >. Consider a project is
-                                                    equivalent to your
-                                                    publication with the
-                                                    corresponding NMR data to be
-                                                    uploaded to nmrXiv. A
-                                                    project can have multiple
-                                                    studies.
-                                                    <b class="text-teal-700"
-                                                        >A sample study
-                                                        corresponds to a group
-                                                        of NMR experiments of
-                                                        one sample</b
-                                                    >, e.g. 1H, 13C, APT, COSY
-                                                    HSQC, HMBC, NOESY in Bruker
-                                                    Format or (another study) in
-                                                    another format such as
-                                                    JCAMP-DX / Varian.
-                                                    <b class="text-teal-700"
-                                                        >Each NMR measurement in
-                                                        a study is referred to
-                                                        as a dataset</b
-                                                    >, e.g. 1H NMR or COSY (are
-                                                    each a dataset).
-                                                </p>
-                                                <img
-                                                    src="/img/primer.png"
-                                                    alt=""
-                                                />
-                                                <p
-                                                    class="text-md text-center leading-5 mb-3"
-                                                >
-                                                    <small
-                                                        >nmrXiv allows you to
-                                                        upload NMR raw data from
-                                                        any NMR instrument. We
-                                                        can currently
-                                                        auto-detect
-                                                        Bruker/Varian/JOEL
-                                                        formats & JCAMP files
-                                                        and will support more
-                                                        raw & processed file
-                                                        formats soon. Once you
-                                                        upload your raw or
-                                                        processed NMR data,
-                                                        nmrXiv will
-                                                        auto-generate the
-                                                        studies and datasets for
-                                                        you based on the
-                                                        uploaded folder
-                                                        structure.
-                                                        <i
-                                                            ><a
-                                                                class="text-xs"
-                                                                target="_blank"
-                                                                href="https://docs.nmrxiv.org/submission-guides/submission/folder-structure"
-                                                                >More info
-                                                                here</a
-                                                            ></i
-                                                        ></small
-                                                    >
-                                                </p>
-                                            </div>
-                                        </blockquote>
-                                    </div>
-                                </div>
-                            </section>
+                        <div
+                            class="max-h-[min(560px,72vh)] overflow-y-auto px-4 sm:px-8 py-6 bg-white"
+                        >
+                            <Primer />
                         </div>
                     </div>
                     <div v-else>
@@ -1918,6 +1799,7 @@ import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
+import Primer from "@/Shared/Primer.vue";
 import {
     ExclamationTriangleIcon,
     ExclamationCircleIcon,
@@ -1940,6 +1822,7 @@ export default {
         PencilIcon,
         JetInputError,
         FileSystemBrowser,
+        Primer,
         ExclamationTriangleIcon,
         ArrowDownOnSquareStackIcon,
         TrashIcon,
