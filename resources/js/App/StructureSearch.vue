@@ -29,7 +29,11 @@
             appear
             @after-leave="query = ''"
         >
-            <HeadlessUiDialog as="div" class="relative z-10" @close="open = false">
+            <HeadlessUiDialog
+                as="div"
+                class="relative z-10"
+                @close="open = false"
+            >
                 <TransitionChild
                     as="template"
                     enter="ease-out duration-300"
