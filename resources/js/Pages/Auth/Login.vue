@@ -179,6 +179,11 @@ export default {
                 }))
                 .post(this.route("login"), {
                     onFinish: () => this.form.reset("password"),
+                    onError: () => {
+                        this.$nextTick(() => {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                        });
+                    },
                 });
         },
     },
