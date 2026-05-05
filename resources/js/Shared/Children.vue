@@ -195,7 +195,7 @@
                                                         sfile.relative_url
                                                         ? 'cursor-pointer bg-gray-100 text-gray-900'
                                                         : 'cursor-pointer text-gray-600',
-                                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                                    'group w-full flex pr-4 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                                                 ]"
                                                 @click.stop="
                                                     handleFolderClick(sfile)

@@ -358,7 +358,7 @@
                 >
                     <!-- Sidebar header (same bar height as right panel headers) -->
                     <div
-                        class="flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b border-gray-100 bg-gray-50 px-5"
+                        class="flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 border-y border-gray-100 bg-gray-50 px-5"
                     >
                         <span
                             class="shrink-0 text-sm font-semibold text-gray-900"
@@ -675,7 +675,7 @@
                     >
                         <!-- Panel header -->
                         <div
-                            class="flex min-h-12 shrink-0 items-center border-b border-gray-100 bg-gray-50 px-5"
+                            class="flex min-h-12 shrink-0 items-center border-y border-gray-100 bg-gray-50 px-5"
                         >
                             <div
                                 class="flex w-full justify-between items-center gap-3"
@@ -1046,10 +1046,15 @@
                                                 class="flex items-center justify-between px-2 pb-1"
                                             >
                                                 <p
+                                                    v-if="
+                                                        file.type !==
+                                                        'directory'
+                                                    "
                                                     class="text-sm font-medium text-gray-500"
                                                 >
                                                     {{ formatFileSize(file) }}
                                                 </p>
+                                                <span v-else></span>
                                                 <a
                                                     v-if="
                                                         file.type !==
@@ -1189,7 +1194,7 @@
                         <!-- File detail header -->
                         <div
                             v-if="$page.props.selectedFileSystemObject"
-                            class="flex min-h-12 shrink-0 items-center border-b border-gray-100 bg-gray-50 px-5"
+                            class="flex min-h-12 shrink-0 items-center border-y border-gray-100 bg-gray-50 px-5"
                         >
                             <div
                                 class="flex w-full items-center justify-between gap-3"
