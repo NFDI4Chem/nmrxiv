@@ -110,7 +110,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                 $assigner->assign($project->fresh());
 
-                if ($release_date->isPast()) {
+                if ($release_date->lessThanOrEqualTo(now())) {
                     $projectPublisher->publish($project);
                 }
                 $updater->update($project->fresh());
@@ -173,7 +173,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $assigner->assign($_studies);
                 $release_date = Carbon::parse($project->release_date);
 
-                if ($release_date->isPast()) {
+                if ($release_date->lessThanOrEqualTo(now())) {
                     foreach ($_studies as $study) {
                         $studyPublisher->publish($study);
                     }
