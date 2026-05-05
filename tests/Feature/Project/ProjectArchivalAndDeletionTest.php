@@ -3,6 +3,7 @@
 namespace Tests\Feature\Project;
 
 use App\Events\ProjectArchival;
+use App\Events\ProjectDeletion;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ProjectArchivalAndDeletionTest extends TestCase
@@ -98,7 +100,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
         $this->project->refresh();
         $this->assertTrue($this->project->is_deleted);
 
-        Event::assertDispatched(\App\Events\ProjectDeletion::class, function ($event) {
+        Event::assertDispatched(ProjectDeletion::class, function ($event) {
             return $event->project->id === $this->project->id;
         });
     }
@@ -210,7 +212,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
         $study = $this->project->studies()->create([
             'name' => 'Test Study',
             'slug' => 'test-study',
-            'uuid' => \Illuminate\Support\Str::uuid(),
+            'uuid' => Str::uuid(),
             'owner_id' => $this->owner->id,
         ]);
 
@@ -308,7 +310,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
         $study = $this->project->studies()->create([
             'name' => 'Test Study',
             'slug' => 'test-study',
-            'uuid' => \Illuminate\Support\Str::uuid(),
+            'uuid' => Str::uuid(),
             'owner_id' => $this->owner->id,
         ]);
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\OrcidController;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -335,7 +336,7 @@ class OrcidControllerTest extends TestCase
      */
     public function test_person_returns_error_when_orcid_id_is_empty(): void
     {
-        $controller = new \App\Http\Controllers\OrcidController;
+        $controller = new OrcidController;
         $response = $controller->person('');
 
         $this->assertEquals(400, $response->status());
@@ -347,7 +348,7 @@ class OrcidControllerTest extends TestCase
      */
     public function test_employment_returns_error_when_orcid_id_is_empty(): void
     {
-        $controller = new \App\Http\Controllers\OrcidController;
+        $controller = new OrcidController;
         $response = $controller->employment('');
 
         $this->assertEquals(400, $response->status());

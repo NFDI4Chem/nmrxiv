@@ -27,7 +27,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
     /**
      * The project instance.
      *
-     * @var \App\Models\Project
+     * @var Project
      */
     public $project;
 
@@ -58,7 +58,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
             $draft = $project->draft;
 
             if ($draft) {
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
 
                 $projectPath = preg_replace(
                     '~//+~',
@@ -128,7 +128,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
                     $path,
                     $fsObjectChild->path
                 );
-                Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newPath);
+                Storage::disk(config('filesystems.default'))->move($fsObjectChild->path, $newPath);
                 $fsObjectChild->path = $newPath;
                 $fsObjectChild->save();
             } else {

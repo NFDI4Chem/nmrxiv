@@ -17,10 +17,10 @@
         </button>
         <button
             v-if="mode == 'button'"
-            class="w-full flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
+            class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-white bg-gray-900 hover:bg-gray-800 transition-all duration-200"
             @click="openDialog(true)"
         >
-            <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />&nbsp;
+            <MagnifyingGlassIcon class="h-5 w-5 mr-2" aria-hidden="true" />
             Search Structure
         </button>
         <TransitionRoot
@@ -40,12 +40,12 @@
                     leave-to="opacity-0"
                 >
                     <div
-                        class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"
+                        class="fixed inset-0 bg-gray-500/40 backdrop-blur-xl transition-opacity"
                     />
                 </TransitionChild>
 
                 <div
-                    class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20"
+                    class="fixed inset-0 z-10 flex items-center justify-center p-4"
                 >
                     <TransitionChild
                         as="template"
@@ -57,103 +57,37 @@
                         leave-to="opacity-0 scale-95"
                     >
                         <DialogPanel
-                            class="mx-auto max-w-3xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
+                            class="mx-auto w-[95vw] max-w-6xl max-h-[95vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
                         >
+                            <!-- Main Content -->
+                            <div class="flex-1 overflow-y-auto">
+                                <div class="px-4 py-6 max-w-6xl mx-auto">
+                                    <StructureEditorContent
+                                        v-model:search-type="type"
+                                        editor-id="structureSearchEditor"
+                                        :editor="editor"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Footer with Actions -->
                             <div
-                                class="border-b border-gray-200 bg-white px-4 py-5 sm:px-6"
+                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
                             >
-                                <h3
-                                    class="text-lg font-medium leading-6 text-gray-900"
+                                <a
+                                    href="#"
+                                    class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                    @click.prevent="openDialog(false)"
                                 >
-                                    Search Structure
-                                </h3>
-                                <!-- <p class="mt-1 text-sm text-gray-500">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit quam corrupti
-                  consectetur.
-                </p> -->
-                            </div>
-                            <div class="p-4">
-                                <div
-                                    id="structureSearchEditor"
-                                    class="w-full border rounded-md"
-                                    style="height: 400px"
-                                />
-                                <div class="mt-6">
-                                    <fieldset class="mt-6">
-                                        <legend
-                                            class="contents text-base font-medium text-gray-900"
-                                        >
-                                            Select search type
-                                        </legend>
-                                        <!-- <p class="text-sm text-gray-500">
-                      These are delivered via SMS to your mobile phone.
-                    </p> -->
-                                        <div class="mt-4 space-y-4">
-                                            <div class="flex items-center">
-                                                <label
-                                                    for="search-type-exact"
-                                                    class="block cursor-pointer text-sm font-medium text-gray-700"
-                                                >
-                                                    <input
-                                                        id="search-type-exact"
-                                                        v-model="type"
-                                                        name="search-type"
-                                                        value="exact"
-                                                        type="radio"
-                                                        class="mr-3 h-4 w-4 border-gray-300 text-secondary-dark focus:ring-secondary-dark"
-                                                    />
-                                                    Exact match</label
-                                                >
-                                            </div>
-                                            <div class="flex items-center">
-                                                <label
-                                                    for="search-type-sub"
-                                                    class="block cursor-pointer text-sm font-medium text-gray-700"
-                                                    ><input
-                                                        id="search-type-sub"
-                                                        v-model="type"
-                                                        name="search-type"
-                                                        type="radio"
-                                                        value="substructure"
-                                                        class="mr-3 h-4 w-4 border-gray-300 text-secondary-dark focus:ring-secondary-dark"
-                                                    />Substructure Search</label
-                                                >
-                                            </div>
-                                            <div class="flex items-center">
-                                                <label
-                                                    for="search-type-similar"
-                                                    class="block cursor-pointer text-sm font-medium text-gray-700"
-                                                    ><input
-                                                        id="search-type-similar"
-                                                        v-model="type"
-                                                        name="search-type"
-                                                        value="similarity"
-                                                        type="radio"
-                                                        class="mr-3 h-4 w-4 border-gray-300 text-secondary-dark focus:ring-secondary-dark"
-                                                    />Similarity Search
-                                                    (tanimoto_threshold=0.5)</label
-                                                >
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-                            <div class="p-4">
-                                <div class="flex justify-end">
-                                    <button
-                                        type="button"
-                                        class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary-dark focus:ring-offset-2"
-                                        @click="openDialog(false)"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        class="ml-3 inline-flex justify-center rounded-md bg-gray-700 text-white py-2 px-4 text-sm font-medium shadow-sm hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-secondary-dark focus:ring-offset-2"
-                                        @click="search"
-                                    >
-                                        Search
-                                    </button>
-                                </div>
+                                    Cancel
+                                </a>
+                                <a
+                                    href="#"
+                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                    @click.prevent="search"
+                                >
+                                    Search
+                                </a>
                             </div>
                         </DialogPanel>
                     </TransitionChild>
@@ -173,6 +107,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { BeakerIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
 
 export default {
     components: {
@@ -182,6 +117,7 @@ export default {
         TransitionRoot,
         BeakerIcon,
         MagnifyingGlassIcon,
+        StructureEditorContent,
     },
     props: {
         mode: {
@@ -209,6 +145,38 @@ export default {
                         "structureSearchEditor",
                         1
                     );
+
+                    // Check if there's a query parameter in URL and load it
+                    const url = new URL(window.location.href);
+                    const querySmiles = url.searchParams.get("query");
+                    const queryType = url.searchParams.get("type");
+
+                    // Load the search type if present
+                    if (
+                        queryType &&
+                        ["exact", "substructure", "similarity"].includes(
+                            queryType
+                        )
+                    ) {
+                        this.type = queryType;
+                    }
+
+                    // Load the structure if present
+                    if (querySmiles && this.editor) {
+                        try {
+                            // Set the molecule from SMILES
+                            this.editor.setMolFile(
+                                OCL.Molecule.fromSmiles(
+                                    decodeURIComponent(querySmiles)
+                                ).toMolfile()
+                            );
+                        } catch (error) {
+                            console.error(
+                                "Error loading structure from query:",
+                                error
+                            );
+                        }
+                    }
                 });
             }
         },

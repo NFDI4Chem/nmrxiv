@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
@@ -64,6 +65,8 @@ class Study extends Model implements Auditable
         'doi',
         'identifier',
         'validation_id',
+        'metadata_bagit_generation_status',
+        'metadata_bagit_generation_logs',
     ];
 
     /**
@@ -72,10 +75,10 @@ class Study extends Model implements Auditable
     protected function casts(): array
     {
         return [
-            'authors' => 'array',
             'citations' => 'array',
             'molecules' => 'array',
             'processing_logs' => 'array',
+            'metadata_bagit_generation_logs' => 'array',
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'is_archived' => 'boolean',
@@ -138,7 +141,7 @@ class Study extends Model implements Auditable
     public function getStudyPhotoUrlAttribute()
     {
         return $this->study_photo_path
-                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->study_photo_path)
+                    ? Storage::disk(config('filesystems.default_public'))->url($this->study_photo_path)
                     : '';
     }
 
@@ -180,12 +183,12 @@ class Study extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
-        return env('APP_URL', null).'/sample/S'.$this->getRawOriginal('identifier');
+        return config('app.url').'/sample/S'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/studies/'.urlencode($this->url);
+        return config('app.url').'/studies/'.urlencode($this->url);
     }
 
     public function draft(): BelongsTo
@@ -268,7 +271,7 @@ class Study extends Model implements Auditable
     /**
      * Get all of the study's users including its owner.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function allUsers()
     {
@@ -303,7 +306,7 @@ class Study extends Model implements Auditable
     /**
      * Remove the given user from the study.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @return void
      */
     public function removeUser($user)
@@ -338,6 +341,25 @@ class Study extends Model implements Auditable
     public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
+    }
+
+    /**
+     * Get all of the authors that belong to the study.
+     */
+    public function studyAuthors(): BelongsToMany
+    {
+        return $this->belongsToMany(Author::class)
+            ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Accessor for authors attribute (alias for studyAuthors relationship).
+     */
+    protected function authors(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->studyAuthors,
+        );
     }
 
     public function scopeFilter($query, array $filters)

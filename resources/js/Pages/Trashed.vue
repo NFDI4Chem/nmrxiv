@@ -69,28 +69,26 @@
                 :projects="projects"
             ></team-projects>
         </div>
-        <div v-else>
-            <div class="text-center py-12">
+        <div v-else class="px-12 py-8 mx-auto max-w-4xl">
+            <div class="text-center py-16">
                 <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="mx-auto h-24 w-24 text-gray-400"
+                    class="mx-auto h-16 w-16 text-gray-300"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="1.5"
                 >
                     <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                     />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">
-                    No items in the trash.
+                <h3 class="mt-4 text-base font-semibold text-gray-900">
+                    Trash is empty
                 </h3>
-                <p class="mt-1 text-sm text-gray-500">
-                    You dont have any Projects, Studies or Datasets in your
-                    trash.
+                <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                    Deleted projects, studies, and datasets will appear here.
                 </p>
             </div>
         </div>

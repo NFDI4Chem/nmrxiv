@@ -44,7 +44,7 @@ COPY deployment/php.production.ini /usr/local/etc/php/conf.d/production.ini
 COPY composer.json composer.lock package*.json ./
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
+RUN composer install --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 # Install Node dependencies  
 RUN npm ci --production=false

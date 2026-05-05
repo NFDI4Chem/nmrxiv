@@ -30,10 +30,10 @@ class ProjectDeletionReminder extends Mailable
      */
     public function build()
     {
-        $coolOffPeriod = (int) env('COOL_OFF_PERIOD', '30');
+        $coolOffPeriod = config('nmrxiv.cool_off_period');
 
         return $this->markdown('vendor.mail.project-deletion-reminder', [
-            'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
+            'url' => url('/dashboard/projects/'.$this->project->id),
             'projectName' => $this->project->name,
             'deletedOn' => explode(' ', $this->project->deleted_on)[0],
             'dueDate' => explode(' ', Carbon::parse($this->project->deleted_on)->addDays($coolOffPeriod))[0],

@@ -6,6 +6,8 @@ use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Study;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -133,10 +135,10 @@ class NMRiumModelTest extends TestCase
         $nmrium = new NMRium;
 
         // Test polymorphic relationship
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphTo::class, $nmrium->nmriumable());
+        $this->assertInstanceOf(MorphTo::class, $nmrium->nmriumable());
 
         // Test user relationship (even though there's no user_id column in DB - method exists)
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $nmrium->user());
+        $this->assertInstanceOf(BelongsTo::class, $nmrium->user());
     }
 
     public function test_complex_nmrium_data_storage(): void

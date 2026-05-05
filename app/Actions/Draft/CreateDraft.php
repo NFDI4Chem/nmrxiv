@@ -16,7 +16,7 @@ class CreateDraft
         [$user_id, $team_id] = $user->getUserTeamData();
 
         $id = Str::uuid();
-        $environment = env('APP_ENV', 'local');
+        $environment = config('app.env', 'local');
 
         $path = $this->generateDraftPath($environment, $user_id, $id);
         $name = $this->generateDraftName($id, $options);

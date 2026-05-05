@@ -27,7 +27,7 @@ class UpdateDOI extends Command
     /**
      * The DOI service instance.
      *
-     * @var \App\Services\DOI\DOIService
+     * @var DOIService
      */
     protected $doiService;
 

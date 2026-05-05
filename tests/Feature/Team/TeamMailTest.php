@@ -6,6 +6,7 @@ use App\Mail\TeamInvitation;
 use App\Models\Team;
 use App\Models\TeamInvitation as TeamInvitationModel;
 use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -64,7 +65,7 @@ class TeamMailTest extends TestCase
 
         $mailable = new TeamInvitation($invitation);
 
-        $this->assertInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class, $mailable);
+        $this->assertInstanceOf(ShouldQueue::class, $mailable);
     }
 
     public function test_team_invitation_mail_handles_different_roles(): void

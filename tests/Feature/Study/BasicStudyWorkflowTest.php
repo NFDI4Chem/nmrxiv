@@ -159,6 +159,46 @@ class BasicStudyWorkflowTest extends TestCase
         ]);
     }
 
+    public function test_authenticated_user_can_update_study_and_receive_json_payload(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Original Study Name',
+            'description' => 'Original description',
+        ]);
+
+        $this->actingAs($this->user)
+            ->putJson(route('dashboard.study.update', $study), [
+                'name' => 'Updated From Json',
+                'description' => 'Updated json description',
+                'color' => '#00AA00',
+                'starred' => false,
+                'is_public' => false,
+            ])
+            ->assertOk()
+            ->assertJsonPath('id', $study->id)
+            ->assertJsonPath('name', 'Updated From Json')
+            ->assertJsonPath('description', 'Updated json description')
+            ->assertJsonPath('color', '#00AA00')
+            ->assertJsonStructure([
+                'id',
+                'name',
+                'description',
+                'datasets',
+                'sample',
+                'tags',
+            ]);
+
+        $this->assertDatabaseHas('studies', [
+            'id' => $study->id,
+            'name' => 'Updated From Json',
+            'description' => 'Updated json description',
+            'color' => '#00AA00',
+        ]);
+    }
+
     public function test_published_study_cannot_be_updated(): void
     {
         $study = Study::factory()->create([

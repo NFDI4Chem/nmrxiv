@@ -42,7 +42,10 @@ class ApplicationController extends Controller
         if ($model && $namespace === 'Molecule') {
             // Redirect to spectra page with compound parameter for now
             // This maintains the current compound viewing functionality
-            return redirect('/spectra?compound='.substr($identifier, 1));
+            // Use getRawOriginal to get the numeric identifier without NMRXIV:M prefix
+            $compoundId = $model->getRawOriginal('identifier');
+
+            return redirect('/spectra?compound='.$compoundId);
         } else {
             abort(404, 'Compound not found');
         }
@@ -102,6 +105,7 @@ class ApplicationController extends Controller
                 }
             } elseif ($namespace == 'Study') {
                 $study = $model;
+                $study->load('studyAuthors'); // Eager load authors
                 $project = $study->project;
                 $tab = 'study';
             } elseif ($namespace == 'Dataset') {
@@ -147,7 +151,7 @@ class ApplicationController extends Controller
                     } else {
                         return Inertia::render('Public/Sample/Show', [
                             'tab' => $tab,
-                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license']),
+                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors']),
                         ]);
                         break;
                     }

@@ -6,6 +6,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -107,7 +108,7 @@ class DeleteProject
     /**
      * Delete dataset and related objects.
      *
-     * @param  \Illuminate\Support\Collection  $datasets
+     * @param  Collection  $datasets
      * @return void
      */
     public function deleteDatasets($dataset)
@@ -205,9 +206,9 @@ class DeleteProject
         $fsoIds = $this->getChildrenIds($filesystemobject, []);
         if (Storage::has($filesystemobject->path)) {
             if ($filesystemobject->type == 'directory') {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->deleteDirectory($filesystemobject->path);
+                Storage::disk(config('filesystems.default'))->deleteDirectory($filesystemobject->path);
             } else {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($filesystemobject->path);
+                Storage::disk(config('filesystems.default'))->delete($filesystemobject->path);
             }
             FileSystemObject::whereIn('id', $fsoIds)->delete();
         }
