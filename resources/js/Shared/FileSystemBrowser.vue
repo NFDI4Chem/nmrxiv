@@ -17,17 +17,15 @@
         :class="[
             fullScreen
                 ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
-                : hasProjectFiles
-                  ? 'h-screen'
-                  : height
-                    ? `${height} overflow-hidden`
-                    : 'h-screen overflow-hidden',
+                : height
+                  ? `min-h-0 ${height} overflow-hidden`
+                  : 'min-h-0 h-screen overflow-hidden',
             'bg-white rounded-lg',
         ]"
     >
-        <div :class="[hasProjectFiles ? '' : 'h-full flex flex-col']">
+        <div class="h-full min-h-0 flex flex-col">
             <!-- Header section with help links and missing files indicator -->
-            <div :class="[fullScreen ? 'px-6 py-2' : '', 'flex']">
+            <div :class="[fullScreen ? 'px-6 py-2' : '', 'flex flex-shrink-0']">
                 <div class="w-full px-5">
                     <!-- Help and documentation section (only shown in edit mode) -->
                     <div
@@ -157,8 +155,8 @@
                 :class="[
                     hasProjectFiles
                         ? fullScreen
-                            ? 'px-6 py-2'
-                            : 'px-5'
+                            ? 'px-6 py-2 flex-shrink-0'
+                            : 'px-5 flex-shrink-0'
                         : 'h-full flex flex-col flex-1 min-h-0 p-5',
                 ]"
             >
@@ -351,39 +349,156 @@
                     fullScreen
                         ? 'overflow-hidden h-full relative px-6'
                         : '',
-                    'min-w-0 flex-1 flex',
+                    'flex min-h-0 min-w-0 flex-1',
                 ]"
             >
                 <!-- Left sidebar with file tree -->
                 <aside
                     ref="sidebarRef"
                     :class="[
-                        height ? height : '',
-                        'flex-shrink-0 flex flex-col bg-white border-r border-gray-200 overflow-hidden',
+                        'flex h-full min-h-0 flex-shrink-0 flex-col bg-white border-r border-gray-200',
                     ]"
                     :style="{ width: sidebarWidth + 'px' }"
                 >
                     <!-- Sidebar header -->
                     <div
-                        class="flex items-center justify-between px-3 py-2 border-b border-gray-100 bg-gray-50"
+                        class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 border-b border-gray-100 bg-gray-50 px-3 py-2.5"
                     >
                         <span
-                            class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-                            >Files</span
+                            class="shrink-0 text-sm font-semibold text-gray-900"
+                            >Folders</span
                         >
-                        <span
-                            v-if="file && file.children"
-                            class="text-xs text-gray-400"
-                            >{{ file.children.length }} items</span
+                        <div
+                            class="flex shrink-0 items-center gap-2.5"
+                            role="toolbar"
+                            aria-label="Folder sort"
                         >
+                            <HeadlessMenu as="div" class="relative z-40 inline-flex">
+                                <MenuButton
+                                    type="button"
+                                    class="inline-flex items-center rounded p-0 text-gray-600 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
+                                    aria-label="Sort folders by"
+                                    aria-haspopup="true"
+                                >
+                                    <Squares2X2OutlineIcon
+                                        class="h-3.5 w-3.5"
+                                        aria-hidden="true"
+                                    />
+                                </MenuButton>
+                                <transition
+                                    enter-active-class="transition ease-out duration-100"
+                                    enter-from-class="transform opacity-0 scale-95"
+                                    enter-to-class="transform opacity-100 scale-100"
+                                    leave-active-class="transition ease-in duration-75"
+                                    leave-from-class="transform opacity-100 scale-100"
+                                    leave-to-class="transform opacity-0 scale-95"
+                                >
+                                    <MenuItems
+                                        class="absolute left-full top-0 z-[100] ml-1.5 w-52 origin-top-left overflow-hidden rounded-lg bg-white p-0 shadow-lg ring-1 ring-black/5 focus:outline-none"
+                                    >
+                                        <MenuItem v-slot="{ active }">
+                                            <button
+                                                type="button"
+                                                :class="[
+                                                    treeSortBy ===
+                                                    'alphabetical'
+                                                        ? 'bg-gray-900 text-white'
+                                                        : active
+                                                          ? 'bg-gray-100 text-gray-900'
+                                                          : 'bg-white text-gray-700',
+                                                    'flex w-full items-center gap-2 rounded-t-lg px-3 py-2 text-left text-sm',
+                                                ]"
+                                                @click="
+                                                    setTreeSortBy(
+                                                        'alphabetical'
+                                                    )
+                                                "
+                                            >
+                                                <QueueListIconOutline
+                                                    class="h-4 w-4 shrink-0 opacity-90"
+                                                    aria-hidden="true"
+                                                />
+                                                <span>Name</span>
+                                            </button>
+                                        </MenuItem>
+                                        <MenuItem v-slot="{ active }">
+                                            <button
+                                                type="button"
+                                                :class="[
+                                                    treeSortBy === 'timestamp'
+                                                        ? 'bg-gray-900 text-white'
+                                                        : active
+                                                          ? 'bg-gray-100 text-gray-900'
+                                                          : 'bg-white text-gray-700',
+                                                    'flex w-full items-center gap-2 rounded-b-lg px-3 py-2 text-left text-sm',
+                                                ]"
+                                                @click="
+                                                    setTreeSortBy('timestamp')
+                                                "
+                                            >
+                                                <ClockIconOutline
+                                                    class="h-4 w-4 shrink-0 opacity-90"
+                                                    aria-hidden="true"
+                                                />
+                                                <span>Date modified</span>
+                                            </button>
+                                        </MenuItem>
+                                    </MenuItems>
+                                </transition>
+                            </HeadlessMenu>
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-gray-400 transition hover:bg-gray-100/80 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
+                                :title="
+                                    treeSortOrder === 'asc'
+                                        ? treeSortBy === 'timestamp'
+                                            ? 'Oldest first — click to show newest first'
+                                            : 'A to Z — click for Z to A'
+                                        : treeSortBy === 'timestamp'
+                                          ? 'Newest first — click to show oldest first'
+                                          : 'Z to A — click for A to Z'
+                                "
+                                :aria-label="
+                                    treeSortOrder === 'asc'
+                                        ? 'Switch to descending order'
+                                        : 'Switch to ascending order'
+                                "
+                                @click="toggleTreeSortOrder"
+                            >
+                                <ChevronUpOutlineIcon
+                                    v-if="treeSortOrder === 'asc'"
+                                    class="h-3 w-3 stroke-[1.5]"
+                                    aria-hidden="true"
+                                />
+                                <ChevronDownOutlineIcon
+                                    v-else
+                                    class="h-3 w-3 stroke-[1.5]"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                            <span
+                                v-if="file && file.children"
+                                class="shrink-0 text-xs text-gray-400 tabular-nums"
+                                >{{ file.children.length }} items</span
+                            >
+                        </div>
                     </div>
 
                     <!-- Scrollable file tree -->
-                    <div class="flex-1 overflow-y-auto overflow-x-hidden p-2">
+                    <div
+                        class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pt-2 pb-10"
+                        :style="{
+                            minHeight: '500px',
+                            maxHeight: '500px',
+                            overflowY: 'scroll',
+                        }"
+                    >
                         <!-- Recursive file tree component -->
                         <children
                             :file="file"
                             :expanded-folders="expandedFolders"
+                            :tree-sort-by="treeSortBy"
+                            :tree-sort-order="treeSortOrder"
                             @toggle-expansion="
                                 (fsoId, isExpanded) =>
                                     toggleFolderExpansion(fsoId, isExpanded)
@@ -525,8 +640,7 @@
                 <!-- Details panel -->
                 <section
                     :class="[
-                        height ? height : '',
-                        'flex-1 flex flex-col overflow-y-auto overflow-x-hidden bg-white hidden md:flex',
+                        'flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-white hidden md:flex',
                     ]"
                 >
                     <div
@@ -534,7 +648,7 @@
                             $page.props.selectedFileSystemObject &&
                             $page.props.selectedFileSystemObject.has_children
                         "
-                        class="flex-1 flex flex-col overflow-hidden"
+                        class="flex min-h-0 flex-1 flex-col overflow-hidden"
                     >
                         <!-- Panel header -->
                         <div
@@ -617,100 +731,159 @@
                         </div>
 
                         <!-- Scrollable content area -->
-                        <div class="flex-1 overflow-y-auto px-5 py-3">
+                        <div
+                            class="min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-12"
+                            :style="{
+                                minHeight: '500px',
+                                maxHeight: '500px',
+                                overflowY: 'scroll',
+                            }"
+                        >
                         <!-- List View Table Header -->
                         <div v-if="viewMode === 'list'" class="mt-2">
                             <div
                                 class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
                             >
                                 <div
-                                    class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600"
                                 >
                                     <div class="col-span-4">
                                         <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            type="button"
+                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                            title="Sort by name"
+                                            aria-label="Sort by name"
                                             @click="sortFiles('name')"
                                         >
-                                            <span>Name</span>
-                                            <ChevronUpIcon
+                                            <QueueListIconOutline
+                                                class="h-4 w-4 shrink-0"
+                                                :class="
+                                                    sortBy === 'name'
+                                                        ? 'text-gray-900'
+                                                        : 'text-gray-600'
+                                                "
+                                                aria-hidden="true"
+                                            />
+                                            <ChevronUpOutlineIcon
                                                 v-if="
                                                     sortBy === 'name' &&
                                                     sortOrder === 'asc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
-                                            <ChevronDownIcon
+                                            <ChevronDownOutlineIcon
                                                 v-else-if="
                                                     sortBy === 'name' &&
                                                     sortOrder === 'desc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
                                         </button>
                                     </div>
                                     <div class="col-span-3">
                                         <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            type="button"
+                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                            title="Sort by date modified"
+                                            aria-label="Sort by date modified"
                                             @click="sortFiles('date')"
                                         >
-                                            <span>Date Modified</span>
-                                            <ChevronUpIcon
+                                            <ClockIconOutline
+                                                class="h-4 w-4 shrink-0"
+                                                :class="
+                                                    sortBy === 'date'
+                                                        ? 'text-gray-900'
+                                                        : 'text-gray-600'
+                                                "
+                                                aria-hidden="true"
+                                            />
+                                            <ChevronUpOutlineIcon
                                                 v-if="
                                                     sortBy === 'date' &&
                                                     sortOrder === 'asc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
-                                            <ChevronDownIcon
+                                            <ChevronDownOutlineIcon
                                                 v-else-if="
                                                     sortBy === 'date' &&
                                                     sortOrder === 'desc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
                                         </button>
                                     </div>
                                     <div class="col-span-2">
                                         <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            type="button"
+                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                            title="Sort by size"
+                                            aria-label="Sort by size"
                                             @click="sortFiles('size')"
                                         >
-                                            <span>Size</span>
-                                            <ChevronUpIcon
+                                            <ScaleIconOutline
+                                                class="h-4 w-4 shrink-0"
+                                                :class="
+                                                    sortBy === 'size'
+                                                        ? 'text-gray-900'
+                                                        : 'text-gray-600'
+                                                "
+                                                aria-hidden="true"
+                                            />
+                                            <ChevronUpOutlineIcon
                                                 v-if="
                                                     sortBy === 'size' &&
                                                     sortOrder === 'asc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
-                                            <ChevronDownIcon
+                                            <ChevronDownOutlineIcon
                                                 v-else-if="
                                                     sortBy === 'size' &&
                                                     sortOrder === 'desc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
                                         </button>
                                     </div>
                                     <div class="col-span-2">
                                         <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            type="button"
+                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                            title="Sort by kind"
+                                            aria-label="Sort by kind"
                                             @click="sortFiles('kind')"
                                         >
-                                            <span>Kind</span>
-                                            <ChevronUpIcon
+                                            <TagIconOutline
+                                                class="h-4 w-4 shrink-0"
+                                                :class="
+                                                    sortBy === 'kind'
+                                                        ? 'text-gray-900'
+                                                        : 'text-gray-600'
+                                                "
+                                                aria-hidden="true"
+                                            />
+                                            <ChevronUpOutlineIcon
                                                 v-if="
                                                     sortBy === 'kind' &&
                                                     sortOrder === 'asc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
-                                            <ChevronDownIcon
+                                            <ChevronDownOutlineIcon
                                                 v-else-if="
                                                     sortBy === 'kind' &&
                                                     sortOrder === 'desc'
                                                 "
-                                                class="h-3 w-3"
+                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                aria-hidden="true"
                                             />
                                         </button>
                                     </div>
@@ -923,7 +1096,7 @@
                         </ul>
                         </div>
                     </div>
-                    <div v-else class="flex-1 flex flex-col overflow-hidden">
+                    <div v-else class="flex min-h-0 flex-1 flex-col overflow-hidden">
                         <!-- File detail header -->
                         <div
                             v-if="$page.props.selectedFileSystemObject"
@@ -982,7 +1155,14 @@
                             </div>
                         </div>
                         <!-- File details content -->
-                        <div class="flex-1 overflow-y-auto px-5 py-4">
+                        <div
+                            class="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-12"
+                            :style="{
+                                minHeight: '500px',
+                                maxHeight: '500px',
+                                overflowY: 'scroll',
+                            }"
+                        >
                             <span
                                 v-if="
                                     $page.props.selectedFileSystemObject &&
@@ -1197,9 +1377,19 @@ import {
     ArrowDownTrayIcon,
     Squares2X2Icon,
     ListBulletIcon,
-    ChevronUpIcon,
-    ChevronDownIcon,
 } from "@heroicons/vue/24/solid";
+
+import {
+    QueueListIcon as QueueListIconOutline,
+    ClockIcon as ClockIconOutline,
+    ScaleIcon as ScaleIconOutline,
+    TagIcon as TagIconOutline,
+    ChevronUpIcon as ChevronUpOutlineIcon,
+    ChevronDownIcon as ChevronDownOutlineIcon,
+    Squares2X2Icon as Squares2X2OutlineIcon,
+} from "@heroicons/vue/24/outline";
+
+import { Menu as HeadlessMenu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 
 // Utility imports
 import ChecksumCalculator from "@/Utils/ChecksumCalculator.js";
@@ -1228,15 +1418,24 @@ export default {
         JetDangerButton, // Danger button component
         Squares2X2Icon, // Grid view icon
         ListBulletIcon, // List view icon
-        ChevronUpIcon, // Sort ascending icon
-        ChevronDownIcon, // Sort descending icon
+        QueueListIconOutline,
+        ClockIconOutline,
+        ScaleIconOutline,
+        TagIconOutline,
+        ChevronUpOutlineIcon,
+        ChevronDownOutlineIcon,
+        Squares2X2OutlineIcon,
+        HeadlessMenu,
+        MenuButton,
+        MenuItems,
+        MenuItem,
     },
 
     /**
      * Component props
      * @prop {Object} draft - Draft object for file uploads (optional)
      * @prop {Boolean} readonly - Whether the browser is in read-only mode
-     * @prop {String} height - Custom height class for the component (optional)
+     * @prop {String} height - Tailwind height classes for the root #fs-dropzone (e.g. h-full min-h-0 when the parent establishes height via flex).
      * @prop {Object} project - Project object for public file access (optional)
      */
     props: ["draft", "readonly", "height", "project"],
@@ -1295,6 +1494,10 @@ export default {
             viewMode: "grid", // 'grid' or 'list'
             sortBy: "name", // 'name', 'date', 'size', 'kind'
             sortOrder: "asc", // 'asc' or 'desc'
+
+            // Sidebar tree sorting (Children.vue)
+            treeSortBy: "alphabetical", // 'alphabetical' | 'timestamp'
+            treeSortOrder: "asc", // 'asc' | 'desc'
 
             // Resizable sidebar
             sidebarWidth: 320, // Default sidebar width in pixels
@@ -1475,6 +1678,23 @@ export default {
             if (!isNaN(parsed) && parsed >= 180 && parsed <= 600) {
                 this.sidebarWidth = parsed;
             }
+        }
+
+        const savedTreeSortBy = localStorage.getItem(
+            "nmrxiv-files-tree-sort-by"
+        );
+        if (
+            savedTreeSortBy === "alphabetical" ||
+            savedTreeSortBy === "timestamp"
+        ) {
+            this.treeSortBy = savedTreeSortBy;
+        }
+
+        const savedTreeSortOrder = localStorage.getItem(
+            "nmrxiv-files-tree-sort-order"
+        );
+        if (savedTreeSortOrder === "asc" || savedTreeSortOrder === "desc") {
+            this.treeSortOrder = savedTreeSortOrder;
         }
 
         if (this.draft) {
@@ -3148,6 +3368,28 @@ export default {
         setViewMode(mode) {
             this.viewMode = mode;
             localStorage.setItem("nmrxiv-files-view-mode", mode);
+        },
+
+        persistTreeSortPreferences() {
+            localStorage.setItem("nmrxiv-files-tree-sort-by", this.treeSortBy);
+            localStorage.setItem(
+                "nmrxiv-files-tree-sort-order",
+                this.treeSortOrder
+            );
+        },
+
+        setTreeSortBy(mode) {
+            if (this.treeSortBy === mode) {
+                return;
+            }
+            this.treeSortBy = mode;
+            this.persistTreeSortPreferences();
+        },
+
+        toggleTreeSortOrder() {
+            this.treeSortOrder =
+                this.treeSortOrder === "asc" ? "desc" : "asc";
+            this.persistTreeSortPreferences();
         },
 
         /**
