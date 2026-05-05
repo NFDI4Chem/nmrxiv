@@ -78,7 +78,12 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { ChevronDownIcon } from "@heroicons/vue/24/outline";
 
-const { limit } = defineProps(["limit"]);
+const { limit } = defineProps({
+    limit: {
+        type: Number,
+        default: undefined,
+    },
+});
 
 const faqs = [
     {

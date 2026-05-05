@@ -28,6 +28,7 @@
 <script>
 import { XMarkIcon } from "@heroicons/vue/24/outline";
 export default {
+    name: "JetstreamBanner",
     components: {
         XMarkIcon,
     },
