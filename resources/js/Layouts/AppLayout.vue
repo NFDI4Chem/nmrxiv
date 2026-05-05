@@ -466,7 +466,7 @@
         <div
             :class="[
                 collapseSidebar ? 'md:pl-16' : 'md:pl-64',
-                'flex flex-col flex-1 z-0',
+                'flex min-h-0 flex-1 flex-col z-0',
             ]"
         >
             <div
@@ -915,7 +915,7 @@
                 </div>
             </div>
             <main
-                class="flex-1 relative overflow-y-hidden bg-white focus:outline-none"
+                class="relative flex min-h-0 flex-1 flex-col overflow-y-hidden bg-white focus:outline-none"
             >
                 <slot name="header"></slot>
                 <slot></slot>
