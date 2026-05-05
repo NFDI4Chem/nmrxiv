@@ -7,6 +7,7 @@ use App\Events\AddingProjectMember;
 use App\Events\ProjectMemberAdded;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -70,7 +71,7 @@ class AddProjectMemberTest extends TestCase
         $unauthorizedUser = User::factory()->withPersonalTeam()->create();
         $newMember = User::factory()->withPersonalTeam()->create();
 
-        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->expectException(AuthorizationException::class);
 
         $this->action->add($unauthorizedUser, $this->project, $newMember->email, 'reviewer');
     }

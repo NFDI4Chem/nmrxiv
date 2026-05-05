@@ -12,6 +12,7 @@ use App\Models\Study;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Spatie\SchemaOrg\Schema;
@@ -240,7 +241,7 @@ class BioschemasController extends Controller
      *
      * @param  string  $username  NMRXIV username
      * @param  string  $projectName  Project slug identifier
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
 
@@ -398,7 +399,7 @@ class BioschemasController extends Controller
      *                             @OA\Property(property="name", type="string", example="magnetic field strength"),
      *                             @OA\Property(property="value", type="number", example=14.1),
      *                             @OA\Property(property="unitText", type="string", example="Tesla"),
-     *                             @OA\Property(property="propertyID", type="string", example="MR:1400253")
+     *                             @OA\Property(property="propertyID", type="string", example="NMR:1400253")
      *                         )
      *                     ),
      *                     @OA\Property(
@@ -487,7 +488,7 @@ class BioschemasController extends Controller
      * - Scientific workflow interoperability
      *
      * @param  string  $identifier  NMRXIV public identifier (P123, S456, D789)
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function modelSchemaByID(Request $request, $identifier)
     {
@@ -707,7 +708,7 @@ class BioschemasController extends Controller
             // $experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
             $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'http://purl.obolibrary.org/obo/UO_0000012');
             $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
-            $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
+            $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'NMR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
             $numberOfScansProperty = BioschemasHelper::preparePropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
             $pulseSequenceProperty = BioschemasHelper::preparePropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
             $spectralWidthProperty = BioschemasHelper::preparePropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, 'http://purl.obolibrary.org/obo/UO_0000169');

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
@@ -162,7 +163,7 @@ class Project extends Model implements Auditable
     /**
      * Get all of the project's users including its owner.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function allUsers()
     {
@@ -183,7 +184,7 @@ class Project extends Model implements Auditable
     /**
      * Determine if the given user belongs to the project.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @return bool
      */
     public function hasUser($user)
@@ -256,7 +257,7 @@ class Project extends Model implements Auditable
     /**
      * Remove the given user from the project.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @return void
      */
     public function removeUser($user)

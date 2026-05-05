@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,7 +24,7 @@ class HasStudiesTraitTest extends TestCase
     {
         $user = new User;
         $relationship = $user->studies();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
     }
 
     public function test_shared_studies_relationship_excludes_creator(): void
@@ -32,7 +33,7 @@ class HasStudiesTraitTest extends TestCase
 
         // Test the relationship exists and is correct type
         $relationship = $user->sharedStudies();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
 
         // Check the where clause excludes 'creator' role
         $query = $relationship->getQuery();
@@ -44,7 +45,7 @@ class HasStudiesTraitTest extends TestCase
         $user = User::factory()->create();
 
         $relationship = $user->recentStudies();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
 
         // Check ordering
         $query = $relationship->getQuery();
@@ -218,9 +219,9 @@ class HasStudiesTraitTest extends TestCase
     {
         $user = new User;
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->studies());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->sharedStudies());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $user->recentStudies());
+        $this->assertInstanceOf(BelongsToMany::class, $user->studies());
+        $this->assertInstanceOf(BelongsToMany::class, $user->sharedStudies());
+        $this->assertInstanceOf(BelongsToMany::class, $user->recentStudies());
     }
 
     public function test_trait_boolean_methods_return_boolean(): void

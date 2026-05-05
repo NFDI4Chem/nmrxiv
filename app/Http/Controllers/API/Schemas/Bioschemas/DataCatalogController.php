@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Spatie\SchemaOrg\Schema;
@@ -246,7 +247,7 @@ class DataCatalogController extends Controller
      * - Compliance with funding agency data sharing requirements
      * - Support for systematic reviews and meta-analyses in chemistry
      *
-     * @return \Illuminate\Http\JsonResponse DataCatalog schema representing NMRXIV repository
+     * @return JsonResponse DataCatalog schema representing NMRXIV repository
      */
     public function dataCatalogSchema(Request $request)
     {

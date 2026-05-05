@@ -6,6 +6,7 @@ use App\Models\License;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -187,6 +188,47 @@ class UpdateProjectTest extends TestCase
 
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name); // Should not change
+    }
+
+    public function test_project_update_allows_keeping_its_current_name()
+    {
+        $updateData = [
+            'name' => 'Original Project Name',
+            'description' => 'Updated description while keeping same name',
+        ];
+
+        $response = $this->actingAs($this->owner)
+            ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success', 'Project updated successfully');
+        $response->assertSessionDoesntHaveErrors(['name']);
+
+        $this->project->refresh();
+        $this->assertEquals('Original Project Name', $this->project->name);
+        $this->assertEquals('Updated description while keeping same name', $this->project->description);
+    }
+
+    public function test_project_update_with_existing_name_returns_json_validation_error()
+    {
+        Project::factory()->create([
+            'owner_id' => $this->owner->id,
+            'name' => 'Existing Project Name',
+        ]);
+
+        $updateData = [
+            'name' => 'Existing Project Name',
+            'description' => 'Should fail with duplicate name',
+        ];
+
+        $response = $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", $updateData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['name']);
+
+        $this->project->refresh();
+        $this->assertEquals('Original Project Name', $this->project->name);
     }
 
     public function test_project_update_can_change_license()
@@ -435,7 +477,7 @@ class UpdateProjectTest extends TestCase
 
         $this->project->refresh();
         $this->assertEquals($releaseDate, $this->project->release_date ?
-            \Carbon\Carbon::parse($this->project->release_date)->format('Y-m-d') : null);
+            Carbon::parse($this->project->release_date)->format('Y-m-d') : null);
     }
 
     public function test_project_release_date_update_requires_authorization()
@@ -495,6 +537,6 @@ class UpdateProjectTest extends TestCase
 
         $this->project->refresh();
         $this->assertEquals($releaseDate, $this->project->release_date ?
-            \Carbon\Carbon::parse($this->project->release_date)->format('Y-m-d H:i:s') : null);
+            Carbon::parse($this->project->release_date)->format('Y-m-d H:i:s') : null);
     }
 }

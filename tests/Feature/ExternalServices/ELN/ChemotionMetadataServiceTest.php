@@ -5,6 +5,7 @@ namespace Tests\Feature\ExternalServices\ELN;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Services\ELN\ChemotionMetadataService;
+use App\Services\ELN\ELNMetadataExtractorInterface;
 use App\Services\FileIntegrityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,7 @@ class ChemotionMetadataServiceTest extends TestCase
 
     public function test_service_implements_interface(): void
     {
-        $this->assertInstanceOf(\App\Services\ELN\ELNMetadataExtractorInterface::class, $this->service);
+        $this->assertInstanceOf(ELNMetadataExtractorInterface::class, $this->service);
     }
 
     public function test_get_eln_type_returns_chemotion(): void
@@ -673,6 +674,52 @@ class ChemotionMetadataServiceTest extends TestCase
         $this->assertEquals('prop-1', $analyses[0]['variable_measured'][0]['property_id']);
         $this->assertEquals('7.26', $analyses[0]['variable_measured'][0]['value']);
         $this->assertEquals('Coupling Constant', $analyses[0]['variable_measured'][1]['name']);
+    }
+
+    public function test_extract_studies_includes_citations(): void
+    {
+        $metadata = [
+            'hasPart' => [
+                '@type' => 'Study',
+                '@id' => 'study-1',
+                'name' => 'Test Study',
+                'citation' => [
+                    [
+                        '@type' => 'CreativeWork',
+                        'name' => 'tert-butyl 5-fluoroindole-1-carboxylate',
+                        'author' => 'Chien, Po-Chung and Manolikakes, Georg',
+                        'url' => 'https://doi.org/10.14272/PCZRVRIBJPHEBB-UHFFFAOYSA-N.1',
+                    ],
+                ],
+            ],
+        ];
+
+        $studies = $this->service->extractStudies($metadata);
+
+        $this->assertCount(1, $studies);
+        $this->assertArrayHasKey('citation', $studies[0]);
+        $this->assertCount(1, $studies[0]['citation']);
+        $this->assertEquals('tert-butyl 5-fluoroindole-1-carboxylate', $studies[0]['citation'][0]['name']);
+        $this->assertEquals('Chien, Po-Chung and Manolikakes, Georg', $studies[0]['citation'][0]['author']);
+        $this->assertEquals('https://doi.org/10.14272/PCZRVRIBJPHEBB-UHFFFAOYSA-N.1', $studies[0]['citation'][0]['url']);
+    }
+
+    public function test_extract_studies_returns_empty_citations_when_none_present(): void
+    {
+        $metadata = [
+            'hasPart' => [
+                '@type' => 'Study',
+                '@id' => 'study-1',
+                'name' => 'Study without citations',
+            ],
+        ];
+
+        $studies = $this->service->extractStudies($metadata);
+
+        $this->assertCount(1, $studies);
+        $this->assertArrayHasKey('citation', $studies[0]);
+        $this->assertIsArray($studies[0]['citation']);
+        $this->assertEmpty($studies[0]['citation']);
     }
 
     public function test_extract_studies_with_non_array_datasets(): void

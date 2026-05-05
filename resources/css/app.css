@@ -49,13 +49,15 @@
 }
 
 .tooltip .tooltiptextright {
-  display: flex;
+  display: inline-flex;
   visibility: hidden;
   position: absolute;
   z-index: 1;
   left: 100%;
   top: 0%;
   margin: auto;
+  white-space: nowrap;
+  width: max-content;
 }
 
 .tooltip:hover .tooltiptextright {

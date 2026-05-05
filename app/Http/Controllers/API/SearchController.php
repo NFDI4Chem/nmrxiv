@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Molecule;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -225,7 +226,7 @@ class SearchController extends Controller
      * - **Tags**: Classification-based search
      * - **Filters**: Property-based filtering
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator|\Illuminate\Http\JsonResponse
+     * @return LengthAwarePaginator|JsonResponse
      */
     public function search(Request $request)
     {

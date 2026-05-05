@@ -6,6 +6,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -107,7 +108,7 @@ class DeleteProject
     /**
      * Delete dataset and related objects.
      *
-     * @param  \Illuminate\Support\Collection  $datasets
+     * @param  Collection  $datasets
      * @return void
      */
     public function deleteDatasets($dataset)
