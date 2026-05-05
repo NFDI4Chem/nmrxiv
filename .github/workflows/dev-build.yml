@@ -62,7 +62,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Docker Hub login (uses repository secrets)
       - name: Log in to Docker Hub

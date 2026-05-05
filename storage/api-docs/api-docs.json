@@ -90,23 +90,6 @@
                             }
                         }
                     },
-                    "403": {
-                        "description": "Account not verified - Email verification required",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "description": "Error message indicating account verification status",
-                                            "type": "string",
-                                            "example": "Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "422": {
                         "description": "Validation error - Invalid input data",
                         "content": {
@@ -1058,9 +1041,7 @@
                                 "created_at",
                                 "-created_at",
                                 "identifier",
-                                "-identifier",
-                                "owner.email",
-                                "-owner.email"
+                                "-identifier"
                             ]
                         }
                     },
@@ -1080,16 +1061,6 @@
                         "schema": {
                             "type": "string",
                             "example": "P123"
-                        }
-                    },
-                    {
-                        "name": "filter[owner.email]",
-                        "in": "query",
-                        "description": "Filter by data owner email",
-                        "schema": {
-                            "type": "string",
-                            "format": "email",
-                            "example": "researcher@university.edu"
                         }
                     },
                     {

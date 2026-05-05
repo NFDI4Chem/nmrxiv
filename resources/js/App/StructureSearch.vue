@@ -29,7 +29,11 @@
             appear
             @after-leave="query = ''"
         >
-            <Dialog as="div" class="relative z-10" @close="open = false">
+            <HeadlessUiDialog
+                as="div"
+                class="relative z-10"
+                @close="open = false"
+            >
                 <TransitionChild
                     as="template"
                     enter="ease-out duration-300"
@@ -92,7 +96,7 @@
                         </DialogPanel>
                     </TransitionChild>
                 </div>
-            </Dialog>
+            </HeadlessUiDialog>
         </TransitionRoot>
     </div>
 </template>
@@ -101,7 +105,7 @@
 import { ref } from "vue";
 import OCL from "openchemlib/full";
 import {
-    Dialog,
+    Dialog as HeadlessUiDialog,
     DialogPanel,
     TransitionChild,
     TransitionRoot,
@@ -111,7 +115,7 @@ import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
 
 export default {
     components: {
-        Dialog,
+        HeadlessUiDialog,
         DialogPanel,
         TransitionChild,
         TransitionRoot,
