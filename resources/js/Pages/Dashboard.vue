@@ -351,38 +351,53 @@
             </div>
         </div>
         <div v-else>
-            <div class="max-w-lg my-6 py-6 mx-auto">
-                <div class="text-center">
-                    <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                    >
-                        <path
-                            vector-effect="non-scaling-stroke"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                        />
-                    </svg>
-                    <h3 class="mt-2 text-md font-medium text-gray-900">
-                        You have no <b>projects</b> or <b>samples</b> yet
-                    </h3>
-                    <div v-if="editableTeamRole" class="mt-2">
-                        <p class="mb-1 text-sm text-gray-500">
-                            Get started by uploading your data.
-                        </p>
-                        <create class="mt-5" mode="button"></create>
+            <div class="max-w-lg my-6 py-6 mx-auto text-center">
+                <div class="px-6 py-4 bg-white shadow-md rounded-lg">
+                    <div class="flex items-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            class="h-6 w-6"
+                        >
+                            <path
+                                d="M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z"
+                                class="fill-current text-gray-400"
+                            ></path>
+                            <polygon
+                                points="21 6 12 10 12 22 21 18"
+                                class="fill-current text-gray-600"
+                            ></polygon>
+                        </svg>
+                        <div
+                            class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
+                        >
+                            Create Your First Project
+                        </div>
+                    </div>
+                    <div class="mt-3 max-w-2xl text-sm text-gray-700">
+                        nmrXiv is organized around projects. Each project can
+                        include multiple samples, and each sample is assigned
+                        its own URL. To begin uploading projects or samples, use
+                        the Submit Data button. For more information, please
+                        refer to our
+                        <a
+                            href="https://docs.nmrxiv.org/introduction/intro"
+                            target="_blank"
+                            class="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
+                        >
+                            documentation </a
+                        >.
+                    </div>
+                    <div class="mt-5 flex flex-col items-center gap-2">
+                        <create mode="button" compact></create>
                         <span
-                            class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                            class="text-xs cursor-pointer hover:text-blue-700"
                         >
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
-                                >Need Help?
+                            >
+                                Need Help?
                             </a>
                         </span>
                     </div>
