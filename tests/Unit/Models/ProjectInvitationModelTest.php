@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 
 use App\Models\Project;
 use App\Models\ProjectInvitation;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -66,7 +67,7 @@ class ProjectInvitationModelTest extends TestCase
         $invitation = new ProjectInvitation;
         $relationship = $invitation->project();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relationship);
+        $this->assertInstanceOf(BelongsTo::class, $relationship);
     }
 
     public function test_all_required_fields_are_fillable()

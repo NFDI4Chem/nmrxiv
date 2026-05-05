@@ -2,10 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Dataset;
+use App\Models\Model;
+use App\Models\Study;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends Factory<Model>
  */
 class NMRiumFactory extends Factory
 {
@@ -17,7 +20,7 @@ class NMRiumFactory extends Factory
         return [
             'nmrium_info' => '{}',
             'nmriumable_id' => 1,
-            'nmriumable_type' => \App\Models\Dataset::class,
+            'nmriumable_type' => Dataset::class,
         ];
     }
 
@@ -27,8 +30,8 @@ class NMRiumFactory extends Factory
     public function forDataset($dataset = null): static
     {
         return $this->state(fn (array $attributes) => [
-            'nmriumable_id' => $dataset?->id ?? \App\Models\Dataset::factory(),
-            'nmriumable_type' => \App\Models\Dataset::class,
+            'nmriumable_id' => $dataset?->id ?? Dataset::factory(),
+            'nmriumable_type' => Dataset::class,
         ]);
     }
 
@@ -38,8 +41,8 @@ class NMRiumFactory extends Factory
     public function forStudy($study = null): static
     {
         return $this->state(fn (array $attributes) => [
-            'nmriumable_id' => $study?->id ?? \App\Models\Study::factory(),
-            'nmriumable_type' => \App\Models\Study::class,
+            'nmriumable_id' => $study?->id ?? Study::factory(),
+            'nmriumable_type' => Study::class,
         ]);
     }
 }

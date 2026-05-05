@@ -16,6 +16,7 @@ permissions:
 jobs:
   lint-security:
     name: Lint & Security (PR)
+    if: github.event.pull_request.merged != true
     uses: ./.github/workflows/lint-security-check.yml
     with:
       run_php: true
@@ -24,5 +25,6 @@ jobs:
 
   test-coverage:
     name: Tests & Coverage (PHP 8.4)
+    if: github.event.pull_request.merged != true
     uses: ./.github/workflows/test-coverage.yml
     secrets: inherit

@@ -9,8 +9,11 @@ use App\Jobs\ProcessFiles;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -52,7 +55,7 @@ class DraftController extends Controller
     /**
      * Process draft and convert to project structure.
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return Response|JsonResponse|RedirectResponse
      */
     public function process(Request $request, Draft $draft)
     {
@@ -79,6 +82,24 @@ class DraftController extends Controller
         $missingFilesData = $this->draftFiles->missing($draft);
 
         return response()->json($missingFilesData);
+    }
+
+    /**
+     * Get a single draft by ID with ownership verification.
+     */
+    public function show(Request $request, Draft $draft): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
+
+        return response()->json([
+            'draft' => $draft->load('Tags'),
+        ]);
     }
 
     /**

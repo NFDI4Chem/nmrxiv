@@ -42,47 +42,46 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user();
 
         return array_merge(parent::share($request), [
-            'flash' => [
-                'message' => fn () => $request->session()->get('message'),
-            ],
-            'auth.user.permissions' => fn () => $user ?
-                $user->getPermissionsViaRoles()->pluck('name')
-                : null,
             'flash' => function () use ($request) {
                 return [
+                    'message' => $request->session()->get('message'),
                     'success' => $request->session()->get('success'),
                     'error' => $request->session()->get('error'),
                 ];
             },
+            'auth.user.permissions' => fn () => $user ?
+                $user->getPermissionsViaRoles()->pluck('name')
+                : null,
             'auth.user.roles' => fn () => $user ?
                 $user->getRoleNames()
                 : null,
             'auth.user.teamRole' => fn () => $user ? $user->teamRole($user->currentTeam) : null,
             'auth.user.notifications' => fn () => $user ?
                 $user->unreadNotifications : null,
-            'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
-            'github' => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
-            'orcid' => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
-            'nfdiaai' => (env('NFDIAAI_CLIENT_ID') !== null && env('NFDIAAI_CLIENT_ID') !== ''),
+            'twitter' => (config('services.twitter.client_id') !== null && config('services.twitter.client_id') !== ''),
+            'github' => (config('services.github.client_id') !== null && config('services.github.client_id') !== ''),
+            'orcid' => (config('services.orcid.client_id') !== null && config('services.orcid.client_id') !== ''),
+            'nfdiaai' => (config('services.regapp.client_id') !== null && config('services.regapp.client_id') !== ''),
             'config.announcements' => Schema::hasTable('announcements') ? Announcement::active() : null,
-            'url' => env('APP_URL'),
-            'nmriumURL' => env('NMRIUM_URL'),
+            'url' => config('app.url'),
+            'nmriumURL' => config('external-links.nmrium_url'),
             'team' => $user ? $user->currentTeam : null,
-            'environment' => env('APP_ENV'),
-            'MEILISEARCH_HOST' => (env('MEILISEARCH_HOST')),
-            'MEILISEARCH_PUBLICKEY' => (env('MEILISEARCH_PUBLICKEY')),
-            'SCOUT_PREFIX' => (env('SCOUT_PREFIX')),
-            'europemcWSApi' => (env('EUROPEMC_WS_API')),
-            'dataciteURL' => env('DATACITE_ENDPOINT'),
-            'coolOffPeriod' => env('COOL_OFF_PERIOD'),
-            'mailFromAddress' => env('MAIL_FROM_ADDRESS'),
-            'orcidSearchApi' => env('ORCID_ID_SEARCH_API'),
-            'orcidPersonApi' => env('ORCID_ID_PERSON_API'),
+            'environment' => config('app.env'),
+            'MEILISEARCH_HOST' => config('scout.meilisearch.host'),
+            'MEILISEARCH_PUBLICKEY' => config('scout.meilisearch.public_key'),
+            'SCOUT_PREFIX' => config('scout.prefix'),
+            'europemcWSApi' => config('external-links.europemc_ws_api'),
+            'dataciteURL' => config('doi.datacite.endpoint'),
+            'coolOffPeriod' => config('nmrxiv.cool_off_period'),
+            'mailFromAddress' => config('mail.from.address'),
+            'chemistryStandardizeUrl' => config('services.chemistry_standardize.url'),
+            'orcidSearchApi' => config('orcid.search_api'),
+            'orcidPersonApi' => config('orcid.person_api'),
             'michiStandardsUrl' => config('external-links.michi_standards_url'),
-            'orcidEmploymentApi' => env('ORCID_ID_EMPLOYMENT_API'),
-            'CM_API' => env('CM_API'),
-            'CROSSREF_API' => env('CROSSREF_API'),
-            'DATACITE_API' => env('DATACITE_API'),
+            'orcidEmploymentApi' => config('orcid.employment_api'),
+            'CM_API' => config('external-links.cm_api'),
+            'CROSSREF_API' => config('external-links.crossref_api'),
+            'DATACITE_API' => config('external-links.datacite_api'),
         ]);
     }
 }

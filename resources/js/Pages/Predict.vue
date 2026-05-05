@@ -267,15 +267,15 @@
                                             ref="fileInput"
                                             type="file"
                                             accept=".mol,.sdf,.sd"
-                                            @change="handleFileSelect"
                                             class="sr-only"
+                                            @change="handleFileSelect"
                                         />
                                     </label>
 
                                     <!-- Clipboard Paste -->
                                     <button
-                                        @click="pasteFromClipboard"
                                         class="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                        @click="pasteFromClipboard"
                                     >
                                         <svg
                                             class="w-4 h-4 mr-2"
@@ -414,8 +414,8 @@
                                 <div class="flex justify-center">
                                     <button
                                         type="button"
-                                        @click="predictSpectrum"
                                         class="inline-flex items-center px-8 py-3 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                        @click="predictSpectrum"
                                     >
                                         Predict Spectrum
                                     </button>

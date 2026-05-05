@@ -77,9 +77,9 @@
                         </label>
                         <button
                             v-if="peakList"
-                            @click="clearPeaks"
                             class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Clear peaks"
+                            @click="clearPeaks"
                         >
                             <svg
                                 class="w-4 h-4"
@@ -114,8 +114,8 @@
                             </p>
                         </div>
                         <button
-                            @click="loadExample"
                             class="flex-shrink-0 text-xs font-medium text-gray-600 hover:text-gray-900 underline transition-colors"
+                            @click="loadExample"
                         >
                             Load example
                         </button>
@@ -132,9 +132,9 @@
                         </label>
                         <button
                             v-if="acsString"
-                            @click="clearACS"
                             class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Clear ACS string"
+                            @click="clearACS"
                         >
                             <svg
                                 class="w-4 h-4"
@@ -169,8 +169,8 @@
                             </p>
                         </div>
                         <button
-                            @click="loadACSExample"
                             class="flex-shrink-0 text-xs font-medium text-gray-600 hover:text-gray-900 underline transition-colors"
+                            @click="loadACSExample"
                         >
                             Load example
                         </button>

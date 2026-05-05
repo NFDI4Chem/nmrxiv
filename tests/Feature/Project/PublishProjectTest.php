@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Project;
 
+use App\Models\Citation;
+use App\Models\Dataset;
+use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Sample;
@@ -115,6 +118,80 @@ class PublishProjectTest extends TestCase
         // Check that validation processing was triggered even though it failed
         $this->project->refresh();
         $this->assertNotNull($this->project->validation);
+    }
+
+    #[Test]
+    public function citations_without_doi_fail_validation(): void
+    {
+        $citation = Citation::factory()->create([
+            'doi' => null,
+        ]);
+
+        $this->project->citations()->attach($citation->id, [
+            'user' => $this->user->id,
+        ]);
+
+        $validation = Validation::factory()->create();
+        $this->project->validation_id = $validation->id;
+        $this->project->save();
+
+        $validation->process();
+
+        // Check that validation report shows citation without DOI
+        $this->assertFalse($validation->report['project']['status']);
+        $this->assertEquals('false|required', $validation->report['project']['citations']);
+        $this->assertNotEmpty($validation->report['project']['citations_detail']);
+        $this->assertEquals(false, $validation->report['project']['citations_detail'][0]['status']);
+        $this->assertEquals('false|required', $validation->report['project']['citations_detail'][0]['doi']);
+    }
+
+    #[Test]
+    public function citations_with_doi_pass_validation(): void
+    {
+        $citation = Citation::factory()->create([
+            'doi' => '10.1234/test.doi',
+        ]);
+
+        $this->project->citations()->attach($citation->id, [
+            'user' => $this->user->id,
+        ]);
+
+        $validation = Validation::factory()->create();
+        $this->project->validation_id = $validation->id;
+        $this->project->save();
+
+        $validation->process();
+
+        // Check that validation report shows citation with valid DOI
+        $this->assertEquals('true|required', $validation->report['project']['citations']);
+        $this->assertNotEmpty($validation->report['project']['citations_detail']);
+        $this->assertEquals(true, $validation->report['project']['citations_detail'][0]['status']);
+        $this->assertEquals('true|required', $validation->report['project']['citations_detail'][0]['doi']);
+    }
+
+    #[Test]
+    public function citations_without_doi_are_skipped_for_future_release_date(): void
+    {
+        $this->project->update(['release_date' => now()->addDay()]);
+
+        $citation = Citation::factory()->create([
+            'doi' => null,
+        ]);
+
+        $this->project->citations()->attach($citation->id, [
+            'user' => $this->user->id,
+        ]);
+
+        $validation = Validation::factory()->create();
+        $this->project->validation_id = $validation->id;
+        $this->project->save();
+
+        $validation->process();
+
+        $this->assertEquals('true|required', $validation->report['project']['citations']);
+        $this->assertNotEmpty($validation->report['project']['citations_detail']);
+        $this->assertEquals(true, $validation->report['project']['citations_detail'][0]['status']);
+        $this->assertEquals('true|skipped-future-release', $validation->report['project']['citations_detail'][0]['doi']);
     }
 
     public function test_unauthorized_user_cannot_publish_project()
@@ -375,7 +452,7 @@ class PublishProjectTest extends TestCase
             'project_id' => $this->project->id,
         ]);
 
-        $draft = \App\Models\Draft::factory()->create([
+        $draft = Draft::factory()->create([
             'name' => 'Test Draft',
             'owner_id' => $this->user->id,
             'project_enabled' => true,
@@ -439,7 +516,7 @@ class PublishProjectTest extends TestCase
         Queue::fake();
 
         // Create a draft with project mode enabled
-        $draft = \App\Models\Draft::factory()->create([
+        $draft = Draft::factory()->create([
             'name' => 'Test Draft',
             'owner_id' => $this->user->id,
             'project_enabled' => true,
@@ -481,7 +558,7 @@ class PublishProjectTest extends TestCase
             'project_id' => $this->project->id,
             'license_id' => null,
         ]);
-        $dataset = \App\Models\Dataset::factory()->create([
+        $dataset = Dataset::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->project->id,
             'license_id' => null,

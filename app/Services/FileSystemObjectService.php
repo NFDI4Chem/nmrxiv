@@ -7,6 +7,7 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -28,7 +29,7 @@ class FileSystemObjectService
     /**
      * Create file system object for draft uploads.
      *
-     * @throws \Illuminate\Database\QueryException
+     * @throws QueryException
      */
     public function createDraftFileSystemObject(
         Draft $draft,
@@ -51,7 +52,7 @@ class FileSystemObjectService
     /**
      * Create file system object for project uploads.
      *
-     * @throws \Illuminate\Database\QueryException
+     * @throws QueryException
      */
     public function createProjectFileSystemObject(
         Project $project,
@@ -211,7 +212,7 @@ class FileSystemObjectService
                 $directory = FileSystemObject::create($creationDefaults);
 
                 return $directory;
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 // Handle unique constraint violation - another process created it
                 if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
                     // Fetch the directory that was created by the other process
@@ -286,7 +287,7 @@ class FileSystemObjectService
                 $fileObject = FileSystemObject::create($creationDefaults);
 
                 return ['fileObject' => $fileObject, 'wasRecentlyCreated' => true];
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 // Handle unique constraint violation - another process created it
                 if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
                     // Fetch the file that was created by the other process

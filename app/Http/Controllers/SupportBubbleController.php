@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SupportBubbleRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent;
@@ -12,7 +13,7 @@ class SupportBubbleController extends Controller
     /**
      * Handle support bubble form submission
      */
-    public function submit(SupportBubbleRequest $request): Response|\Illuminate\Http\JsonResponse
+    public function submit(SupportBubbleRequest $request): Response|JsonResponse
     {
         try {
             // Fire the event

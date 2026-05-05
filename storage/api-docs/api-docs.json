@@ -2589,7 +2589,7 @@
                                                             },
                                                             "propertyID": {
                                                                 "type": "string",
-                                                                "example": "MR:1400253"
+                                                                "example": "NMR:1400253"
                                                             }
                                                         },
                                                         "type": "object"
