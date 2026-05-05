@@ -1,6 +1,6 @@
 <template>
     <TransitionRoot :show="open" as="template" appear>
-        <Dialog as="div" class="relative z-10">
+        <HeadlessUiDialog as="div" class="relative z-10">
             <TransitionChild
                 as="template"
                 enter="ease-out duration-300"
@@ -518,7 +518,7 @@
                     </DialogPanel>
                 </TransitionChild>
             </div>
-        </Dialog>
+        </HeadlessUiDialog>
     </TransitionRoot>
 </template>
 
@@ -526,7 +526,7 @@
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import { ref } from "vue";
 import {
-    Dialog,
+    Dialog as HeadlessUiDialog,
     DialogPanel,
     TransitionChild,
     TransitionRoot,
@@ -537,9 +537,10 @@ import axios from "axios";
 import { router } from "@inertiajs/vue3";
 
 export default {
+    name: "AppOnboarding",
     components: {
         JetApplicationLogo,
-        Dialog,
+        HeadlessUiDialog,
         DialogPanel,
         TransitionChild,
         TransitionRoot,
