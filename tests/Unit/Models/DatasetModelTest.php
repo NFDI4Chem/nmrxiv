@@ -9,8 +9,10 @@ use App\Models\License;
 use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Study;
+use App\Models\Team;
 use App\Models\User;
 use App\Models\Validation;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -258,9 +260,9 @@ class DatasetModelTest extends TestCase
         $dataset = Dataset::factory()->create();
 
         $relationship = $dataset->team();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relationship);
+        $this->assertInstanceOf(BelongsTo::class, $relationship);
         $this->assertEquals('Team_id', $relationship->getForeignKeyName());
-        $this->assertEquals(\App\Models\Team::class, $relationship->getRelated()::class);
+        $this->assertEquals(Team::class, $relationship->getRelated()::class);
     }
 
     public function test_it_has_one_nmrium(): void

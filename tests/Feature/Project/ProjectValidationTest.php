@@ -4,6 +4,7 @@ namespace Tests\Feature\Project;
 
 use App\Models\Dataset;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
@@ -59,7 +60,7 @@ class ProjectValidationTest extends TestCase
         ]);
 
         // Create a sample for the study to avoid null access in Validation
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->project->id,
         ]);
@@ -109,7 +110,7 @@ class ProjectValidationTest extends TestCase
         ]);
 
         // Create a sample for the study to avoid null access in Validation
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->project->id,
         ]);
@@ -164,11 +165,11 @@ class ProjectValidationTest extends TestCase
         ]);
 
         // Create samples for both studies to avoid null access in Validation
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study1->id,
             'project_id' => $this->project->id,
         ]);
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study2->id,
             'project_id' => $this->project->id,
         ]);

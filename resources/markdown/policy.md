@@ -1,7 +1,3 @@
-# Privacy Policy
-
-Effective date: Oct 13, 2022
-
 nmrXiv ("us", "we", or "our") operates the https://nmrxiv.org website (hereinafter referred to as the "Service").
 
 This page informs you of our policies regarding the collection, use and disclosure of personal data when you use our Service and the choices you have associated with that data.

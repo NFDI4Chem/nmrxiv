@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AuthorResource extends JsonResource
@@ -9,7 +10,7 @@ class AuthorResource extends JsonResource
     /**
      * Transform the author resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array<string, mixed>
      */
     public function toArray($request): array
@@ -25,8 +26,12 @@ class AuthorResource extends JsonResource
             'affiliation' => $this->affiliation,
             'contributor_type' => $this->whenPivotLoaded('author_project', function () {
                 return $this->pivot->contributor_type;
+            }) ?? $this->whenPivotLoaded('author_study', function () {
+                return $this->pivot->contributor_type;
             }),
             'sort_order' => $this->whenPivotLoaded('author_project', function () {
+                return $this->pivot->sort_order;
+            }) ?? $this->whenPivotLoaded('author_study', function () {
                 return $this->pivot->sort_order;
             }),
             'created_at' => $this->created_at?->toISOString(),

@@ -6,7 +6,7 @@ trait HasDOI
 {
     public function generateDOI($doiService)
     {
-        $doi_host = env('DOI_HOST', null);
+        $doi_host = config('doi.host');
 
         if (! is_null($doi_host)) {
             $identifier = $this->getIdentifier($this, 'identifier');
@@ -71,7 +71,7 @@ trait HasDOI
      */
     public function updateDOIMetadata($doiService)
     {
-        $doi_host = env('DOI_HOST', null);
+        $doi_host = config('doi.host');
 
         if (! is_null($doi_host)) {
             $doi = $this->doi;

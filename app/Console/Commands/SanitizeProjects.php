@@ -93,7 +93,7 @@ class SanitizeProjects extends Command
                 $user_id = $project->owner->id;
                 $team_id = $project->team_id;
                 $id = Str::uuid();
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
                 $path = preg_replace(
                     '~//+~',
                     '/',
@@ -169,7 +169,7 @@ class SanitizeProjects extends Command
                 $user_id = $project->owner->id;
                 $team_id = $project->team_id;
                 $id = Str::uuid();
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
                 $path = preg_replace(
                     '~//+~',
                     '/',
@@ -362,7 +362,7 @@ class SanitizeProjects extends Command
                 }
 
                 if ($fsObject->path && $fsObject->type == 'file') {
-                    $exists = Storage::disk(env('FILESYSTEM_DRIVER'))->exists($fsObject->path);
+                    $exists = Storage::disk(config('filesystems.default'))->exists($fsObject->path);
                     if (! $exists) {
                         $fsObject->status = 'missing';
                     } else {
@@ -382,7 +382,7 @@ class SanitizeProjects extends Command
                 if (! $fsObject->path) {
                     $project = $fsObject->project;
                     if ($project) {
-                        $environment = env('APP_ENV', 'local');
+                        $environment = config('app.env', 'local');
                         $path = preg_replace(
                             '~//+~',
                             '/',
@@ -431,7 +431,7 @@ class SanitizeProjects extends Command
             if ($fsObjectChild->type == 'file') {
                 $newFilePath = '/'.$draft->path.$fsObjectChild->relative_url;
                 if ($fsObjectChild->path && $newFilePath && $fsObjectChild->path != $newFilePath) {
-                    Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newFilePath);
+                    Storage::disk(config('filesystems.default'))->move($fsObjectChild->path, $newFilePath);
                     $fsObjectChild->path = $newFilePath;
                     $fsObjectChild->draft_id = $draft->id;
                     $fsObjectChild->save();

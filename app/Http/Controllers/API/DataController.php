@@ -9,7 +9,9 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class DataController extends Controller
@@ -56,7 +58,7 @@ class DataController extends Controller
      *         in="query",
      *         description="Sort field with optional direction prefix (-created_at for descending)",
      *
-     *         @OA\Schema(type="string", enum={"created_at", "-created_at", "identifier", "-identifier", "owner.email", "-owner.email"}, default="-created_at")
+     *         @OA\Schema(type="string", enum={"created_at", "-created_at", "identifier", "-identifier"}, default="-created_at")
      *     ),
      *
      *     @OA\Parameter(
@@ -73,14 +75,6 @@ class DataController extends Controller
      *         description="Filter by NMRXIV identifier (exact match)",
      *
      *         @OA\Schema(type="string", example="P123")
-     *     ),
-     *
-     *     @OA\Parameter(
-     *         name="filter[owner.email]",
-     *         in="query",
-     *         description="Filter by data owner email",
-     *
-     *         @OA\Schema(type="string", format="email", example="researcher@university.edu")
      *     ),
      *
      *     @OA\Parameter(
@@ -252,15 +246,15 @@ class DataController extends Controller
      * and includes Bioschemas.org metadata for enhanced discoverability.
      *
      * @param  string  $model  The data model type (projects|samples|datasets)
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function all(Request $request, $model)
     {
         $per_page = \Request::get('per_page') ?: 100;
 
         $defaultSort = '-created_at';
-        $allowedSorts = ['created_at', 'identifier', 'owner.email'];
-        $allowedFilters = ['name', 'created_at', 'identifier', 'owner.email', 'doi'];
+        $allowedSorts = ['created_at', 'identifier'];
+        $allowedFilters = ['name', 'created_at', 'identifier', 'doi'];
         if ($model === 'projects') {
             return ProjectResource::collection(
                 QueryBuilder::for(Project::class)
@@ -482,7 +476,7 @@ class DataController extends Controller
      * - Usage statistics and engagement metrics
      *
      * @param  string  $id  NMRXIV identifier (P123, S456, D789)
-     * @return \App\Http\Resources\ProjectResource|\App\Http\Resources\StudyResource|\App\Http\Resources\DatasetResource|\Illuminate\Http\JsonResponse
+     * @return ProjectResource|StudyResource|DatasetResource|JsonResponse
      */
     public function id(Request $request, $id)
     {

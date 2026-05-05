@@ -10,6 +10,7 @@ use App\Models\StudyInvitation as StudyInvitationModel;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -83,7 +84,7 @@ class StudyMailTest extends TestCase
 
         $mailable = new StudyInvitation($invitation);
 
-        $this->assertInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class, $mailable);
+        $this->assertInstanceOf(ShouldQueue::class, $mailable);
     }
 
     public function test_study_publish_mail_can_be_rendered(): void

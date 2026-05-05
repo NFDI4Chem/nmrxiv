@@ -9,10 +9,12 @@ use App\Models\Study;
 use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
 use App\Services\StorageSignedUrlService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Handle file system operations and signed URL generation for file uploads.
@@ -30,8 +32,8 @@ class FileSystemController extends Controller
     /**
      * Generate signed URLs for draft file uploads.
      *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ValidationException
+     * @throws ModelNotFoundException
      */
     public function signedDraftStorageURL(Request $request): JsonResponse
     {
@@ -71,8 +73,8 @@ class FileSystemController extends Controller
     /**
      * Generate signed URLs for project file uploads.
      *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ValidationException
+     * @throws ModelNotFoundException
      */
     public function signedStorageURL(Request $request): JsonResponse
     {
@@ -108,7 +110,7 @@ class FileSystemController extends Controller
     /**
      * Delete a filesystem object and all its children recursively.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function deleteFSO(Request $request, Draft $draft, FileSystemObject $filesystemobject): JsonResponse
     {

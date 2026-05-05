@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,7 @@ class UpdateProject
     /**
      * Create a project.
      *
-     * @return \App\Models\Project
+     * @return Project
      */
     public function update(Project $project, array $input)
     {
@@ -36,7 +37,7 @@ class UpdateProject
             if (array_key_exists('photo', $input)) {
                 $image = $input['photo'];
                 if (! is_null($image)) {
-                    $s3 = Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'));
+                    $s3 = Storage::disk(config('filesystems.default_public'));
                     $file_name = uniqid().'.'.$image->getClientOriginalExtension();
                     $s3filePath = '/projects/'.$file_name;
                     $s3->put($s3filePath, file_get_contents($image), 'public');
@@ -190,7 +191,7 @@ class UpdateProject
     /**
      * Attach citations to a project.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @param  array  $citations
      * @return void
      */

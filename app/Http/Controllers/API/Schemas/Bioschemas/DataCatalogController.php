@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Spatie\SchemaOrg\Schema;
@@ -246,7 +247,7 @@ class DataCatalogController extends Controller
      * - Compliance with funding agency data sharing requirements
      * - Support for systematic reviews and meta-analyses in chemistry
      *
-     * @return \Illuminate\Http\JsonResponse DataCatalog schema representing NMRXIV repository
+     * @return JsonResponse DataCatalog schema representing NMRXIV repository
      */
     public function dataCatalogSchema(Request $request)
     {
@@ -254,13 +255,13 @@ class DataCatalogController extends Controller
         $contributors = $this->prepareContributors();
 
         $nmrXivProvider = Schema::Organization();
-        $nmrXivProvider->name(Config::get('schemas.bioschema.provider'));
-        $nmrXivProvider->url(Config::get('schemas.bioschema.provider_url'));
+        $nmrXivProvider->name(Config::get('schemas.bioschemas.provider'));
+        $nmrXivProvider->url(Config::get('schemas.bioschemas.provider_url'));
 
         $dataCatalogSchema = Schema::DataCatalog();
-        $dataCatalogSchema['@id'] = url(Config::get('app.url'));
+        $dataCatalogSchema['@id'] = Config::get('app.url');
         $dataCatalogSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
-        $dataCatalogSchema->description(env('APP_DESCRIPTION'));
+        $dataCatalogSchema->description(Config::get('app.description', 'NMRXIV is an open-access preprint repository for sharing and discovering nuclear magnetic resonance (NMR) spectroscopy data.'));
         $dataCatalogSchema->keywords($keywords);
         $dataCatalogSchema->name(Config::get('app.name'));
         $dataCatalogSchema->provider($nmrXivProvider);

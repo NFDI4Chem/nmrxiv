@@ -7,6 +7,7 @@ use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DataCiteController extends Controller
@@ -363,7 +364,7 @@ class DataCiteController extends Controller
      *
      * @param  string  $username  NMRXIV username
      * @param  string  $projectName  Project slug identifier
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
 
@@ -620,7 +621,7 @@ class DataCiteController extends Controller
      * - **Datasets**: Specific NMR experiments and spectroscopic data
      *
      * @param  string  $identifier  NMRXIV public identifier (P123, S456, D789)
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function modelSchemaByID(Request $request, $identifier)
     {

@@ -2,8 +2,11 @@
 /public/hot
 /public/build
 /public/storage
+/public/vendor
+/public/vendor/swagger-api
 /storage/*.key
 /storage/pail
+/storage/app/spectra_parse
 /vendor
 .env
 .env.production
