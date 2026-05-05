@@ -92,7 +92,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Fetch latest release tag (fallback to short SHA) and short SHA for tags
       - name: Fetch latest release (gh)

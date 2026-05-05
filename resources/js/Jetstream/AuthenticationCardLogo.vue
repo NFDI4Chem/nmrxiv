@@ -1,15 +1,15 @@
 <template>
-    <Link :href="'/'">
+    <InertiaLink :href="'/'">
         <jet-application-logo class="block w-auto" />
-    </Link>
+    </InertiaLink>
 </template>
 
 <script>
-import { Link } from "@inertiajs/vue3";
+import { Link as InertiaLink } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 export default {
     components: {
-        Link,
+        InertiaLink,
         JetApplicationLogo,
     },
 };

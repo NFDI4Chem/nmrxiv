@@ -1,7 +1,7 @@
 <template>
     <a>
         <div>
-            <Link :href="'/spectra?compound=' + molecule.identifier">
+            <InertiaLink :href="'/spectra?compound=' + molecule.identifier">
                 <div class="rounded overflow-hidden">
                     <Depictor2D
                         class="p-4 border-b"
@@ -83,19 +83,24 @@
         >
       </div> -->
                 <!-- </div> -->
-            </Link>
+            </InertiaLink>
         </div>
     </a>
 </template>
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link as InertiaLink } from "@inertiajs/vue3";
 export default {
     components: {
         Depictor2D,
-        Link,
+        InertiaLink,
     },
-    props: ["molecule"],
+    props: {
+        molecule: {
+            type: Object,
+            required: true,
+        },
+    },
     data() {
         return {
             results: [],
