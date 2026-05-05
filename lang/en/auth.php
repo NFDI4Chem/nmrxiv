@@ -15,7 +15,6 @@ return [
 
     'failed' => 'These credentials do not match our records.',
     'password' => 'These credentials do not match our records.',
-    'unknown_email' => 'No account exists with this email address.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
 ];

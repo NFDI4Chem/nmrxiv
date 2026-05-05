@@ -6,16 +6,12 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
-use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
-use Laravel\Fortify\LoginRateLimiter;
 
 /**
  * Fortify Service Provider
@@ -64,37 +60,6 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
-
-        Fortify::authenticateUsing(function (Request $request) {
-            $usernameKey = Fortify::username();
-            $username = $request->{$usernameKey};
-
-            $user = User::query()->where($usernameKey, $username)->first();
-
-            $limiter = app(LoginRateLimiter::class);
-
-            if (! $user) {
-                $limiter->increment($request);
-
-                throw ValidationException::withMessages([
-                    $usernameKey => [
-                        app()->isProduction()
-                            ? trans('auth.failed')
-                            : trans('auth.unknown_email'),
-                    ],
-                ])->redirectTo(route('login'));
-            }
-
-            if (! Hash::check($request->password, $user->password)) {
-                $limiter->increment($request);
-
-                throw ValidationException::withMessages([
-                    $usernameKey => [trans('auth.failed')],
-                ])->redirectTo(route('login'));
-            }
-
-            return $user;
-        });
 
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->email.$request->ip());
