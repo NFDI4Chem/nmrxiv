@@ -1795,11 +1795,37 @@ export default {
         },
 
         /**
+         * Replace the expandedFolders Set so Vue 3 picks up the change.
+         *
+         * Vue 3 reactivity for `Set` instances does not always notify
+         * dependents on `.add` / `.delete` / `.clear` mutations. Reassigning
+         * the property with a new `Set` instance reliably triggers updates.
+         *
+         * @param {Iterable<number>|Set<number>} [iterable]
+         */
+        setExpandedFolders(iterable = []) {
+            this.expandedFolders = new Set(iterable);
+        },
+
+        /**
+         * Mutate the expandedFolders Set immutably via a callback.
+         *
+         * Clones the current Set, hands it to the callback for mutation,
+         * then reassigns it so Vue picks up the change.
+         *
+         * @param {(next: Set<number>) => void} mutator
+         */
+        mutateExpandedFolders(mutator) {
+            const next = new Set(this.expandedFolders);
+            mutator(next);
+            this.expandedFolders = next;
+        },
+
+        /**
          * Clear file tree state when step changes
          */
         clearFileTreeState() {
-            // Clear expanded folders
-            this.expandedFolders.clear();
+            this.setExpandedFolders();
 
             // Reset selection to root
             if (this.file) {
@@ -2851,11 +2877,13 @@ export default {
          * Track when a folder is expanded/collapsed
          */
         toggleFolderExpansion(fsoId, isExpanded) {
-            if (isExpanded) {
-                this.expandedFolders.add(fsoId);
-            } else {
-                this.expandedFolders.delete(fsoId);
-            }
+            this.mutateExpandedFolders((next) => {
+                if (isExpanded) {
+                    next.add(fsoId);
+                } else {
+                    next.delete(fsoId);
+                }
+            });
             this.updateURLWithExpandedState();
         },
 
@@ -2899,11 +2927,11 @@ export default {
             const expandedParam = urlParams.get("expanded");
 
             if (expandedParam) {
-                this.expandedFolders = new Set(
+                this.setExpandedFolders(
                     expandedParam
                         .split(",")
                         .filter((id) => id)
-                        .map((id) => parseInt(id))
+                        .map((id) => parseInt(id, 10))
                 );
             }
         },
@@ -3034,7 +3062,9 @@ export default {
 
                 // If this is a 404 or similar, the folder might not exist anymore
                 if (error.response && error.response.status === 404) {
-                    this.expandedFolders.delete(folder.id);
+                    this.mutateExpandedFolders((next) => {
+                        next.delete(folder.id);
+                    });
                     this.updateURLWithExpandedState();
                 }
             } finally {
@@ -3188,15 +3218,19 @@ export default {
             const pathFolders = [];
             this.buildPathToObject(this.file, targetObject, [], pathFolders);
 
-            // Add all path folders to expanded folders and load their children if needed
-            for (const folder of pathFolders) {
-                if (folder.has_children && folder.id) {
-                    this.expandedFolders.add(folder.id);
+            const expandable = pathFolders.filter(
+                (folder) => folder.has_children && folder.id
+            );
 
-                    // Load children if not already loaded
-                    if (!folder.children || folder.children.length === 0) {
-                        await this.fetchFolderChildren(folder);
-                    }
+            this.mutateExpandedFolders((next) => {
+                for (const folder of expandable) {
+                    next.add(folder.id);
+                }
+            });
+
+            for (const folder of expandable) {
+                if (!folder.children || folder.children.length === 0) {
+                    await this.fetchFolderChildren(folder);
                 }
             }
 
@@ -3273,64 +3307,58 @@ export default {
          * Revert selection to parent folder after a file/folder is deleted
          */
         async revertToParentAfterDeletion(deletedObject, parentInfo) {
-            // Remove the deleted object from expanded folders if it was a folder
-            if (deletedObject.type === "directory" && deletedObject.id) {
-                this.expandedFolders.delete(deletedObject.id);
-            }
+            const parentFolder =
+                parentInfo && parentInfo.id
+                    ? this.findObjectById(this.file, parentInfo.id)
+                    : null;
 
-            if (parentInfo && parentInfo.id) {
-                // Find the parent folder in the refreshed tree
-                const parentFolder = this.findObjectById(
-                    this.file,
-                    parentInfo.id
-                );
-
-                if (parentFolder) {
-                    // Select the parent folder
-                    this.$page.props.selectedFileSystemObject = parentFolder;
-                    this.updateSelectedFolder(parentFolder);
-
-                    // Ensure parent folder is in expanded folders if it has children
-                    if (parentFolder.has_children) {
-                        this.expandedFolders.add(parentFolder.id);
-                    }
-
-                    // Load parent folder's children if needed
-                    if (
-                        parentFolder.has_children &&
-                        (!parentFolder.children ||
-                            parentFolder.children.length === 0)
-                    ) {
-                        await this.fetchFolderChildren(parentFolder);
-                    }
-
-                    // Update URL with new selection and expanded state
-                    const urlParams = new URLSearchParams(
-                        window.location.search
-                    );
-                    urlParams.set("selected", parentFolder.id);
-
-                    if (this.expandedFolders.size > 0) {
-                        urlParams.set(
-                            "expanded",
-                            Array.from(this.expandedFolders).join(",")
-                        );
-                    } else {
-                        urlParams.delete("expanded");
-                    }
-
-                    const newUrl = `${
-                        window.location.pathname
-                    }?${urlParams.toString()}`;
-                    window.history.replaceState({}, "", newUrl);
-                } else {
-                    this.revertToRoot();
+            this.mutateExpandedFolders((next) => {
+                if (deletedObject.type === "directory" && deletedObject.id) {
+                    next.delete(deletedObject.id);
                 }
-            } else {
+
+                if (parentFolder && parentFolder.has_children) {
+                    next.add(parentFolder.id);
+                }
+            });
+
+            if (!parentFolder) {
                 this.revertToRoot();
+
+                this.$nextTick(() => {
+                    this.forceRefreshExpandedState();
+                });
+
+                return;
             }
 
-            // Refresh UI to reflect changes
+            this.$page.props.selectedFileSystemObject = parentFolder;
+            this.updateSelectedFolder(parentFolder);
+
+            if (
+                parentFolder.has_children &&
+                (!parentFolder.children || parentFolder.children.length === 0)
+            ) {
+                await this.fetchFolderChildren(parentFolder);
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set("selected", parentFolder.id);
+
+            if (this.expandedFolders.size > 0) {
+                urlParams.set(
+                    "expanded",
+                    Array.from(this.expandedFolders).join(",")
+                );
+            } else {
+                urlParams.delete("expanded");
+            }
+
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
+
             this.$nextTick(() => {
                 this.forceRefreshExpandedState();
             });

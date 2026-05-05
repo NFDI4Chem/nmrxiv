@@ -13,6 +13,12 @@
         <nav class="flex-1 space-y-0" aria-label="Sidebar">
             <!-- Main disclosure container for root level folder -->
             <Disclosure
+                :key="
+                    'tree-root-' +
+                    String(file.id ?? file.relative_url ?? '') +
+                    '-' +
+                    (file.name == '/' || isExpanded(file.id) ? 'o' : 'c')
+                "
                 v-slot="{ open }"
                 as="div"
                 :default-open="file.name == '/' || isExpanded(file.id)"
@@ -158,6 +164,14 @@
                                     <!-- Directory with children - create nested disclosure -->
                                     <span v-if="sfile.has_children">
                                         <Disclosure
+                                            :key="
+                                                'tree-folder-' +
+                                                sfile.id +
+                                                '-' +
+                                                (isExpanded(sfile.id)
+                                                    ? 'o'
+                                                    : 'c')
+                                            "
                                             v-slot="{ open }"
                                             as="div"
                                             class="space-y-1"
