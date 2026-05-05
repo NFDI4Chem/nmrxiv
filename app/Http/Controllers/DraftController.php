@@ -10,11 +10,14 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
+use App\Support\ProvisionalDoi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 /**
  * Handle draft management operations including file processing, validation, and project conversion.
@@ -145,12 +148,97 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
+        if (! $project) {
+            return response()->json([
+                'project' => null,
+                'studies' => [],
+            ]);
+        }
+
         $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
 
         return response()->json([
             'project' => $project->load(['owner']),
             'studies' => $studies,
         ]);
+    }
+
+    /**
+     * Create or return the draft project's provisional DOI (not registered with DataCite).
+     */
+    public function storeProvisionalDoi(Request $request, Draft $draft): JsonResponse
+    {
+        $this->authorizeDraftOwner($draft);
+
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id, $team_id, $team] = $user->getUserTeamData();
+
+        try {
+            $payload = DB::transaction(function () use ($draft, $user, $user_id, $team_id, $team): array {
+                Draft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
+
+                $project = Project::query()->where('draft_id', $draft->id)->first();
+
+                if (! $project) {
+                    $project = $this->processDraft->createNewProject($draft, $user_id, $team_id, $user, $team);
+                }
+
+                $locked = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
+
+                if ($locked->provisional_doi === null || $locked->provisional_doi === '') {
+                    $locked->provisional_doi = ProvisionalDoi::forDraft($draft);
+                    $locked->save();
+                }
+
+                $locked->refresh();
+
+                return [
+                    'provisional_doi' => $locked->provisional_doi,
+                    'url' => $locked->provisional_doi_url,
+                ];
+            });
+        } catch (RuntimeException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 503);
+        }
+
+        return response()->json($payload);
+    }
+
+    /**
+     * Clear the provisional DOI for the draft's project.
+     */
+    public function destroyProvisionalDoi(Request $request, Draft $draft): Response
+    {
+        $this->authorizeDraftOwner($draft);
+
+        $project = Project::query()->where('draft_id', $draft->id)->first();
+
+        if (! $project) {
+            return response()->noContent();
+        }
+
+        if ($project->draft_id === null) {
+            abort(403);
+        }
+
+        $project->provisional_doi = null;
+        $project->save();
+
+        return response()->noContent();
+    }
+
+    private function authorizeDraftOwner(Draft $draft): void
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
     }
 
     /**

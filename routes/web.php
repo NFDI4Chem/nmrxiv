@@ -301,6 +301,10 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');
+        Route::post('drafts/{draft}/provisional-doi', [DraftController::class, 'storeProvisionalDoi'])
+            ->name('dashboard.draft.provisional-doi.store');
+        Route::delete('drafts/{draft}/provisional-doi', [DraftController::class, 'destroyProvisionalDoi'])
+            ->name('dashboard.draft.provisional-doi.destroy');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
         Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
