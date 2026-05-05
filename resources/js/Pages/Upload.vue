@@ -782,28 +782,6 @@
                                                         </div>
                                                     </div>
                                                 </Link>
-                                                <div
-                                                    v-if="
-                                                        draft.processing_logs &&
-                                                        draft.processing_logs
-                                                            .length > 0
-                                                    "
-                                                    class="ml-4 flex-shrink-0"
-                                                >
-                                                    <button
-                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                        @click="
-                                                            showProcessingLogs(
-                                                                draft
-                                                            )
-                                                        "
-                                                    >
-                                                        <InformationCircleIcon
-                                                            class="w-4 h-4 mr-1"
-                                                        />
-                                                        View Logs
-                                                    </button>
-                                                </div>
                                             </div>
                                         </li>
                                     </ul>
@@ -904,6 +882,11 @@
                                                 :draft="currentDraft"
                                                 :height="'flex-1 w-full'"
                                                 @loading="filesLoading"
+                                                @show-processing-logs="
+                                                    showProcessingLogs(
+                                                        currentDraft
+                                                    )
+                                                "
                                             ></file-system-browser>
                                         </div>
                                     </div>
@@ -2502,98 +2485,168 @@
             @close="showLogsDialog = false"
         >
             <template #title>
-                <div class="block">
-                    Processing Logs - {{ selectedDraftForLogs?.name }}
+                <div class="flex items-start gap-3">
+                    <span
+                        class="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200"
+                        aria-hidden="true"
+                    >
+                        <InformationCircleIcon class="h-5 w-5" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <div
+                            class="text-base font-semibold leading-6 text-gray-900"
+                        >
+                            Processing logs
+                        </div>
+                        <div
+                            class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500"
+                        >
+                            <span
+                                v-if="selectedDraftForLogs?.name"
+                                class="truncate font-medium text-gray-700"
+                                :title="selectedDraftForLogs.name"
+                            >
+                                {{ selectedDraftForLogs.name }}
+                            </span>
+                            <span
+                                v-if="selectedDraftForLogs?.key"
+                                aria-hidden="true"
+                                >&middot;</span
+                            >
+                            <span
+                                v-if="selectedDraftForLogs?.key"
+                                class="font-mono text-[11px] text-gray-500"
+                            >
+                                ID:&nbsp;{{ selectedDraftForLogs.key }}
+                            </span>
+                            <span
+                                v-if="
+                                    selectedDraftForLogs?.processing_logs
+                                        ?.length
+                                "
+                                aria-hidden="true"
+                                >&middot;</span
+                            >
+                            <span
+                                v-if="
+                                    selectedDraftForLogs?.processing_logs
+                                        ?.length
+                                "
+                                class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700 ring-1 ring-inset ring-gray-200"
+                            >
+                                {{
+                                    selectedDraftForLogs.processing_logs.length
+                                }}
+                                {{
+                                    selectedDraftForLogs.processing_logs
+                                        .length === 1
+                                        ? "entry"
+                                        : "entries"
+                                }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </template>
 
             <template #content>
                 <div
-                    class="relative h-[70vh] overflow-y-auto z-0 mt-1 rounded-lg"
+                    class="relative -mx-1 mt-3 flex max-h-[70vh] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
                 >
-                    <ul
+                    <ol
                         v-if="
                             selectedDraftForLogs?.processing_logs &&
                             selectedDraftForLogs.processing_logs.length > 0
                         "
-                        role="list"
-                        class="divide-y divide-gray-200"
+                        role="log"
+                        aria-live="polite"
+                        class="flex-1 divide-y divide-gray-100 overflow-y-auto"
                     >
                         <li
                             v-for="(
                                 log, index
                             ) in selectedDraftForLogs.processing_logs"
                             :key="index"
-                            class="px-4 py-4"
+                            class="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-gray-50/80"
                         >
-                            <div class="flex space-x-3">
-                                <div class="flex-shrink-0">
-                                    <CheckIcon
-                                        v-if="log.level === 'info'"
-                                        class="h-5 w-5 text-green-400"
-                                        aria-hidden="true"
-                                    />
-                                    <ExclamationCircleIcon
-                                        v-else-if="log.level === 'error'"
-                                        class="h-5 w-5 text-red-400"
-                                        aria-hidden="true"
-                                    />
-                                    <InformationCircleIcon
-                                        v-else
-                                        class="h-5 w-5 text-yellow-400"
-                                        aria-hidden="true"
-                                    />
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <div class="text-sm text-gray-500">
-                                        <time :datetime="log.timestamp">
-                                            {{ formatDateTime(log.timestamp) }}
-                                        </time>
-                                        <span class="ml-2 font-medium">
-                                            {{ log.level.toUpperCase() }}
-                                        </span>
-                                    </div>
-                                    <div class="mt-1 text-sm text-gray-900">
-                                        {{ log.message }}
-                                    </div>
-                                    <div
-                                        v-if="
-                                            log.context &&
-                                            Object.keys(log.context).length > 0
+                            <span
+                                class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                                :class="
+                                    logLevelMeta(log.level).iconWrapperClass
+                                "
+                                aria-hidden="true"
+                            >
+                                <component
+                                    :is="logLevelMeta(log.level).iconComponent"
+                                    class="h-4 w-4"
+                                    :class="logLevelMeta(log.level).iconClass"
+                                />
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <div
+                                    class="flex flex-wrap items-center gap-x-2 gap-y-0.5"
+                                >
+                                    <span
+                                        class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                                        :class="
+                                            logLevelMeta(log.level).badgeClass
                                         "
-                                        class="mt-2"
                                     >
-                                        <details class="text-xs text-gray-600">
-                                            <summary
-                                                class="cursor-pointer hover:text-gray-800"
-                                            >
-                                                Show Details
-                                            </summary>
-                                            <pre
-                                                class="mt-2 whitespace-pre-wrap bg-gray-50 p-2 rounded"
-                                                >{{
-                                                    JSON.stringify(
-                                                        log.context,
-                                                        null,
-                                                        2
-                                                    )
-                                                }}</pre
-                                            >
-                                        </details>
-                                    </div>
+                                        {{ logLevelMeta(log.level).label }}
+                                    </span>
+                                    <time
+                                        v-if="log.timestamp"
+                                        :datetime="log.timestamp"
+                                        class="font-mono text-[11px] text-gray-500"
+                                    >
+                                        {{ formatDateTime(log.timestamp) }}
+                                    </time>
                                 </div>
+                                <p
+                                    class="mt-1 break-words text-sm leading-relaxed text-gray-900"
+                                >
+                                    {{ log.message }}
+                                </p>
+                                <details
+                                    v-if="
+                                        log.context &&
+                                        Object.keys(log.context).length > 0
+                                    "
+                                    class="mt-2 text-xs text-gray-600"
+                                >
+                                    <summary
+                                        class="inline-flex cursor-pointer select-none items-center gap-1 rounded text-gray-600 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
+                                    >
+                                        <span>Show details</span>
+                                    </summary>
+                                    <pre
+                                        class="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-gray-200 bg-gray-50 p-3 font-mono text-[11px] leading-relaxed text-gray-800"
+                                        >{{
+                                            JSON.stringify(log.context, null, 2)
+                                        }}</pre
+                                    >
+                                </details>
                             </div>
                         </li>
-                    </ul>
-                    <div v-else class="text-center py-12">
-                        <InformationCircleIcon
-                            class="mx-auto h-12 w-12 text-gray-400"
-                        />
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">
-                            No logs available
+                    </ol>
+                    <div
+                        v-else
+                        class="flex flex-col items-center justify-center px-6 py-16 text-center"
+                    >
+                        <span
+                            class="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-500 ring-1 ring-inset ring-gray-200"
+                            aria-hidden="true"
+                        >
+                            <InformationCircleIcon class="h-6 w-6" />
+                        </span>
+                        <h3 class="text-sm font-semibold text-gray-900">
+                            No processing logs yet
                         </h3>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Processing logs will appear here when available.
+                        <p
+                            class="mt-1 max-w-xs text-xs leading-relaxed text-gray-500"
+                        >
+                            Logs will appear here as the draft is validated and
+                            processed.
                         </p>
                     </div>
                 </div>
@@ -3022,6 +3075,69 @@ export default {
         showProcessingLogs(draft) {
             this.selectedDraftForLogs = draft;
             this.showLogsDialog = true;
+        },
+
+        /**
+         * Visual metadata for a processing-log level (icon component + color tokens).
+         *
+         * @param {string|null|undefined} rawLevel
+         * @returns {{ key: string, label: string, iconComponent: string, iconWrapperClass: string, iconClass: string, badgeClass: string }}
+         */
+        logLevelMeta(rawLevel) {
+            const key = String(rawLevel || "info").toLowerCase();
+
+            const presets = {
+                error: {
+                    label: "Error",
+                    iconComponent: "ExclamationCircleIcon",
+                    iconWrapperClass:
+                        "bg-red-50 ring-1 ring-inset ring-red-200",
+                    iconClass: "text-red-600",
+                    badgeClass:
+                        "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200",
+                },
+                warning: {
+                    label: "Warning",
+                    iconComponent: "InformationCircleIcon",
+                    iconWrapperClass:
+                        "bg-amber-50 ring-1 ring-inset ring-amber-200",
+                    iconClass: "text-amber-600",
+                    badgeClass:
+                        "bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200",
+                },
+                warn: {
+                    label: "Warning",
+                    iconComponent: "InformationCircleIcon",
+                    iconWrapperClass:
+                        "bg-amber-50 ring-1 ring-inset ring-amber-200",
+                    iconClass: "text-amber-600",
+                    badgeClass:
+                        "bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200",
+                },
+                info: {
+                    label: "Info",
+                    iconComponent: "InformationCircleIcon",
+                    iconWrapperClass:
+                        "bg-sky-50 ring-1 ring-inset ring-sky-200",
+                    iconClass: "text-sky-600",
+                    badgeClass:
+                        "bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-200",
+                },
+                success: {
+                    label: "Success",
+                    iconComponent: "CheckIcon",
+                    iconWrapperClass:
+                        "bg-emerald-50 ring-1 ring-inset ring-emerald-200",
+                    iconClass: "text-emerald-600",
+                    badgeClass:
+                        "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200",
+                },
+            };
+
+            return {
+                key,
+                ...(presets[key] ?? presets.info),
+            };
         },
         toggleCompoundDetails() {
             this.showCompoundDetails = !this.showCompoundDetails;
