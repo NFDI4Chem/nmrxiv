@@ -2,10 +2,14 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Author;
+use App\Models\Citation;
 use App\Models\Dataset;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
+use App\Models\User;
+use App\Services\DOI\DOIService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -377,7 +381,7 @@ class HasDOIModelTest extends TestCase
         $project = Project::factory()->create(['license_id' => $license->id]);
 
         // Create project with authors to test creators array
-        $author = \App\Models\Author::factory()->create([
+        $author = Author::factory()->create([
             'given_name' => 'John',
             'family_name' => 'Doe',
             'orcid_id' => '0000-0002-1825-0097',
@@ -427,7 +431,7 @@ class HasDOIModelTest extends TestCase
         $project = Project::factory()->create(['license_id' => $license->id]);
 
         // Create citation to test related identifiers
-        $citation = \App\Models\Citation::factory()->create([
+        $citation = Citation::factory()->create([
             'doi' => '10.1234/test.citation',
         ]);
 
@@ -533,7 +537,7 @@ class HasDOIModelTest extends TestCase
         ]);
 
         // Create mock DOI service
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/project', $this->isType('array'))
@@ -560,7 +564,7 @@ class HasDOIModelTest extends TestCase
             'doi' => '10.1234/study',
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/study', $this->isType('array'))
@@ -592,7 +596,7 @@ class HasDOIModelTest extends TestCase
             'doi' => '10.1234/dataset',
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/dataset', $this->isType('array'))
@@ -615,7 +619,7 @@ class HasDOIModelTest extends TestCase
             'doi' => null,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('createDOI')
             ->with('P123', $this->isType('array'))
@@ -646,7 +650,7 @@ class HasDOIModelTest extends TestCase
             'doi' => null,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('createDOI')
             ->with('P456.S789', $this->isType('array'))
@@ -665,7 +669,7 @@ class HasDOIModelTest extends TestCase
         putenv('DOI_HOST=https://api.datacite.org');
 
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'project_id' => null,
             'license_id' => $license->id,
@@ -674,7 +678,7 @@ class HasDOIModelTest extends TestCase
             'owner_id' => $owner->id,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('createDOI')
             ->with('S999', $this->isType('array'))
@@ -711,7 +715,7 @@ class HasDOIModelTest extends TestCase
             'doi' => null,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('createDOI')
             ->with('P111.S222.D333', $this->isType('array'))
@@ -730,7 +734,7 @@ class HasDOIModelTest extends TestCase
         putenv('DOI_HOST=https://api.datacite.org');
 
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'project_id' => null,
             'identifier' => 444,
@@ -745,7 +749,7 @@ class HasDOIModelTest extends TestCase
             'doi' => null,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('createDOI')
             ->with('S444.D555', $this->isType('array'))
@@ -764,14 +768,14 @@ class HasDOIModelTest extends TestCase
         putenv('DOI_HOST=https://api.datacite.org');
 
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'license_id' => $license->id,
             'doi' => '10.1234/existing.doi',
             'owner_id' => $owner->id,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/existing.doi', $this->isType('array'))
@@ -795,7 +799,7 @@ class HasDOIModelTest extends TestCase
             'doi' => null,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->never())
             ->method('updateDOI');
 
@@ -810,7 +814,7 @@ class HasDOIModelTest extends TestCase
     {
         // Test getMetadata for Study without project - covers different branches
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'name' => 'Standalone Study',
             'description' => 'Study without project',
@@ -831,7 +835,7 @@ class HasDOIModelTest extends TestCase
     {
         // Test getMetadata for Dataset without project - covers different branches
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'name' => 'Study Name',
             'project_id' => null,
@@ -895,7 +899,7 @@ class HasDOIModelTest extends TestCase
     {
         // Test addRelatedIdentifiers for Study without project - covers different branch
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'project_id' => null,
             'license_id' => $license->id,
@@ -903,7 +907,7 @@ class HasDOIModelTest extends TestCase
             'owner_id' => $owner->id,
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/standalone.study', $this->isType('array'))
@@ -918,7 +922,7 @@ class HasDOIModelTest extends TestCase
     {
         // Test addRelatedIdentifiers for Dataset without project - covers different branch
         $license = License::factory()->create();
-        $owner = \App\Models\User::factory()->create();
+        $owner = User::factory()->create();
         $study = Study::factory()->create([
             'project_id' => null,
             'license_id' => $license->id,
@@ -933,7 +937,7 @@ class HasDOIModelTest extends TestCase
             'doi' => '10.1234/dataset',
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/dataset', $this->isType('array'))
@@ -966,7 +970,7 @@ class HasDOIModelTest extends TestCase
             'doi' => '10.1234/project.dataset',
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/main.project', $this->callback(function ($attributes) {
@@ -1007,7 +1011,7 @@ class HasDOIModelTest extends TestCase
             'doi' => '10.1234/study.dataset',
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/study.with.project', $this->callback(function ($attributes) {
@@ -1048,7 +1052,7 @@ class HasDOIModelTest extends TestCase
             'doi' => '10.1234/test.dataset',
         ]);
 
-        $doiService = $this->createMock(\App\Services\DOI\DOIService::class);
+        $doiService = $this->createMock(DOIService::class);
         $doiService->expects($this->once())
             ->method('updateDOI')
             ->with('10.1234/test.dataset', $this->callback(function ($attributes) {

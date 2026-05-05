@@ -419,7 +419,9 @@
                                                     <a
                                                         v-if="
                                                             file.type !==
-                                                            'directory'
+                                                                'directory' &&
+                                                            project?.owner &&
+                                                            project?.slug
                                                         "
                                                         :href="
                                                             url +
@@ -540,7 +542,9 @@
                                                         <a
                                                             v-if="
                                                                 file.type !==
-                                                                'directory'
+                                                                    'directory' &&
+                                                                project?.owner &&
+                                                                project?.slug
                                                             "
                                                             :href="
                                                                 url +
@@ -697,17 +701,20 @@ export default {
                 : "//nmriumdev.nmrxiv.org";
         },
         downloadURL() {
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/download/" +
-                this.project.slug +
-                "?key=" +
-                this.$page.props.selectedFileSystemObject.key +
-                "&uuid=" +
-                this.$page.props.selectedFileSystemObject.uuid
-            );
+            if (this.project?.owner?.username && this.project?.slug) {
+                return (
+                    this.url +
+                    "/" +
+                    this.project.owner.username +
+                    "/download/" +
+                    this.project.slug +
+                    "?key=" +
+                    this.$page.props.selectedFileSystemObject.key +
+                    "&uuid=" +
+                    this.$page.props.selectedFileSystemObject.uuid
+                );
+            }
+            return null;
         },
         canUpdateFiles() {
             return this.studyPermissions
@@ -981,17 +988,20 @@ export default {
             console.log("getFileDownloadURL called for:", file.name);
             if (file.type === "directory") return "#";
 
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/download/" +
-                this.project.slug +
-                "?key=" +
-                file.key +
-                "&uuid=" +
-                file.uuid
-            );
+            if (this.project?.owner?.username && this.project?.slug) {
+                return (
+                    this.url +
+                    "/" +
+                    this.project.owner.username +
+                    "/download/" +
+                    this.project.slug +
+                    "?key=" +
+                    file.key +
+                    "&uuid=" +
+                    file.uuid
+                );
+            }
+            return "#";
         },
     },
 };

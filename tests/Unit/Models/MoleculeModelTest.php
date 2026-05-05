@@ -5,6 +5,9 @@ namespace Tests\Unit\Models;
 use App\Models\Molecule;
 use App\Models\Sample;
 use App\Models\Study;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -19,7 +22,7 @@ class MoleculeModelTest extends TestCase
 
         // Test the relationship exists and is correct type
         $relationship = $molecule->samples();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
     }
 
     public function test_samples_relationship_includes_pivot_data()
@@ -28,7 +31,7 @@ class MoleculeModelTest extends TestCase
 
         // Test pivot relationship configuration
         $relationship = $molecule->samples();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
 
         // Test pivot columns are configured
         $pivotColumns = $relationship->getPivotColumns();
@@ -106,7 +109,7 @@ class MoleculeModelTest extends TestCase
         $molecule = new Molecule;
         $relationship = $molecule->samples();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relationship);
+        $this->assertInstanceOf(BelongsToMany::class, $relationship);
     }
 
     public function test_all_required_fields_are_fillable()
@@ -215,7 +218,7 @@ class MoleculeModelTest extends TestCase
         $molecule = new Molecule;
 
         // Create a mock for the samples collection that has a load method
-        $samplesCollection = $this->getMockBuilder(\Illuminate\Database\Eloquent\Collection::class)
+        $samplesCollection = $this->getMockBuilder(Collection::class)
             ->onlyMethods(['load'])
             ->getMock();
 
@@ -256,7 +259,7 @@ class MoleculeModelTest extends TestCase
         $studiesQuery = $molecule->studies();
 
         // Should return Eloquent query builder
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $studiesQuery);
+        $this->assertInstanceOf(Builder::class, $studiesQuery);
     }
 
     #[Test]
@@ -288,7 +291,7 @@ class MoleculeModelTest extends TestCase
         $method = $reflection->getMethod('studies');
 
         // We need to mock the samples property to return our collection with load method
-        $mockSamplesCollection = $this->getMockBuilder(\Illuminate\Database\Eloquent\Collection::class)
+        $mockSamplesCollection = $this->getMockBuilder(Collection::class)
             ->onlyMethods(['load'])
             ->getMock();
 
@@ -311,7 +314,7 @@ class MoleculeModelTest extends TestCase
         $result = $molecule->studies();
 
         // Should return a query builder
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertInstanceOf(Builder::class, $result);
     }
 
     #[Test]
@@ -329,7 +332,7 @@ class MoleculeModelTest extends TestCase
 
         $samplesCollection = collect([$sample]);
 
-        $mockSamplesCollection = $this->getMockBuilder(\Illuminate\Database\Eloquent\Collection::class)
+        $mockSamplesCollection = $this->getMockBuilder(Collection::class)
             ->onlyMethods(['load'])
             ->getMock();
 
@@ -351,6 +354,6 @@ class MoleculeModelTest extends TestCase
         $result = $molecule->studies();
 
         // Should return a query builder that will search for study ID 42
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertInstanceOf(Builder::class, $result);
     }
 }

@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class DeleteProjectTest extends TestCase
@@ -115,7 +116,7 @@ class DeleteProjectTest extends TestCase
     public function test_permanent_delete_removes_all_objects()
     {
         // Create super-admin role for test
-        \Spatie\Permission\Models\Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
+        Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
 
         $project = Project::factory()->create(['is_public' => false]);
         $study = Study::factory()->for($project)->create();

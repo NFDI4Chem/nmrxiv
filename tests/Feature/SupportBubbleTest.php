@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent;
 use Tests\TestCase;
 
 class SupportBubbleTest extends TestCase
@@ -210,13 +211,13 @@ class SupportBubbleTest extends TestCase
     public function test_exception_handling_when_event_fails(): void
     {
         // Mock the SupportBubbleSubmittedEvent to throw an exception when constructed
-        $this->mock(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function ($mock) {
+        $this->mock(SupportBubbleSubmittedEvent::class, function ($mock) {
             $mock->shouldReceive('__construct')
                 ->andThrow(new \Exception('Event construction failed'));
         });
 
         // Listen for the event and throw an exception
-        \Event::listen(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function () {
+        \Event::listen(SupportBubbleSubmittedEvent::class, function () {
             throw new \Exception('Event listener failed');
         });
 
@@ -245,7 +246,7 @@ class SupportBubbleTest extends TestCase
         \Log::spy();
 
         // Listen for the event and throw an exception
-        \Event::listen(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function () {
+        \Event::listen(SupportBubbleSubmittedEvent::class, function () {
             throw new \Exception('Event listener failed');
         });
 
@@ -290,7 +291,7 @@ class SupportBubbleTest extends TestCase
 
         $response->assertStatus(200);
 
-        \Event::assertDispatched(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function ($event) use ($validData) {
+        \Event::assertDispatched(SupportBubbleSubmittedEvent::class, function ($event) use ($validData) {
             return $event->subject === $validData['subject']
                 && $event->message === $validData['message']
                 && $event->email === $validData['email']
@@ -317,7 +318,7 @@ class SupportBubbleTest extends TestCase
 
         $response->assertStatus(200);
 
-        \Event::assertDispatched(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class);
+        \Event::assertDispatched(SupportBubbleSubmittedEvent::class);
     }
 
     /**
@@ -340,7 +341,7 @@ class SupportBubbleTest extends TestCase
 
         $response->assertStatus(200);
 
-        \Event::assertDispatched(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function ($event) {
+        \Event::assertDispatched(SupportBubbleSubmittedEvent::class, function ($event) {
             return ! empty($event->ip) && ! empty($event->userAgent);
         });
     }

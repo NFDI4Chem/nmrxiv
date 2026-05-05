@@ -42,7 +42,8 @@
         "spatie/laravel-tags": "^4.9",
         "spatie/laravel-welcome-notification": "^2.4",
         "spatie/schema-org": "^3.11",
-        "tightenco/ziggy": "^2.5"
+        "tightenco/ziggy": "^2.5",
+        "whikloj/bagittools": "^6.0"
     },
     "require-dev": {
         "brianium/paratest": "^7.8",

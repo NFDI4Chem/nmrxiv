@@ -4,6 +4,7 @@ namespace Tests\Feature\Project;
 
 use App\Models\License;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -64,7 +65,7 @@ class ProjectPublicViewTest extends TestCase
         $study = Study::factory()->for($this->publicProject)->create();
 
         // Create a sample for the study to avoid null access in StudyResource
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->publicProject->id,
         ]);
@@ -111,7 +112,7 @@ class ProjectPublicViewTest extends TestCase
         ]);
 
         // Create a sample for the study to avoid null access in StudyResource
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->publicProject->id,
         ]);

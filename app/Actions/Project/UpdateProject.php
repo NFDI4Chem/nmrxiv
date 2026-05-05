@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -15,17 +16,19 @@ class UpdateProject
     /**
      * Create a project.
      *
-     * @return \App\Models\Project
+     * @return Project
      */
     public function update(Project $project, array $input)
     {
         $errorMessages = [
             'license.required_if' => 'The license field is required when the project is made public.',
+            'photo.mimes' => 'The project image must be a file of type: jpg, jpeg, png, gif, webp.',
         ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
                 ->where('owner_id', $project->owner_id)->ignore($project->id), ],
             'license' => ['required_if:is_public,"true"'],
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'],
         ], $errorMessages)->validate();
 
         return DB::transaction(function () use ($input, $project) {
@@ -34,7 +37,7 @@ class UpdateProject
             if (array_key_exists('photo', $input)) {
                 $image = $input['photo'];
                 if (! is_null($image)) {
-                    $s3 = Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'));
+                    $s3 = Storage::disk(config('filesystems.default_public'));
                     $file_name = uniqid().'.'.$image->getClientOriginalExtension();
                     $s3filePath = '/projects/'.$file_name;
                     $s3->put($s3filePath, file_get_contents($image), 'public');
@@ -188,7 +191,7 @@ class UpdateProject
     /**
      * Attach citations to a project.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @param  array  $citations
      * @return void
      */

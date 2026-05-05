@@ -146,7 +146,7 @@ class BioschemasHelper
      */
     public static function prepareDataDownload($dataset)
     {
-        $url = env('APP_URL');
+        $url = config('app.url');
         $user = $dataset->owner->username;
         if (property_exists($dataset, 'project')) {
             $slug = $dataset->project->slug;
@@ -175,8 +175,8 @@ class BioschemasHelper
     public static function preparePublisher()
     {
         $publisherSchema = Schema::Organization();
-        $publisherSchema->name(env('APP_NAME'));
-        $publisherSchema->url(env('APP_URL'));
+        $publisherSchema->name(config('app.name'));
+        $publisherSchema->url(config('app.url'));
 
         return $publisherSchema;
     }
@@ -192,8 +192,8 @@ class BioschemasHelper
     public static function prepareDataCatalogLite()
     {
         $dataCatalogSchema = Schema::DataCatalog();
-        $dataCatalogSchema->name(env('APP_NAME'));
-        $dataCatalogSchema->url(env('APP_URL'));
+        $dataCatalogSchema->name(config('app.name'));
+        $dataCatalogSchema->url(config('app.url'));
 
         return $dataCatalogSchema;
     }

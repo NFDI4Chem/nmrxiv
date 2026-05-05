@@ -6,6 +6,7 @@ use App\Actions\Author\SyncProjectAuthors;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
 use App\Http\Controllers\FileSystemController;
+use App\Models\Author;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\License;
@@ -54,7 +55,8 @@ class ProcessDraftELNSubmission implements ShouldQueue
         try {
             $logger->log($draft, 'info', 'Starting ELN submission processing');
 
-            if (strtolower($draft->eln) !== 'chemotion') {
+            // Check if ELN is supported
+            if (! in_array(strtolower($draft->eln), ['chemotion', 'nobs'])) {
                 $logger->log($draft, 'info', "ELN not supported: {$draft->eln}");
 
                 return;
@@ -364,47 +366,89 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 })
                 ->first();
 
+            // If no direct match found, try to find studies within the sample folder
+            $studiesInSample = collect();
             if (! $study) {
-                $logger->log($project->draft, 'error', 'Study not found: '.$studyName);
+                $logger->log($project->draft, 'info', 'Direct study not found. Looking for studies within sample folder: '.$studyName);
 
-                return;
+                // Find all studies whose name starts with the analysis folders in this sample
+                // The folder structure is: sample_X/analysis_Y/dataset_Z
+                // Studies are created with names like "dataset_Z"
+                $folderName = $studyMetadata['folderName'] ?? $studyName;
+
+                // Get analysis IDs from the metadata datasets
+                $analysisIds = [];
+                if (isset($studyMetadata['chemical_substance']['datasets'])) {
+                    foreach ($studyMetadata['chemical_substance']['datasets'] as $dataset) {
+                        if (isset($dataset['analyses'])) {
+                            $analysisIds[] = $dataset['analyses'];
+                        }
+                        if (isset($dataset['datasets']) && is_array($dataset['datasets'])) {
+                            foreach ($dataset['datasets'] as $datasetId) {
+                                $studiesInSample->push($project->studies()->where('name', $datasetId)->first());
+                            }
+                        }
+                    }
+                }
+
+                $studiesInSample = $studiesInSample->filter();
+
+                if ($studiesInSample->isEmpty()) {
+                    $logger->log($project->draft, 'error', 'No studies found for sample folder: '.$studyName);
+
+                    return;
+                }
+
+                $logger->log($project->draft, 'info', 'Found '.$studiesInSample->count().' studies in sample folder');
+            } else {
+                $studiesInSample = collect([$study]);
             }
 
-            // Get the draft to access processing logs
-            $draft = $project->draft;
-            $processingLogs = $draft ? $draft->process_logs : [];
+            // Process metadata for each study in the sample
+            foreach ($studiesInSample as $study) {
+                if (! $study) {
+                    continue;
+                }
 
-            $study->update([
-                'name' => $studyMetadata['name'].' ('.$studyName.')',
-                'external_url' => $studyMetadata['url'],
-                'tracking_item_name' => $studyMetadata['tracking_item_name'],
-                'processing_logs' => $processingLogs,
-            ]);
+                // Get the draft to access processing logs
+                $draft = $project->draft;
+                $processingLogs = $draft ? $draft->process_logs : [];
 
-            // update STATUS_PROCESSED in Chemotion Repository Tracker
-            $trackerService = app(ChemotionRepositoryTrackerService::class);
-            $trackerService->updateElnSubmissionStatus(
-                submissionId: $study->tracking_item_name,
-                newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
-                additionalMetadata: $studyMetadata,
-                ownerName: $study->owner->first_name.' '.$study->owner->last_name,
-                ownerEmail: $study->owner->email
-            );
+                $study->update([
+                    'name' => $studyMetadata['name'].' ('.$study->name.')',
+                    'external_url' => $studyMetadata['url'],
+                    'tracking_item_name' => $studyMetadata['tracking_item_name'],
+                    'processing_logs' => $processingLogs,
+                ]);
 
-            $logger->log($project->draft, 'info', 'Attaching metadata to study: '.$study->name);
+                $logger->log($project->draft, 'info', 'Attaching metadata to study: '.$study->name);
 
-            $this->updateStudyDescription($study, $studyMetadata, $logger);
+                $this->updateStudyDescription($study, $studyMetadata, $logger);
 
-            $this->attachLicenseToStudy($study, $studyMetadata, $logger);
+                $this->attachLicenseToStudy($study, $studyMetadata, $logger);
 
-            $this->attachKeywordsToStudy($study, $studyMetadata, $logger);
+                $this->attachKeywordsToStudy($study, $studyMetadata, $logger);
 
-            $this->attachAuthorsToStudy($study, $studyMetadata['authors'], $logger);
+                $this->attachAuthorsToStudy($study, $studyMetadata['authors'], $logger);
 
-            // $this->attachCitationsToStudy($study, $studyMetadata['citation'] ?? [], $logger);
+                $this->attachCitationsToStudy($study, $studyMetadata['citation'] ?? [], $logger);
 
-            if (isset($studyMetadata['chemical_substance']['molecule'])) {
-                $this->attachMoleculesToStudy($study, [$studyMetadata['chemical_substance']['molecule']], $logger);
+                if (isset($studyMetadata['chemical_substance']['molecule'])) {
+                    $this->attachMoleculesToStudy($study, [$studyMetadata['chemical_substance']['molecule']], $logger);
+                }
+            }
+
+            // update STATUS_PROCESSED in Chemotion Repository Tracker (only once for the first study)
+            if ($studiesInSample->isNotEmpty()) {
+                $firstStudy = $studiesInSample->first();
+                $trackerService = app(ChemotionRepositoryTrackerService::class);
+                $trackerService->updateElnSubmissionStatus(
+                    submissionId: $firstStudy->tracking_item_name,
+                    newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
+                    additionalMetadata: $studyMetadata,
+                    ownerName: $firstStudy->owner->first_name.' '.$firstStudy->owner->last_name,
+                    ownerEmail: $firstStudy->owner->email
+                );
             }
 
         } catch (\Exception $e) {
@@ -450,7 +494,11 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             if (! empty($authorData)) {
+                // Sync authors to project
                 app(SyncProjectAuthors::class)->handle($project, $authorData);
+
+                // Also sync authors directly to the study for independent studies
+                $this->syncStudyAuthors($study, $authorData, $logger);
             }
 
         } catch (\Exception $e) {
@@ -459,30 +507,74 @@ class ProcessDraftELNSubmission implements ShouldQueue
     }
 
     /**
+     * Sync authors to study.
+     */
+    private function syncStudyAuthors($study, array $authorData, DraftProcessingLogger $logger): void
+    {
+        try {
+            $authorIds = [];
+
+            foreach ($authorData as $index => $data) {
+                // Find existing author by ORCID or name
+                $author = null;
+
+                if (! empty($data['orcid_id'])) {
+                    $author = Author::where('orcid_id', $data['orcid_id'])->first();
+                }
+
+                if (! $author) {
+                    $author = Author::where('given_name', $data['given_name'])
+                        ->where('family_name', $data['family_name'])
+                        ->first();
+                }
+
+                // Create if not found
+                if (! $author) {
+                    $author = Author::create([
+                        'given_name' => $data['given_name'],
+                        'family_name' => $data['family_name'],
+                        'email_id' => $data['email_id'],
+                        'orcid_id' => $data['orcid_id'],
+                        'affiliation' => $data['affiliation'],
+                    ]);
+                }
+
+                $authorIds[$author->id] = [
+                    'contributor_type' => $data['contributor_type'],
+                    'sort_order' => $index + 1,
+                ];
+            }
+
+            // Sync authors to study
+            $study->studyAuthors()->sync($authorIds);
+
+            $logger->log($study->project->draft, 'info', 'Synced '.count($authorIds).' authors to study: '.$study->name);
+
+        } catch (\Exception $e) {
+            $logger->log($study->project->draft, 'error', 'Failed to sync authors to study: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Attach citations to study.
      */
-    private function attachCitationsToStudy($study, array $citations): void
+    private function attachCitationsToStudy($study, array $citations, DraftProcessingLogger $logger): void
     {
         if (empty($citations)) {
+            $logger->log($study->project->draft, 'info', 'No citations found for study: '.$study->name);
+
             return;
         }
 
         try {
-            // Store citations as JSON in study metadata
             $study->update([
-                'citations' => json_encode($citations),
+                'citations' => $citations,
             ]);
 
-            Log::info('Attached citations to study', [
-                'study_id' => $study->id,
-                'citations_count' => count($citations),
-            ]);
+            $logger->log($study->project->draft, 'info', 'Attached '.count($citations).' citations to study: '.$study->name);
 
         } catch (\Exception $e) {
-            Log::error('Failed to attach citations to study', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to attach citations to study: '.$e->getMessage());
         }
     }
 

@@ -14,7 +14,7 @@ class UpdateStudy
     /**
      * Create a study.
      *
-     * @return \App\Models\Study
+     * @return Study
      */
     public function update(Study $study, array $input)
     {

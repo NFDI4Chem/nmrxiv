@@ -13,7 +13,7 @@ class Author extends Model
     /**
      * Projects that belongs to authors.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
+     * @return BelongsToMany
      */
     protected $fillable = [
         'title',
@@ -28,5 +28,10 @@ class Author extends Model
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class);
+    }
+
+    public function studies(): BelongsToMany
+    {
+        return $this->belongsToMany(Study::class, 'author_study');
     }
 }

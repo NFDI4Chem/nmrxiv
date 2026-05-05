@@ -95,6 +95,47 @@
                                         <span
                                             class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
                                         >
+                                            Description
+                                        </span>
+                                        <button
+                                            v-if="canUpdateStudy"
+                                            type="button"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            @click="openStudyDetailsPane"
+                                        >
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
+                                            <span>Edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <dd
+                                    class="mt-1 text-md text-gray-900 space-y-5"
+                                >
+                                    <p
+                                        style="max-width: 100ch !important"
+                                        class="prose mt-4 text-sm text-blue-gray-500"
+                                        v-html="md(study.description)"
+                                    ></p>
+                                </dd>
+                            </div>
+                            <div class="mb-4">
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-0 flex items-center"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            class="w-full border-t border-gray-300"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="relative flex items-center justify-between"
+                                    >
+                                        <span
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                        >
                                             License
                                         </span>
                                         <button
@@ -117,7 +158,7 @@
                                     >
                                         <p
                                             style="max-width: 100ch !important"
-                                            class="prose mt-1 text-sm text-blue-gray-500"
+                                            class="prose mt-4 text-sm text-blue-gray-500"
                                         >
                                             {{ license.title }}
                                             <ToolTip
@@ -129,6 +170,56 @@
                                     </dd>
                                 </div>
                             </div>
+
+                            <!-- Author -->
+                            <div
+                                v-if="
+                                    (project &&
+                                        project.authors &&
+                                        project.authors.length > 0) ||
+                                    (study &&
+                                        study.authors &&
+                                        study.authors.length > 0)
+                                "
+                                class="mb-8"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-0 flex items-center"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            class="w-full border-t border-gray-300"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="relative flex items-center justify-between"
+                                    >
+                                        <span
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                        >
+                                            Author
+                                        </span>
+                                    </div>
+                                </div>
+                                <dd
+                                    class="mt-2 text-md text-gray-900 space-y-5"
+                                >
+                                    <div
+                                        class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
+                                    >
+                                        <author-card
+                                            :authors="
+                                                study.authors &&
+                                                study.authors.length > 0
+                                                    ? study.authors
+                                                    : project.authors
+                                            "
+                                        />
+                                    </div>
+                                </dd>
+                            </div>
+
                             <div class="mb-4">
                                 <!-- <div class="relative">
                                     <div
@@ -208,12 +299,12 @@
                                         </div>
                                     </section> -->
                                     <div>
-                                        <div class="py-4 max-w-7xl mx-auto">
+                                        <div class="py-4">
                                             <div
-                                                class="pb-3 border-b border-gray-200 sm:flex sm:items-center sm:justify-between"
+                                                class="pb-3 border-b border-gray-200 sm:flex sm:items-center sm:justify-left"
                                             >
                                                 <h3
-                                                    class="text-lg leading-6 font-medium text-gray-900"
+                                                    class="text-lg leading-6 font-medium text-gray-900 text-left"
                                                 >
                                                     Sample chemical composition
                                                 </h3>
@@ -548,47 +639,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <div class="relative">
-                                    <div
-                                        class="absolute inset-0 flex items-center"
-                                        aria-hidden="true"
-                                    >
-                                        <div
-                                            class="w-full border-t border-gray-300"
-                                        ></div>
-                                    </div>
-                                    <div
-                                        class="relative flex items-center justify-between"
-                                    >
-                                        <span
-                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
-                                        >
-                                            Description
-                                        </span>
-                                        <button
-                                            v-if="canUpdateStudy"
-                                            type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                            @click="openStudyDetailsPane"
-                                        >
-                                            <PencilIcon
-                                                class="w-4 h-4 mr-1 text-gray-600"
-                                            />
-                                            <span>Edit</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <dd
-                                    class="mt-1 text-md text-gray-900 space-y-5"
-                                >
-                                    <p
-                                        style="max-width: 100ch !important"
-                                        class="prose mt-1 text-sm text-blue-gray-500"
-                                        v-html="md(study.description)"
-                                    ></p>
-                                </dd>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -609,6 +659,7 @@ import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
+import AuthorCard from "@/Shared/AuthorCard.vue";
 export default {
     components: {
         StudyContent,
@@ -619,6 +670,7 @@ export default {
         InformationCircleIcon,
         JetInputError,
         Depictor2D,
+        AuthorCard,
     },
     props: [
         "study",
@@ -655,6 +707,9 @@ export default {
             return this.studyPermissions
                 ? this.studyPermissions.canUpdateStudy
                 : false;
+        },
+        chemistryStandardizeUrl() {
+            return this.$page.props.chemistryStandardizeUrl;
         },
     },
     mounted() {
@@ -731,10 +786,7 @@ export default {
             }
         },
         standardizeMolecules(mol) {
-            return axios.post(
-                "https://api.cheminf.studio/latest/chem/standardize",
-                mol
-            );
+            return axios.post(this.chemistryStandardizeUrl, mol);
         },
         associateMoleculeToStudy(mol, study) {
             axios

@@ -10,7 +10,9 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -239,7 +241,7 @@ class UserModelTest extends TestCase
             'email_verified_at' => '2023-01-01 12:00:00',
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->email_verified_at);
+        $this->assertInstanceOf(Carbon::class, $user->email_verified_at);
     }
 
     public function test_it_has_teams_when_using_jetstream(): void
@@ -394,7 +396,7 @@ class UserModelTest extends TestCase
 
         // Create a fake notification manually in the database
         $notification = DatabaseNotification::create([
-            'id' => \Illuminate\Support\Str::uuid(),
+            'id' => Str::uuid(),
             'type' => 'App\\Notifications\\TestNotification',
             'notifiable_type' => User::class,
             'notifiable_id' => $user->id,

@@ -4,7 +4,7 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-blue.svg)](https://GitHub.com/NFDI4Chem/nmrxiv/graphs/commit-activity)
 [![GitHub issues](https://img.shields.io/github/issues/NFDI4Chem/nmrxiv.svg)](https://GitHub.com/NFDI4Chem/nmrxiv/issues/)
 [![GitHub contributors](https://img.shields.io/github/contributors/NFDI4Chem/nmrxiv.svg)](https://GitHub.com/NFDI4Chem/nmrxiv/graphs/contributors/)
-![Workflow](https://github.com/NFDI4Chem/nmrxiv/actions/workflows/build.yml/badge.svg)
+![Workflow](https://github.com/NFDI4Chem/nmrxiv/actions/workflows/prod-build.yml/badge.svg)
 ![Workflow](https://github.com/NFDI4Chem/nmrxiv/actions/workflows/release-please.yml/badge.svg)
 [![Powered by Laravel](https://img.shields.io/badge/Powered%20by-Laravel-red.svg?style=flat&logo=Laravel)](https://laravel.com)
 

@@ -38472,14 +38472,14 @@ var footerNavigation = {
     href: "https://docs.nmrxiv.org"
   }, {
     name: "Guides",
-    href: "https://docs.nmrxiv.org/docs/submission-guides/overview"
+    href: "https://docs.nmrxiv.org/submission-guides/overview"
   }, {
     name: "API Status",
-    href: "https://docs.nmrxiv.org/docs/developer-guides/API"
+    href: "https://docs.nmrxiv.org/developer-guides/API"
   }],
   About: [{
     name: "Adivsory Board",
-    href: "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee"
+    href: "https://docs.nmrxiv.org/contributing/contributors-and-steering-committee"
   } // { name: "Metrics", href: "#" },
   // { name: "Blog", href: "#" },
   // { name: "Press", href: "#" },

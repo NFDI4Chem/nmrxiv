@@ -7,6 +7,7 @@ use App\Actions\Study\RemoveStudyMember;
 use App\Actions\Study\UpdateStudyMemberRole;
 use App\Models\Study;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class StudyMemberController extends Controller
@@ -15,7 +16,7 @@ class StudyMemberController extends Controller
      * Add a new team member to a study.
      *
      * @param  int  $studyId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function memberStore(Request $request, $studyId)
     {
@@ -37,7 +38,7 @@ class StudyMemberController extends Controller
      *
      * @param  int  $studyId
      * @param  int  $userId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function updateMemberRole(Request $request, $studyId, $userId)
     {
@@ -56,7 +57,7 @@ class StudyMemberController extends Controller
      *
      * @param  int  $studyId
      * @param  int  $userId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function removeMember(Request $request, $studyId, $userId)
     {

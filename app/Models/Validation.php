@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -241,6 +242,54 @@ class Validation extends Model
 
                 array_push($studiesValidation, $studyReport);
             }
+
+            // Validate citations
+            $citations = $project->citations;
+            $citationsValidation = [];
+            $citationsStatus = $citations && $citations->isNotEmpty();
+            $shouldValidateCitationDoi = true;
+
+            if ($project->release_date) {
+                $shouldValidateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
+            }
+
+            if ($citationsStatus) {
+                foreach ($citations as $citation) {
+                    $citationReport = [
+                        'name' => $citation->title ?? 'Untitled',
+                        'id' => $citation->id,
+                    ];
+
+                    if ($shouldValidateCitationDoi) {
+                        // Check if DOI is present only for current/past release date projects.
+                        $hasDoi = is_string($citation->doi) && trim($citation->doi) !== '';
+
+                        if ($hasDoi) {
+                            $citationReport['doi'] = 'true|required';
+                        } else {
+                            $citationReport['doi'] = 'false|required';
+                            $citationsStatus = false; // Citation validation failed
+                        }
+
+                        $citationReport['status'] = $hasDoi;
+                    } else {
+                        $citationReport['doi'] = 'true|skipped-future-release';
+                        $citationReport['status'] = true;
+                    }
+
+                    $citationsValidation[] = $citationReport;
+                }
+            }
+            // Set overall citations validation status and store detailed report
+            if ($citationsStatus) {
+                $report['project']['citations'] = 'true|required';
+            } else {
+                $report['project']['citations'] = 'false|required';
+                $status = false; // Propagate to project status
+            }
+
+            // Store detailed citations validation data separately
+            $report['project']['citations_detail'] = $citationsValidation;
 
             $report['project']['studies'] = $studiesValidation;
             $report['project']['status'] = $status;

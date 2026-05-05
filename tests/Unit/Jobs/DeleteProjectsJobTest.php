@@ -5,6 +5,7 @@ namespace Tests\Unit\Jobs;
 use App\Actions\Project\DeleteProject;
 use App\Jobs\DeleteProjects;
 use App\Models\Project;
+use App\Models\User;
 use App\Notifications\ProjectDeletionReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,7 +25,7 @@ class DeleteProjectsJobTest extends TestCase
     {
         parent::setUp();
 
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $this->project = Project::factory()->create([
             'owner_id' => $user->id,
             'is_deleted' => true,
@@ -230,7 +231,7 @@ class DeleteProjectsJobTest extends TestCase
     public function test_prepare_send_list_adds_project_owner_for_non_creator_members(): void
     {
         // Test line 69 - adds project owner for non-creator members
-        $member = \App\Models\User::factory()->create();
+        $member = User::factory()->create();
         $this->project->users()->attach($member, ['role' => 'collaborator']);
 
         $job = new DeleteProjects($this->project);
