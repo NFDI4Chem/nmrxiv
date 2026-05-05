@@ -858,7 +858,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-else>
+                    <div v-else class="flex min-h-0 flex-1 flex-col">
                         <div v-if="showPrimer">
                             <div
                                 class="h-[calc(100vh-235px)] overflow-y-auto px-4 sm:px-6 py-4"
@@ -866,7 +866,7 @@
                                 <Primer />
                             </div>
                         </div>
-                        <div v-else>
+                        <div v-else class="flex min-h-0 flex-1 flex-col">
                             <div
                                 v-if="currentStep && currentDraft"
                                 class="flex min-h-0 flex-1 flex-col overflow-hidden"
@@ -903,13 +903,13 @@
                                     >
                                         <div
                                             id="tour-step-upload-spectra"
-                                            class="flex min-h-0 flex-1 flex-col overflow-hidden"
+                                            class="flex min-h-[500px] flex-1 flex-col overflow-hidden"
                                         >
                                             <file-system-browser
                                                 ref="fsbRef"
                                                 :readonly="false"
                                                 :draft="currentDraft"
-                                                :height="'h-full w-full flex-1'"
+                                                :height="'flex-1 w-full'"
                                                 @loading="filesLoading"
                                             ></file-system-browser>
                                         </div>

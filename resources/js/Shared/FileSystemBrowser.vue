@@ -18,12 +18,12 @@
             fullScreen
                 ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
                 : height
-                ? `min-h-0 ${height} overflow-hidden`
+                ? `flex flex-col min-h-0 ${height} overflow-hidden`
                 : 'min-h-0 h-screen overflow-hidden',
             'bg-white rounded-lg',
         ]"
     >
-        <div class="h-full min-h-0 flex flex-col">
+        <div class="flex min-h-0 flex-1 flex-col">
             <!-- Header section with help links and missing files indicator -->
             <div :class="[fullScreen ? 'px-6 py-2' : '', 'flex flex-shrink-0']">
                 <div class="w-full px-5">
@@ -356,19 +356,53 @@
                     ]"
                     :style="{ width: sidebarWidth + 'px' }"
                 >
-                    <!-- Sidebar header -->
+                    <!-- Sidebar header (same bar height as right panel headers) -->
                     <div
-                        class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 border-b border-gray-100 bg-gray-50 px-3 py-2.5"
+                        class="flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b border-gray-100 bg-gray-50 px-5"
                     >
                         <span
                             class="shrink-0 text-sm font-semibold text-gray-900"
                             >Folders</span
                         >
                         <div
-                            class="flex shrink-0 items-center gap-2.5"
+                            class="flex shrink-0 items-center gap-1 sm:gap-2"
                             role="toolbar"
-                            aria-label="Folder sort"
+                            aria-label="Folder tree"
                         >
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-gray-500 transition hover:bg-gray-100/80 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40"
+                                :disabled="!hasProjectFiles || loading"
+                                title="Expand all folders"
+                                aria-label="Expand all folders"
+                                @click="expandAllFoldersInTree"
+                            >
+                                <ArrowsPointingOutIcon
+                                    class="h-4 w-4"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-gray-500 transition hover:bg-gray-100/80 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40"
+                                :disabled="
+                                    !hasProjectFiles ||
+                                    loading ||
+                                    expandedFolders.size === 0
+                                "
+                                title="Collapse all folders"
+                                aria-label="Collapse all folders"
+                                @click="collapseAllFoldersInTree"
+                            >
+                                <ArrowsPointingInIcon
+                                    class="h-4 w-4"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                            <span
+                                class="mx-0.5 hidden h-5 w-px shrink-0 bg-gray-200 sm:block"
+                                aria-hidden="true"
+                            ></span>
                             <HeadlessMenu
                                 as="div"
                                 class="relative z-40 inline-flex"
@@ -475,22 +509,12 @@
                                     aria-hidden="true"
                                 />
                             </button>
-                            <span
-                                v-if="file && file.children"
-                                class="shrink-0 text-xs text-gray-400 tabular-nums"
-                                >{{ file.children.length }} items</span
-                            >
                         </div>
                     </div>
 
                     <!-- Scrollable file tree -->
                     <div
                         class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pt-2 pb-10"
-                        :style="{
-                            minHeight: '500px',
-                            maxHeight: '500px',
-                            overflowY: 'scroll',
-                        }"
                     >
                         <!-- Recursive file tree component -->
                         <children
@@ -651,26 +675,67 @@
                     >
                         <!-- Panel header -->
                         <div
-                            class="flex-shrink-0 px-5 py-3 border-b border-gray-100 bg-gray-50"
+                            class="flex min-h-12 shrink-0 items-center border-b border-gray-100 bg-gray-50 px-5"
                         >
-                            <div class="flex justify-between items-center">
-                                <p
-                                    class="font-semibold text-sm text-gray-800 truncate"
-                                    :title="
-                                        $page.props.selectedFileSystemObject
-                                            .relative_url
-                                    "
+                            <div
+                                class="flex w-full justify-between items-center gap-3"
+                            >
+                                <nav
+                                    class="flex min-w-0 flex-1 flex-wrap items-center gap-x-0.5 gap-y-1 text-sm"
+                                    aria-label="Folder path"
                                 >
-                                    {{
-                                        truncateMiddle(
-                                            $page.props.selectedFileSystemObject
-                                                .relative_url,
-                                            50
-                                        )
-                                    }}
-                                </p>
+                                    <button
+                                        type="button"
+                                        class="inline-flex shrink-0 items-center rounded p-0.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                        :class="
+                                            pathBreadcrumbSegments.length === 0
+                                                ? 'text-gray-900'
+                                                : ''
+                                        "
+                                        title="Project root"
+                                        aria-label="Go to project root"
+                                        @click="breadcrumbGoToRoot"
+                                    >
+                                        <HomeIcon
+                                            class="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
+                                    <template
+                                        v-for="(
+                                            seg, idx
+                                        ) in pathBreadcrumbSegments"
+                                        :key="seg.path + '-' + idx"
+                                    >
+                                        <ChevronRightIcon
+                                            class="mx-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <button
+                                            v-if="!seg.isLast"
+                                            type="button"
+                                            class="min-w-0 max-w-[12rem] truncate text-left font-medium text-gray-700 transition hover:text-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            @click="
+                                                breadcrumbNavigateToPath(
+                                                    seg.path
+                                                )
+                                            "
+                                        >
+                                            {{ seg.label }}
+                                        </button>
+                                        <span
+                                            v-else
+                                            class="min-w-0 max-w-[12rem] truncate font-semibold text-gray-900 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            aria-current="page"
+                                        >
+                                            {{ seg.label }}
+                                        </span>
+                                    </template>
+                                </nav>
                                 <div
-                                    class="flex items-center space-x-2 flex-shrink-0 ml-3"
+                                    class="flex items-center space-x-2 flex-shrink-0"
                                 >
                                     <!-- View Toggle -->
                                     <div
@@ -734,11 +799,6 @@
                         <!-- Scrollable content area -->
                         <div
                             class="min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-12"
-                            :style="{
-                                minHeight: '500px',
-                                maxHeight: '500px',
-                                overflowY: 'scroll',
-                            }"
                         >
                             <!-- List View Table Header -->
                             <div v-if="viewMode === 'list'" class="mt-2">
@@ -1129,26 +1189,67 @@
                         <!-- File detail header -->
                         <div
                             v-if="$page.props.selectedFileSystemObject"
-                            class="flex-shrink-0 px-5 py-3 border-b border-gray-100 bg-gray-50"
+                            class="flex min-h-12 shrink-0 items-center border-b border-gray-100 bg-gray-50 px-5"
                         >
-                            <div class="flex items-center justify-between">
-                                <p
-                                    class="font-semibold text-sm text-gray-800 truncate"
-                                    :title="
-                                        $page.props.selectedFileSystemObject
-                                            .relative_url
-                                    "
+                            <div
+                                class="flex w-full items-center justify-between gap-3"
+                            >
+                                <nav
+                                    class="flex min-w-0 flex-1 flex-wrap items-center gap-x-0.5 gap-y-1 text-sm"
+                                    aria-label="File path"
                                 >
-                                    {{
-                                        truncateMiddle(
-                                            $page.props.selectedFileSystemObject
-                                                .relative_url,
-                                            50
-                                        )
-                                    }}
-                                </p>
+                                    <button
+                                        type="button"
+                                        class="inline-flex shrink-0 items-center rounded p-0.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                        :class="
+                                            pathBreadcrumbSegments.length === 0
+                                                ? 'text-gray-900'
+                                                : ''
+                                        "
+                                        title="Project root"
+                                        aria-label="Go to project root"
+                                        @click="breadcrumbGoToRoot"
+                                    >
+                                        <HomeIcon
+                                            class="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
+                                    <template
+                                        v-for="(
+                                            seg, idx
+                                        ) in pathBreadcrumbSegments"
+                                        :key="seg.path + '-' + idx"
+                                    >
+                                        <ChevronRightIcon
+                                            class="mx-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <button
+                                            v-if="!seg.isLast"
+                                            type="button"
+                                            class="min-w-0 max-w-[12rem] truncate text-left font-medium text-gray-700 transition hover:text-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            @click="
+                                                breadcrumbNavigateToPath(
+                                                    seg.path
+                                                )
+                                            "
+                                        >
+                                            {{ seg.label }}
+                                        </button>
+                                        <span
+                                            v-else
+                                            class="min-w-0 max-w-[12rem] truncate font-semibold text-gray-900 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            aria-current="page"
+                                        >
+                                            {{ seg.label }}
+                                        </span>
+                                    </template>
+                                </nav>
                                 <div
-                                    class="flex items-center space-x-2 flex-shrink-0 ml-3"
+                                    class="flex items-center space-x-2 flex-shrink-0"
                                 >
                                     <button
                                         v-if="
@@ -1182,11 +1283,6 @@
                         <!-- File details content -->
                         <div
                             class="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-12"
-                            :style="{
-                                minHeight: '500px',
-                                maxHeight: '500px',
-                                overflowY: 'scroll',
-                            }"
                         >
                             <span
                                 v-if="
@@ -1412,6 +1508,10 @@ import {
     ChevronUpIcon as ChevronUpOutlineIcon,
     ChevronDownIcon as ChevronDownOutlineIcon,
     Squares2X2Icon as Squares2X2OutlineIcon,
+    HomeIcon,
+    ChevronRightIcon,
+    ArrowsPointingOutIcon,
+    ArrowsPointingInIcon,
 } from "@heroicons/vue/24/outline";
 
 import {
@@ -1459,6 +1559,10 @@ export default {
         MenuButton,
         MenuItems,
         MenuItem,
+        HomeIcon,
+        ChevronRightIcon,
+        ArrowsPointingOutIcon,
+        ArrowsPointingInIcon,
     },
 
     /**
@@ -1682,6 +1786,20 @@ export default {
                 return 0;
             });
         },
+
+        /**
+         * Path segments for breadcrumb navigation (labels + cumulative paths).
+         *
+         * @returns {Array<{ label: string, path: string, isLast: boolean }>}
+         */
+        pathBreadcrumbSegments() {
+            const fso = this.$page.props.selectedFileSystemObject;
+            if (!fso?.relative_url) {
+                return [];
+            }
+
+            return this.buildPathBreadcrumbSegments(fso.relative_url);
+        },
     },
 
     watch: {
@@ -1795,6 +1913,148 @@ export default {
                 text.substring(text.length - end)
             );
         },
+
+        /**
+         * Normalize a relative path for comparison (leading slash, no duplicate slashes).
+         *
+         * @param {string|null|undefined} path
+         * @returns {string}
+         */
+        normalizeRelativePath(path) {
+            if (path == null || path === "") {
+                return "/";
+            }
+
+            const normalized = String(path).replace(/\/+/g, "/");
+
+            if (normalized === "/") {
+                return "/";
+            }
+
+            return (
+                "/" +
+                normalized
+                    .replace(/^\/+|\/+$/g, "")
+                    .split("/")
+                    .filter(Boolean)
+                    .join("/")
+            );
+        },
+
+        /**
+         * Build breadcrumb segment descriptors from a relative_url.
+         *
+         * @param {string} relativeUrl
+         * @returns {Array<{ label: string, path: string, isLast: boolean }>}
+         */
+        buildPathBreadcrumbSegments(relativeUrl) {
+            const norm = this.normalizeRelativePath(relativeUrl);
+
+            if (norm === "/") {
+                return [];
+            }
+
+            const parts = norm.split("/").filter(Boolean);
+            const segments = [];
+            let acc = "";
+
+            for (let i = 0; i < parts.length; i++) {
+                acc += "/" + parts[i];
+                segments.push({
+                    label: parts[i],
+                    path: acc,
+                    isLast: i === parts.length - 1,
+                });
+            }
+
+            return segments;
+        },
+
+        /**
+         * Find a file or folder in the tree by normalized relative_url.
+         *
+         * @param {object|null} fileObject
+         * @param {string} targetPath
+         * @returns {object|null}
+         */
+        findObjectByRelativeUrl(fileObject, targetPath) {
+            const norm = this.normalizeRelativePath(targetPath);
+
+            if (norm === "/") {
+                if (
+                    fileObject &&
+                    (fileObject.name === "/" ||
+                        this.normalizeRelativePath(fileObject.relative_url) ===
+                            "/")
+                ) {
+                    return fileObject;
+                }
+
+                return null;
+            }
+
+            return this.findObjectByRelativeUrlRecursive(fileObject, norm);
+        },
+
+        /**
+         * @param {object|null} node
+         * @param {string} norm
+         * @returns {object|null}
+         */
+        findObjectByRelativeUrlRecursive(node, norm) {
+            if (!node) {
+                return null;
+            }
+
+            if (this.normalizeRelativePath(node.relative_url) === norm) {
+                return node;
+            }
+
+            if (node.children && Array.isArray(node.children)) {
+                for (const child of node.children) {
+                    const found = this.findObjectByRelativeUrlRecursive(
+                        child,
+                        norm
+                    );
+
+                    if (found) {
+                        return found;
+                    }
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * Navigate breadcrumb to a folder or file at the given path.
+         *
+         * @param {string} targetPath
+         * @returns {Promise<void>}
+         */
+        async breadcrumbNavigateToPath(targetPath) {
+            const target = this.findObjectByRelativeUrl(this.file, targetPath);
+
+            if (!target) {
+                return;
+            }
+
+            await this.displaySelected(target);
+        },
+
+        /**
+         * Navigate to project root.
+         *
+         * @returns {Promise<void>}
+         */
+        async breadcrumbGoToRoot() {
+            if (!this.file) {
+                return;
+            }
+
+            await this.displaySelected(this.file);
+        },
+
         /**
          * Initialize step tracking from current URL
          *
@@ -2848,7 +3108,8 @@ export default {
          * in the right panel. This method handles:
          * - Setting the selected file system object globally
          * - Calculating the correct folder path for breadcrumb navigation
-         * - Lazy loading folder contents if needed
+         * - Lazy loading folder contents if needed (via expandPathToObject)
+         * - Expanding the left sidebar tree to reveal the selected item
          * - Updating the selected folder state for UI consistency
          *
          * The method determines the correct folder path based on:
@@ -2858,7 +3119,7 @@ export default {
          *
          * @param {Object} file - The file or folder object to display
          */
-        displaySelected(file) {
+        async displaySelected(file) {
             this.$page.props.selectedFileSystemObject = file;
             let sFolder = "/";
 
@@ -2893,16 +3154,65 @@ export default {
             // Update the selected folder for breadcrumb display
             this.$page.props.selectedFolder = sFolder;
 
-            // Lazy load folder contents if this is an unexpanded folder with children
-            if (file.has_children && file.level > 0 && !file.children) {
-                file.loading = true;
-                axios
-                    .get("/api/v1/files/children/" + file.id)
-                    .then((response) => {
-                        file.children = response.data.files[0].children;
-                        file.loading = false;
-                    });
+            // Expand left tree to this item and load children on the path; updates URL
+            await this.expandPathToObject(file);
+        },
+
+        /**
+         * Recursively collect folder ids in the loaded tree that can be expanded.
+         *
+         * @param {object|null} fileObject
+         * @param {Array<number>} ids
+         * @returns {Array<number>}
+         */
+        collectExpandableFolderIds(fileObject, ids = []) {
+            if (!fileObject) {
+                return ids;
             }
+
+            const isDir =
+                fileObject.type === "directory" || fileObject.name === "/";
+
+            if (isDir && fileObject.has_children && fileObject.id) {
+                ids.push(fileObject.id);
+            }
+
+            if (fileObject.children && Array.isArray(fileObject.children)) {
+                for (const child of fileObject.children) {
+                    this.collectExpandableFolderIds(child, ids);
+                }
+            }
+
+            return ids;
+        },
+
+        /**
+         * Expand all folders that appear in the currently loaded tree data.
+         */
+        expandAllFoldersInTree() {
+            if (!this.file) {
+                return;
+            }
+
+            const ids = this.collectExpandableFolderIds(this.file, []);
+            this.setExpandedFolders(ids);
+            this.updateURLWithExpandedState();
+
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
+        },
+
+        /**
+         * Collapse every expanded folder in the sidebar tree.
+         */
+        collapseAllFoldersInTree() {
+            this.setExpandedFolders();
+            this.updateURLWithExpandedState();
+
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
         },
 
         /**
@@ -2916,6 +3226,7 @@ export default {
                     next.delete(fsoId);
                 }
             });
+
             this.updateURLWithExpandedState();
         },
 

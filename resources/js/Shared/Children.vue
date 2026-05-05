@@ -60,7 +60,7 @@
                                     open
                                         ? 'text-gray-700 rotate-90'
                                         : 'text-gray-300',
-                                    'mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                    'ml-1 mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                 ]"
                                 aria-hidden="true"
                             />
@@ -226,7 +226,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'ml-1 mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             aria-hidden="true"
                                                         />
