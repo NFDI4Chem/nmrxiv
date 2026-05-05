@@ -12,11 +12,13 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Mockery;
 use Tests\TestCase;
 
@@ -32,7 +34,7 @@ class ProcessSubmissionTest extends TestCase
     {
         parent::setUp();
 
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $this->project = Project::factory()->create([
             'owner_id' => $user->id,
             'status' => 'queued',
@@ -99,8 +101,8 @@ class ProcessSubmissionTest extends TestCase
             'type' => 'directory',
             'name' => 'study',
             'slug' => 'study',
-            'key' => \Illuminate\Support\Str::uuid()->toString(),
-            'uuid' => \Illuminate\Support\Str::uuid()->toString(),
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
             'path' => $this->draft->path,
             'status' => 'present',
         ]);
@@ -146,8 +148,8 @@ class ProcessSubmissionTest extends TestCase
             'type' => 'directory',
             'name' => 'study',
             'slug' => 'study',
-            'key' => \Illuminate\Support\Str::uuid()->toString(),
-            'uuid' => \Illuminate\Support\Str::uuid()->toString(),
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
             'path' => $this->draft->path,
             'status' => 'present',
         ]);
@@ -192,8 +194,8 @@ class ProcessSubmissionTest extends TestCase
             'type' => 'directory',
             'name' => 'parent',
             'slug' => 'parent',
-            'key' => \Illuminate\Support\Str::uuid()->toString(),
-            'uuid' => \Illuminate\Support\Str::uuid()->toString(),
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
             'path' => $draftPath.'/parent',
             'status' => 'present',
         ]);
@@ -204,8 +206,8 @@ class ProcessSubmissionTest extends TestCase
             'type' => 'file',
             'name' => 'child.txt',
             'slug' => 'child-txt',
-            'key' => \Illuminate\Support\Str::uuid()->toString(),
-            'uuid' => \Illuminate\Support\Str::uuid()->toString(),
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
             'path' => $draftPath.'/parent/child.txt',
             'parent_id' => $parentFolder->id,
             'status' => 'present',
@@ -228,7 +230,7 @@ class ProcessSubmissionTest extends TestCase
 
     public function test_prepare_send_list_returns_creators_and_owners(): void
     {
-        $creator = \App\Models\User::factory()->create();
+        $creator = User::factory()->create();
         $this->project->users()->attach($creator, ['role' => 'creator']);
 
         $job = new ProcessSubmission($this->project);

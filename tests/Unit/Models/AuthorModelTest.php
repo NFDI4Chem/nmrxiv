@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 
 use App\Models\Author;
 use App\Models\Project;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -84,7 +85,7 @@ class AuthorModelTest extends TestCase
     {
         $author = Author::factory()->create();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $author->projects());
+        $this->assertInstanceOf(BelongsToMany::class, $author->projects());
     }
 
     public function test_author_can_be_attached_to_project(): void

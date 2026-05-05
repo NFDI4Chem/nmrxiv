@@ -8,6 +8,8 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class SyncCitations
 {
@@ -19,7 +21,7 @@ class SyncCitations
      * @param  array<int, array<string, mixed>>  $citations
      * @return array<int, Citation>
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function sync(Project $project, array $citations, User $user): array
     {
@@ -35,12 +37,9 @@ class SyncCitations
         foreach ($citations as $citationData) {
             $this->validateCitationData($citationData);
 
-            $doi = $citationData['doi'];
-
-            if (! is_null($doi)) {
-                $citation = $this->findOrCreateCitation($project, $citationData, $doi);
-                $processedCitations[] = $citation;
-            }
+            $citation = $this->findOrCreateCitation($project, $citationData);
+            $this->rememberCitation($project, $citation);
+            $processedCitations[] = $citation;
         }
 
         DB::transaction(function () use ($project, $processedCitations, $user): void {
@@ -55,13 +54,13 @@ class SyncCitations
      *
      * @param  array<string, mixed>  $citationData
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     private function validateCitationData(array $citationData): void
     {
         Validator::make($citationData, [
             'title' => ['required', 'string'],
-            'doi' => ['required', 'string'],
+            'doi' => ['nullable', 'string'],
             'authors' => ['required', 'string'],
             'citation_text' => ['nullable', 'string'],
         ])->validate();
@@ -72,11 +71,32 @@ class SyncCitations
      *
      * @param  array<string, mixed>  $citationData
      */
-    private function findOrCreateCitation(Project $project, array $citationData, string $doi): Citation
+    private function findOrCreateCitation(Project $project, array $citationData): Citation
     {
-        $existingCitation = $project->citations->filter(function ($citation) use ($doi) {
-            return $doi === $citation->doi;
-        })->first();
+        $doi = $this->normalizeDoi($citationData['doi'] ?? null);
+        $title = $this->normalizeText($citationData['title'] ?? null);
+        $titleSlug = $this->normalizeTitleSlug($citationData['title'] ?? null);
+
+        $existingCitation = null;
+
+        // 1. Try to match by ID first (explicit reference)
+        if (! empty($citationData['id'])) {
+            $existingCitation = $project->citations->firstWhere('id', (int) $citationData['id']);
+        }
+
+        // 2. Try to match by DOI (if not null/empty)
+        if (! $existingCitation && ! is_null($doi)) {
+            $existingCitation = $project->citations->firstWhere('doi', $doi);
+        }
+
+        // 3. Try to match by title slug (content-based matching for missing DOI)
+        if (! $existingCitation && ! is_null($titleSlug)) {
+            $existingCitation = $project->citations->first(function ($citation) use ($titleSlug): bool {
+                $citationSlug = $this->normalizeTitleSlug($citation->title_slug ?? $citation->title);
+
+                return $citationSlug === $titleSlug;
+            });
+        }
 
         if ($existingCitation) {
             $existingCitation->update($this->prepareCitationAttributes($citationData));
@@ -96,10 +116,67 @@ class SyncCitations
     private function prepareCitationAttributes(array $citationData): array
     {
         return [
-            'doi' => $citationData['doi'] ?? null,
-            'title' => $citationData['title'] ?? null,
-            'authors' => $citationData['authors'] ?? null,
-            'citation_text' => $citationData['citation_text'] ?? null,
+            'doi' => $this->normalizeDoi($citationData['doi'] ?? null),
+            'title' => $this->normalizeText($citationData['title'] ?? null),
+            'title_slug' => $this->normalizeTitleSlug($citationData['title'] ?? null),
+            'authors' => $this->normalizeText($citationData['authors'] ?? null),
+            'citation_text' => $this->normalizeText($citationData['citation_text'] ?? null),
         ];
+    }
+
+    private function normalizeTitleSlug(mixed $title): ?string
+    {
+        $normalizedTitle = $this->normalizeText($title);
+
+        if (is_null($normalizedTitle)) {
+            return null;
+        }
+
+        $slug = Str::slug($normalizedTitle);
+
+        if ($slug === '') {
+            return null;
+        }
+
+        return $slug;
+    }
+
+    private function rememberCitation(Project $project, Citation $citation): void
+    {
+        $citations = $project->citations;
+
+        if (! $citations->contains('id', $citation->id)) {
+            $project->setRelation('citations', $citations->push($citation));
+        }
+    }
+
+    private function normalizeDoi(mixed $doi): ?string
+    {
+        if (! is_string($doi)) {
+            return null;
+        }
+
+        $normalizedDoi = trim($doi);
+
+        if ($normalizedDoi === '') {
+            return null;
+        }
+
+        return $normalizedDoi;
+    }
+
+    private function normalizeText(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalizedValue = trim($value);
+
+        if ($normalizedValue === '') {
+            return null;
+        }
+
+        return $normalizedValue;
     }
 }

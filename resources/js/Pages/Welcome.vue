@@ -6,16 +6,26 @@
             <!-- Header and Hero with Animated Gradient -->
             <div class="relative overflow-hidden">
                 <!-- Animated mesh gradient background -->
-                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"></div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                ></div>
                 <div class="absolute inset-0 opacity-20">
-                    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-                    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-                    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+                    <div
+                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                    ></div>
+                    <div
+                        class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+                    ></div>
+                    <div
+                        class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+                    ></div>
                 </div>
-                
+
                 <!-- Gradient fade to white at bottom -->
-                <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-white"></div>
-                
+                <div
+                    class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-white"
+                ></div>
+
                 <header class="relative">
                     <Popover class="relative border-b border-white/20">
                         <div
@@ -27,7 +37,7 @@
                                         class="block h-9 w-auto"
                                     />
                                 </Link>
-                                
+
                                 <!-- Desktop Navigation -->
                                 <PopoverGroup
                                     as="nav"
@@ -59,7 +69,7 @@
                                     </Link>
                                 </PopoverGroup>
                             </div>
-                            
+
                             <!-- Mobile menu button -->
                             <div class="md:hidden">
                                 <PopoverButton
@@ -72,7 +82,7 @@
                                     />
                                 </PopoverButton>
                             </div>
-                            
+
                             <!-- Auth Buttons -->
                             <div
                                 v-if="
@@ -224,30 +234,42 @@
                     <div class="relative py-20 sm:py-24 lg:py-32">
                         <div class="text-center">
                             <!-- Main Heading -->
-                            <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-                                Open, FAIR and Consensus-Driven
-                                <span class="block mt-2 text-gray-900">NMR Data Repository</span>
+                            <h1
+                                class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl"
+                            >
+                                Open,
+                                <span class="highlight-word">FAIR</span> and
+                                Consensus-Driven
+                                <span class="block mt-2 text-gray-900"
+                                    ><span
+                                        class="highlight-word highlight-word-delay"
+                                        >NMR Data Repository</span
+                                    ></span
+                                >
                             </h1>
-                            
+
                             <!-- Description -->
-                            <p class="mt-6 max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed">
-                                Archive, browse, and analyze NMR spectroscopy data with comprehensive tools for research and collaboration worldwide.
+                            <p
+                                class="mt-6 max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed"
+                            >
+                                Archive, browse, and analyze NMR spectroscopy
+                                data with comprehensive tools for research and
+                                collaboration worldwide.
                             </p>
-                            
+
                             <!-- Action Buttons -->
-                            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <div
+                                class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+                            >
                                 <Link
                                     href="/projects"
                                     class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-white bg-gray-900 hover:bg-gray-800 transition-all duration-200"
                                 >
                                     Browse Data
                                 </Link>
-                                
-                                <StructureSearch
-                                    ref="structure-search"
-                                    mode="button"
-                                ></StructureSearch>
-                                
+
+                                <UnifiedSearch></UnifiedSearch>
+
                                 <Link
                                     href="/register"
                                     class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-gray-900 bg-white border border-gray-900 hover:bg-gray-50 transition-all duration-200"
@@ -255,16 +277,24 @@
                                     Submit Data
                                 </Link>
                             </div>
-                            
+
                             <!-- Quick Links -->
-                            <div class="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm">
+                            <div
+                                class="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm"
+                            >
                                 <a
                                     href="https://docs.nmrxiv.org"
                                     target="_blank"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
                                 >
-                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M7 3.41a1 1 0 0 0-.668-.943L2.275 1.039a.987.987 0 0 0-.877.166c-.25.192-.398.493-.398.812V12.2c0 .454.296.853.725.977l3.948 1.365A1 1 0 0 0 7 13.596V3.41ZM9 13.596a1 1 0 0 0 1.327.946l3.948-1.365c.429-.124.725-.523.725-.977V2.017c0-.32-.147-.62-.398-.812a.987.987 0 0 0-.877-.166L9.668 2.467A1 1 0 0 0 9 3.41v10.186Z" />
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="currentColor"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M7 3.41a1 1 0 0 0-.668-.943L2.275 1.039a.987.987 0 0 0-.877.166c-.25.192-.398.493-.398.812V12.2c0 .454.296.853.725.977l3.948 1.365A1 1 0 0 0 7 13.596V3.41ZM9 13.596a1 1 0 0 0 1.327.946l3.948-1.365c.429-.124.725-.523.725-.977V2.017c0-.32-.147-.62-.398-.812a.987.987 0 0 0-.877-.166L9.668 2.467A1 1 0 0 0 9 3.41v10.186Z"
+                                        />
                                     </svg>
                                     Documentation
                                 </a>
@@ -273,8 +303,14 @@
                                     target="_blank"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
                                 >
-                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M8 .198a8 8 0 0 0-8 8 7.999 7.999 0 0 0 5.47 7.59c.4.076.547-.172.547-.384 0-.19-.007-.694-.01-1.36-2.226.482-2.695-1.074-2.695-1.074-.364-.923-.89-1.17-.89-1.17-.725-.496.056-.486.056-.486.803.056 1.225.824 1.225.824.714 1.224 1.873.87 2.33.666.072-.518.278-.87.507-1.07-1.777-.2-3.644-.888-3.644-3.954 0-.873.31-1.586.823-2.146-.09-.202-.36-1.016.07-2.118 0 0 .67-.214 2.2.82a7.67 7.67 0 0 1 2-.27 7.67 7.67 0 0 1 2 .27c1.52-1.034 2.19-.82 2.19-.82.43 1.102.16 1.916.08 2.118.51.56.82 1.273.82 2.146 0 3.074-1.87 3.75-3.65 3.947.28.24.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.14.46.55.38A7.972 7.972 0 0 0 16 8.199a8 8 0 0 0-8-8Z" />
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="currentColor"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M8 .198a8 8 0 0 0-8 8 7.999 7.999 0 0 0 5.47 7.59c.4.076.547-.172.547-.384 0-.19-.007-.694-.01-1.36-2.226.482-2.695-1.074-2.695-1.074-.364-.923-.89-1.17-.89-1.17-.725-.496.056-.486.056-.486.803.056 1.225.824 1.225.824.714 1.224 1.873.87 2.33.666.072-.518.278-.87.507-1.07-1.777-.2-3.644-.888-3.644-3.954 0-.873.31-1.586.823-2.146-.09-.202-.36-1.016.07-2.118 0 0 .67-.214 2.2.82a7.67 7.67 0 0 1 2-.27 7.67 7.67 0 0 1 2 .27c1.52-1.034 2.19-.82 2.19-.82.43 1.102.16 1.916.08 2.118.51.56.82 1.273.82 2.146 0 3.074-1.87 3.75-3.65 3.947.28.24.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.14.46.55.38A7.972 7.972 0 0 0 16 8.199a8 8 0 0 0-8-8Z"
+                                        />
                                     </svg>
                                     GitHub
                                 </a>
@@ -283,8 +319,18 @@
                                     target="_blank"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
                                 >
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"
+                                        />
                                     </svg>
                                     API
                                 </a>
@@ -297,7 +343,7 @@
             <!-- Journals Section with Transparent Background -->
             <div class="relative overflow-hidden bg-white">
                 <!-- Content -->
-                <div class="relative pb-16 pt-16 sm:pb-20 sm:pt-20">
+                <div class="relative py-2">
                     <div class="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12">
                         <h2
                             class="text-center text-lg sm:text-xl font-semibold leading-8 text-gray-900"
@@ -338,12 +384,119 @@
                 </div>
             </div>
 
+            <!-- Promotional Section - Apple Music Style -->
+            <div class="relative">
+                <!-- Gradient background matching metrics section -->
+                <div
+                    class="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"
+                ></div>
+
+                <div
+                    class="relative max-w-6xl mx-auto px-6 pt-20 sm:px-8 sm:pt-24 lg:px-12"
+                >
+                    <div
+                        class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm"
+                    >
+                        <div
+                            class="grid grid-cols-1 lg:grid-cols-2 gap-4 p-8 sm:p-12 items-center"
+                        >
+                            <!-- Left Side: Content -->
+                            <div>
+                                <!-- Brand Text -->
+                                <div class="mb-6">
+                                    <p
+                                        class="text-sm font-semibold text-gray-500 uppercase tracking-wide"
+                                    >
+                                        NMR PREDICTION
+                                    </p>
+                                </div>
+
+                                <!-- Main Heading -->
+                                <h2
+                                    class="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-900 leading-tight tracking-tight"
+                                >
+                                    Fast and accurate<sup>*</sup> NMR spectra
+                                    predictions from chemical structures
+                                </h2>
+
+                                <!-- Call to Action Button -->
+                                <div class="mt-8">
+                                    <span
+                                        class="inline-flex items-center px-6 py-3 bg-gray-400 text-white text-base font-semibold rounded-full cursor-not-allowed opacity-60"
+                                    >
+                                        Coming Soon
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Right Side: Visual Element -->
+                            <div
+                                class="relative h-full flex items-center justify-center"
+                            >
+                                <!-- Spectra Card Cascade -->
+                                <div
+                                    class="relative w-full max-w-lg aspect-[4/3]"
+                                >
+                                    <!-- Card 1 - Back layer -->
+                                    <div
+                                        class="absolute inset-0 rounded-2xl overflow-hidden shadow-lg bg-white animate-cascade-rotate-1"
+                                    >
+                                        <img
+                                            src="/img/spectra/1.png"
+                                            alt="NMR Spectrum"
+                                            class="w-full h-full object-cover"
+                                        />
+                                    </div>
+
+                                    <!-- Card 2 - Middle back -->
+                                    <div
+                                        class="absolute inset-0 rounded-2xl overflow-hidden shadow-lg bg-white animate-cascade-rotate-2"
+                                    >
+                                        <img
+                                            src="/img/spectra/2.png"
+                                            alt="NMR Spectrum"
+                                            class="w-full h-full object-cover"
+                                        />
+                                    </div>
+
+                                    <!-- Card 3 - Middle front -->
+                                    <div
+                                        class="absolute inset-0 rounded-2xl overflow-hidden shadow-xl bg-white animate-cascade-rotate-3"
+                                    >
+                                        <img
+                                            src="/img/spectra/3.png"
+                                            alt="NMR Spectrum"
+                                            class="w-full h-full object-cover"
+                                        />
+                                    </div>
+
+                                    <!-- Card 4 - Front layer -->
+                                    <div
+                                        class="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl bg-white animate-cascade-rotate-4 hover:scale-[1.02] transition-transform duration-300"
+                                    >
+                                        <img
+                                            src="/img/spectra/4.png"
+                                            alt="NMR Spectrum"
+                                            class="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Metrics Section - Apple iPad Style -->
             <div class="relative">
                 <!-- Gradient background: white -> gray -> white -->
-                <div class="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"></div>
-                
-                <div class="relative max-w-6xl mx-auto px-6 py-20 sm:px-8 sm:py-24 lg:px-12">
+                <div
+                    class="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"
+                ></div>
+
+                <div
+                    class="relative max-w-6xl mx-auto px-6 pb-20 sm:px-8 sm:pb-24 pt-4 lg:px-12"
+                >
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Projects Card -->
                         <a
@@ -351,23 +504,40 @@
                             class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
                         >
                             <div>
-                                <p class="text-sm font-semibold text-gray-500 mb-2">Publications & Studies</p>
-                                <h3 class="text-3xl font-bold text-gray-900 leading-tight">
-                                    Explore<br>dataset<br>collections.
+                                <p
+                                    class="text-sm font-semibold text-gray-500 mb-2"
+                                >
+                                    Publications & Studies
+                                </p>
+                                <h3
+                                    class="text-3xl font-bold text-gray-900 leading-tight"
+                                >
+                                    Explore<br />dataset<br />collections.
                                 </h3>
                                 <p class="text-sm text-gray-600 mt-4">
-                                    Comprehensive collections of NMR data and spectra organized by publication or research study.
+                                    Comprehensive collections of NMR data and
+                                    spectra organized by publication or research
+                                    study.
                                 </p>
                             </div>
-                            
+
                             <div class="mt-auto">
                                 <div class="text-gray-900 mb-6">
-                                    <div class="text-5xl font-bold">{{ projects }}</div>
-                                    <div class="text-lg mt-1 text-gray-600">Projects</div>
+                                    <div class="text-5xl font-bold">
+                                        {{ projects }}
+                                    </div>
+                                    <div class="text-lg mt-1 text-gray-600">
+                                        Projects
+                                    </div>
                                     <small
-                                        v-if="embargoed_projects && embargoed_projects > 0"
+                                        v-if="
+                                            embargoed_projects &&
+                                            embargoed_projects > 0
+                                        "
                                         class="text-sm text-gray-500"
-                                    >{{ embargoed_projects }} in embargo</small>
+                                        >{{ embargoed_projects }} in
+                                        embargo</small
+                                    >
                                 </div>
                             </div>
                         </a>
@@ -378,19 +548,31 @@
                             class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
                         >
                             <div>
-                                <p class="text-sm font-semibold text-gray-500 mb-2">Chemical Structures</p>
-                                <h3 class="text-3xl font-bold text-gray-900 leading-tight">
-                                    Discover<br>compounds<br>spectra.
+                                <p
+                                    class="text-sm font-semibold text-gray-500 mb-2"
+                                >
+                                    Chemical Structures
+                                </p>
+                                <h3
+                                    class="text-3xl font-bold text-gray-900 leading-tight"
+                                >
+                                    Discover<br />compounds<br />spectra.
                                 </h3>
                                 <p class="text-sm text-gray-600 mt-4">
-                                    Search and analyze chemical structures with their associated experimental data and measurements.
+                                    Search and analyze chemical structures with
+                                    their associated experimental data and
+                                    measurements.
                                 </p>
                             </div>
-                            
+
                             <div class="mt-auto">
                                 <div class="text-gray-900 mb-6">
-                                    <div class="text-5xl font-bold">{{ compounds }}</div>
-                                    <div class="text-lg mt-1 text-gray-600">Compounds</div>
+                                    <div class="text-5xl font-bold">
+                                        {{ compounds }}
+                                    </div>
+                                    <div class="text-lg mt-1 text-gray-600">
+                                        Compounds
+                                    </div>
                                 </div>
                             </div>
                         </a>
@@ -401,19 +583,30 @@
                             class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
                         >
                             <div>
-                                <p class="text-sm font-semibold text-gray-500 mb-2">Experimental data</p>
-                                <h3 class="text-3xl font-bold text-gray-900 leading-tight">
-                                    Access and<br>compare<br>spectra.
+                                <p
+                                    class="text-sm font-semibold text-gray-500 mb-2"
+                                >
+                                    Experimental data
+                                </p>
+                                <h3
+                                    class="text-3xl font-bold text-gray-900 leading-tight"
+                                >
+                                    Access and<br />compare<br />spectra.
                                 </h3>
                                 <p class="text-sm text-gray-600 mt-4">
-                                    Access raw NMR spectroscopy data with complete experimental details and metadata.
+                                    Access raw NMR spectroscopy data with
+                                    complete experimental details and metadata.
                                 </p>
                             </div>
-                            
+
                             <div class="mt-auto">
                                 <div class="text-gray-900 mb-6">
-                                    <div class="text-5xl font-bold">{{ spectra }}</div>
-                                    <div class="text-lg mt-1 text-gray-600">Spectra</div>
+                                    <div class="text-5xl font-bold">
+                                        {{ spectra }}
+                                    </div>
+                                    <div class="text-lg mt-1 text-gray-600">
+                                        Spectra
+                                    </div>
                                 </div>
                             </div>
                         </a>
@@ -422,7 +615,6 @@
             </div>
 
             <div class="relative">
-        
                 <div class="mt-12">
                     <div
                         class="lg:mx-auto lg:max-w-6xl lg:px-12 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden"
@@ -430,7 +622,9 @@
                         <div
                             class="px-4 z-20 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
                         >
-                            <div class="bg-white p-5 rounded-md border">
+                            <div
+                                class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm"
+                            >
                                 <div>
                                     <span
                                         class="h-12 w-12 rounded-md flex items-center justify-center bg-blue-600"
@@ -442,19 +636,23 @@
                                     </span>
                                 </div>
                                 <div class="mt-6">
-                                <h2
-                                    class="text-2xl font-bold tracking-tight text-gray-900"
-                                >
-                                    Build with Our API
-                                </h2>
-                                <p class="mt-4 text-base text-gray-500">
-                                    Leverage our comprehensive API to build innovative tools and applications. Access rich data and metadata to power your research workflows and analytical solutions.
-                                </p>
+                                    <h2
+                                        class="text-2xl font-bold tracking-tight text-gray-900"
+                                    >
+                                        Build with Our API
+                                    </h2>
+                                    <p class="mt-4 text-base text-gray-500">
+                                        Leverage our comprehensive API to build
+                                        innovative tools and applications.
+                                        Access rich data and metadata to power
+                                        your research workflows and analytical
+                                        solutions.
+                                    </p>
                                     <div class="mt-6">
                                         <a
                                             target="_blank"
                                             href="https://docs.nmrxiv.org/developer-guides/api.html"
-                                            class="inline-flex bg-blue-600 bg-origin-border px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white hover:bg-blue-700"
+                                            class="inline-flex items-center justify-center bg-blue-600 bg-origin-border px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white hover:bg-blue-700 transition-colors duration-200"
                                         >
                                             View API Docs
                                         </a>
@@ -561,14 +759,24 @@
                                     Built to be FAIR from ground up
                                 </h2>
                             </div>
-                            <a 
+                            <a
                                 href="https://docs.nmrxiv.org"
                                 target="_blank"
                                 class="hidden sm:inline-flex items-center gap-1 text-brand font-medium text-brand-hover transition-colors text-sm"
                             >
                                 Learn more
-                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                <svg
+                                    class="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                    />
                                 </svg>
                             </a>
                         </div>
@@ -576,9 +784,17 @@
 
                     <!-- Scrollable Container - Full Width -->
                     <div class="relative">
-                        <div class="overflow-x-auto scrollbar-hide px-6 sm:px-8 lg:px-12" ref="scrollContainer">
-                            <div class="flex gap-3 pb-4" style="width: max-content;">
-                                <div v-for="(feature, index) in features" :key="feature.name"
+                        <div
+                            ref="scrollContainer"
+                            class="overflow-x-auto scrollbar-hide px-6 sm:px-8 lg:px-12"
+                        >
+                            <div
+                                class="flex gap-3 pb-4"
+                                style="width: max-content"
+                            >
+                                <div
+                                    v-for="(feature, index) in features"
+                                    :key="feature.name"
                                     class="relative bg-white rounded-3xl p-8 border border-gray-200 transition-all duration-300 flex-shrink-0 w-[320px] h-[320px] flex flex-col"
                                 >
                                     <div class="flex-1 flex flex-col">
@@ -592,22 +808,37 @@
                                             />
                                         </span>
                                         <div class="mt-6 flex-1">
-                                            <h3 class="text-2xl font-bold text-gray-900 leading-tight mb-3">
+                                            <h3
+                                                class="text-2xl font-bold text-gray-900 leading-tight mb-3"
+                                            >
                                                 {{ feature.name }}
                                             </h3>
-                                            <p class="text-base text-gray-600 leading-relaxed" v-if="feature.shortDescription">
+                                            <p
+                                                v-if="feature.shortDescription"
+                                                class="text-base text-gray-600 leading-relaxed"
+                                            >
                                                 {{ feature.shortDescription }}
                                             </p>
                                         </div>
                                     </div>
                                     <div class="flex justify-end">
                                         <button
-                                            @click="openFeatureModal(index)"
                                             class="flex items-center justify-center h-11 w-11 rounded-3xl bg-gray-900 text-white hover:bg-gray-700 transition-colors flex-shrink-0"
                                             :aria-label="`Learn more about ${feature.name}`"
+                                            @click="openFeatureModal(index)"
                                         >
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            <svg
+                                                class="h-5 w-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2.5"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M12 4.5v15m7.5-7.5h-15"
+                                                />
                                             </svg>
                                         </button>
                                     </div>
@@ -615,26 +846,46 @@
                             </div>
                         </div>
                     </div>
-                        
+
                     <!-- Navigation Arrows -->
                     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
                         <div class="flex justify-end gap-2 mt-6">
-                            <button 
-                                @click="scrollLeft"
+                            <button
                                 class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="!canScrollLeft"
+                                @click="scrollLeft"
                             >
-                                <svg class="h-5 w-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                                <svg
+                                    class="h-5 w-5 text-gray-900"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M15.75 19.5 8.25 12l7.5-7.5"
+                                    />
                                 </svg>
                             </button>
-                            <button 
-                                @click="scrollRight"
+                            <button
                                 class="h-10 w-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="!canScrollRight"
+                                @click="scrollRight"
                             >
-                                <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                <svg
+                                    class="h-5 w-5 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                    />
                                 </svg>
                             </button>
                         </div>
@@ -644,7 +895,11 @@
 
             <!-- Feature Modal -->
             <TransitionRoot appear :show="isFeatureModalOpen" as="template">
-                <Dialog as="div" @close="closeFeatureModal" class="relative z-50">
+                <Dialog
+                    as="div"
+                    class="relative z-50"
+                    @close="closeFeatureModal"
+                >
                     <TransitionChild
                         as="template"
                         enter="duration-300 ease-out"
@@ -654,11 +909,15 @@
                         leave-from="opacity-100"
                         leave-to="opacity-0"
                     >
-                        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+                        <div
+                            class="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                        />
                     </TransitionChild>
 
                     <div class="fixed inset-0 overflow-y-auto">
-                        <div class="flex min-h-full items-center justify-center p-4">
+                        <div
+                            class="flex min-h-full items-center justify-center p-4"
+                        >
                             <TransitionChild
                                 as="template"
                                 enter="duration-300 ease-out"
@@ -668,36 +927,63 @@
                                 leave-from="opacity-100 scale-100"
                                 leave-to="opacity-0 scale-95"
                             >
-                                <DialogPanel class="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white p-8 sm:p-12 text-left align-middle shadow-2xl transition-all">
+                                <DialogPanel
+                                    class="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white p-8 sm:p-12 text-left align-middle shadow-2xl transition-all"
+                                >
                                     <div class="absolute right-6 top-6">
                                         <button
-                                            @click="closeFeatureModal"
                                             class="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                                            @click="closeFeatureModal"
                                         >
-                                            <XMarkIcon class="h-5 w-5 text-gray-900" />
+                                            <XMarkIcon
+                                                class="h-5 w-5 text-gray-900"
+                                            />
                                         </button>
                                     </div>
-                                    
+
                                     <div v-if="selectedFeature">
-                                        <p class="text-sm font-medium text-gray-600 mb-2">{{ selectedFeature.category || 'Feature' }}</p>
+                                        <p
+                                            class="text-sm font-medium text-gray-600 mb-2"
+                                        >
+                                            {{
+                                                selectedFeature.category ||
+                                                "Feature"
+                                            }}
+                                        </p>
                                         <DialogTitle
                                             as="h2"
                                             class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight"
                                         >
-                                            {{ selectedFeature.modalTitle || selectedFeature.name }}
+                                            {{
+                                                selectedFeature.modalTitle ||
+                                                selectedFeature.name
+                                            }}
                                         </DialogTitle>
-                                        <div class="mt-6 text-base text-gray-700 space-y-4">
-                                            <p>{{ selectedFeature.modalDescription }}</p>
+                                        <div
+                                            class="mt-6 text-base text-gray-700 space-y-4"
+                                        >
+                                            <p>
+                                                {{
+                                                    selectedFeature.modalDescription
+                                                }}
+                                            </p>
                                         </div>
-                                        
-                                        <div class="mt-8" v-if="selectedFeature.learnMoreUrl">
+
+                                        <div
+                                            v-if="selectedFeature.learnMoreUrl"
+                                            class="mt-8"
+                                        >
                                             <a
-                                                :href="selectedFeature.learnMoreUrl"
+                                                :href="
+                                                    selectedFeature.learnMoreUrl
+                                                "
                                                 target="_blank"
                                                 class="inline-flex items-center gap-2 text-brand font-medium text-brand-hover transition-colors"
                                             >
                                                 Learn more
-                                                <ArrowRightIcon class="h-4 w-4" />
+                                                <ArrowRightIcon
+                                                    class="h-4 w-4"
+                                                />
                                             </a>
                                         </div>
                                     </div>
@@ -707,14 +993,16 @@
                     </div>
                 </Dialog>
             </TransitionRoot>
-            <!-- nmrXiv Project Group Section - iPad Style -->
+            <!-- Academic and public/private partners Section - iPad Style -->
             <div class="bg-white border-t border-gray-100">
                 <div class="py-20">
                     <!-- Section Header with max-width -->
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
                         <div class="max-w-3xl">
                             <p class="text-lg text-gray-600 leading-relaxed">
-                                Our initiative consists of academic and public/private partners that contribute unique expertise and resources towards our joint goal
+                                Our initiative consists of academic and
+                                public/private partners that contribute unique
+                                expertise and resources towards our joint goal
                             </p>
                         </div>
                     </div>
@@ -723,220 +1011,335 @@
                     <div class="relative">
                         <!-- Cards Container -->
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div 
-                                id="partners-carousel" 
+                            <div
+                                id="partners-carousel"
                                 class="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth"
-                                style="scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;"
+                                style="
+                                    scrollbar-width: none;
+                                    -ms-overflow-style: none;
+                                    -webkit-overflow-scrolling: touch;
+                                "
                             >
-                            <!-- Share FAIRly Card (nmrXiv) -->
-                            <div class="flex-none w-[320px] sm:w-[350px] snap-start">
-                                <a 
-                                    href="https://nmrxiv.org" 
-                                    target="_blank"
-                                    class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                <!-- Share FAIRly Card (nmrXiv) -->
+                                <div
+                                    class="flex-none w-[320px] sm:w-[350px] snap-start"
                                 >
-                                    <!-- Content -->
-                                    <div class="relative h-full flex flex-col p-8">
-                                        <!-- Top Section - Labels & Title -->
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 mb-2">NFDI4Chem, Friedrich Schiller University Jena</p>
-                                            <h3 class="text-2xl font-semibold text-gray-900 leading-tight mb-2">
-                                                Share FAIRly
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                Research data infrastructure for chemistry, enabling FAIR sharing of raw and processed NMR data worldwide through nmrXiv.org
-                                            </p>
-                                        </div>
-                                        
-                                        <!-- Bottom - Logos (sticky to bottom, stacked) -->
-                                        <div class="mt-auto pt-8">
-                                            <div class="flex flex-col gap-4 w-full max-w-[180px]">
-                                                <div class="w-full">
-                                                    <img
-                                                        class="w-full h-auto object-contain"
-                                                        src="/img/nfdi4chem-logo.png"
-                                                        alt="NFDI4Chem"
-                                                    />
+                                    <a
+                                        href="https://nmrxiv.org"
+                                        target="_blank"
+                                        class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                    >
+                                        <!-- Content -->
+                                        <div
+                                            class="relative h-full flex flex-col p-8"
+                                        >
+                                            <!-- Top Section - Labels & Title -->
+                                            <div>
+                                                <p
+                                                    class="text-xs font-medium text-gray-500 mb-2"
+                                                >
+                                                    NFDI4Chem, Friedrich
+                                                    Schiller University Jena
+                                                </p>
+                                                <h3
+                                                    class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                >
+                                                    Share FAIRly
+                                                </h3>
+                                                <p
+                                                    class="text-sm text-gray-600"
+                                                >
+                                                    Research data infrastructure
+                                                    for chemistry, enabling FAIR
+                                                    sharing of raw and processed
+                                                    NMR data worldwide through
+                                                    nmrXiv.org
+                                                </p>
+                                            </div>
+
+                                            <!-- Bottom - Logos (sticky to bottom, stacked) -->
+                                            <div class="mt-auto pt-8">
+                                                <div
+                                                    class="flex flex-col gap-4 w-full max-w-[180px]"
+                                                >
+                                                    <div class="w-full">
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/nfdi4chem-logo.png"
+                                                            alt="NFDI4Chem"
+                                                        />
+                                                    </div>
+                                                    <div class="w-full">
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/FSU-Jena-logo.jpg"
+                                                            alt="Friedrich Schiller University Jena"
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div class="w-full">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Analyze & Automate Card -->
+                                <div
+                                    class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                >
+                                    <a
+                                        href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
+                                        target="_blank"
+                                        class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                    >
+                                        <!-- Content -->
+                                        <div
+                                            class="relative h-full flex flex-col p-8"
+                                        >
+                                            <!-- Top Section - Labels & Title -->
+                                            <div>
+                                                <p
+                                                    class="text-xs font-medium text-gray-500 mb-2"
+                                                >
+                                                    CT.nmrsolutions.io
+                                                </p>
+                                                <h3
+                                                    class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                >
+                                                    Analyze & Automate
+                                                </h3>
+                                                <p
+                                                    class="text-sm text-gray-600"
+                                                >
+                                                    Analyze experimental NMR
+                                                    spectra fully with
+                                                    CT.nmrsolutions.io and
+                                                    determine NMR parameters
+                                                    automatically
+                                                </p>
+                                            </div>
+
+                                            <!-- Bottom - Large Image/Content (sticky to bottom) -->
+                                            <div class="mt-auto pt-8">
+                                                <div
+                                                    class="w-full max-w-[200px]"
+                                                >
                                                     <img
                                                         class="w-full h-auto object-contain"
-                                                        src="/img/FSU-Jena-logo.jpg"
-                                                        alt="Friedrich Schiller University Jena"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <!-- Analyze & Automate Card -->
-                            <div class="flex-none w-[320px] sm:w-[350px] snap-start">
-                                <a 
-                                    href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard" 
-                                    target="_blank"
-                                    class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
-                                >
-                                    <!-- Content -->
-                                    <div class="relative h-full flex flex-col p-8">
-                                        <!-- Top Section - Labels & Title -->
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 mb-2">CT.nmrsolutions.io</p>
-                                            <h3 class="text-2xl font-semibold text-gray-900 leading-tight mb-2">
-                                                Analyze & Automate
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                Analyze experimental NMR spectra fully with CT.nmrsolutions.io and determine NMR parameters automatically
-                                            </p>
-                                        </div>
-                                        
-                                        <!-- Bottom - Large Image/Content (sticky to bottom) -->
-                                        <div class="mt-auto pt-8">
-                                            <div class="w-full max-w-[200px]">
-                                                <img
-                                                    class="w-full h-auto object-contain"
-                                                    src="/img/ct.png"
-                                                    alt="CT NMR Solutions"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <!-- View & Process Card -->
-                            <div class="flex-none w-[320px] sm:w-[350px] snap-start">
-                                <a 
-                                    href="https://www.nmrium.org/" 
-                                    target="_blank"
-                                    class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
-                                >
-                                    <!-- Content -->
-                                    <div class="relative h-full flex flex-col p-8">
-                                        <!-- Top Section - Labels & Title -->
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 mb-2">NMRium</p>
-                                            <h3 class="text-2xl font-semibold text-gray-900 leading-tight mb-2">
-                                                View & Process
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                Enhance productivity with NMRium, offering intuitive, secure, browser-based processing of NMR spectra
-                                            </p>
-                                        </div>
-                                        
-                                        <!-- Bottom - Large Image/Content (sticky to bottom) -->
-                                        <div class="mt-auto pt-8">
-                                            <div class="w-full max-w-[200px]">
-                                                <img
-                                                    class="w-full h-auto object-contain"
-                                                    src="/img/nmrium-logo.png"
-                                                    alt="NMRium"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <!-- Quantify Card -->
-                            <div class="flex-none w-[320px] sm:w-[350px] snap-start">
-                                <a 
-                                    href="https://qnmr.org" 
-                                    target="_blank"
-                                    class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
-                                >
-                                    <!-- Content -->
-                                    <div class="relative h-full flex flex-col p-8">
-                                        <!-- Top Section - Labels & Title -->
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 mb-2">University of Illinois Chicago</p>
-                                            <h3 class="text-2xl font-semibold text-gray-900 leading-tight mb-2">
-                                                Quantify
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                Metrologically quantify (qnmr.org) biomedical material, products, and samples
-                                            </p>
-                                        </div>
-                                        
-                                        <!-- Bottom - Large Image/Content (sticky to bottom) -->
-                                        <div class="mt-auto pt-8">
-                                            <div class="w-full max-w-[200px]">
-                                                <img
-                                                    class="w-full h-auto object-contain"
-                                                    src="/img/uic.png"
-                                                    alt="University of Illinois Chicago"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <!-- Identify & Qualify Card -->
-                            <div class="flex-none w-[320px] sm:w-[350px] snap-start">
-                                <a 
-                                    href="https://nobs.naturalproducts.net/" 
-                                    target="_blank"
-                                    class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
-                                >
-                                    <!-- Content -->
-                                    <div class="relative h-full flex flex-col p-8">
-                                        <!-- Top Section - Labels & Title -->
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 mb-2">Natural Products Community</p>
-                                            <h3 class="text-2xl font-semibold text-gray-900 leading-tight mb-2">
-                                                Identify & Qualify
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                Separate, identify, and qualify complex natural, pharmaceutical, and related health products
-                                            </p>
-                                        </div>
-                                        
-                                        <!-- Bottom - Logos (sticky to bottom, stacked) -->
-                                        <div class="mt-auto pt-8">
-                                            <div class="flex flex-col gap-3 w-full max-w-[180px]">
-                                                <div class="w-full">
-                                                    <img
-                                                        class="w-full h-auto object-contain"
-                                                        src="/img/UniversiteDeGeneve.png"
-                                                        alt="University of Geneva"
-                                                    />
-                                                </div>
-                                                <div class="w-full">
-                                                    <img
-                                                        class="w-full h-auto object-contain"
-                                                        src="/img/UniversiteParisSaclay.png"
-                                                        alt="Université Paris-Saclay"
+                                                        src="/img/ct.png"
+                                                        alt="CT NMR Solutions"
                                                     />
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </a>
-                            </div>
+                                    </a>
+                                </div>
+
+                                <!-- View & Process Card -->
+                                <div
+                                    class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                >
+                                    <a
+                                        href="https://www.nmrium.org/"
+                                        target="_blank"
+                                        class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                    >
+                                        <!-- Content -->
+                                        <div
+                                            class="relative h-full flex flex-col p-8"
+                                        >
+                                            <!-- Top Section - Labels & Title -->
+                                            <div>
+                                                <p
+                                                    class="text-xs font-medium text-gray-500 mb-2"
+                                                >
+                                                    NMRium
+                                                </p>
+                                                <h3
+                                                    class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                >
+                                                    View & Process
+                                                </h3>
+                                                <p
+                                                    class="text-sm text-gray-600"
+                                                >
+                                                    Enhance productivity with
+                                                    NMRium, offering intuitive,
+                                                    secure, browser-based
+                                                    processing of NMR spectra
+                                                </p>
+                                            </div>
+
+                                            <!-- Bottom - Large Image/Content (sticky to bottom) -->
+                                            <div class="mt-auto pt-8">
+                                                <div
+                                                    class="w-full max-w-[200px]"
+                                                >
+                                                    <img
+                                                        class="w-full h-auto object-contain"
+                                                        src="/img/nmrium-logo.png"
+                                                        alt="NMRium"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Quantify Card -->
+                                <div
+                                    class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                >
+                                    <a
+                                        href="https://qnmr.org"
+                                        target="_blank"
+                                        class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                    >
+                                        <!-- Content -->
+                                        <div
+                                            class="relative h-full flex flex-col p-8"
+                                        >
+                                            <!-- Top Section - Labels & Title -->
+                                            <div>
+                                                <p
+                                                    class="text-xs font-medium text-gray-500 mb-2"
+                                                >
+                                                    University of Illinois
+                                                    Chicago
+                                                </p>
+                                                <h3
+                                                    class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                >
+                                                    Quantify
+                                                </h3>
+                                                <p
+                                                    class="text-sm text-gray-600"
+                                                >
+                                                    Metrologically quantify
+                                                    (qnmr.org) biomedical
+                                                    material, products, and
+                                                    samples
+                                                </p>
+                                            </div>
+
+                                            <!-- Bottom - Large Image/Content (sticky to bottom) -->
+                                            <div class="mt-auto pt-8">
+                                                <div
+                                                    class="w-full max-w-[200px]"
+                                                >
+                                                    <img
+                                                        class="w-full h-auto object-contain"
+                                                        src="/img/uic.png"
+                                                        alt="University of Illinois Chicago"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Identify & Qualify Card -->
+                                <div
+                                    class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                >
+                                    <a
+                                        href="https://nobs.naturalproducts.net/"
+                                        target="_blank"
+                                        class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                    >
+                                        <!-- Content -->
+                                        <div
+                                            class="relative h-full flex flex-col p-8"
+                                        >
+                                            <!-- Top Section - Labels & Title -->
+                                            <div>
+                                                <p
+                                                    class="text-xs font-medium text-gray-500 mb-2"
+                                                >
+                                                    Natural Products Community
+                                                </p>
+                                                <h3
+                                                    class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                >
+                                                    Identify & Qualify
+                                                </h3>
+                                                <p
+                                                    class="text-sm text-gray-600"
+                                                >
+                                                    Separate, identify, and
+                                                    qualify complex natural,
+                                                    pharmaceutical, and related
+                                                    health products
+                                                </p>
+                                            </div>
+
+                                            <!-- Bottom - Logos (sticky to bottom, stacked) -->
+                                            <div class="mt-auto pt-8">
+                                                <div
+                                                    class="flex flex-col gap-3 w-full max-w-[180px]"
+                                                >
+                                                    <div class="w-full">
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/UniversiteDeGeneve.png"
+                                                            alt="University of Geneva"
+                                                        />
+                                                    </div>
+                                                    <div class="w-full">
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/UniversiteParisSaclay.png"
+                                                            alt="Université Paris-Saclay"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Navigation Controls -->
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div class="flex items-center justify-end gap-3 mt-8">
-                                <button 
+                            <div
+                                class="flex items-center justify-end gap-3 mt-8"
+                            >
+                                <button
                                     onclick="document.getElementById('partners-carousel').scrollBy({ left: -370, behavior: 'smooth' })"
                                     class="w-10 h-10 rounded-full bg-gray-200/80 hover:bg-gray-300/80 flex items-center justify-center transition-colors backdrop-blur-sm"
                                     aria-label="Previous"
                                 >
-                                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    <svg
+                                        class="w-5 h-5 text-gray-700"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M15 19l-7-7 7-7"
+                                        ></path>
                                     </svg>
                                 </button>
-                                <button 
+                                <button
                                     onclick="document.getElementById('partners-carousel').scrollBy({ left: 370, behavior: 'smooth' })"
                                     class="w-10 h-10 rounded-full bg-gray-200/80 hover:bg-gray-300/80 flex items-center justify-center transition-colors backdrop-blur-sm"
                                     aria-label="Next"
                                 >
-                                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    <svg
+                                        class="w-5 h-5 text-gray-700"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 5l7 7-7 7"
+                                        ></path>
                                     </svg>
                                 </button>
                             </div>
@@ -1011,7 +1414,7 @@
                             <div class="flex flex-col sm:flex-row gap-3">
                                 <Link
                                     href="/register"
-                                    class="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-blue-50 transition-colors duration-200"
+                                    class="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-full hover:bg-blue-50 transition-colors duration-200 shadow-sm"
                                 >
                                     Get started
                                     <ArrowRightIcon
@@ -1021,7 +1424,7 @@
                                 <a
                                     href="https://docs.nmrxiv.org/submission-guides/data-lifecycle.html"
                                     target="_blank"
-                                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-white font-semibold rounded-xl border border-slate-600 hover:bg-slate-800 hover:border-slate-500 transition-colors duration-200"
+                                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-white font-semibold rounded-full border border-slate-600 hover:bg-slate-800 hover:border-slate-500 transition-colors duration-200"
                                 >
                                     Learn more
                                 </a>
@@ -1045,6 +1448,7 @@ import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Projects from "@/Shared/Projects.vue";
 import Footer from "@/Shared/Footer.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
+import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
 import {
     Popover,
     PopoverButton,
@@ -1109,7 +1513,8 @@ const features = [
         shortDescription: "Find data with powerful search tools.",
         category: "Discovery",
         modalTitle: "Advanced search capabilities",
-        modalDescription: "Search nmrXiv using multiple methods: browse datasets, search by structure similarity, or upload your own spectra for comparison. Our advanced search tools help you find exactly what you need from our comprehensive NMR database.",
+        modalDescription:
+            "Search nmrXiv using multiple methods: browse datasets, search by structure similarity, or upload your own spectra for comparison. Our advanced search tools help you find exactly what you need from our comprehensive NMR database.",
         learnMoreUrl: "https://docs.nmrxiv.org",
         icon: MagnifyingGlassIcon,
     },
@@ -1118,7 +1523,8 @@ const features = [
         shortDescription: "Transparent and community-driven.",
         category: "Philosophy",
         modalTitle: "Built on open source principles",
-        modalDescription: "nmrXiv is built entirely on open-source technologies and follows open science principles. Our codebase is publicly available, allowing the community to contribute, audit, and improve the platform. We believe in transparency and collaboration to advance scientific research.",
+        modalDescription:
+            "nmrXiv is built entirely on open-source technologies and follows open science principles. Our codebase is publicly available, allowing the community to contribute, audit, and improve the platform. We believe in transparency and collaboration to advance scientific research.",
         learnMoreUrl: "https://github.com/NFDI4Chem/nmrxiv",
         icon: ScaleIcon,
     },
@@ -1127,7 +1533,8 @@ const features = [
         shortDescription: "Automated spectral annotations.",
         category: "Analysis",
         modalTitle: "Automated spectral assignments",
-        modalDescription: "Leverage machine learning and AI to automatically assign NMR peaks and annotations. Our system can help identify compounds and suggest assignments based on spectral patterns, saving researchers valuable time in data analysis.",
+        modalDescription:
+            "Leverage machine learning and AI to automatically assign NMR peaks and annotations. Our system can help identify compounds and suggest assignments based on spectral patterns, saving researchers valuable time in data analysis.",
         learnMoreUrl: "https://docs.nmrxiv.org",
         icon: ShareIcon,
     },
@@ -1136,7 +1543,8 @@ const features = [
         shortDescription: "AI-powered spectrum prediction.",
         category: "Analysis",
         modalTitle: "Predict NMR spectra",
-        modalDescription: "Use advanced computational methods to predict NMR spectra for your compounds. Compare predicted vs. experimental data to validate structures and identify discrepancies, accelerating your research workflow.",
+        modalDescription:
+            "Use advanced computational methods to predict NMR spectra for your compounds. Compare predicted vs. experimental data to validate structures and identify discrepancies, accelerating your research workflow.",
         learnMoreUrl: "https://docs.nmrxiv.org",
         icon: PencilSquareIcon,
     },
@@ -1145,7 +1553,8 @@ const features = [
         shortDescription: "Standardized data formats.",
         category: "Standards",
         modalTitle: "Standardized schemas and identifiers",
-        modalDescription: "nmrXiv implements standardized data schemas and MIChI (Molecular Identifier for Chemical Information) to ensure data consistency and interoperability. This makes your data findable, accessible, and reusable across different platforms and tools.",
+        modalDescription:
+            "nmrXiv implements standardized data schemas and MIChI (Molecular Identifier for Chemical Information) to ensure data consistency and interoperability. This makes your data findable, accessible, and reusable across different platforms and tools.",
         learnMoreUrl: "https://docs.nmrxiv.org",
         icon: DocumentTextIcon,
     },
@@ -1154,7 +1563,8 @@ const features = [
         shortDescription: "Collaborative problem solving.",
         category: "Engagement",
         modalTitle: "Join community challenges",
-        modalDescription: "Participate in structure elucidation challenges and collaborative research projects. Work with researchers worldwide to solve complex spectroscopy problems and contribute to advancing the field of NMR spectroscopy.",
+        modalDescription:
+            "Participate in structure elucidation challenges and collaborative research projects. Work with researchers worldwide to solve complex spectroscopy problems and contribute to advancing the field of NMR spectroscopy.",
         learnMoreUrl: "https://docs.nmrxiv.org",
         icon: ChatBubbleLeftIcon,
     },
@@ -1163,7 +1573,8 @@ const features = [
         shortDescription: "Developer-friendly tools.",
         category: "Integration",
         modalTitle: "Comprehensive API and documentation",
-        modalDescription: "Access our rich dataset through a well-documented RESTful API. Build custom tools, integrate nmrXiv data into your workflows, or create new applications. Our comprehensive documentation helps developers get started quickly.",
+        modalDescription:
+            "Access our rich dataset through a well-documented RESTful API. Build custom tools, integrate nmrXiv data into your workflows, or create new applications. Our comprehensive documentation helps developers get started quickly.",
         learnMoreUrl: "https://docs.nmrxiv.org/developer-guides/api.html",
         icon: DocumentTextIcon,
     },
@@ -1172,7 +1583,8 @@ const features = [
         shortDescription: "Secure and reliable storage.",
         category: "Reliability",
         modalTitle: "Enterprise-grade data backups",
-        modalDescription: "Your data is protected with automated daily backups and redundant storage systems. We ensure your research data is safe, secure, and always accessible when you need it.",
+        modalDescription:
+            "Your data is protected with automated daily backups and redundant storage systems. We ensure your research data is safe, secure, and always accessible when you need it.",
         learnMoreUrl: "https://docs.nmrxiv.org",
         icon: CircleStackIcon,
     },
@@ -1222,6 +1634,7 @@ export default {
         FAQs,
         FlashMessages,
         StructureSearch,
+        UnifiedSearch,
         Footer,
     },
 
@@ -1259,6 +1672,28 @@ export default {
         },
     },
 
+    mounted() {
+        axios.get(route("bioschemas.datacatalog")).then((response) => {
+            this.schema = response.data;
+        });
+
+        // Setup scroll listener
+        this.$nextTick(() => {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                container.addEventListener("scroll", this.updateScrollButtons);
+                this.updateScrollButtons();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        const container = this.$refs.scrollContainer;
+        if (container) {
+            container.removeEventListener("scroll", this.updateScrollButtons);
+        }
+    },
+
     methods: {
         openFeatureModal(index) {
             this.selectedFeatureIndex = index;
@@ -1273,14 +1708,14 @@ export default {
         scrollLeft() {
             const container = this.$refs.scrollContainer;
             if (container) {
-                container.scrollBy({ left: -330, behavior: 'smooth' });
+                container.scrollBy({ left: -330, behavior: "smooth" });
                 setTimeout(() => this.updateScrollButtons(), 300);
             }
         },
         scrollRight() {
             const container = this.$refs.scrollContainer;
             if (container) {
-                container.scrollBy({ left: 330, behavior: 'smooth' });
+                container.scrollBy({ left: 330, behavior: "smooth" });
                 setTimeout(() => this.updateScrollButtons(), 300);
             }
         },
@@ -1288,32 +1723,11 @@ export default {
             const container = this.$refs.scrollContainer;
             if (container) {
                 this.canScrollLeft = container.scrollLeft > 0;
-                this.canScrollRight = 
-                    container.scrollLeft < (container.scrollWidth - container.clientWidth - 10);
+                this.canScrollRight =
+                    container.scrollLeft <
+                    container.scrollWidth - container.clientWidth - 10;
             }
         },
-    },
-
-    mounted() {
-        axios.get(route("bioschemas.datacatalog")).then((response) => {
-            this.schema = response.data;
-        });
-        
-        // Setup scroll listener
-        this.$nextTick(() => {
-            const container = this.$refs.scrollContainer;
-            if (container) {
-                container.addEventListener('scroll', this.updateScrollButtons);
-                this.updateScrollButtons();
-            }
-        });
-    },
-
-    beforeUnmount() {
-        const container = this.$refs.scrollContainer;
-        if (container) {
-            container.removeEventListener('scroll', this.updateScrollButtons);
-        }
     },
 };
 </script>
@@ -1321,15 +1735,15 @@ export default {
 <style scoped>
 /* Custom brand color */
 .text-brand {
-    color: #FD0039;
+    color: #fd0039;
 }
 
 .text-brand-hover:hover {
-    color: #D4002F;
+    color: #d4002f;
 }
 
 .ring-brand {
-    --tw-ring-color: #FD0039;
+    --tw-ring-color: #fd0039;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -1339,8 +1753,8 @@ export default {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 /* Retailstack-inspired blob animations */
@@ -1430,5 +1844,141 @@ export default {
 
 .animate-fade-in-up {
     animation: fade-in-up 1s ease-out 0.3s both;
+}
+
+/* Highlight word animation with subtle color changes */
+.highlight-word {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+.highlight-word::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    right: -6px;
+    top: 15%;
+    bottom: 15%;
+    background: linear-gradient(
+        90deg,
+        rgba(147, 197, 253, 0) 0%,
+        rgba(147, 197, 253, 0.3) 10%,
+        rgba(147, 197, 253, 0.3) 90%,
+        rgba(147, 197, 253, 0) 100%
+    );
+    border-radius: 4px;
+    z-index: -1;
+    transform-origin: left center;
+    animation: highlight-sweep 3s ease-in-out infinite,
+        color-change 20s ease-in-out infinite;
+}
+
+.highlight-word-delay::before {
+    animation-delay: 1.5s, 0s;
+}
+
+@keyframes highlight-sweep {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    15% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+    85% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+}
+
+@keyframes color-change {
+    0%,
+    100% {
+        background: linear-gradient(
+            90deg,
+            rgba(147, 197, 253, 0) 0%,
+            rgba(147, 197, 253, 0.3) 10%,
+            rgba(147, 197, 253, 0.3) 90%,
+            rgba(147, 197, 253, 0) 100%
+        ); /* Soft Blue */
+    }
+    25% {
+        background: linear-gradient(
+            90deg,
+            rgba(196, 181, 253, 0) 0%,
+            rgba(196, 181, 253, 0.3) 10%,
+            rgba(196, 181, 253, 0.3) 90%,
+            rgba(196, 181, 253, 0) 100%
+        ); /* Soft Lavender */
+    }
+    50% {
+        background: linear-gradient(
+            90deg,
+            rgba(167, 243, 208, 0) 0%,
+            rgba(167, 243, 208, 0.3) 10%,
+            rgba(167, 243, 208, 0.3) 90%,
+            rgba(167, 243, 208, 0) 100%
+        ); /* Soft Mint */
+    }
+    75% {
+        background: linear-gradient(
+            90deg,
+            rgba(253, 230, 138, 0) 0%,
+            rgba(253, 230, 138, 0.3) 10%,
+            rgba(253, 230, 138, 0.3) 90%,
+            rgba(253, 230, 138, 0) 100%
+        ); /* Soft Yellow */
+    }
+}
+
+/* Cascade rotation animations - cards cycle through positions */
+@keyframes cascade-cycle {
+    0% {
+        transform: translate(-24px, -24px) rotate(-3deg) scale(0.95);
+        opacity: 0.6;
+        z-index: 10;
+    }
+    25% {
+        transform: translate(-12px, -12px) rotate(-1deg) scale(0.97);
+        opacity: 0.75;
+        z-index: 20;
+    }
+    50% {
+        transform: translate(8px, 8px) rotate(1deg) scale(0.99);
+        opacity: 0.9;
+        z-index: 30;
+    }
+    75% {
+        transform: translate(16px, 16px) rotate(0deg) scale(1);
+        opacity: 1;
+        z-index: 40;
+    }
+    100% {
+        transform: translate(-24px, -24px) rotate(-3deg) scale(0.95);
+        opacity: 0.6;
+        z-index: 10;
+    }
+}
+
+.animate-cascade-rotate-1 {
+    animation: cascade-cycle 12s ease-in-out infinite;
+}
+
+.animate-cascade-rotate-2 {
+    animation: cascade-cycle 12s ease-in-out infinite 3s;
+}
+
+.animate-cascade-rotate-3 {
+    animation: cascade-cycle 12s ease-in-out infinite 6s;
+}
+
+.animate-cascade-rotate-4 {
+    animation: cascade-cycle 12s ease-in-out infinite 9s;
 }
 </style>

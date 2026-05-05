@@ -797,6 +797,47 @@
                 </div>
             </div>
 
+            <!-- Single Sample Modal -->
+            <jet-confirmation-modal
+                :show="showSingleSampleModal"
+                @close="showSingleSampleModal = false"
+            >
+                <template #title> Single sample detected in project </template>
+                <template #content>
+                    <div class="space-y-3">
+                        <p class="text-sm text-gray-600">
+                            Your project contains only one sample. In nmrXiv,
+                            single samples can be published directly without
+                            creating a project. Projects are intended to group
+                            multiple related samples, for example those
+                            belonging to the same study or publication.
+                            <a
+                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
+                                target="_blank"
+                                class="text-blue-600 hover:text-blue-700"
+                                >Click to read more.</a
+                            >
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            How would you like to proceed?
+                        </p>
+                    </div>
+                </template>
+                <template #footer>
+                    <jet-secondary-button
+                        @click="showSingleSampleModal = false"
+                    >
+                        Cancel
+                    </jet-secondary-button>
+                    <jet-secondary-button class="ml-2" @click="publishAsSample">
+                        Publish as Sample
+                    </jet-secondary-button>
+                    <jet-success-button class="ml-2" @click="publishAsProject">
+                        Publish as Project
+                    </jet-success-button>
+                </template>
+            </jet-confirmation-modal>
+
             <!-- Draft Warning Modal -->
             <jet-confirmation-modal
                 :show="showDraftWarningModal"
@@ -859,22 +900,42 @@
                 :show="showPublishConfirmationModal"
                 @close="showPublishConfirmationModal = false"
             >
-                <template #title> Are you sure you want to publish? </template>
+                <template #title> </template>
                 <template #content>
-                    <div v-if="isReleasedToday()">
-                        Once the data is published you will no longer be able to
-                        change the data uploaded! If published as a project, you
-                        may add more samples (spectra) to the project later.
+                    <div v-if="isReleasedToday()" class="text-sm text-gray-600">
+                        <span v-if="publishForm.enableProjectMode">
+                            Once the data is published you will no longer be
+                            able to change the data uploaded! If published as a
+                            project, you may add more samples (spectra) to the
+                            project later.
+                        </span>
+                        <span v-else>
+                            Once the data is published you will no longer be
+                            able to change the data uploaded! This sample will
+                            be published as an individual sample.
+                        </span>
                     </div>
-                    <div v-else>
-                        Opting for an Embargo publication grants your project a
-                        DOI, yet it stays private exclusively for you. You have
-                        the option to share the project with others and can
-                        adjust the release date or promptly make it public
-                        through the project's dashboard view. But once the data
-                        is published you will no longer be able to change the
-                        data uploaded! If published as a project, you may add
-                        more samples (spectra) to the project later if desired.
+                    <div v-else class="text-sm text-gray-600">
+                        <span v-if="publishForm.enableProjectMode">
+                            Opting for an Embargo publication grants your
+                            project a DOI, yet it stays private exclusively for
+                            you. You have the option to share the project with
+                            others and can adjust the release date or promptly
+                            make it public through the project's dashboard view.
+                            But once the data is published you will no longer be
+                            able to change the data uploaded! If published as a
+                            project, you may add more samples (spectra) to the
+                            project later if desired.
+                        </span>
+                        <span v-else>
+                            Opting for an Embargo publication grants your sample
+                            a DOI, yet it stays private exclusively for you. You
+                            have the option to share the sample with others and
+                            can adjust the release date or promptly make it
+                            public through the sample's dashboard view. But once
+                            the data is published you will no longer be able to
+                            change the data uploaded!
+                        </span>
                     </div>
                 </template>
                 <template #footer>
@@ -981,6 +1042,7 @@ export default {
             validation: null,
             showPublishConfirmationModal: false,
             showDraftWarningModal: false,
+            showSingleSampleModal: false,
             draftWarningConfirmed: false,
             photoPreview: null,
         };
@@ -1111,7 +1173,9 @@ export default {
                 project_enabled: this.publishForm.enableProjectMode ? 1 : 0,
             });
         },
-        updateProject() {
+        updateProject(callbacks = {}) {
+            const { onSuccess = null, onError = null } = callbacks;
+
             // Reset draft warning when name changes
             this.draftWarningConfirmed = false;
 
@@ -1147,8 +1211,16 @@ export default {
                 route("dashboard.project.update", this.project.id),
                 {
                     preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {},
+                    onSuccess: () => {
+                        if (onSuccess) {
+                            onSuccess();
+                        }
+                    },
+                    onError: () => {
+                        if (onError) {
+                            onError();
+                        }
+                    },
                 }
             );
         },
@@ -1218,6 +1290,15 @@ export default {
                 this.showDraftWarningModal = true;
                 return;
             }
+            // Check if project has only one sample and project mode is enabled
+            if (
+                this.project.studies &&
+                this.project.studies.length === 1 &&
+                this.publishForm.enableProjectMode
+            ) {
+                this.showSingleSampleModal = true;
+                return;
+            }
             // Proceed to normal publish confirmation
             this.showPublishConfirmationModal = true;
         },
@@ -1226,23 +1307,51 @@ export default {
             this.showDraftWarningModal = false;
             this.showPublishConfirmationModal = true;
         },
+        publishAsSample() {
+            this.showSingleSampleModal = false;
+            this.publishForm.enableProjectMode = false;
+            if (this.draft) {
+                this.updateDraft();
+            }
+            this.showPublishConfirmationModal = true;
+        },
+        publishAsProject() {
+            this.showSingleSampleModal = false;
+            this.publishForm.enableProjectMode = true;
+            if (this.draft) {
+                this.updateDraft();
+            }
+            this.showPublishConfirmationModal = true;
+        },
         publish() {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
                 this.errors = null;
-                axios
-                    .post(
-                        route("dashboard.project.publish", this.project.id),
-                        this.publishForm
-                    )
-                    .catch((err) => {
-                        this.errors = err.response.data.errors;
-                        this.validation = err.response.data.validation.report;
-                    })
-                    .then((response) => {
-                        this.status = response.data.project.status;
-                        // this.trackProject();
-                    });
+                this.updateProject({
+                    onSuccess: () => {
+                        axios
+                            .post(
+                                route(
+                                    "dashboard.project.publish",
+                                    this.project.id
+                                ),
+                                this.publishForm
+                            )
+                            .catch((err) => {
+                                this.errors = err.response.data.errors;
+                                this.validation =
+                                    err.response.data.validation.report;
+                            })
+                            .then((response) => {
+                                this.status = response.data.project.status;
+                                // this.trackProject();
+                            });
+                    },
+                    onError: () => {
+                        this.errors =
+                            "Please resolve the highlighted form errors before publishing.";
+                    },
+                });
             }
         },
         isReleasedToday() {

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\ELN\ChemotionMetadataService;
 use App\Services\ELN\ELNMetadataExtractorInterface;
+use App\Services\ELN\NOBSMetadataService;
 use InvalidArgumentException;
 
 /**
@@ -21,6 +22,7 @@ class ELNMetadataServiceFactory
     {
         return match (strtolower($elnType)) {
             'chemotion' => new ChemotionMetadataService(app(FileIntegrityService::class)),
+            'nobs' => new NOBSMetadataService(app(FileIntegrityService::class)),
             default => throw new InvalidArgumentException("Unsupported ELN type: {$elnType}")
         };
     }
@@ -32,7 +34,7 @@ class ELNMetadataServiceFactory
     {
         return [
             'chemotion',
-            // Add more ELN types here as they are implemented
+            'nobs',
         ];
     }
 

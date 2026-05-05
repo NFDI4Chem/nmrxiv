@@ -14,7 +14,7 @@ class CreateNewStudy
     /**
      * Create a study.
      *
-     * @return \App\Models\Study
+     * @return Study
      */
     public function create(array $input)
     {

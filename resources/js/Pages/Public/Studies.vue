@@ -1,80 +1,39 @@
 <template>
     <app-layout :title="pageTitle">
         <template #header>
-            <div class="relative border-b border-zinc-900/5">
+            <div class="relative border-b border-zinc-900/5 overflow-hidden">
+                <!-- Animated mesh gradient background -->
+                <div
+                    v-if="!molecule"
+                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                ></div>
+                <div v-if="!molecule" class="absolute inset-0 opacity-20">
+                    <div
+                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                    ></div>
+                    <div
+                        class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+                    ></div>
+                    <div
+                        class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+                    ></div>
+                </div>
+
                 <div
                     class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
                 >
-                    <div
-                        v-if="!molecule"
-                        class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"
-                        >
-                            <defs>
-                                <pattern
-                                    id=":r99:"
-                                    width="72"
-                                    height="56"
-                                    patternUnits="userSpaceOnUse"
-                                    x="-12"
-                                    y="4"
-                                >
-                                    <path d="M.5 56V.5H72" fill="none"></path>
-                                </pattern>
-                            </defs>
-                            <rect
-                                width="100%"
-                                height="100%"
-                                stroke-width="0"
-                                fill="url(#:r99:)"
-                            ></rect>
-                            <svg x="-12" y="4" class="overflow-visible">
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="288"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="144"
-                                    y="56"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="504"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="720"
-                                    y="336"
-                                ></rect>
-                            </svg>
-                        </svg>
-                    </div>
                     <div v-if="!molecule">
                         <div
                             class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                         >
-                            Browse Spectra (Samples)
+                            Browse Samples (Spectra)
                         </div>
                         <p>
                             Explore, analyse, and share raw spectra and
                             assignments. Learn more about
                             <a
                                 class="text-teal-900"
-                                href="https://docs.nmrxiv.org/docs/introduction/intro"
+                                href="https://docs.nmrxiv.org/introduction/intro"
                                 target="_blank"
                                 >spectra</a
                             >.
@@ -431,23 +390,25 @@
                     class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
                 >
                     <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
+                        class="mx-auto h-16 w-16 text-gray-300"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        stroke-width="1.5"
                         aria-hidden="true"
                     >
                         <path
-                            vector-effect="non-scaling-stroke"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
                         />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No studies
+                    <h3 class="mt-4 text-base font-semibold text-gray-900">
+                        No studies available
                     </h3>
+                    <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                        Published studies will appear here for public access.
+                    </p>
                 </div>
             </div>
         </div>
@@ -561,3 +522,33 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+/* Blob animations */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+</style>

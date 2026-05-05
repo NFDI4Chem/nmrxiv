@@ -22,15 +22,23 @@
                     <DisclosureButton
                         class="flex w-full items-center justify-between py-5 text-left group"
                     >
-                        <span 
+                        <span
                             class="text-base font-medium pr-4"
-                            :class="open ? 'text-teal-700' : 'text-gray-900 group-hover:text-gray-700'"
+                            :class="
+                                open
+                                    ? 'text-teal-700'
+                                    : 'text-gray-900 group-hover:text-gray-700'
+                            "
                         >
                             {{ faq.question }}
                         </span>
-                        <ChevronDownIcon 
+                        <ChevronDownIcon
                             class="h-5 w-5 flex-shrink-0 transition-transform duration-200"
-                            :class="open ? 'rotate-180 text-teal-600' : 'text-gray-400'"
+                            :class="
+                                open
+                                    ? 'rotate-180 text-teal-600'
+                                    : 'text-gray-400'
+                            "
                         />
                     </DisclosureButton>
                     <DisclosurePanel class="pb-5 pr-12">
@@ -45,16 +53,16 @@
             <div class="mt-10 pt-8 border-t border-gray-100 text-center">
                 <p class="text-gray-500 text-sm">
                     Can't find what you're looking for?
-                    <a 
-                        href="https://docs.nmrxiv.org/FAQs.html" 
+                    <a
+                        href="https://docs.nmrxiv.org/FAQs.html"
                         target="_blank"
                         class="text-teal-600 font-medium hover:text-teal-700"
                     >
                         View all FAQs
                     </a>
                     or
-                    <a 
-                        href="https://www.nfdi4chem.de/helpdesk/" 
+                    <a
+                        href="https://www.nfdi4chem.de/helpdesk/"
                         target="_blank"
                         class="text-teal-600 font-medium hover:text-teal-700"
                     >
@@ -82,7 +90,8 @@ const faqs = [
         answer: "nmrXiv is a specialized repository designed specifically for NMR data with domain-specific validation, visualization tools, and metadata standards. While Zenodo is a general-purpose repository, nmrXiv provides tailored features for the NMR community including format validation, spectral viewers, and standardized NMR-specific metadata.",
     },
     {
-        question: "What is the minimum requirements for submitting my NMR data?",
+        question:
+            "What is the minimum requirements for submitting my NMR data?",
         answer: "The minimum requirements include: organized data structure (project, samples, and datasets), at least one NMR spectrum in a readable format (JCAMP-DX, JEOL, Bruker, NMReData, or NMRium), and basic metadata describing your sample and experiment. At least one format must be validated for successful submission.",
     },
     {

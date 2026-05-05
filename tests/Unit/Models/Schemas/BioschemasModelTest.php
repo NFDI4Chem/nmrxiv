@@ -4,6 +4,8 @@ namespace Tests\Unit\Models;
 
 use App\Models\Schemas\Bioschemas;
 use App\Models\Schemas\Study;
+use Spatie\SchemaOrg\BaseType;
+use Spatie\SchemaOrg\Schema;
 use Tests\TestCase;
 
 class BioschemasModelTest extends TestCase
@@ -170,12 +172,12 @@ class BioschemasModelTest extends TestCase
 
     public function test_bioschemas_extends_spatie_schema(): void
     {
-        $this->assertTrue(is_subclass_of(Bioschemas::class, \Spatie\SchemaOrg\Schema::class));
+        $this->assertTrue(is_subclass_of(Bioschemas::class, Schema::class));
     }
 
     public function test_study_extends_spatie_base_type(): void
     {
-        $this->assertTrue(is_subclass_of(Study::class, \Spatie\SchemaOrg\BaseType::class));
+        $this->assertTrue(is_subclass_of(Study::class, BaseType::class));
     }
 
     public function test_bioschemas_can_create_multiple_study_instances(): void

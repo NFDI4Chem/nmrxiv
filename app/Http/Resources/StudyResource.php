@@ -2,13 +2,15 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StudyResource extends JsonResource
 {
     private bool $lite = true;
 
-    private array $properties = ['sample', 'users', 'license'];
+    private array $properties = ['sample', 'users', 'license', 'authors'];
 
     public function lite(bool $lite, ?array $properties = []): self
     {
@@ -23,8 +25,8 @@ class StudyResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  Request  $request
+     * @return array|Arrayable|\JsonSerializable
      */
     public function toArray($request): array
     {
@@ -107,6 +109,18 @@ class StudyResource extends JsonResource
                         function () {
                             return [
                                 'license' => new LicenseResource($this->license),
+                            ];
+                        }
+                    ),
+                ];
+            }),
+            $this->mergeWhen(! $this->lite, function () {
+                return [
+                    $this->mergeWhen(
+                        in_array('authors', $this->properties),
+                        function () {
+                            return [
+                                'authors' => $this->studyAuthors ? AuthorResource::collection($this->studyAuthors) : [],
                             ];
                         }
                     ),

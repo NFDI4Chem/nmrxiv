@@ -22,9 +22,11 @@ use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\RorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
+use App\Http\Controllers\SupportBubbleController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UploadController;
 use App\Models\Dataset;
@@ -88,8 +90,12 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
+Route::get('/predict', function () {
+    return Inertia::render('Predict');
+})->name('predict');
+
 // Custom support bubble route with rate limiting and enhanced security
-Route::post('support-bubble', [\App\Http\Controllers\SupportBubbleController::class, 'submit'])
+Route::post('support-bubble', [SupportBubbleController::class, 'submit'])
     ->middleware(['throttle:support-bubble'])
     ->name('supportBubble.submit');
 
@@ -126,7 +132,7 @@ Route::middleware('web', WelcomesNewUsers::class)->group(function () {
 });
 
 // ROR API - publicly accessible with rate limiting
-Route::get('ror/search', [\App\Http\Controllers\RorController::class, 'search'])
+Route::get('ror/search', [RorController::class, 'search'])
     ->middleware('throttle:60,1')
     ->name('ror.search');
 
@@ -291,6 +297,8 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::post('datasets/{dataset}/snapshot', [DatasetController::class, 'snapshot'])
             ->name('dashboard.dataset.snapshot');
 
+        Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
+            ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])

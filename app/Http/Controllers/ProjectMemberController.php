@@ -7,6 +7,7 @@ use App\Actions\Project\RemoveProjectMember;
 use App\Actions\Project\UpdateProjectMemberRole;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ProjectMemberController extends Controller
@@ -15,7 +16,7 @@ class ProjectMemberController extends Controller
      * Add a new team member to a project.
      *
      * @param  int  $projectId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function memberStore(Request $request, $projectId)
     {
@@ -37,7 +38,7 @@ class ProjectMemberController extends Controller
      *
      * @param  int  $projectId
      * @param  int  $userId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function updateMemberRole(Request $request, $projectId, $userId)
     {
@@ -56,7 +57,7 @@ class ProjectMemberController extends Controller
      *
      * @param  int  $projectId
      * @param  int  $userId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function removeMember(Request $request, $projectId, $userId)
     {

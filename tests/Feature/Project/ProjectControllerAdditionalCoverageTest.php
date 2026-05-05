@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Project;
 
+use App\Http\Controllers\ProjectController;
 use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
@@ -77,7 +79,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ]);
 
             // Create a sample for each study
-            \App\Models\Sample::factory()->create([
+            Sample::factory()->create([
                 'study_id' => $study->id,
                 'project_id' => $this->project->id,
             ]);
@@ -91,7 +93,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         ]);
 
         // Create sample for private study too
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $privateStudy->id,
             'project_id' => $this->project->id,
         ]);
@@ -126,7 +128,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         ]);
 
         // Create a sample for the study
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->project->id,
         ]);
@@ -251,7 +253,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ]);
 
             // Create a sample for each study
-            \App\Models\Sample::factory()->create([
+            Sample::factory()->create([
                 'study_id' => $study->id,
                 'project_id' => $this->privateProject->id,
             ]);
@@ -281,7 +283,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         ]);
 
         // Create a sample for the study
-        \App\Models\Sample::factory()->create([
+        Sample::factory()->create([
             'study_id' => $study->id,
             'project_id' => $this->privateProject->id,
         ]);
@@ -311,7 +313,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ]);
 
             // Create a sample for each study
-            \App\Models\Sample::factory()->create([
+            Sample::factory()->create([
                 'study_id' => $study->id,
                 'project_id' => $this->privateProject->id,
             ]);
@@ -445,7 +447,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         ]);
 
         // Use reflection to access private method
-        $controller = new \App\Http\Controllers\ProjectController;
+        $controller = new ProjectController;
         $reflection = new \ReflectionClass($controller);
         $method = $reflection->getMethod('prepareSendList');
         $method->setAccessible(true);
@@ -467,7 +469,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $controller = new \App\Http\Controllers\ProjectController;
+        $controller = new ProjectController;
         $reflection = new \ReflectionClass($controller);
         $method = $reflection->getMethod('prepareSendList');
         $method->setAccessible(true);
@@ -489,7 +491,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $controller = new \App\Http\Controllers\ProjectController;
+        $controller = new ProjectController;
         $reflection = new \ReflectionClass($controller);
         $method = $reflection->getMethod('prepareSendList');
         $method->setAccessible(true);
