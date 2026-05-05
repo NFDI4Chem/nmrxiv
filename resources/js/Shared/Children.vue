@@ -54,7 +54,7 @@
                                     open
                                         ? 'text-gray-700 rotate-90'
                                         : 'text-gray-300',
-                                    'mr-2 flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                    'mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                 ]"
                                 aria-hidden="true"
                             />
@@ -138,7 +138,10 @@
                 <!-- Collapsible panel containing child items -->
                 <DisclosurePanel class="space-y-1">
                     <!-- Iterate through direct children -->
-                    <span v-for="sfile in file.children" :key="sfile.name">
+                    <span
+                        v-for="sfile in sortedChildren(file.children)"
+                        :key="sfile.id ?? sfile.name"
+                    >
                         <div class="ml-2">
                             <!-- Child item container with selection handling -->
                             <div
@@ -209,7 +212,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             aria-hidden="true"
                                                         />
@@ -331,8 +334,10 @@
                                             <DisclosurePanel class="space-y-0">
                                                 <!-- Deep nested items -->
                                                 <div
-                                                    v-for="subItem in sfile.children"
-                                                    :key="subItem.name"
+                                                    v-for="subItem in sortedChildren(
+                                                        sfile.children
+                                                    )"
+                                                    :key="subItem.id ?? subItem.name"
                                                     as="div"
                                                     class="cursor-pointer group w-full flex pl-4 pr-2 py-0 font-medium text-gray-600 rounded-md"
                                                     @click.stop="
@@ -355,6 +360,12 @@
                                                             :project="project"
                                                             :expanded-folders="
                                                                 expandedFolders
+                                                            "
+                                                            :tree-sort-by="
+                                                                treeSortBy
+                                                            "
+                                                            :tree-sort-order="
+                                                                treeSortOrder
                                                             "
                                                             @toggle-expansion="
                                                                 (
@@ -505,9 +516,35 @@ export default {
      * @prop {Object} study - Study data object
      * @prop {Object} project - Project data object
      * @prop {Object} file - Current file/folder object to render
-     * @prop {Set} expandedFolders - Set of expanded folder IDs for state tracking
+     * @prop {String} treeSortBy - 'alphabetical' or 'timestamp' (sidebar tree)
+     * @prop {String} treeSortOrder - 'asc' or 'desc'
      */
-    props: ["study", "project", "file", "expandedFolders"],
+    props: {
+        study: {
+            type: Object,
+            default: null,
+        },
+        project: {
+            type: Object,
+            default: null,
+        },
+        file: {
+            type: Object,
+            default: null,
+        },
+        expandedFolders: {
+            type: Object,
+            default: null,
+        },
+        treeSortBy: {
+            type: String,
+            default: "alphabetical",
+        },
+        treeSortOrder: {
+            type: String,
+            default: "asc",
+        },
+    },
 
     /**
      * Events emitted by this component
@@ -589,6 +626,56 @@ export default {
          */
         isExpanded(fsoId) {
             return this.expandedFolders && this.expandedFolders.has(fsoId);
+        },
+
+        /**
+         * Return a sorted copy of folder children for the sidebar tree.
+         *
+         * @param {Array|null|undefined} children
+         * @returns {Array}
+         */
+        sortedChildren(children) {
+            if (!Array.isArray(children) || children.length === 0) {
+                return [];
+            }
+
+            const mode =
+                this.treeSortBy === "timestamp"
+                    ? "timestamp"
+                    : "alphabetical";
+            const order = this.treeSortOrder === "desc" ? "desc" : "asc";
+            const mult = order === "asc" ? 1 : -1;
+
+            return [...children].sort((a, b) => {
+                if (mode === "alphabetical") {
+                    const cmp = String(a.name || "").localeCompare(
+                        String(b.name || ""),
+                        undefined,
+                        { sensitivity: "base", numeric: true }
+                    );
+                    if (cmp !== 0) {
+                        return cmp * mult;
+                    }
+
+                    return 0;
+                }
+
+                const ta = new Date(
+                    a.updated_at || a.created_at || 0
+                ).getTime();
+                const tb = new Date(
+                    b.updated_at || b.created_at || 0
+                ).getTime();
+                if (ta !== tb) {
+                    return (ta < tb ? -1 : 1) * mult;
+                }
+
+                return String(a.name || "").localeCompare(
+                    String(b.name || ""),
+                    undefined,
+                    { sensitivity: "base", numeric: true }
+                );
+            });
         },
 
         /**

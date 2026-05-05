@@ -273,12 +273,23 @@
                                 id="tour-step-project-name"
                                 class="flex w-full min-w-0 flex-col gap-1.5"
                             >
-                                <span
-                                    id="upload-draft-name-label"
-                                    class="text-xs font-medium normal-case tracking-normal text-gray-600"
+                                <div
+                                    class="flex w-full min-w-0 items-start justify-between gap-x-4 gap-y-1"
                                 >
-                                    Project name
-                                </span>
+                                    <span
+                                        id="upload-draft-name-label"
+                                        class="shrink-0 text-xs font-medium normal-case tracking-normal text-gray-600"
+                                    >
+                                        Project name
+                                    </span>
+                                    <p
+                                        id="upload-draft-name-hint"
+                                        class="min-w-0 flex-1 text-right text-xs font-normal normal-case tracking-normal leading-snug text-gray-500"
+                                    >
+                                        Click the name or pencil to edit. Press
+                                        Enter to save.
+                                    </p>
+                                </div>
                                 <div
                                     class="group flex w-full min-w-0 items-stretch overflow-hidden rounded-lg border border-gray-300 bg-white/95 shadow-sm transition-colors hover:border-teal-400/90 hover:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/25 focus-within:ring-offset-2 focus-within:ring-offset-white"
                                 >
@@ -310,104 +321,207 @@
                                         />
                                     </button>
                                 </div>
-                                <p
-                                    id="upload-draft-name-hint"
-                                    class="text-xs font-normal normal-case tracking-normal text-gray-500"
-                                >
-                                    Click the name or pencil to edit. Press
-                                    Enter to save.
-                                </p>
                                 <jet-input-error
                                     :message="draftForm.errors.name"
                                     class="mt-0.5 normal-case"
                                 />
 
-                                <div
-                                    class="mt-4 border-t border-gray-100 pt-4"
-                                >
-                                    <SwitchGroup
-                                        as="div"
-                                        class="flex items-start gap-3"
-                                    >
-                                        <HeadlessSwitch
-                                            v-model="needsReservedDoi"
-                                            :class="[
-                                                needsReservedDoi
-                                                    ? 'bg-teal-600'
-                                                    : 'bg-gray-200',
-                                                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
-                                            ]"
-                                        >
-                                            <span class="sr-only"
-                                                >I need a DOI</span
-                                            >
-                                            <span
-                                                aria-hidden="true"
-                                                :class="[
-                                                    needsReservedDoi
-                                                        ? 'translate-x-5'
-                                                        : 'translate-x-0',
-                                                    'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                                ]"
-                                            />
-                                        </HeadlessSwitch>
-                                        <SwitchLabel
-                                            as="span"
-                                            class="cursor-pointer select-none text-sm font-medium leading-6 text-gray-900"
-                                            passive
-                                        >
-                                            I need a DOI
-                                        </SwitchLabel>
-                                    </SwitchGroup>
-
+                                <div class="mt-4 flex flex-col gap-1.5">
                                     <div
-                                        v-if="needsReservedDoi"
-                                        class="mt-3 space-y-2"
+                                        class="flex min-w-0 items-start justify-between gap-3"
                                     >
-                                        <div
-                                            class="flex w-full min-w-0 overflow-hidden rounded-lg border border-gray-300 bg-gray-50 shadow-sm"
+                                        <span
+                                            id="upload-doi-label"
+                                            class="text-xs font-medium normal-case tracking-normal text-gray-600"
                                         >
-                                            <input
-                                                id="upload-reserved-doi-preview"
-                                                type="text"
-                                                readonly
-                                                tabindex="-1"
-                                                class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 font-mono text-sm text-gray-800 outline-none"
-                                                :value="reservedDoiPreview"
-                                                aria-describedby="upload-reserved-doi-hint"
-                                            />
-                                            <button
-                                                type="button"
-                                                class="inline-flex shrink-0 items-center gap-1.5 border-l border-gray-200 bg-white px-3 py-2 text-sm font-medium text-teal-700 transition hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
-                                                @click="
-                                                    copyReservedDoiToClipboard()
-                                                "
-                                            >
-                                                <ClipboardDocumentIcon
-                                                    class="h-4 w-4 shrink-0"
-                                                    aria-hidden="true"
-                                                />
-                                                Copy
-                                            </button>
-                                        </div>
-                                        <p
-                                            id="upload-reserved-doi-hint"
-                                            class="text-xs leading-relaxed text-gray-500"
-                                        >
-                                            Reserve a DOI by pressing the button
-                                            (so it can be included in files prior
-                                            to upload). The DOI is registered
-                                            when your upload is published.
-                                        </p>
-                                        <p
+                                            Digital Object Identifier
+                                        </span>
+                                        <span
                                             v-if="doiCopySucceeded"
-                                            class="text-xs font-medium text-teal-600"
+                                            class="shrink-0 text-right text-xs font-medium leading-snug text-teal-700"
                                             role="status"
                                             aria-live="polite"
                                         >
                                             Copied to clipboard.
-                                        </p>
+                                        </span>
                                     </div>
+                                    <template v-if="project?.provisional_doi">
+                                        <div class="space-y-2">
+                                            <div
+                                                class="flex w-full min-w-0 overflow-hidden rounded-lg border border-gray-300 bg-gray-50 shadow-sm"
+                                            >
+                                                <input
+                                                    id="upload-reserved-doi-preview"
+                                                    type="text"
+                                                    readonly
+                                                    tabindex="-1"
+                                                    class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 font-mono text-sm text-gray-800 outline-none"
+                                                    :value="
+                                                        reservedDoiDisplayUrl
+                                                    "
+                                                    aria-labelledby="upload-doi-label"
+                                                    aria-describedby="upload-reserved-doi-hint-persisted"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex shrink-0 items-center gap-1.5 border-l border-gray-200 bg-white px-3 py-2 text-sm font-medium text-teal-700 transition hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
+                                                    @click="
+                                                        copyReservedDoiToClipboard()
+                                                    "
+                                                >
+                                                    <ClipboardDocumentIcon
+                                                        class="h-4 w-4 shrink-0"
+                                                        aria-hidden="true"
+                                                    />
+                                                    Copy
+                                                </button>
+                                            </div>
+                                            <p
+                                                id="upload-reserved-doi-hint-persisted"
+                                                class="text-xs leading-relaxed text-gray-500"
+                                            >
+                                                This provisional DOI is saved
+                                                for this draft. Copy the URL to
+                                                cite it in your files or
+                                                manuscripts; it will be
+                                                registered when you publish this
+                                                submission.
+                                            </p>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <SwitchGroup
+                                            as="div"
+                                            class="flex items-start gap-3"
+                                        >
+                                            <div
+                                                class="flex shrink-0 items-center gap-2"
+                                                :aria-busy="
+                                                    provisionalDoiLoading
+                                                "
+                                            >
+                                                <HeadlessSwitch
+                                                    :model-value="needsReservedDoi"
+                                                    :disabled="
+                                                        provisionalDoiLoading
+                                                    "
+                                                    :class="[
+                                                        needsReservedDoi
+                                                            ? 'bg-teal-600'
+                                                            : 'bg-gray-200',
+                                                        provisionalDoiLoading
+                                                            ? 'cursor-wait opacity-70'
+                                                            : 'cursor-pointer',
+                                                        'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+                                                    ]"
+                                                    @update:model-value="
+                                                        onReservedDoiSwitch(
+                                                            $event
+                                                        )
+                                                    "
+                                                >
+                                                    <span class="sr-only"
+                                                        >Reserve a provisional
+                                                        DOI for this draft</span
+                                                    >
+                                                    <span
+                                                        aria-hidden="true"
+                                                        :class="[
+                                                            needsReservedDoi
+                                                                ? 'translate-x-5'
+                                                                : 'translate-x-0',
+                                                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                                        ]"
+                                                    />
+                                                </HeadlessSwitch>
+                                                <svg
+                                                    v-if="
+                                                        provisionalDoiLoading
+                                                    "
+                                                    class="h-5 w-5 shrink-0 animate-spin text-teal-600"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    aria-hidden="true"
+                                                >
+                                                    <circle
+                                                        class="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        stroke-width="4"
+                                                    ></circle>
+                                                    <path
+                                                        class="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                            <SwitchLabel
+                                                as="span"
+                                                class="cursor-pointer select-none text-sm font-medium leading-6 text-gray-900"
+                                                passive
+                                            >
+                                                Reserve a provisional DOI for
+                                                this draft
+                                            </SwitchLabel>
+                                        </SwitchGroup>
+                                        <p
+                                            v-if="provisionalDoiError"
+                                            class="text-xs font-medium text-red-600"
+                                            role="alert"
+                                            aria-live="polite"
+                                        >
+                                            {{ provisionalDoiError }}
+                                        </p>
+
+                                        <div
+                                            v-if="needsReservedDoi"
+                                            class="mt-3 space-y-2"
+                                        >
+                                            <div
+                                                class="flex w-full min-w-0 overflow-hidden rounded-lg border border-gray-300 bg-gray-50 shadow-sm"
+                                            >
+                                                <input
+                                                    id="upload-reserved-doi-preview-pending"
+                                                    type="text"
+                                                    readonly
+                                                    tabindex="-1"
+                                                    class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 font-mono text-sm text-gray-800 outline-none"
+                                                    :value="
+                                                        reservedDoiDisplayUrl
+                                                    "
+                                                    aria-labelledby="upload-doi-label"
+                                                    aria-describedby="upload-reserved-doi-hint"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex shrink-0 items-center gap-1.5 border-l border-gray-200 bg-white px-3 py-2 text-sm font-medium text-teal-700 transition hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
+                                                    @click="
+                                                        copyReservedDoiToClipboard()
+                                                    "
+                                                >
+                                                    <ClipboardDocumentIcon
+                                                        class="h-4 w-4 shrink-0"
+                                                        aria-hidden="true"
+                                                    />
+                                                    Copy
+                                                </button>
+                                            </div>
+                                            <p
+                                                id="upload-reserved-doi-hint"
+                                                class="text-xs leading-relaxed text-gray-500"
+                                            >
+                                                Copy this preview URL to cite
+                                                the dataset in your files or
+                                                manuscripts. The identifier is
+                                                registered when you publish this
+                                                submission.
+                                            </p>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -417,9 +531,9 @@
         </template>
         <!-- End of Header -->
 
-        <div class="relative">
-            <div v-if="!loading">
-                <div class="mx-auto">
+        <div class="relative flex min-h-0 flex-1 flex-col">
+            <div v-if="!loading" class="flex min-h-0 flex-1 flex-col">
+                <div class="mx-auto flex w-full min-h-0 flex-1 flex-col">
                     <div
                         v-if="drafts.length > 0 && !currentDraft"
                         class="px-12"
@@ -753,27 +867,49 @@
                             </div>
                         </div>
                         <div v-else>
-                            <div v-if="currentStep && currentDraft">
+                            <div
+                                v-if="currentStep && currentDraft"
+                                class="flex min-h-0 flex-1 flex-col overflow-hidden"
+                            >
                                 <div
                                     v-if="currentStep.id == '1'"
                                     id="submission-dropzone"
-                                    class="border-gray-100"
+                                    class="flex min-h-0 flex-1 flex-col overflow-hidden border-gray-100"
                                 >
-                                    <div class="mx-5 pt-4">
+                                    <div
+                                        v-if="filesErrorMessage"
+                                        class="mx-5 mb-3 pt-4"
+                                    >
                                         <div
-                                            class="text-red-600"
-                                            v-html="
-                                                sanitizeHtml(filesErrorMessage)
-                                            "
-                                        ></div>
+                                            role="alert"
+                                            class="flex gap-3 rounded-lg border border-red-200 bg-red-50/95 px-4 py-3 shadow-sm ring-1 ring-red-900/5 dark:border-red-900/60 dark:bg-red-950/50 dark:ring-red-500/10"
+                                        >
+                                            <ExclamationCircleIcon
+                                                class="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400"
+                                                aria-hidden="true"
+                                            />
+                                            <div
+                                                class="min-w-0 flex-1 text-sm font-medium leading-relaxed text-red-900 dark:text-red-100 [&_a]:font-semibold [&_a]:text-red-800 [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-colors hover:[&_a]:text-red-950 dark:[&_a]:text-red-200 dark:hover:[&_a]:text-red-50"
+                                                v-html="
+                                                    sanitizeHtml(
+                                                        filesErrorMessage
+                                                    )
+                                                "
+                                            ></div>
+                                        </div>
                                     </div>
-                                    <div class="relative bg-white mt-3">
-                                        <div id="tour-step-upload-spectra">
+                                    <div
+                                        class="relative mt-3 flex min-h-0 flex-1 flex-col overflow-hidden bg-white"
+                                    >
+                                        <div
+                                            id="tour-step-upload-spectra"
+                                            class="flex min-h-0 flex-1 flex-col overflow-hidden"
+                                        >
                                             <file-system-browser
                                                 ref="fsbRef"
                                                 :readonly="false"
                                                 :draft="currentDraft"
-                                                :height="'h-[calc(100vh-285px)]'"
+                                                :height="'h-full w-full flex-1'"
                                                 @loading="filesLoading"
                                             ></file-system-browser>
                                         </div>
@@ -783,7 +919,10 @@
                                         class="mt-2"
                                     />
                                 </div>
-                                <div v-if="currentStep.id == '2'">
+                                <div
+                                    v-if="currentStep.id == '2'"
+                                    class="flex min-h-0 flex-1 flex-col"
+                                >
                                     <div
                                         class="h-[calc(100vh-135px)] overflow-hidden"
                                     >
@@ -2675,6 +2814,8 @@ export default {
             needsReservedDoi: false,
             doiCopySucceeded: false,
             doiCopyResetTimer: null,
+            provisionalDoiLoading: false,
+            provisionalDoiError: null,
         };
     },
     computed: {
@@ -2715,6 +2856,16 @@ export default {
             }
 
             return `https://doi.org/10.5281/nmrxiv.preview.draft-${this.currentDraft.id}`;
+        },
+        reservedDoiDisplayUrl() {
+            if (this.project?.provisional_doi_url) {
+                return this.project.provisional_doi_url;
+            }
+            if (this.project?.provisional_doi) {
+                const host = "https://doi.org".replace(/\/$/, "");
+                return `${host}/${this.project.provisional_doi}`;
+            }
+            return this.reservedDoiPreview;
         },
         primed() {
             return this.$page.props.auth.user?.primed;
@@ -2865,7 +3016,9 @@ export default {
         },
         async copyReservedDoiToClipboard() {
             try {
-                await navigator.clipboard.writeText(this.reservedDoiPreview);
+                await navigator.clipboard.writeText(
+                    this.reservedDoiDisplayUrl
+                );
                 this.doiCopySucceeded = true;
                 if (this.doiCopyResetTimer) {
                     clearTimeout(this.doiCopyResetTimer);
@@ -2961,6 +3114,96 @@ export default {
         fetchDraftById(draftId) {
             return axios.get("/dashboard/drafts/" + draftId + "/show");
         },
+        syncNeedsReservedFromProject() {
+            this.needsReservedDoi = !!(
+                this.project && this.project.provisional_doi
+            );
+        },
+        hydrateProvisionalDoiFromDraftInfo() {
+            if (!this.currentDraft?.id) {
+                return Promise.resolve();
+            }
+            return axios
+                .get("/dashboard/drafts/" + this.currentDraft.id + "/info")
+                .then((response) => {
+                    const p = response.data.project;
+                    if (!p) {
+                        this.needsReservedDoi = false;
+                        return;
+                    }
+                    if (this.project && this.project.id === p.id) {
+                        this.project = {
+                            ...this.project,
+                            provisional_doi: p.provisional_doi ?? null,
+                            provisional_doi_url:
+                                p.provisional_doi_url ?? null,
+                        };
+                    } else {
+                        this.project = p;
+                    }
+                    this.syncNeedsReservedFromProject();
+                })
+                .catch(() => {});
+        },
+        applyProvisionalPayloadToProject(payload) {
+            if (!payload?.provisional_doi) {
+                return;
+            }
+            this.project = {
+                ...(this.project || {}),
+                provisional_doi: payload.provisional_doi,
+                provisional_doi_url: payload.url ?? null,
+            };
+            this.syncNeedsReservedFromProject();
+        },
+        stripProvisionalFromProject() {
+            if (!this.project) {
+                return;
+            }
+            const next = { ...this.project };
+            delete next.provisional_doi;
+            next.provisional_doi_url = null;
+            this.project = next;
+            this.syncNeedsReservedFromProject();
+        },
+        async onReservedDoiSwitch(wantsOn) {
+            if (this.provisionalDoiLoading || !this.currentDraft?.id) {
+                return;
+            }
+            this.provisionalDoiError = null;
+            this.provisionalDoiLoading = true;
+            const prev = this.needsReservedDoi;
+            this.needsReservedDoi = wantsOn;
+            try {
+                if (wantsOn) {
+                    const { data } = await axios.post(
+                        "/dashboard/drafts/" +
+                            this.currentDraft.id +
+                            "/provisional-doi"
+                    );
+                    this.applyProvisionalPayloadToProject(data);
+                    await this.hydrateProvisionalDoiFromDraftInfo();
+                } else {
+                    await axios.delete(
+                        "/dashboard/drafts/" +
+                            this.currentDraft.id +
+                            "/provisional-doi"
+                    );
+                    this.stripProvisionalFromProject();
+                }
+            } catch (e) {
+                this.needsReservedDoi = prev;
+                const msg =
+                    e.response?.data?.message ||
+                    (Array.isArray(e.response?.data?.errors?.name)
+                        ? e.response.data.errors.name[0]
+                        : null) ||
+                    "Could not update the provisional DOI. Please try again.";
+                this.provisionalDoiError = msg;
+            } finally {
+                this.provisionalDoiLoading = false;
+            }
+        },
         formatStatus(status) {
             if (!status) return "";
 
@@ -2987,6 +3230,7 @@ export default {
         selectDraft(draft) {
             this.needsReservedDoi = false;
             this.doiCopySucceeded = false;
+            this.provisionalDoiError = null;
             if (this.doiCopyResetTimer) {
                 clearTimeout(this.doiCopyResetTimer);
                 this.doiCopyResetTimer = null;
@@ -3013,6 +3257,7 @@ export default {
                 } else {
                     this.selectStep(1);
                 }
+                this.hydrateProvisionalDoiFromDraftInfo();
             });
         },
         createNewDraft() {
@@ -3167,6 +3412,7 @@ export default {
         },
         process() {
             this.errorMessage = null;
+            this.filesErrorMessage = null;
             let foldersExist = false;
             this.$refs.fsbRef.file.children.forEach((fso) => {
                 if (fso.has_children) {
@@ -3213,6 +3459,7 @@ export default {
                     this.loadingStep = false;
                     this.project = response.data.project;
                     this.studies = response.data.studies;
+                    this.syncNeedsReservedFromProject();
                     if (
                         this.project &&
                         this.studies &&
@@ -3280,6 +3527,7 @@ export default {
                     this.loadingStep = false;
                     this.project = response.data.project;
                     this.studies = response.data.studies;
+                    this.syncNeedsReservedFromProject();
                     this.fetchValidations();
                     this.spectraLoadingStatus = false;
                     this.inprogressStudies = this.studies.filter(
@@ -3734,6 +3982,7 @@ export default {
                     this.loadingStep = false;
                     this.project = response.data.project;
                     this.studies = response.data.studies;
+                    this.syncNeedsReservedFromProject();
                     this.fetchValidations();
                     this.spectraLoadingStatus = false;
                 });

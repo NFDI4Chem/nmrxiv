@@ -1,10 +1,16 @@
 <template>
-    <div class="tooltip">
+    <div
+        class="tooltip shrink-0 rounded-full p-0.5 text-blue-600 outline-none hover:bg-gray-100 hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+        tabindex="0"
+        role="button"
+        aria-label="More information"
+    >
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 ml-2"
+            class="h-4 w-4"
             viewBox="0 0 20 20"
             fill="currentColor"
+            aria-hidden="true"
         >
             <path
                 fill-rule="evenodd"
