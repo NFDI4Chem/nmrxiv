@@ -24,7 +24,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
     /**
      * The project instance.
      *
-     * @var \App\Models\Project
+     * @var Project
      */
     public $project;
 
@@ -181,7 +181,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
     /**
      * Get the S3 storage client instance.
      *
-     * @return \Aws\S3\S3Client
+     * @return S3Client
      */
     protected function storageClient()
     {

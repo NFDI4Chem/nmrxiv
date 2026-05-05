@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Jobs;
 
+use App\Actions\Draft\DraftProcessingLogger;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
+use App\Services\PathGeneratorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -40,12 +42,12 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $method->setAccessible(true);
 
         // Mock the PathGeneratorService
-        $pathGenerator = $this->createMock(\App\Services\PathGeneratorService::class);
+        $pathGenerator = $this->createMock(PathGeneratorService::class);
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
         // Mock the DraftProcessingLogger (actual class lives under App\Actions\Draft)
-        $logger = $this->createMock(\App\Actions\Draft\DraftProcessingLogger::class);
+        $logger = $this->createMock(DraftProcessingLogger::class);
 
         try {
             // This will fail because we're not actually extracting a real zip,
@@ -88,12 +90,12 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $method->setAccessible(true);
 
         // Mock the PathGeneratorService
-        $pathGenerator = $this->createMock(\App\Services\PathGeneratorService::class);
+        $pathGenerator = $this->createMock(PathGeneratorService::class);
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
         // Mock the DraftProcessingLogger (actual class lives under App\Actions\Draft)
-        $logger = $this->createMock(\App\Actions\Draft\DraftProcessingLogger::class);
+        $logger = $this->createMock(DraftProcessingLogger::class);
 
         try {
             // This will fail because we're not actually extracting a real zip,

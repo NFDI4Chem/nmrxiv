@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\License;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,19 +14,19 @@ class LicenseModelTest extends TestCase
     public function test_it_has_many_projects(): void
     {
         $license = License::factory()->create();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $license->projects());
+        $this->assertInstanceOf(HasMany::class, $license->projects());
     }
 
     public function test_it_has_many_studies(): void
     {
         $license = License::factory()->create();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $license->studies());
+        $this->assertInstanceOf(HasMany::class, $license->studies());
     }
 
     public function test_it_has_many_datasets(): void
     {
         $license = License::factory()->create();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $license->datasets());
+        $this->assertInstanceOf(HasMany::class, $license->datasets());
     }
 
     public function test_it_has_correct_fillable_attributes(): void

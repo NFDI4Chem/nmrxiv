@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Study\AddStudyMember;
 use App\Models\StudyInvitation;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -14,7 +15,7 @@ class StudyInvitationController extends Controller
      * Accept a study invitation.
      *
      * @param  \Laravel\Jetstream\StudyInvitation  $invitation
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function acceptInvitation(Request $request, StudyInvitation $invitation)
     {
@@ -36,7 +37,7 @@ class StudyInvitationController extends Controller
      * Cancel the given study invitation.
      *
      * @param  \Laravel\Jetstream\StudyInvitation  $invitation
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroyInvitation(Request $request, StudyInvitation $invitation)
     {

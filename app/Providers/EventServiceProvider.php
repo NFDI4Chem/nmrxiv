@@ -6,8 +6,10 @@ use App\Events\DraftProcessed;
 use App\Events\StudyPublish;
 use App\Listeners\SendDraftProcessedNotification;
 use App\Listeners\StudyPublish as StudyPublishListener;
+use App\Services\Socialite\NFDIAAI\Provider;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -43,9 +45,9 @@ class EventServiceProvider extends ServiceProvider
         // Manually register event listeners as fallback
         Event::listen(DraftProcessed::class, SendDraftProcessedNotification::class);
         Event::listen(StudyPublish::class, StudyPublishListener::class);
-        Event::listen(function (\SocialiteProviders\Manager\SocialiteWasCalled $event) {
+        Event::listen(function (SocialiteWasCalled $event) {
             // Canonical slug for NFDI AAI provider is 'regapp' (matches IdP registered callback URI)
-            $event->extendSocialite('regapp', \App\Services\Socialite\NFDIAAI\Provider::class);
+            $event->extendSocialite('regapp', Provider::class);
         });
     }
 }

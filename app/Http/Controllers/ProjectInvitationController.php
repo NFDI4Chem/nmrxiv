@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Project\AddProjectMember;
 use App\Models\ProjectInvitation;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -14,7 +15,7 @@ class ProjectInvitationController extends Controller
      * Accept a project invitation.
      *
      * @param  \Laravel\Jetstream\ProjectInvitation  $invitation
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function acceptInvitation(Request $request, ProjectInvitation $invitation)
     {
@@ -36,7 +37,7 @@ class ProjectInvitationController extends Controller
      * Cancel the given project invitation.
      *
      * @param  \Laravel\Jetstream\ProjectInvitation  $invitation
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroyInvitation(Request $request, ProjectInvitation $invitation)
     {
