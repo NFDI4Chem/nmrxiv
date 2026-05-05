@@ -81,7 +81,9 @@
                                         / 3 -
                                         <span v-if="currentStep.id == '1'">
                                             <span
-                                                v-if="showPrimer && currentDraft"
+                                                v-if="
+                                                    showPrimer && currentDraft
+                                                "
                                             >
                                                 Introduction
                                             </span>
@@ -121,7 +123,8 @@
                                                 <label
                                                     for="comments"
                                                     class="text-sm font-medium text-gray-700"
-                                                    >Don't show this again</label
+                                                    >Don't show this
+                                                    again</label
                                                 >
                                             </div>
                                             <jet-button
@@ -390,55 +393,32 @@
                                         </div>
                                     </template>
                                     <template v-else>
-                                        <SwitchGroup
-                                            as="div"
-                                            class="flex items-start gap-3"
-                                        >
-                                            <div
-                                                class="flex shrink-0 items-center gap-2"
+                                        <div class="flex flex-col gap-2">
+                                            <button
+                                                type="button"
+                                                class="group inline-flex w-fit max-w-full shrink-0 cursor-pointer items-center gap-2 self-start rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition duration-150 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                                                :class="
+                                                    needsReservedDoi
+                                                        ? 'border border-gray-300 bg-white text-gray-800 hover:border-gray-400 hover:bg-gray-50 hover:shadow-md active:bg-gray-100'
+                                                        : 'border border-gray-800/35 bg-gray-900 text-white hover:border-gray-800 hover:bg-gray-800 hover:shadow-md active:bg-gray-950'
+                                                "
+                                                :disabled="
+                                                    provisionalDoiLoading ||
+                                                    !currentDraft?.id
+                                                "
                                                 :aria-busy="
                                                     provisionalDoiLoading
                                                 "
+                                                :aria-pressed="needsReservedDoi"
+                                                @click="
+                                                    onReservedDoiSwitch(
+                                                        !needsReservedDoi
+                                                    )
+                                                "
                                             >
-                                                <HeadlessSwitch
-                                                    :model-value="needsReservedDoi"
-                                                    :disabled="
-                                                        provisionalDoiLoading
-                                                    "
-                                                    :class="[
-                                                        needsReservedDoi
-                                                            ? 'bg-teal-600'
-                                                            : 'bg-gray-200',
-                                                        provisionalDoiLoading
-                                                            ? 'cursor-wait opacity-70'
-                                                            : 'cursor-pointer',
-                                                        'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
-                                                    ]"
-                                                    @update:model-value="
-                                                        onReservedDoiSwitch(
-                                                            $event
-                                                        )
-                                                    "
-                                                >
-                                                    <span class="sr-only"
-                                                        >Reserve a provisional
-                                                        DOI for this draft</span
-                                                    >
-                                                    <span
-                                                        aria-hidden="true"
-                                                        :class="[
-                                                            needsReservedDoi
-                                                                ? 'translate-x-5'
-                                                                : 'translate-x-0',
-                                                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                                        ]"
-                                                    />
-                                                </HeadlessSwitch>
                                                 <svg
-                                                    v-if="
-                                                        provisionalDoiLoading
-                                                    "
-                                                    class="h-5 w-5 shrink-0 animate-spin text-teal-600"
+                                                    v-if="provisionalDoiLoading"
+                                                    class="h-4 w-4 shrink-0 animate-spin text-current"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     fill="none"
                                                     viewBox="0 0 24 24"
@@ -458,16 +438,29 @@
                                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                                     ></path>
                                                 </svg>
-                                            </div>
-                                            <SwitchLabel
-                                                as="span"
-                                                class="cursor-pointer select-none text-sm font-medium leading-6 text-gray-900"
-                                                passive
+                                                <span>{{
+                                                    needsReservedDoi
+                                                        ? "Remove provisional DOI"
+                                                        : "Reserve provisional DOI"
+                                                }}</span>
+                                                <ChevronRightIcon
+                                                    v-if="
+                                                        !needsReservedDoi &&
+                                                        !provisionalDoiLoading
+                                                    "
+                                                    class="h-4 w-4 shrink-0 opacity-90 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                            <p
+                                                class="text-xs leading-relaxed text-gray-500"
                                             >
                                                 Reserve a provisional DOI for
-                                                this draft
-                                            </SwitchLabel>
-                                        </SwitchGroup>
+                                                this draft so you can cite it in
+                                                files or manuscripts before
+                                                publication.
+                                            </p>
+                                        </div>
                                         <p
                                             v-if="provisionalDoiError"
                                             class="text-xs font-medium text-red-600"
@@ -2642,12 +2635,8 @@ import {
 import {
     ArrowLeftIcon,
     ClipboardDocumentIcon,
+    ChevronRightIcon,
 } from "@heroicons/vue/24/outline";
-import {
-    Switch as HeadlessSwitch,
-    SwitchGroup,
-    SwitchLabel,
-} from "@headlessui/vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
@@ -2685,9 +2674,7 @@ export default {
         ExclamationCircleIcon,
         ArrowLeftIcon,
         ClipboardDocumentIcon,
-        HeadlessSwitch,
-        SwitchGroup,
-        SwitchLabel,
+        ChevronRightIcon,
     },
     mixins: [Global],
     props: ["draft_id"],
@@ -3016,9 +3003,7 @@ export default {
         },
         async copyReservedDoiToClipboard() {
             try {
-                await navigator.clipboard.writeText(
-                    this.reservedDoiDisplayUrl
-                );
+                await navigator.clipboard.writeText(this.reservedDoiDisplayUrl);
                 this.doiCopySucceeded = true;
                 if (this.doiCopyResetTimer) {
                     clearTimeout(this.doiCopyResetTimer);
@@ -3135,8 +3120,7 @@ export default {
                         this.project = {
                             ...this.project,
                             provisional_doi: p.provisional_doi ?? null,
-                            provisional_doi_url:
-                                p.provisional_doi_url ?? null,
+                            provisional_doi_url: p.provisional_doi_url ?? null,
                         };
                     } else {
                         this.project = p;
