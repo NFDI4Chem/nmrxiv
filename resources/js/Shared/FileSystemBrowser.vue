@@ -55,16 +55,28 @@
                         <div
                             class="flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-1"
                         >
-                            <span
+                            <div
                                 v-if="draft && draft.key"
-                                class="cursor-default select-all text-xs font-medium tabular-nums text-gray-500"
-                                title="Draft reference"
+                                class="flex flex-wrap items-center gap-x-3 gap-y-1"
                             >
-                                Draft ID:
-                                <span class="font-mono text-gray-700">{{
-                                    draft.key
-                                }}</span>
-                            </span>
+                                <span
+                                    class="cursor-default select-all text-xs font-medium tabular-nums text-gray-500"
+                                    title="Draft reference"
+                                >
+                                    Draft ID:
+                                    <span class="font-mono text-gray-700">{{
+                                        draft.key
+                                    }}</span>
+                                </span>
+                                <button
+                                    v-if="draftHasProcessingLogs"
+                                    type="button"
+                                    class="text-xs font-semibold text-teal-700 underline decoration-teal-700/40 underline-offset-2 transition hover:text-teal-900 hover:decoration-teal-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                    @click="$emit('show-processing-logs')"
+                                >
+                                    Logs
+                                </button>
+                            </div>
 
                             <!-- Missing files warning (shown when files are missing) -->
                             <a
@@ -1579,10 +1591,7 @@ export default {
      */
     props: ["draft", "readonly", "height", "project"],
 
-    /**
-     * Events emitted by this component
-     */
-    emits: ["loading", "proceed"],
+    emits: ["loading", "proceed", "show-processing-logs"],
 
     /**
      * Component reactive data
@@ -1641,6 +1650,9 @@ export default {
             // Resizable sidebar
             sidebarWidth: 320, // Default sidebar width in pixels
             isResizing: false, // Whether sidebar is being resized
+
+            // Debounce: folder drag/drop adds files asynchronously; wait before checksums
+            checksumScheduleTimer: null,
         };
     },
     /**
@@ -1676,6 +1688,19 @@ export default {
                 this.file &&
                     Array.isArray(this.file.children) &&
                     this.file.children.length > 0
+            );
+        },
+
+        /**
+         * Whether the draft has server-side processing log entries to show.
+         *
+         * @returns {boolean}
+         */
+        draftHasProcessingLogs() {
+            return (
+                Boolean(this.draft) &&
+                Array.isArray(this.draft.processing_logs) &&
+                this.draft.processing_logs.length > 0
             );
         },
 
@@ -2249,6 +2274,10 @@ export default {
             if (this.dropzone) {
                 this.dropzone.removeAllFiles();
             }
+            if (this.checksumScheduleTimer != null) {
+                clearTimeout(this.checksumScheduleTimer);
+                this.checksumScheduleTimer = null;
+            }
             this.precentageUpload = 0;
             this.totalFilesCount = 0;
             this.uploadedFilesCount = 0;
@@ -2274,8 +2303,95 @@ export default {
                 this.dropzone.removeAllFiles();
             }
 
+            if (this.checksumScheduleTimer != null) {
+                clearTimeout(this.checksumScheduleTimer);
+                this.checksumScheduleTimer = null;
+            }
+
             // Update busy status
             this.updateBusyStatus(false);
+        },
+
+        /**
+         * Wait until Dropzone's file queue stops growing, then run checksums.
+         * Folder drag/drop (and large picks) can add files in waves with pauses
+         * longer than a fixed debounce; polling until length stabilizes ensures
+         * MD5/SHA are computed for every queued File like the folder input path.
+         */
+        scheduleChecksumsAfterFilesQueued() {
+            if (this.checksumScheduleTimer != null) {
+                clearTimeout(this.checksumScheduleTimer);
+                this.checksumScheduleTimer = null;
+            }
+
+            const stabilityMs = 450;
+            const maxWaitMs = 120000;
+            const startedAt = Date.now();
+
+            const pollUntilQueueStable = () => {
+                const snapshot = this.dropzone?.files?.length ?? 0;
+
+                this.checksumScheduleTimer = setTimeout(() => {
+                    const current = this.dropzone?.files?.length ?? 0;
+
+                    if (current !== snapshot) {
+                        if (Date.now() - startedAt > maxWaitMs) {
+                            this.checksumScheduleTimer = null;
+                            if (current > 0) {
+                                this.runChecksumsAndStartUploadForQueuedFiles();
+                            }
+
+                            return;
+                        }
+
+                        pollUntilQueueStable();
+
+                        return;
+                    }
+
+                    this.checksumScheduleTimer = null;
+
+                    if (current > 0) {
+                        this.runChecksumsAndStartUploadForQueuedFiles();
+                    }
+                }, stabilityMs);
+            };
+
+            pollUntilQueueStable();
+        },
+
+        /**
+         * Calculate checksums for every file Dropzone has queued, then start batched upload.
+         *
+         * @returns {Promise<void>}
+         */
+        async runChecksumsAndStartUploadForQueuedFiles() {
+            const vm = this;
+
+            if (!vm.dropzone || vm.dropzone.files.length === 0) {
+                return;
+            }
+
+            vm.updateBusyStatus(true);
+
+            const queueFiles = vm.dropzone.files.slice();
+
+            await vm.calculateChecksumsForFiles(queueFiles);
+
+            vm.$nextTick(() => {
+                setTimeout(() => {
+                    const timer = setInterval(() => {
+                        if (vm.totalFilesCount === vm.selectedFSO.length) {
+                            clearInterval(timer);
+                            vm.status = "BATCH UPLOAD STARTED";
+                            vm.processFilesSequentially(vm);
+                        } else {
+                            vm.totalFilesCount = vm.selectedFSO.length;
+                            vm.status = "CALCULATING CHECKSUMS";
+                        }
+                    }, 500);
+                });
+            });
         },
 
         /**
@@ -3042,64 +3158,12 @@ export default {
                         };
                     }
                     vm.selectedFSO.push(file);
+                    vm.scheduleChecksumsAfterFilesQueued();
                 });
-                vm.dropzone.on("addedfiles", (files) => {
-                    if (files.length > 0) {
-                        this.updateBusyStatus(true);
-
-                        // Convert FileList to array for processing
-                        let filesArray = [];
-                        for (let i = 0; i < files.length; i++) {
-                            filesArray.push(files[i]);
-                        }
-
-                        // Extract real File objects from Dropzone wrappers if needed
-                        const realFilesArray = filesArray.map((file) => {
-                            // If it's a Dropzone wrapper object, try to extract the real File
-                            if (
-                                "upload" in file &&
-                                file.upload &&
-                                file.upload.file
-                            ) {
-                                return file.upload.file;
-                            }
-                            // If it doesn't have slice method but has other properties, it might be wrapped
-                            if (
-                                typeof file.slice !== "function" &&
-                                file instanceof File === false
-                            ) {
-                                // Try to find the original file object in the wrapper
-                                for (const key in file) {
-                                    if (file[key] instanceof File) {
-                                        return file[key];
-                                    }
-                                }
-                            }
-                            return file; // Return as-is if it seems to be a real File object
-                        });
-
-                        // Calculate checksums for all files before processing
-                        vm.calculateChecksumsForFiles(realFilesArray).then(
-                            () => {
-                                setTimeout(() => {
-                                    var timer = setInterval(function () {
-                                        if (
-                                            vm.totalFilesCount ===
-                                            vm.selectedFSO.length
-                                        ) {
-                                            clearInterval(timer);
-                                            vm.status = "BATCH UPLOAD STARTED";
-                                            vm.processFilesSequentially(vm);
-                                        } else {
-                                            vm.totalFilesCount =
-                                                vm.selectedFSO.length;
-                                            vm.status = "CALCULATING CHECKSUMS";
-                                        }
-                                    }, 500);
-                                });
-                            }
-                        );
-                    }
+                vm.dropzone.on("addedfiles", () => {
+                    // Intentionally empty: folder drag/drop and paste queue files
+                    // asynchronously: `addedfiles` can fire before all files are
+                    // added. Checksums are scheduled from `addedfile` (debounced).
                 });
                 vm.dropzone.on("queuecomplete", () => {
                     vm.handleQueueComplete();
