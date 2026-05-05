@@ -384,6 +384,11 @@
                                                     @loading="
                                                         updateLoadingStatus
                                                     "
+                                                    @show-processing-logs="
+                                                        showProcessingLogs(
+                                                            currentDraft
+                                                        )
+                                                    "
                                                 ></file-system-browser>
                                             </div>
                                             <jet-input-error
