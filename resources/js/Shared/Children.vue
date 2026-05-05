@@ -351,7 +351,10 @@
                                                     v-for="subItem in sortedChildren(
                                                         sfile.children
                                                     )"
-                                                    :key="subItem.id ?? subItem.name"
+                                                    :key="
+                                                        subItem.id ??
+                                                        subItem.name
+                                                    "
                                                     as="div"
                                                     class="cursor-pointer group w-full flex pl-4 pr-2 py-0 font-medium text-gray-600 rounded-md"
                                                     @click.stop="
@@ -654,9 +657,7 @@ export default {
             }
 
             const mode =
-                this.treeSortBy === "timestamp"
-                    ? "timestamp"
-                    : "alphabetical";
+                this.treeSortBy === "timestamp" ? "timestamp" : "alphabetical";
             const order = this.treeSortOrder === "desc" ? "desc" : "asc";
             const mult = order === "asc" ? 1 : -1;
 

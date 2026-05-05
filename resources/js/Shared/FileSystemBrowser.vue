@@ -18,8 +18,8 @@
             fullScreen
                 ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
                 : height
-                  ? `min-h-0 ${height} overflow-hidden`
-                  : 'min-h-0 h-screen overflow-hidden',
+                ? `min-h-0 ${height} overflow-hidden`
+                : 'min-h-0 h-screen overflow-hidden',
             'bg-white rounded-lg',
         ]"
     >
@@ -33,9 +33,7 @@
                         class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 pr-2 sm:pr-5"
                     >
                         <!-- Documentation link with tooltip -->
-                        <div
-                            class="min-w-0 flex-1 text-sm text-gray-700"
-                        >
+                        <div class="min-w-0 flex-1 text-sm text-gray-700">
                             <div
                                 class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3"
                             >
@@ -346,9 +344,7 @@
             <div
                 v-else-if="hasProjectFiles"
                 :class="[
-                    fullScreen
-                        ? 'overflow-hidden h-full relative px-6'
-                        : '',
+                    fullScreen ? 'overflow-hidden h-full relative px-6' : '',
                     'flex min-h-0 min-w-0 flex-1',
                 ]"
             >
@@ -373,7 +369,10 @@
                             role="toolbar"
                             aria-label="Folder sort"
                         >
-                            <HeadlessMenu as="div" class="relative z-40 inline-flex">
+                            <HeadlessMenu
+                                as="div"
+                                class="relative z-40 inline-flex"
+                            >
                                 <MenuButton
                                     type="button"
                                     class="inline-flex items-center rounded p-0 text-gray-600 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
@@ -404,8 +403,8 @@
                                                     'alphabetical'
                                                         ? 'bg-gray-900 text-white'
                                                         : active
-                                                          ? 'bg-gray-100 text-gray-900'
-                                                          : 'bg-white text-gray-700',
+                                                        ? 'bg-gray-100 text-gray-900'
+                                                        : 'bg-white text-gray-700',
                                                     'flex w-full items-center gap-2 rounded-t-lg px-3 py-2 text-left text-sm',
                                                 ]"
                                                 @click="
@@ -428,8 +427,8 @@
                                                     treeSortBy === 'timestamp'
                                                         ? 'bg-gray-900 text-white'
                                                         : active
-                                                          ? 'bg-gray-100 text-gray-900'
-                                                          : 'bg-white text-gray-700',
+                                                        ? 'bg-gray-100 text-gray-900'
+                                                        : 'bg-white text-gray-700',
                                                     'flex w-full items-center gap-2 rounded-b-lg px-3 py-2 text-left text-sm',
                                                 ]"
                                                 @click="
@@ -455,8 +454,8 @@
                                             ? 'Oldest first — click to show newest first'
                                             : 'A to Z — click for Z to A'
                                         : treeSortBy === 'timestamp'
-                                          ? 'Newest first — click to show oldest first'
-                                          : 'Z to A — click for A to Z'
+                                        ? 'Newest first — click to show oldest first'
+                                        : 'Z to A — click for A to Z'
                                 "
                                 :aria-label="
                                     treeSortOrder === 'asc'
@@ -670,7 +669,9 @@
                                         )
                                     }}
                                 </p>
-                                <div class="flex items-center space-x-2 flex-shrink-0 ml-3">
+                                <div
+                                    class="flex items-center space-x-2 flex-shrink-0 ml-3"
+                                >
                                     <!-- View Toggle -->
                                     <div
                                         class="flex rounded-md border border-gray-200 overflow-hidden"
@@ -739,372 +740,398 @@
                                 overflowY: 'scroll',
                             }"
                         >
-                        <!-- List View Table Header -->
-                        <div v-if="viewMode === 'list'" class="mt-2">
-                            <div
-                                class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
-                            >
+                            <!-- List View Table Header -->
+                            <div v-if="viewMode === 'list'" class="mt-2">
                                 <div
-                                    class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600"
+                                    class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
                                 >
-                                    <div class="col-span-4">
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                                            title="Sort by name"
-                                            aria-label="Sort by name"
-                                            @click="sortFiles('name')"
-                                        >
-                                            <QueueListIconOutline
-                                                class="h-4 w-4 shrink-0"
-                                                :class="
-                                                    sortBy === 'name'
-                                                        ? 'text-gray-900'
-                                                        : 'text-gray-600'
-                                                "
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronUpOutlineIcon
-                                                v-if="
-                                                    sortBy === 'name' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronDownOutlineIcon
-                                                v-else-if="
-                                                    sortBy === 'name' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-3">
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                                            title="Sort by date modified"
-                                            aria-label="Sort by date modified"
-                                            @click="sortFiles('date')"
-                                        >
-                                            <ClockIconOutline
-                                                class="h-4 w-4 shrink-0"
-                                                :class="
-                                                    sortBy === 'date'
-                                                        ? 'text-gray-900'
-                                                        : 'text-gray-600'
-                                                "
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronUpOutlineIcon
-                                                v-if="
-                                                    sortBy === 'date' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronDownOutlineIcon
-                                                v-else-if="
-                                                    sortBy === 'date' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                                            title="Sort by size"
-                                            aria-label="Sort by size"
-                                            @click="sortFiles('size')"
-                                        >
-                                            <ScaleIconOutline
-                                                class="h-4 w-4 shrink-0"
-                                                :class="
-                                                    sortBy === 'size'
-                                                        ? 'text-gray-900'
-                                                        : 'text-gray-600'
-                                                "
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronUpOutlineIcon
-                                                v-if="
-                                                    sortBy === 'size' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronDownOutlineIcon
-                                                v-else-if="
-                                                    sortBy === 'size' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                                            title="Sort by kind"
-                                            aria-label="Sort by kind"
-                                            @click="sortFiles('kind')"
-                                        >
-                                            <TagIconOutline
-                                                class="h-4 w-4 shrink-0"
-                                                :class="
-                                                    sortBy === 'kind'
-                                                        ? 'text-gray-900'
-                                                        : 'text-gray-600'
-                                                "
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronUpOutlineIcon
-                                                v-if="
-                                                    sortBy === 'kind' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                            <ChevronDownOutlineIcon
-                                                v-else-if="
-                                                    sortBy === 'kind' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-1">
-                                        <!-- Download column - no header text -->
+                                    <div
+                                        class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600"
+                                    >
+                                        <div class="col-span-4">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by name"
+                                                aria-label="Sort by name"
+                                                @click="sortFiles('name')"
+                                            >
+                                                <QueueListIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'name'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'name' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'name' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-3">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by date modified"
+                                                aria-label="Sort by date modified"
+                                                @click="sortFiles('date')"
+                                            >
+                                                <ClockIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'date'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'date' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'date' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by size"
+                                                aria-label="Sort by size"
+                                                @click="sortFiles('size')"
+                                            >
+                                                <ScaleIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'size'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'size' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'size' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by kind"
+                                                aria-label="Sort by kind"
+                                                @click="sortFiles('kind')"
+                                            >
+                                                <TagIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'kind'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'kind' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'kind' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-1">
+                                            <!-- Download column - no header text -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <ul
-                            role="list"
-                            :class="[
-                                'mb-3',
-                                viewMode === 'grid'
-                                    ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
-                                    : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md',
-                            ]"
-                        >
-                            <li
-                                v-for="file in sortedFiles"
-                                :key="file.key"
+                            <ul
+                                role="list"
                                 :class="[
+                                    'mb-3',
                                     viewMode === 'grid'
-                                        ? 'relative shadow rounded-lg'
-                                        : 'hover:bg-gray-50',
+                                        ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
+                                        : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md',
                                 ]"
                             >
-                                <!-- Grid View Layout -->
-                                <template v-if="viewMode === 'grid'">
-                                    <div
-                                        style="user-select: none"
-                                        class="hover:cursor-pointer"
-                                        @dblclick.stop="displaySelected(file)"
-                                    >
+                                <li
+                                    v-for="file in sortedFiles"
+                                    :key="file.key"
+                                    :class="[
+                                        viewMode === 'grid'
+                                            ? 'relative shadow rounded-lg'
+                                            : 'hover:bg-gray-50',
+                                    ]"
+                                >
+                                    <!-- Grid View Layout -->
+                                    <template v-if="viewMode === 'grid'">
                                         <div
-                                            class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                            style="user-select: none"
+                                            class="hover:cursor-pointer"
+                                            @dblclick.stop="
+                                                displaySelected(file)
+                                            "
                                         >
-                                            <span
-                                                v-if="file.type == 'directory'"
+                                            <div
+                                                class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
                                             >
-                                                <FolderIcon
-                                                    class="cursor-pointer h-28 w-28 text-teal-600 flex-shrink-0 mx-auto"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                            <span v-else>
-                                                <DocumentTextIcon
-                                                    class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                            <span
-                                                v-if="file.status == 'missing'"
-                                                class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
-                                            >
-                                                <div
-                                                    class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-                                                >
-                                                    <svg
-                                                        class="h-6 w-6 text-red-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke-width="1.5"
-                                                        stroke="currentColor"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
-                                            </span>
-                                        </div>
-                                        <p
-                                            class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
-                                        >
-                                            <span
-                                                class="float-left"
-                                                :title="file.name"
-                                            >
-                                                {{
-                                                    truncateMiddle(
-                                                        file.name,
-                                                        25
-                                                    )
-                                                }}
-                                            </span>
-                                        </p>
-                                        <div
-                                            class="flex items-center justify-between px-2 pb-1"
-                                        >
-                                            <p
-                                                class="text-sm font-medium text-gray-500"
-                                            >
-                                                {{ formatFileSize(file) }}
-                                            </p>
-                                            <a
-                                                v-if="
-                                                    file.type !== 'directory' &&
-                                                    readonly
-                                                "
-                                                :href="getFileDownloadURL(file)"
-                                                class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
-                                                title="Download file"
-                                                @click.stop
-                                            >
-                                                <ArrowDownTrayIcon
-                                                    class="h-4 w-4"
-                                                />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- List View Layout -->
-                                <template v-else>
-                                    <div
-                                        class="px-3 py-3 grid grid-cols-12 gap-4 items-center"
-                                    >
-                                        <!-- Name Column -->
-                                        <div
-                                            class="col-span-4 flex items-center"
-                                        >
-                                            <div class="flex-shrink-0 mr-3">
-                                                <FolderIcon
+                                                <span
                                                     v-if="
                                                         file.type == 'directory'
                                                     "
-                                                    class="cursor-pointer h-5 w-5 text-teal-600"
-                                                    aria-hidden="true"
-                                                    @dblclick.stop="
-                                                        displaySelected(file)
+                                                >
+                                                    <FolderIcon
+                                                        class="cursor-pointer h-28 w-28 text-teal-600 flex-shrink-0 mx-auto"
+                                                        aria-hidden="true"
+                                                    />
+                                                </span>
+                                                <span v-else>
+                                                    <DocumentTextIcon
+                                                        class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                        aria-hidden="true"
+                                                    />
+                                                </span>
+                                                <span
+                                                    v-if="
+                                                        file.status == 'missing'
                                                     "
-                                                />
-                                                <DocumentTextIcon
-                                                    v-else
-                                                    class="h-5 w-5 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
+                                                    class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
+                                                >
+                                                    <div
+                                                        class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                                                    >
+                                                        <svg
+                                                            class="h-6 w-6 text-red-600"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke-width="1.5"
+                                                            stroke="currentColor"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </span>
                                             </div>
-                                            <div class="min-w-0 flex-1">
-                                                <p
-                                                    class="text-sm font-medium text-gray-900 truncate"
+                                            <p
+                                                class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
+                                            >
+                                                <span
+                                                    class="float-left"
                                                     :title="file.name"
                                                 >
-                                                    {{ file.name }}
+                                                    {{
+                                                        truncateMiddle(
+                                                            file.name,
+                                                            25
+                                                        )
+                                                    }}
+                                                </span>
+                                            </p>
+                                            <div
+                                                class="flex items-center justify-between px-2 pb-1"
+                                            >
+                                                <p
+                                                    class="text-sm font-medium text-gray-500"
+                                                >
+                                                    {{ formatFileSize(file) }}
                                                 </p>
+                                                <a
+                                                    v-if="
+                                                        file.type !==
+                                                            'directory' &&
+                                                        readonly
+                                                    "
+                                                    :href="
+                                                        getFileDownloadURL(file)
+                                                    "
+                                                    class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
+                                                    title="Download file"
+                                                    @click.stop
+                                                >
+                                                    <ArrowDownTrayIcon
+                                                        class="h-4 w-4"
+                                                    />
+                                                </a>
                                             </div>
                                         </div>
+                                    </template>
 
-                                        <!-- Date Modified Column -->
-                                        <div class="col-span-3">
-                                            <p class="text-sm text-gray-500">
-                                                {{
-                                                    formatDate(
-                                                        file.updated_at ||
-                                                            file.created_at
-                                                    )
-                                                }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Size Column -->
-                                        <div class="col-span-2">
-                                            <p class="text-sm text-gray-500">
-                                                {{
-                                                    file.type === "directory"
-                                                        ? "--"
-                                                        : formatFileSize(file)
-                                                }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Kind Column -->
-                                        <div class="col-span-2">
-                                            <p class="text-sm text-gray-500">
-                                                {{
-                                                    file.type === "directory"
-                                                        ? "Folder"
-                                                        : "Document"
-                                                }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Download Column -->
+                                    <!-- List View Layout -->
+                                    <template v-else>
                                         <div
-                                            class="col-span-1 flex justify-center"
+                                            class="px-3 py-3 grid grid-cols-12 gap-4 items-center"
                                         >
-                                            <a
-                                                v-if="
-                                                    file.type !== 'directory' &&
-                                                    readonly
-                                                "
-                                                :href="getFileDownloadURL(file)"
-                                                class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
-                                                title="Download file"
+                                            <!-- Name Column -->
+                                            <div
+                                                class="col-span-4 flex items-center"
                                             >
-                                                <ArrowDownTrayIcon
-                                                    class="h-5 w-5"
-                                                />
-                                            </a>
-                                            <!-- No download icon for folders -->
+                                                <div class="flex-shrink-0 mr-3">
+                                                    <FolderIcon
+                                                        v-if="
+                                                            file.type ==
+                                                            'directory'
+                                                        "
+                                                        class="cursor-pointer h-5 w-5 text-teal-600"
+                                                        aria-hidden="true"
+                                                        @dblclick.stop="
+                                                            displaySelected(
+                                                                file
+                                                            )
+                                                        "
+                                                    />
+                                                    <DocumentTextIcon
+                                                        v-else
+                                                        class="h-5 w-5 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <p
+                                                        class="text-sm font-medium text-gray-900 truncate"
+                                                        :title="file.name"
+                                                    >
+                                                        {{ file.name }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Date Modified Column -->
+                                            <div class="col-span-3">
+                                                <p
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    {{
+                                                        formatDate(
+                                                            file.updated_at ||
+                                                                file.created_at
+                                                        )
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Size Column -->
+                                            <div class="col-span-2">
+                                                <p
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    {{
+                                                        file.type ===
+                                                        "directory"
+                                                            ? "--"
+                                                            : formatFileSize(
+                                                                  file
+                                                              )
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Kind Column -->
+                                            <div class="col-span-2">
+                                                <p
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    {{
+                                                        file.type ===
+                                                        "directory"
+                                                            ? "Folder"
+                                                            : "Document"
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Download Column -->
+                                            <div
+                                                class="col-span-1 flex justify-center"
+                                            >
+                                                <a
+                                                    v-if="
+                                                        file.type !==
+                                                            'directory' &&
+                                                        readonly
+                                                    "
+                                                    :href="
+                                                        getFileDownloadURL(file)
+                                                    "
+                                                    class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
+                                                    title="Download file"
+                                                >
+                                                    <ArrowDownTrayIcon
+                                                        class="h-5 w-5"
+                                                    />
+                                                </a>
+                                                <!-- No download icon for folders -->
+                                            </div>
                                         </div>
-                                    </div>
-                                </template>
-                            </li>
-                        </ul>
+                                    </template>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    <div v-else class="flex min-h-0 flex-1 flex-col overflow-hidden">
+                    <div
+                        v-else
+                        class="flex min-h-0 flex-1 flex-col overflow-hidden"
+                    >
                         <!-- File detail header -->
                         <div
                             v-if="$page.props.selectedFileSystemObject"
                             class="flex-shrink-0 px-5 py-3 border-b border-gray-100 bg-gray-50"
                         >
-                            <div
-                                class="flex items-center justify-between"
-                            >
+                            <div class="flex items-center justify-between">
                                 <p
                                     class="font-semibold text-sm text-gray-800 truncate"
                                     :title="
@@ -1114,8 +1141,7 @@
                                 >
                                     {{
                                         truncateMiddle(
-                                            $page.props
-                                                .selectedFileSystemObject
+                                            $page.props.selectedFileSystemObject
                                                 .relative_url,
                                             50
                                         )
@@ -1126,9 +1152,8 @@
                                 >
                                     <button
                                         v-if="
-                                            $page.props
-                                                .selectedFileSystemObject.id &&
-                                            !readonly
+                                            $page.props.selectedFileSystemObject
+                                                .id && !readonly
                                         "
                                         class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
                                         @click="confirmFSODeletion"
@@ -1141,8 +1166,8 @@
                                     </button>
                                     <a
                                         v-if="
-                                            $page.props
-                                                .selectedFileSystemObject.id &&
+                                            $page.props.selectedFileSystemObject
+                                                .id &&
                                             readonly &&
                                             downloadURL
                                         "
@@ -1389,7 +1414,12 @@ import {
     Squares2X2Icon as Squares2X2OutlineIcon,
 } from "@heroicons/vue/24/outline";
 
-import { Menu as HeadlessMenu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
+import {
+    Menu as HeadlessMenu,
+    MenuButton,
+    MenuItems,
+    MenuItem,
+} from "@headlessui/vue";
 
 // Utility imports
 import ChecksumCalculator from "@/Utils/ChecksumCalculator.js";
@@ -1882,20 +1912,21 @@ export default {
          */
         handleBeforeUnload(event) {
             // Check if upload is in progress
-            const uploadInProgress = this.dropzone && this.status && this.precentageUpload < 100;
-            
+            const uploadInProgress =
+                this.dropzone && this.status && this.precentageUpload < 100;
+
             // Check if deletion is in progress
             const deletionInProgress = this.isDeletingFiles;
-            
+
             if (uploadInProgress || deletionInProgress) {
                 // Standard way to trigger confirmation dialog
                 event.preventDefault();
-                
+
                 // Set appropriate message based on operation
-                const message = uploadInProgress 
+                const message = uploadInProgress
                     ? "Files are being uploaded. Are you sure you want to leave?"
                     : "Files are being deleted. Are you sure you want to leave?";
-                
+
                 // Chrome requires returnValue to be set
                 event.returnValue = message;
                 return event.returnValue;
@@ -2302,7 +2333,8 @@ export default {
         onResize(event) {
             if (!this.isResizing || !this.$refs.sidebarRef) return;
             const containerLeft =
-                this.$refs.sidebarRef.parentElement.getBoundingClientRect().left;
+                this.$refs.sidebarRef.parentElement.getBoundingClientRect()
+                    .left;
             let newWidth = event.clientX - containerLeft;
             // Clamp between min 180px and max 600px
             newWidth = Math.max(180, Math.min(600, newWidth));
@@ -3415,8 +3447,7 @@ export default {
         },
 
         toggleTreeSortOrder() {
-            this.treeSortOrder =
-                this.treeSortOrder === "asc" ? "desc" : "asc";
+            this.treeSortOrder = this.treeSortOrder === "asc" ? "desc" : "asc";
             this.persistTreeSortPreferences();
         },
 
