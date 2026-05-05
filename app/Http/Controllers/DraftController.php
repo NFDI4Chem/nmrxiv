@@ -89,7 +89,7 @@ class DraftController extends Controller
      */
     public function show(Request $request, Draft $draft): JsonResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
         [$user_id] = $user->getUserTeamData();
 
