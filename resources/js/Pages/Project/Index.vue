@@ -8,7 +8,7 @@
                 </div>
             </div>
         </div> -->
-        <span v-if="projects.length <= 0">
+        <span v-if="projects && projects.length <= 0">
             <div v-if="mode == 'create' && editableTeamRole" class="mt-4">
                 <div class="px-6 py-4 bg-white shadow-md rounded-lg">
                     <div class="flex items-center">
@@ -34,10 +34,17 @@
                     </div>
                     <div class="mt-3 max-w-2xl text-sm text-gray-700">
                         nmrXiv is organized around projects. Projects can
-                        contain as many samples as you wish and each sample
-                        receives its very own URL. Use the "UPLOAD" button on
-                        the upper left side to start uploading projects or
-                        samples. To learn more, check out our documentation.
+                        include multiple samples, and each sample is assigned
+                        its own URL. To begin uploading projects or samples, use
+                        the Submit Data button. For more information, please
+                        refer to our
+                        <a
+                            href="https://docs.nmrxiv.org/introduction/intro"
+                            target="_blank"
+                            class="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
+                        >
+                            documentation </a
+                        >.
                     </div>
                     <!-- <button
                         type="button"
