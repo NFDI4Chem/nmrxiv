@@ -43,6 +43,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | BrowserSync client (local only, optional)
+    |--------------------------------------------------------------------------
+    |
+    | When set (e.g. http://localhost:3000), app.blade.php loads the BrowserSync
+    | client for live reload. Leave unset if BrowserSync is not running on that
+    | port (avoids net::ERR_CONNECTION_REFUSED in the console).
+    |
+    */
+
+    'browser_sync_client_url' => env('BROWSER_SYNC_CLIENT_URL'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Description
     |--------------------------------------------------------------------------
     |
