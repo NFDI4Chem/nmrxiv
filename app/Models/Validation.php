@@ -85,13 +85,15 @@ class Validation extends Model
     public function process()
     {
         $project = $this->project;
-        $project->load('tags', 'authors', 'citations');
+        $project->load('tags', 'authors', 'citations', 'draft');
 
         $report = $this->report;
 
         $status = true;
         $warnings = [];
         $errors = [];
+
+        $samplesMode = $project->draft && $project->draft->project_enabled === false;
 
         $schema_version = $project->schema_version ? $project->schema_version : config('validations.default');
 
@@ -206,7 +208,13 @@ class Validation extends Model
                         'files' => $instrumentType ? $instrumentType : null,
                         'nmrium_info' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
                         'assay' => $dataset->assay,
-                        'assignments' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
+                        // The validator rule for `assignments` is `array|min:1`,
+                        // so we only pass the actual saved entries (atom_peaks)
+                        // when present, plus an `acs` token when the user pasted
+                        // a free-form ACS string. Falling back to `has_nmrium`
+                        // here would have been a lie - it lets unfilled samples
+                        // pass validation just because spectra were imported.
+                        'assignments' => $this->assignmentsValueFor($dataset),
                     ];
 
                     $dataset_rules = $rules['dataset'];
@@ -247,13 +255,13 @@ class Validation extends Model
             $citations = $project->citations;
             $citationsValidation = [];
             $citationsStatus = $citations && $citations->isNotEmpty();
-            $shouldValidateCitationDoi = true;
+            $shouldValidateCitationDoi = ! $samplesMode;
 
-            if ($project->release_date) {
+            if ($shouldValidateCitationDoi && $project->release_date) {
                 $shouldValidateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
             }
 
-            if ($citationsStatus) {
+            if ($citations && $citations->isNotEmpty()) {
                 foreach ($citations as $citation) {
                     $citationReport = [
                         'name' => $citation->title ?? 'Untitled',
@@ -273,15 +281,20 @@ class Validation extends Model
 
                         $citationReport['status'] = $hasDoi;
                     } else {
-                        $citationReport['doi'] = 'true|skipped-future-release';
+                        $citationReport['doi'] = $samplesMode
+                            ? 'true|skipped-samples-mode'
+                            : 'true|skipped-future-release';
                         $citationReport['status'] = true;
                     }
 
                     $citationsValidation[] = $citationReport;
                 }
             }
-            // Set overall citations validation status and store detailed report
-            if ($citationsStatus) {
+
+            // In samples mode, citations are optional and DOIs are not enforced.
+            if ($samplesMode) {
+                $report['project']['citations'] = 'true|optional';
+            } elseif ($citationsStatus) {
                 $report['project']['citations'] = 'true|required';
             } else {
                 $report['project']['citations'] = 'false|required';
@@ -350,5 +363,31 @@ class Validation extends Model
         }
 
         return $data;
+    }
+
+    /**
+     * Build the value passed to the dataset's `assignments` validation rule
+     * (`array|min:1`). We satisfy `min:1` whenever the user has either
+     * pasted a non-empty ACS string OR added at least one atom_peaks row.
+     * Returns null when nothing is set so the rule fails cleanly and the
+     * UI sees `assignments: false|array|min:1` in the report.
+     */
+    protected function assignmentsValueFor(Dataset $dataset): ?array
+    {
+        $a = $dataset->assignments;
+        if (! is_array($a)) {
+            return null;
+        }
+        $entries = [];
+        if (! empty($a['acs']) && trim((string) $a['acs']) !== '') {
+            $entries[] = ['type' => 'acs'];
+        }
+        if (! empty($a['atom_peaks']) && is_array($a['atom_peaks'])) {
+            foreach ($a['atom_peaks'] as $row) {
+                $entries[] = $row;
+            }
+        }
+
+        return $entries === [] ? null : $entries;
     }
 }

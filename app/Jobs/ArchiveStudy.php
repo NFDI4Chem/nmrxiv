@@ -6,7 +6,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use Aws\S3\S3Client;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,11 +15,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
-class ArchiveStudy implements ShouldBeUnique, ShouldQueue
+class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 0;
+
+    /**
+     * Only ever run an archive job once. Failures must surface to Horizon
+     * rather than be retried, otherwise large zips re-run from scratch and
+     * compound the load on Ceph.
+     */
+    public $tries = 1;
 
     /**
      * The project instance.
@@ -45,6 +52,17 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
     }
 
     /**
+     * Bound the unique lock so a crashed worker cannot strand it in Redis.
+     * The lock is also released as soon as `handle()` starts (per
+     * ShouldBeUniqueUntilProcessing), so the only role of this TTL is the
+     * crash/kill safety net.
+     */
+    public function uniqueFor(): int
+    {
+        return 600;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
@@ -55,11 +73,18 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
         Log::info('Current timestamp: '.now()->toString());
 
         Log::info('Archiving study for projects '.$this->project->id);
-        $project = $this->project;
+        // Re-fetch the project so we see studies / files added between
+        // dispatch and handle. Without this, a job dispatched while a prior
+        // ArchiveStudy run was still working would observe stale state.
+        $project = Project::with('studies')->find($this->project->id);
         if ($project) {
             Log::info("Project {$project->id} studies count: ".$project->studies->count());
             foreach ($project->studies as $study) {
                 Log::info("Processing study {$study->id}");
+                // Refresh study state. The earlier reference held by `$project`
+                // could be stale if another job (or the FileSystemObject
+                // observer) updated `download_url` after we were enqueued.
+                $study->refresh();
                 $study->internal_status = 'processing';
                 $study->save();
                 $archiveDownloadURL = $study->download_url;

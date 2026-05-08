@@ -7,6 +7,7 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
+use App\Observers\FileSystemObjectObserver;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +24,8 @@ class FileSystemObjectService
 {
     public function __construct(
         private PathGeneratorService $pathGenerator,
-        private FileIntegrityService $integrityService
+        private FileIntegrityService $integrityService,
+        private FileSystemObjectObserver $fileSystemObjectObserver
     ) {}
 
     /**
@@ -344,6 +346,19 @@ class FileSystemObjectService
 
             // Get all objects to delete (for storage cleanup)
             $objectsToDelete = FileSystemObject::whereIn('id', $allIds)->get();
+
+            // Run the same study-side invalidation the observer would have
+            // run for a per-row delete. We MUST do this before the mass
+            // `Builder::delete()` below — Eloquent skips model events for
+            // mass deletes, so the observer would otherwise never fire and
+            // the affected study would silently keep its stale download_url,
+            // has_nmrium, internal_status, NMRium rows, etc. Resolving the
+            // study here also requires the parent chain to still exist,
+            // which is only true before the bulk delete.
+            $this->fileSystemObjectObserver->invalidateForExternalChange(
+                $fileSystemObject,
+                'service:bulk-delete'
+            );
 
             // Delete from storage first (before database deletion)
             foreach ($objectsToDelete as $obj) {

@@ -8,6 +8,7 @@ use App\Actions\Project\UpdateDOI;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Notifications\DraftProcessedNotification;
+use App\Services\DOI\DOIService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -15,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
@@ -110,7 +112,30 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
             }
             $updater->update($project->fresh());
 
+            $this->linkProvisionalDoiSafely($project->fresh());
+
             Notification::send($project->owner, new DraftProcessedNotification($project));
+        }
+    }
+
+    /**
+     * @see ProcessSubmission::linkProvisionalDoiSafely
+     */
+    private function linkProvisionalDoiSafely(Project $project): void
+    {
+        if (empty($project->provisional_doi) || empty($project->doi)) {
+            return;
+        }
+
+        try {
+            $project->linkProvisionalDoi(app(DOIService::class));
+        } catch (\Throwable $e) {
+            Log::warning('ProcessProject: linkProvisionalDoi failed; canonical DOI is still valid', [
+                'project_id' => $project->id,
+                'doi' => $project->doi,
+                'provisional_doi' => $project->provisional_doi,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

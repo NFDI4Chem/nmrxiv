@@ -44,6 +44,20 @@ class ArchiveStudyJobTest extends TestCase
         $this->assertEquals(0, $job->timeout);
     }
 
+    public function test_it_runs_only_once_to_avoid_partial_zip_retries(): void
+    {
+        $job = new ArchiveStudy($this->project);
+
+        $this->assertEquals(1, $job->tries);
+    }
+
+    public function test_unique_lock_expires_so_orphaned_locks_do_not_block_redispatch(): void
+    {
+        $job = new ArchiveStudy($this->project);
+
+        $this->assertGreaterThan(0, $job->uniqueFor());
+    }
+
     public function test_it_stores_project_in_constructor(): void
     {
         $job = new ArchiveStudy($this->project);

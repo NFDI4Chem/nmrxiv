@@ -22,6 +22,13 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
     public $timeout = 0;
 
     /**
+     * Only ever run an archive job once. Failures must surface to Horizon
+     * rather than be retried, otherwise large zips re-run from scratch and
+     * compound the load on Ceph.
+     */
+    public $tries = 1;
+
+    /**
      * The project instance.
      *
      * @var Project
@@ -42,6 +49,16 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
     public function uniqueId(): string
     {
         return $this->project->id;
+    }
+
+    /**
+     * How long (seconds) the unique lock should be held. Without this,
+     * a crashed/killed worker can leave the lock orphaned in redis and
+     * silently swallow every subsequent dispatch for this project.
+     */
+    public function uniqueFor(): int
+    {
+        return 14400;
     }
 
     /**
