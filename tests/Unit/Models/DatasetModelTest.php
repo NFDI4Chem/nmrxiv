@@ -101,6 +101,7 @@ class DatasetModelTest extends TestCase
             'dataset_photo_path',
             'license_id',
             'external_url',
+            'assignments',
         ];
 
         $dataset = new Dataset;
@@ -280,22 +281,48 @@ class DatasetModelTest extends TestCase
         $this->assertEquals($nmrium->id, $dataset->nmrium->id);
     }
 
-    public function test_it_has_one_fs_object(): void
+    public function test_it_resolves_fs_object_through_canonical_fs_id(): void
     {
-        $dataset = Dataset::factory()->create();
-
-        // Create FileSystemObject manually with required fields
+        // The canonical link is `datasets.fs_id -> file_system_objects.id`,
+        // set atomically when the dataset is created from a folder. The
+        // relationship must follow that FK rather than the back-pointer.
         $fsObject = FileSystemObject::create([
             'name' => 'test-file.txt',
             'slug' => 'test-file-txt',
             'key' => 'test-key',
             'uuid' => '123e4567-e89b-12d3-a456-426614174000',
-            'dataset_id' => $dataset->id,
         ]);
 
-        $dataset->refresh();
+        $dataset = Dataset::factory()->create(['fs_id' => $fsObject->id]);
+
         $this->assertInstanceOf(FileSystemObject::class, $dataset->fsObject);
         $this->assertEquals($fsObject->id, $dataset->fsObject->id);
+    }
+
+    public function test_fs_object_resolves_even_when_back_pointer_is_stale(): void
+    {
+        // Regression for the validation bug where every dataset's `files`
+        // rule failed for studies whose backing folders had a `dataset_id`
+        // back-pointer pointing at a different (orphan) dataset row -
+        // a state observed on study 48 after re-archive cycles. The
+        // relationship must use `datasets.fs_id`, not the back-pointer.
+        $orphanDataset = Dataset::factory()->create();
+        $fsObject = FileSystemObject::create([
+            'name' => 'real-folder',
+            'slug' => 'real-folder',
+            'key' => 'real-key',
+            'uuid' => '223e4567-e89b-12d3-a456-426614174001',
+        ]);
+        $fsObject->forceFill([
+            'instrument_type' => 'bruker',
+            'dataset_id' => $orphanDataset->id,
+        ])->save();
+
+        $dataset = Dataset::factory()->create(['fs_id' => $fsObject->id]);
+
+        $this->assertInstanceOf(FileSystemObject::class, $dataset->fsObject);
+        $this->assertEquals($fsObject->id, $dataset->fsObject->id);
+        $this->assertSame('bruker', $dataset->fsObject->instrument_type);
     }
 
     public function test_it_can_sort_by_rating(): void
