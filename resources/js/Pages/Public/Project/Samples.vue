@@ -1,6 +1,6 @@
 <template>
     <!-- Page header with dynamic title -->
-    <Head :title="'Samples - ' + project.data.name" />
+    <Head :title="'Compound library - ' + project.data.name" />
 
     <!-- Main layout wrapper -->
     <project-layout :project="project" :selected-tab="tab">
@@ -85,7 +85,7 @@
                                     <div
                                         class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
                                     >
-                                        No samples
+                                        No compounds
                                     </div>
                                 </div>
                             </div>

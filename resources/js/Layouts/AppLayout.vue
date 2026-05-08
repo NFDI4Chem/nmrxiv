@@ -119,7 +119,7 @@
                                         v-if="item.href && item.name"
                                         :href="item.href"
                                         :class="[
-                                            $page.url === item.href
+                                            primaryNavItemActive(item)
                                                 ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
                                                 : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
                                             'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg transition-all duration-200 ease-in-out',
@@ -128,7 +128,7 @@
                                         <component
                                             :is="item.icon"
                                             :class="[
-                                                $page.url === item.href
+                                                primaryNavItemActive(item)
                                                     ? 'text-gray-900'
                                                     : 'text-gray-400 group-hover:text-gray-600',
                                                 'h-5 w-5 flex-shrink-0 transition-colors duration-200',
@@ -153,7 +153,7 @@
                                             :key="child.name"
                                             :href="child.href"
                                             :class="[
-                                                $page.url === child.href
+                                                sidebarChildNavActive(child)
                                                     ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
                                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
                                                 'group flex items-center gap-3 px-3 py-2 text-sm rounded-r-lg transition-all duration-200',
@@ -162,7 +162,7 @@
                                             <component
                                                 :is="child.icon"
                                                 :class="[
-                                                    $page.url === child.href
+                                                    sidebarChildNavActive(child)
                                                         ? 'text-gray-700'
                                                         : 'text-gray-400 group-hover:text-gray-600',
                                                     'h-4 w-4 flex-shrink-0 transition-colors duration-200',
@@ -264,7 +264,7 @@
                                     <Link
                                         :href="item.href"
                                         :class="[
-                                            $page.url === item.href
+                                            primaryNavItemActive(item)
                                                 ? 'bg-gray-100 text-gray-900 shadow-sm'
                                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                                             'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out',
@@ -273,7 +273,7 @@
                                         <component
                                             :is="item.icon"
                                             :class="[
-                                                $page.url === item.href
+                                                primaryNavItemActive(item)
                                                     ? 'text-gray-900'
                                                     : 'text-gray-500 group-hover:text-gray-700',
                                                 'h-6 w-6 transition-colors duration-200',
@@ -301,7 +301,7 @@
                                     <Link
                                         :href="child.href"
                                         :class="[
-                                            $page.url === child.href
+                                            sidebarChildNavActive(child)
                                                 ? 'text-gray-900 shadow-sm'
                                                 : 'text-gray-700 hover:text-gray-600',
                                             'flex items-center justify-center w-12 h-12 rounded-lg transition-colors',
@@ -310,7 +310,7 @@
                                         <component
                                             :is="child.icon"
                                             :class="[
-                                                $page.url === child.href
+                                                sidebarChildNavActive(child)
                                                     ? 'text-gray-900'
                                                     : 'text-gray-500 group-hover:text-gray-600',
                                                 'h-5 w-5 transition-colors',
@@ -406,7 +406,7 @@
                                 v-if="item.name && item.href"
                                 :href="item.href"
                                 :class="[
-                                    $page.url === item.href
+                                    primaryNavItemActive(item)
                                         ? 'bg-gray-50 text-gray-900 font-medium border-l-2 border-gray-900'
                                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
                                     'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg transition-all duration-200 ease-in-out',
@@ -415,7 +415,7 @@
                                 <component
                                     :is="item.icon"
                                     :class="[
-                                        $page.url === item.href
+                                        primaryNavItemActive(item)
                                             ? 'text-gray-900'
                                             : 'text-gray-400 group-hover:text-gray-600',
                                         'h-5 w-5 flex-shrink-0 transition-colors duration-200',
@@ -437,7 +437,7 @@
                                     :key="child.name"
                                     :href="child.href"
                                     :class="[
-                                        $page.url === child.href
+                                        sidebarChildNavActive(child)
                                             ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
                                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
                                         'group flex items-center gap-3 px-3 py-2 text-sm rounded-r-lg transition-all duration-200',
@@ -446,7 +446,7 @@
                                     <component
                                         :is="child.icon"
                                         :class="[
-                                            $page.url === child.href
+                                            sidebarChildNavActive(child)
                                                 ? 'text-gray-700'
                                                 : 'text-gray-400 group-hover:text-gray-600',
                                             'h-4 w-4 flex-shrink-0 transition-colors duration-200',
@@ -989,7 +989,8 @@ const navigation = [
             {
                 auth: true,
                 name: "Shared with me",
-                href: "/dashboard/shared-with-me",
+                href: "/dashboard?workspace=shared",
+                workspace: "shared",
                 id: "tour-step-shared-with-me",
                 icon: UsersIcon,
                 bg: "bg-white",
@@ -997,7 +998,8 @@ const navigation = [
             {
                 auth: false,
                 name: "Recent",
-                href: "/dashboard/recent",
+                href: "/dashboard?workspace=recent",
+                workspace: "recent",
                 id: "tour-step-recent",
                 icon: ClockIcon,
                 bg: "bg-white",
@@ -1005,7 +1007,8 @@ const navigation = [
             {
                 auth: false,
                 name: "Starred",
-                href: "/dashboard/starred",
+                href: "/dashboard?workspace=starred",
+                workspace: "starred",
                 id: "tour-step-starred",
                 icon: StarIcon,
                 bg: "bg-white",
@@ -1013,7 +1016,8 @@ const navigation = [
             {
                 auth: false,
                 name: "Trash",
-                href: "/dashboard/trashed",
+                href: "/dashboard?workspace=trashed",
+                workspace: "trashed",
                 id: "tour-step-trash",
                 icon: TrashIcon,
                 bg: "bg-white",
@@ -1190,6 +1194,27 @@ export default {
             return this.$page.props.auth.user?.notifications
                 ? this.$page.props.auth.user?.notifications.length
                 : 0;
+        },
+        primaryNavItemActive(item) {
+            if (!item?.href) {
+                return false;
+            }
+            if (item.href === "/dashboard") {
+                const ws = this.$page.props.dashboardWorkspace;
+
+                return ws === "default" || ws === undefined || ws === null;
+            }
+
+            return this.$page.url === item.href;
+        },
+        sidebarChildNavActive(child) {
+            if (child.workspace) {
+                return (
+                    this.$page.props.dashboardWorkspace === child.workspace
+                );
+            }
+
+            return this.$page.url === child.href;
         },
     },
 };

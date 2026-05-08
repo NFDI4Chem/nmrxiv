@@ -75,6 +75,17 @@ class HandleInertiaRequests extends Middleware
             'dataciteURL' => config('doi.datacite.endpoint'),
             'coolOffPeriod' => config('nmrxiv.cool_off_period'),
             'mailFromAddress' => config('mail.from.address'),
+            'dashboardWorkspace' => function () use ($request) {
+                if (! $request->routeIs('dashboard')) {
+                    return null;
+                }
+
+                $workspace = $request->query('workspace');
+
+                return in_array($workspace, ['shared', 'recent', 'starred', 'trashed'], true)
+                    ? $workspace
+                    : 'default';
+            },
             'chemistryStandardizeUrl' => config('services.chemistry_standardize.url'),
             'orcidSearchApi' => config('orcid.search_api'),
             'orcidPersonApi' => config('orcid.person_api'),

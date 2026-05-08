@@ -1,65 +1,61 @@
 <template>
     <div
-        class="flex flex-col sm:flex-row sm:items-center text-sm sm:text-base text-gray-500 space-y-1 sm:space-y-0"
+        class="flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:gap-3"
     >
-        <!-- Icon and title (mobile) -->
-        <div class="flex items-center sm:hidden mb-1">
-            <CalendarDaysIcon
-                class="flex-shrink-0 h-4 w-4 text-teal-500 mr-2"
-                aria-hidden="true"
-            />
-        </div>
-
-        <!-- Desktop layout with icon -->
-        <div class="hidden sm:flex sm:items-center">
-            <CalendarDaysIcon
-                class="flex-shrink-0 h-5 w-5 text-teal-500 mr-2"
-                aria-hidden="true"
-            />
-        </div>
-
-        <!-- Date information -->
+        <CalendarDaysIcon
+            class="h-3.5 w-3.5 shrink-0 text-teal-500 sm:h-4 sm:w-4"
+            aria-hidden="true"
+        />
         <div
-            class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4"
+            class="flex min-w-0 flex-1 flex-col gap-2 text-gray-500 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 sm:gap-y-1"
         >
-            <!-- Published date -->
-            <div v-if="release_date" class="flex text-xs items-center">
-                <span class="font-medium text-gray-600 mr-1.5">Published:</span>
-                <span class="font-semibold text-gray-800">{{
-                    formatDate(release_date)
-                }}</span>
-            </div>
+            <template v-if="release_date">
+                <div class="flex flex-wrap items-baseline gap-x-1.5">
+                    <span class="font-medium text-gray-500 dark:text-gray-400"
+                        >Published</span
+                    >
+                    <span
+                        class="tabular-nums text-gray-800 dark:text-gray-200"
+                        >{{ formatRecordTimestamp(release_date) }}</span
+                    >
+                </div>
+                <span
+                    v-if="release_date && (created_at || updated_at)"
+                    class="hidden text-gray-300 sm:inline dark:text-gray-600"
+                    aria-hidden="true"
+                    >·</span
+                >
+            </template>
 
-            <!-- Separator for desktop -->
+            <template v-if="created_at">
+                <div class="flex flex-wrap items-baseline gap-x-1.5">
+                    <span class="font-medium text-gray-500 dark:text-gray-400"
+                        >Created</span
+                    >
+                    <span
+                        class="tabular-nums text-gray-800 dark:text-gray-200"
+                        >{{ formatRecordTimestamp(created_at) }}</span
+                    >
+                </div>
+                <span
+                    v-if="created_at && updated_at"
+                    class="hidden text-gray-300 sm:inline dark:text-gray-600"
+                    aria-hidden="true"
+                    >·</span
+                >
+            </template>
+
             <div
-                v-if="release_date && (created_at || updated_at)"
-                class="hidden sm:block text-gray-300"
+                v-if="updated_at"
+                class="flex flex-wrap items-baseline gap-x-1.5"
             >
-                •
-            </div>
-
-            <!-- Created date -->
-            <div v-if="created_at" class="flex text-xs items-center">
-                <span class="font-medium text-gray-600 mr-1.5">Created:</span>
-                <span class="font-semibold text-gray-800">{{
-                    formatDate(created_at)
-                }}</span>
-            </div>
-
-            <!-- Separator for desktop -->
-            <div
-                v-if="created_at && updated_at"
-                class="hidden sm:block text-gray-300"
-            >
-                •
-            </div>
-
-            <!-- Updated date -->
-            <div v-if="updated_at" class="flex text-xs items-center">
-                <span class="font-medium text-gray-600 mr-1.5">Updated:</span>
-                <span class="font-semibold text-gray-800">{{
-                    formatDateTime(updated_at)
-                }}</span>
+                <span class="font-medium text-gray-500 dark:text-gray-400"
+                    >Updated</span
+                >
+                <span
+                    class="tabular-nums text-gray-800 dark:text-gray-200"
+                    >{{ formatRecordTimestamp(updated_at) }}</span
+                >
             </div>
         </div>
     </div>

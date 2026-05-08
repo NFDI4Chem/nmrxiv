@@ -162,6 +162,19 @@ export default {
                 timeStyle: "short",
             }).format(date);
         },
+        /**
+         * Unified date+time display for record metadata (Published / Created / Updated rows).
+         */
+        formatRecordTimestamp(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+            const date = new Date(timestamp);
+            return new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+            }).format(date);
+        },
         md(data) {
             if (!data) return "";
 

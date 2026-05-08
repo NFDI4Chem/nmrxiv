@@ -189,14 +189,18 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
             ->name('submission');
-        Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
-            ->name('shared-with-me');
-        Route::get('starred', [DashboardController::class, 'starred'])
-            ->name('starred');
-        Route::get('trashed', [DashboardController::class, 'trashed'])
-            ->name('trashed');
-        Route::get('recent', [DashboardController::class, 'recent'])
-            ->name('recent');
+        Route::get('shared-with-me', function () {
+            return redirect()->route('dashboard', ['workspace' => 'shared']);
+        })->name('shared-with-me');
+        Route::get('starred', function () {
+            return redirect()->route('dashboard', ['workspace' => 'starred']);
+        })->name('starred');
+        Route::get('trashed', function () {
+            return redirect()->route('dashboard', ['workspace' => 'trashed']);
+        })->name('trashed');
+        Route::get('recent', function () {
+            return redirect()->route('dashboard', ['workspace' => 'recent']);
+        })->name('recent');
 
         Route::post('/storage/signed-draft-storage-url', [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url', [FileSystemController::class, 'signedStorageURL']);

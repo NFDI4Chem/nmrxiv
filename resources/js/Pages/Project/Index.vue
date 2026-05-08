@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w-full min-w-0">
         <!-- <div class="flex items-baseline justify-between">
             <div id="tour-step-projects">
                 <h2 class="text-lg">Projects</h2>
@@ -8,14 +8,19 @@
                 </div>
             </div>
         </div> -->
-        <span v-if="projects.length <= 0">
-            <div v-if="mode == 'create' && editableTeamRole" class="mt-4">
-                <div class="px-6 py-4 bg-white shadow-md rounded-lg">
-                    <div class="flex items-center">
+        <div v-if="projects.length <= 0" class="w-full min-w-0">
+            <div
+                v-if="mode == 'create' && editableTeamRole"
+                class="mt-4 w-full"
+            >
+                <div
+                    class="w-full rounded-lg border border-gray-200 bg-white px-6 py-7 shadow-sm ring-1 ring-black/[0.04]"
+                >
+                    <div class="flex items-center gap-3">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
-                            class="h-6 w-6"
+                            class="h-5 w-5 shrink-0"
                         >
                             <path
                                 d="M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z"
@@ -27,12 +32,14 @@
                             ></polygon>
                         </svg>
                         <div
-                            class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
+                            class="text-xs font-semibold uppercase tracking-wide text-gray-500"
                         >
-                            Create Your First Project
+                            Create your first project
                         </div>
                     </div>
-                    <div class="mt-3 max-w-2xl text-sm text-gray-700">
+                    <div
+                        class="mt-3 block w-full min-w-0 text-sm leading-relaxed text-gray-600"
+                    >
                         nmrXiv is organized around projects. Projects can
                         contain as many samples as you wish and each sample
                         receives its very own URL. Use the "UPLOAD" button on
@@ -70,272 +77,242 @@
             <div v-else>
                 <slot name="emptyText"></slot>
             </div>
-        </span>
-        <span v-else>
-            <div
+        </div>
+        <div
+            v-else
+            class="flex w-full min-w-0 flex-col items-stretch gap-5"
+        >
+            <article
                 v-for="project in projects"
                 :key="project.uuid"
-                class="mt-8 relative"
+                class="group relative flex w-full max-w-none min-w-0 flex-row overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm ring-1 ring-black/[0.04] transition-all duration-200 hover:border-gray-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:border-gray-800 dark:bg-gray-950 dark:ring-white/10"
             >
-                <div class="absolute rotate-90 -left-16 top-1/3">
+                <!-- Left status ribbon (Draft / Published / Embargo, …) -->
+                <aside
+                    v-if="project.status"
+                    class="flex w-11 shrink-0 flex-col items-center justify-center gap-1 border-r border-black/[0.06] px-0.5 py-3 text-center sm:w-12 sm:py-4"
+                    :class="statusRibbonSurface(project)"
+                    :aria-label="`Project status: ${statusRibbonLabel(project)}`"
+                >
+                    <component
+                        :is="statusRibbonIcon(project)"
+                        class="h-4 w-4 shrink-0"
+                        :class="statusRibbonIconTone(project)"
+                        aria-hidden="true"
+                    />
                     <span
-                        v-if="project.is_public"
-                        class="inline-flex bg-gray-100 px-4 items-center border-b border-l border-r rounded-b-md"
+                        class="max-w-[2.75rem] select-none text-[9px] font-bold uppercase leading-tight tracking-wide [text-orientation:mixed] [writing-mode:vertical-rl] sm:max-w-none sm:text-[10px]"
+                        :class="statusRibbonTextTone(project)"
                     >
-                        <svg
-                            class="h-3 w-3 text-green-400 inline"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 64 64"
-                            width="512"
-                            height="512"
-                        >
-                            <g id="globe">
-                                <path
-                                    d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
-                                />
-                                <path
-                                    d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
-                                />
-                                <path
-                                    d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
-                                />
-                            </g>
-                        </svg>
-                        <span class="ml-2">Public&nbsp;</span>
+                        {{ statusRibbonLabel(project) }}
                     </span>
-                    <span
-                        v-else
-                        class="inline-flex bg-red-100 px-4 items-center border-b border-l border-r rounded-b-md"
-                    >
-                        <svg
-                            id="Capa_1"
-                            class="h-3 w-3 text-gray-400 inline"
-                            version="1.1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            x="0px"
-                            y="0px"
-                            viewBox="0 0 512 512"
-                            style="enable-background: new 0 0 512 512"
-                            xml:space="preserve"
+                </aside>
+                <div class="flex min-w-0 flex-1 flex-col">
+                    <div class="px-4 py-4 sm:px-5">
+                        <!-- Title row + quick actions -->
+                        <div
+                            class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
                         >
-                            <g>
-                                <g>
-                                    <path
-                                        d="M437.333,192h-32v-42.667C405.333,66.99,338.344,0,256,0S106.667,66.99,106.667,149.333V192h-32
-    C68.771,192,64,196.771,64,202.667v266.667C64,492.865,83.135,512,106.667,512h298.667C428.865,512,448,492.865,448,469.333
-    V202.667C448,196.771,443.229,192,437.333,192z M287.938,414.823c0.333,3.01-0.635,6.031-2.656,8.292
-    c-2.021,2.26-4.917,3.552-7.948,3.552h-42.667c-3.031,0-5.927-1.292-7.948-3.552c-2.021-2.26-2.99-5.281-2.656-8.292l6.729-60.51
-    c-10.927-7.948-17.458-20.521-17.458-34.313c0-23.531,19.135-42.667,42.667-42.667s42.667,19.135,42.667,42.667
-    c0,13.792-6.531,26.365-17.458,34.313L287.938,414.823z M341.333,192H170.667v-42.667C170.667,102.281,208.948,64,256,64
-    s85.333,38.281,85.333,85.333V192z"
-                                    />
-                                </g>
-                            </g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                            <g></g>
-                        </svg>
-                        <span class="ml-2">Private</span>
-                    </span>
-                </div>
-                <div class="rounded overflow-hidden border shadow-lg">
-                    <div class="px-6 py-4">
-                        <div class="flex justify-between items-center bg-white">
                             <div
-                                class="flex-grow cursor-pointer"
+                                class="min-w-0 flex-1 cursor-pointer rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                                 @click="getLink(project)"
                             >
-                                <div class="grid grid-cols-1">
-                                    <div class="font-bold text-xl mb-2">
-                                        <span
-                                            class="cursor-pointer flex max-w-2xl break-words block"
-                                        >
-                                            <div class="float-end">
-                                                <StarIcon
-                                                    :class="[
-                                                        project.is_bookmarked
-                                                            ? 'text-yellow-400'
-                                                            : 'text-gray-200',
-                                                        'h-6 w-6 flex-shrink-0 -ml-1 mr-1',
-                                                    ]"
-                                                ></StarIcon>
-                                            </div>
-                                            {{ project.name }}
-                                            <ProjectStatusBadge
-                                                :project="project"
-                                            />
-                                            <div
-                                                class="flex items-baseline mt-1"
-                                            >
-                                                <span
-                                                    class="text-sm text-gray-600"
-                                                >
-                                                    <div
-                                                        v-if="
-                                                            (team &&
-                                                                team.id !=
-                                                                    project.team_id) ||
-                                                            project.owner_id !=
-                                                                $page.props.auth
-                                                                    .user.id
-                                                        "
-                                                        class="text-sm text-gray-600"
-                                                    >
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                                                        >
-                                                            Shared by:
-                                                            {{
-                                                                project.owner
-                                                                    ? project
-                                                                          .owner
-                                                                          .first_name
-                                                                    : ""
-                                                            }}
-                                                            {{
-                                                                project.owner
-                                                                    ? project
-                                                                          .owner
-                                                                          .last_name
-                                                                    : ""
-                                                            }}</span
-                                                        >
-                                                    </div>
-                                                </span>
-                                            </div>
-                                        </span>
-                                    </div>
-                                </div>
+                                <h2
+                                    class="break-words text-lg font-semibold leading-snug tracking-tight text-gray-900 transition-colors group-hover:text-indigo-700 sm:text-xl dark:text-gray-100 dark:group-hover:text-indigo-400"
+                                >
+                                    {{ project.name }}
+                                </h2>
                             </div>
-                            <div class="border-l cursor-pointer">
+                            <div
+                                class="flex shrink-0 items-center gap-1 sm:border-l sm:border-gray-100 sm:pl-4"
+                                @click.stop
+                            >
+                                <button
+                                    type="button"
+                                    class="rounded-lg p-1.5 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:hover:bg-gray-800"
+                                    :class="
+                                        project.is_bookmarked
+                                            ? 'text-amber-400'
+                                            : 'text-gray-300 hover:text-amber-400 dark:text-gray-600'
+                                    "
+                                    :aria-pressed="project.is_bookmarked"
+                                    :aria-label="
+                                        project.is_bookmarked
+                                            ? 'Remove project from starred'
+                                            : 'Star project'
+                                    "
+                                    @click.stop="toggleProjectStarred(project)"
+                                >
+                                    <StarIcon class="h-5 w-5" aria-hidden="true" />
+                                </button>
                                 <div class="tooltip">
                                     <a
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         :href="getProjectSummaryLink(project)"
-                                        class="text-gray-500 hover:text-gray-900"
+                                        class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                                        aria-label="Open project summary in a new tab"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="h-5 w-5 text-gray-600 ml-4"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                                            />
-                                        </svg>
+                                        <ArrowTopRightOnSquareIcon
+                                            class="h-5 w-5"
+                                        />
                                     </a>
                                     <span
-                                        class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                        >Open project in the summary view</span
+                                        class="tooltiptextbottom rounded-md bg-gray-900 px-2 py-1 text-center text-xs text-white shadow-lg"
+                                        >Summary view</span
                                     >
                                 </div>
-                                <div v-if="!project.is_public" class="tooltip">
+                                <div
+                                    v-if="!project.is_public"
+                                    class="tooltip"
+                                >
                                     <a
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         :href="getProjectSettingsLink(project)"
-                                        class="text-gray-500 hover:text-gray-900"
+                                        class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                                        aria-label="Open project settings in a new tab"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="h-5 w-5 text-gray-600 ml-4"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
-                                            />
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                        </svg>
+                                        <Cog6ToothIcon class="h-5 w-5" />
                                     </a>
                                     <span
-                                        class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                        >Open project settings view</span
+                                        class="tooltiptextbottom rounded-md bg-gray-900 px-2 py-1 text-center text-xs text-white shadow-lg"
+                                        >Settings</span
                                     >
                                 </div>
                             </div>
                         </div>
 
-                        <p
-                            v-if="project.description"
-                            class="text-gray-700 text-base line-clamp-2 ... pr-10"
+                        <!-- Shared owner -->
+                        <div
+                            v-if="
+                                (team && team.id != project.team_id) ||
+                                project.owner_id !=
+                                    $page.props.auth.user.id
+                            "
+                            class="mt-3"
                         >
-                            {{ project.description }}
-                        </p>
-                        <p
-                            v-else
-                            class="text-gray-500 text-base line-clamp-2 ... pr-10"
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-900 ring-1 ring-inset ring-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-200 dark:ring-indigo-900"
+                            >
+                                <UserCircleIcon
+                                    class="h-3.5 w-3.5 shrink-0 text-indigo-600 dark:text-indigo-400"
+                                    aria-hidden="true"
+                                />
+                                Shared by
+                                {{
+                                    project.owner
+                                        ? `${project.owner.first_name} ${project.owner.last_name}`
+                                        : ""
+                                }}
+                            </span>
+                        </div>
+
+                        <!-- Description + tags (compact block) -->
+                        <div class="mt-3 space-y-2">
+                            <p
+                                v-if="project.description"
+                                class="line-clamp-3 text-sm leading-snug text-gray-600 dark:text-gray-400"
+                            >
+                                {{ project.description }}
+                            </p>
+                            <p
+                                v-else
+                                class="text-sm leading-snug text-gray-400 dark:text-gray-500"
+                            >
+                                No description yet.
+                            </p>
+                            <div v-if="project.tags && project.tags.length">
+                                <Tag size="sm" :tags="project.tags" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer meta -->
+                    <div
+                        class="border-t border-gray-100 bg-gray-50/80 px-4 py-3 sm:px-5 dark:border-gray-800 dark:bg-gray-900/40"
+                    >
+                        <div
+                            class="flex flex-row flex-wrap items-center justify-between gap-x-4 gap-y-2"
                         >
-                            <i>-- No description --</i>
-                        </p>
-                    </div>
-                    <div class="px-6 pt-1 pb-2">
-                        <Tag :tags="project.tags" />
-                    </div>
-                    <div class="px-6 pt-2 border-t">
-                        <ShowProjectDates
-                            class="text-xs ml-0 mb-1"
-                            :release_date="project.release_date"
-                            :created_at="project.created_at"
-                            :updated_at="project.updated_at"
-                        />
+                            <ShowProjectDates
+                                class="min-w-0 flex-1"
+                                :release_date="project.release_date"
+                                :created_at="project.created_at"
+                                :updated_at="project.updated_at"
+                            />
+                            <span
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium tabular-nums"
+                                :class="
+                                    project.is_public
+                                        ? 'border-emerald-200/80 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200'
+                                        : 'border-gray-200 bg-gray-100 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200'
+                                "
+                            >
+                                <GlobeAltIcon
+                                    v-if="project.is_public"
+                                    class="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400"
+                                />
+                                <LockClosedIcon
+                                    v-else
+                                    class="h-3.5 w-3.5 shrink-0 text-gray-600 dark:text-gray-400"
+                                />
+                                {{ project.is_public ? "Public" : "Private" }}
+                            </span>
+                        </div>
                         <div
                             v-if="
                                 !project.is_public &&
                                 project.release_date &&
                                 project.doi
                             "
-                            class="float mt-1 border-t px-3 py-0.5 -mx-6 mt-4 text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                            class="mt-3 flex items-center gap-2 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
                         >
-                            &nbsp;&nbsp;
-                            <b
-                                >Release date:
-                                {{ formatDate(project.release_date) }}</b
-                            >
+                            <span class="font-semibold">Scheduled release</span>
+                            <span class="tabular-nums">{{
+                                formatRecordTimestamp(project.release_date)
+                            }}</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </span>
+            </article>
+        </div>
     </div>
 </template>
 <script>
 import { router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
+import {
+    ArchiveBoxIcon,
+    ArrowPathIcon,
+    ArrowTopRightOnSquareIcon,
+    CheckCircleIcon,
+    Cog6ToothIcon,
+    DocumentTextIcon,
+    GlobeAltIcon,
+    LockClosedIcon,
+    ShieldExclamationIcon,
+    TrashIcon,
+    UserCircleIcon,
+} from "@heroicons/vue/24/outline";
 import Tag from "@/Shared/Tag.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
-import ProjectStatusBadge from "@/Components/ProjectStatusBadge.vue";
 export default {
     components: {
         StarIcon,
+        ArrowTopRightOnSquareIcon,
+        Cog6ToothIcon,
+        ArchiveBoxIcon,
+        ArrowPathIcon,
+        DocumentTextIcon,
+        CheckCircleIcon,
+        GlobeAltIcon,
+        LockClosedIcon,
+        ShieldExclamationIcon,
+        TrashIcon,
+        UserCircleIcon,
         ShowProjectDates,
         Tag,
-        ProjectStatusBadge,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},
@@ -393,6 +370,103 @@ export default {
         },
         getProjectSettingsLink(project) {
             return route("dashboard.project.settings", [project.id]);
+        },
+        toggleProjectStarred(project) {
+            window.axios
+                .get(this.route("project.toggle-starred", [project.id]))
+                .then(() => {
+                    router.reload({ only: ["projects"] });
+                })
+                .catch(() => {});
+        },
+        statusRibbonKey(project) {
+            return String(project.status ?? "").toLowerCase();
+        },
+        statusRibbonLabel(project) {
+            const labels = {
+                deleted: "Deleted",
+                embargo: "Embargo",
+                draft: "Draft",
+                archived: "Archived",
+                published: "Published",
+                complete: "Complete",
+                processing: "Processing",
+            };
+            const key = this.statusRibbonKey(project);
+            if (!project.status) {
+                return "";
+            }
+            return (
+                labels[key] ??
+                String(project.status)
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())
+            );
+        },
+        statusRibbonSurface(project) {
+            const key = this.statusRibbonKey(project);
+            const surfaces = {
+                deleted:
+                    "bg-red-50 border-red-100/90 dark:bg-red-950/45 dark:border-red-900/55",
+                embargo:
+                    "bg-amber-50 border-amber-100 dark:bg-amber-950/45 dark:border-amber-900/55",
+                draft: "bg-rose-50 border-rose-100 dark:bg-rose-950/45 dark:border-rose-900/55",
+                archived:
+                    "bg-gray-100 border-gray-200 dark:bg-gray-800 dark:border-gray-700",
+                published:
+                    "bg-emerald-50 border-emerald-100 dark:bg-emerald-950/45 dark:border-emerald-900/55",
+                complete:
+                    "bg-emerald-50 border-emerald-100 dark:bg-emerald-950/45 dark:border-emerald-900/55",
+                processing:
+                    "bg-sky-50 border-sky-100 dark:bg-sky-950/45 dark:border-sky-900/55",
+            };
+            return (
+                surfaces[key] ??
+                "bg-gray-50 border-gray-200 dark:bg-gray-900 dark:border-gray-700"
+            );
+        },
+        statusRibbonIcon(project) {
+            const key = this.statusRibbonKey(project);
+            const icons = {
+                deleted: TrashIcon,
+                embargo: ShieldExclamationIcon,
+                draft: DocumentTextIcon,
+                archived: ArchiveBoxIcon,
+                published: CheckCircleIcon,
+                complete: CheckCircleIcon,
+                processing: ArrowPathIcon,
+            };
+            return icons[key] ?? DocumentTextIcon;
+        },
+        statusRibbonIconTone(project) {
+            const key = this.statusRibbonKey(project);
+            const tones = {
+                deleted: "text-red-700 dark:text-red-300",
+                embargo: "text-amber-800 dark:text-amber-300",
+                draft: "text-rose-800 dark:text-rose-300",
+                archived: "text-gray-700 dark:text-gray-300",
+                published: "text-emerald-700 dark:text-emerald-300",
+                complete: "text-emerald-700 dark:text-emerald-300",
+                processing: "text-sky-700 dark:text-sky-300",
+            };
+            return (
+                tones[key] ?? "text-gray-800 dark:text-gray-200"
+            );
+        },
+        statusRibbonTextTone(project) {
+            const key = this.statusRibbonKey(project);
+            const tones = {
+                deleted: "text-red-950 dark:text-red-100",
+                embargo: "text-amber-950 dark:text-amber-100",
+                draft: "text-rose-950 dark:text-rose-100",
+                archived: "text-gray-900 dark:text-gray-100",
+                published: "text-emerald-950 dark:text-emerald-100",
+                complete: "text-emerald-950 dark:text-emerald-100",
+                processing: "text-sky-950 dark:text-sky-100",
+            };
+            return (
+                tones[key] ?? "text-gray-900 dark:text-gray-100"
+            );
         },
     },
 };

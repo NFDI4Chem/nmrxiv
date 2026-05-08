@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="study"
-        class="flex flex-col border rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
+        class="flex flex-col overflow-hidden rounded-lg border border-gray-200/80 bg-white ring-1 ring-black/5"
     >
         <Link
             :href="
@@ -9,15 +9,16 @@
                     ? route('preview', [obfuscationCode, study.id, 'study'])
                     : route('dashboard.studies', [study.id])
             "
+            class="flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
         >
-            <div class="relative overflow-hidden bg-white-200">
-                <div class="pt-2 px-2">
-                    <ul role="list">
-                        <li
-                            class="col-span-1 divide-y divide-gray-200 cursor-pointer"
-                        >
+            <div class="relative overflow-hidden bg-white px-3 pb-2 pt-3">
+                <ul role="list">
+                    <li
+                        class="col-span-1 cursor-pointer divide-y divide-gray-200"
+                    >
+                        <div class="relative rounded-t-md bg-white">
                             <div
-                                class="bg-white rounded-t-md flex justify-center items-center"
+                                class="flex items-center justify-center"
                             >
                                 <span
                                     v-if="
@@ -33,92 +34,71 @@
                                         :show-download="false"
                                     ></Depictor2D>
                                 </span>
-                                <span v-else>
-                                    <div class="h-64">
+                                <span v-else class="block w-full">
+                                    <div
+                                        class="relative h-48 sm:h-56"
+                                    >
                                         <div
-                                            class="absolute inset-0 flex items-center justify-center"
+                                            class="absolute inset-0 flex items-center justify-center px-3 text-center"
                                         >
-                                            <h2 class="text-gray-200 font-bold">
-                                                <i
-                                                    >-- molecule(s) information
-                                                    missing --</i
-                                                >
-                                            </h2>
+                                            <p
+                                                class="text-sm font-medium leading-snug text-gray-500 dark:text-gray-400"
+                                            >
+                                                No chemical structure is linked to this compound yet.
+                                            </p>
                                         </div>
                                     </div>
                                 </span>
                             </div>
-                        </li>
-                    </ul>
-                    <div class="bg-white"></div>
-                </div>
+
+                            <span
+                                class="pointer-events-none absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-white px-1.5 py-0.5 sm:right-2.5 sm:top-2.5 dark:bg-gray-900"
+                                :aria-label="
+                                    (study.is_public ? 'Public' : 'Private') +
+                                    ' compound' +
+                                    (study.identifier
+                                        ? ', ' + study.identifier
+                                        : '')
+                                "
+                            >
+                                <GlobeAltIcon
+                                    v-if="study.is_public"
+                                    class="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400"
+                                    aria-hidden="true"
+                                />
+                                <LockClosedIcon
+                                    v-else
+                                    class="h-3.5 w-3.5 shrink-0 text-gray-500 dark:text-gray-400"
+                                    aria-hidden="true"
+                                />
+                                <span
+                                    v-if="study.identifier"
+                                    class="font-mono text-[11px] font-semibold tabular-nums leading-none tracking-wide text-gray-700 dark:text-gray-200"
+                                    >{{ study.identifier }}</span
+                                >
+                            </span>
+                        </div>
+                    </li>
+                </ul>
             </div>
             <div
-                class="flex-1 border-t bg-white p-3 flex flex-col justify-between"
+                class="flex flex-1 flex-col justify-between gap-3 border-t border-gray-100 bg-white px-5 py-4 sm:px-6"
             >
-                <div>
-                    <small
-                        v-if="study.identifier"
-                        class="text-gray-500 float-left"
-                        >#{{ study.identifier }}</small
+                <div class="min-w-0">
+                    <h3
+                        class="truncate text-lg font-semibold leading-snug tracking-tight text-gray-900 sm:text-xl dark:text-gray-100"
                     >
-                    <div class="float-right">
-                        <div
-                            v-if="study.is_public"
-                            class="flex items-center mt-1"
-                        >
-                            <svg
-                                class="h-3 w-3 mr-1 text-green-400 inline"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 64 64"
-                                width="512"
-                                height="512"
-                            >
-                                <g id="globe">
-                                    <path
-                                        d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
-                                    />
-                                    <path
-                                        d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
-                                    />
-                                    <path
-                                        d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
-                                    />
-                                </g>
-                            </svg>
-
-                            <p class="text-xs text-gray-600">Public</p>
-                        </div>
-                        <div v-else class="flex items-center mt-1">
-                            <LockClosedIcon
-                                class="w-3 h-3 mr-1 text-teal-600"
-                            />
-                            <p class="text-xs text-gray-600">Private</p>
-                        </div>
-                    </div>
+                        {{ study.name }}
+                    </h3>
                 </div>
-
-                <div
-                    class="flex items-center font-bold truncate text-lg text-gray-600"
-                >
-                    <span class="">
-                        <!-- Commented now to avoid to lighten the query, will be added later with cache. -->
-                        <!--  <StarIcon
-                        :class="[
-                            study.is_bookmarked
-                                ? 'text-yellow-400'
-                                : 'text-gray-200',
-                            'h-6 w-6 flex-shrink-0 -ml-1 mr-1',
-                        ]"
-                    ></StarIcon> -->
-                    </span>
-                    {{ study.name }}
-                </div>
-                <div class="pt-1">
-                    <div class="text-xs text-gray-600">
-                        <span class="text-gray-400">Last updated on</span>
-                        {{ formatDate(study.updated_at) }}
-                    </div>
+                <div class="text-[11px] leading-snug text-gray-500 sm:text-xs">
+                    <span class="font-normal text-gray-500 dark:text-gray-400"
+                        >Updated</span
+                    >
+                    <span
+                        class="ml-1.5 tabular-nums font-semibold text-gray-800 dark:text-gray-200"
+                        >{{ formatRecordTimestamp(study.updated_at) }}</span
+                    >
                 </div>
             </div>
         </Link>
@@ -126,11 +106,12 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { GlobeAltIcon, LockClosedIcon } from "@heroicons/vue/24/outline";
 import { Link } from "@inertiajs/vue3";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
+        GlobeAltIcon,
         LockClosedIcon,
         Link,
         Depictor2D,
