@@ -75,6 +75,24 @@ class UpdateProjectTest extends TestCase
         $this->assertEquals('#FF5733', $this->project->color);
     }
 
+    public function test_project_update_can_suppress_success_flash_message()
+    {
+        $updateData = [
+            'name' => 'Updated Without Toast',
+            'description' => 'No flash please',
+            'suppress_project_updated_flash' => true,
+        ];
+
+        $response = $this->actingAs($this->owner)
+            ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
+
+        $response->assertStatus(302);
+        $response->assertSessionMissing('success');
+
+        $this->project->refresh();
+        $this->assertEquals('Updated Without Toast', $this->project->name);
+    }
+
     public function test_project_collaborator_can_update_project_via_http()
     {
         $updateData = [

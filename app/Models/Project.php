@@ -62,7 +62,18 @@ class Project extends Model implements Auditable
         'deleted_on',
         'species',
         'provisional_doi',
+        'provisional_doi_registered_at',
     ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'provisional_doi_registered_at' => 'datetime',
+        ];
+    }
 
     protected static $marks = [
         Like::class,
