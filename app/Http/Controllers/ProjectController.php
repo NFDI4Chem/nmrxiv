@@ -430,7 +430,17 @@ class ProjectController extends Controller
 
         $updater->update($project, $request->all());
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');
+        if ($request->wantsJson()) {
+            return new JsonResponse('', 200);
+        }
+
+        $redirect = back();
+
+        if (! $request->boolean('suppress_project_updated_flash')) {
+            $redirect = $redirect->with('success', 'Project updated successfully');
+        }
+
+        return $redirect;
     }
 
     public function updateReleaseDate(Request $request, UpdateProject $updater, Project $project)

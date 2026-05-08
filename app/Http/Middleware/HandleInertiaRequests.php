@@ -65,6 +65,7 @@ class HandleInertiaRequests extends Middleware
             'config.announcements' => Schema::hasTable('announcements') ? Announcement::active() : null,
             'url' => config('app.url'),
             'nmriumURL' => config('external-links.nmrium_url'),
+            'spectraParserUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/spectra/parse/url',
             'team' => $user ? $user->currentTeam : null,
             'environment' => config('app.env'),
             'MEILISEARCH_HOST' => config('scout.meilisearch.host'),

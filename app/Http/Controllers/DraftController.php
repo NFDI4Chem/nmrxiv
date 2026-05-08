@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Draft\DraftFiles;
 use App\Actions\Draft\ProcessDraft;
+use App\Actions\Draft\ResetSampleFolder;
 use App\Actions\Draft\UserDrafts;
 use App\Jobs\ProcessFiles;
 use App\Models\Draft;
@@ -34,7 +35,8 @@ class DraftController extends Controller
         private FileSystemController $fileSystemController,
         private UserDrafts $userDrafts,
         private ProcessDraft $processDraft,
-        private DraftFiles $draftFiles
+        private DraftFiles $draftFiles,
+        private ResetSampleFolder $resetSampleFolder
     ) {}
 
     /**
@@ -88,6 +90,32 @@ class DraftController extends Controller
     }
 
     /**
+     * Reset cached state for a single sample folder so the next "Proceed to
+     * Step 2" run reprocesses it from scratch.
+     */
+    public function resetSampleFolder(Request $request, Draft $draft, FileSystemObject $filesystemobject): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
+
+        if ($filesystemobject->draft_id !== $draft->id) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Filesystem object does not belong to this draft.',
+            ], 403);
+        }
+
+        $result = $this->resetSampleFolder->execute($draft, $filesystemobject);
+
+        return response()->json($result, $result['ok'] ? 200 : 422);
+    }
+
+    /**
      * Get a single draft by ID with ownership verification.
      */
     public function show(Request $request, Draft $draft): JsonResponse
@@ -101,7 +129,7 @@ class DraftController extends Controller
         }
 
         return response()->json([
-            'draft' => $draft->load('Tags'),
+            'draft' => $draft->load(['Tags', 'project:id,slug,status,draft_id']),
         ]);
     }
 
@@ -155,10 +183,48 @@ class DraftController extends Controller
             ]);
         }
 
-        $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+        $project->load(['owner']);
+        $studies = $project->studies()
+            ->with(['datasets', 'sample.molecules', 'tags'])
+            ->get();
 
         return response()->json([
-            'project' => $project->load(['owner']),
+            'project' => $project,
+            'studies' => $studies,
+        ]);
+    }
+
+    /**
+     * Lightweight study processing status for upload polling (read-only).
+     */
+    public function status(Request $request, Draft $draft): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
+
+        $project = Project::where('draft_id', $draft->id)->first();
+
+        if (! $project) {
+            return response()->json([
+                'project_id' => null,
+                'inprogress_count' => 0,
+                'studies' => [],
+            ]);
+        }
+
+        $studies = $project->studies()
+            ->select(['id', 'name', 'slug', 'internal_status', 'has_nmrium', 'project_id'])
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'project_id' => $project->id,
+            'inprogress_count' => $studies->where('internal_status', '!=', 'complete')->count(),
             'studies' => $studies,
         ]);
     }

@@ -296,11 +296,15 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.datasets.nmriumInfo');
         Route::post('datasets/{dataset}/snapshot', [DatasetController::class, 'snapshot'])
             ->name('dashboard.dataset.snapshot');
+        Route::put('datasets/{dataset}/assignments', [DatasetController::class, 'updateAssignments'])
+            ->name('dashboard.datasets.assignments.update');
 
         Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
             ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');
+        Route::get('drafts/{draft}/status', [DraftController::class, 'status'])
+            ->name('dashboard.draft.status');
         Route::post('drafts/{draft}/provisional-doi', [DraftController::class, 'storeProvisionalDoi'])
             ->name('dashboard.draft.provisional-doi.store');
         Route::delete('drafts/{draft}/provisional-doi', [DraftController::class, 'destroyProvisionalDoi'])
@@ -313,6 +317,8 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.update');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [FileSystemController::class, 'deleteFSO'])
             ->name('dashboard.draft.files.delete');
+        Route::post('drafts/{draft}/sample-folders/{filesystemobject}/reset', [DraftController::class, 'resetSampleFolder'])
+            ->name('dashboard.draft.sample-folder.reset');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])

@@ -72,6 +72,59 @@ class UploadTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_upload_does_not_redirect_when_project_is_in_draft_status(): void
+    {
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+
+        Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get('/upload?draft_id='.$draft->id.'&step=1');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_upload_redirects_to_publish_when_project_is_not_in_draft_status(): void
+    {
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+
+        Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'status' => 'queued',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get('/upload?draft_id='.$draft->id.'&step=1');
+
+        $response->assertRedirect(route('publish', ['draft' => $draft->id]));
+    }
+
+    public function test_upload_does_not_redirect_when_draft_has_no_associated_project(): void
+    {
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get('/upload?draft_id='.$draft->id);
+
+        $response->assertStatus(200);
+    }
+
     public function test_publish_requires_authentication(): void
     {
         $draft = Draft::factory()->create([
