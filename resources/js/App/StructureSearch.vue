@@ -103,7 +103,8 @@
 
 <script>
 import { ref } from "vue";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
+import { createStructureEditor } from "@/Utils/structureEditor";
 import {
     Dialog as HeadlessUiDialog,
     DialogPanel,
@@ -145,9 +146,8 @@ export default {
             this.open = value;
             if (value) {
                 this.$nextTick(() => {
-                    this.editor = OCL.StructureEditor.createSVGEditor(
-                        "structureSearchEditor",
-                        1
+                    this.editor = createStructureEditor(
+                        "structureSearchEditor"
                     );
 
                     // Check if there's a query parameter in URL and load it

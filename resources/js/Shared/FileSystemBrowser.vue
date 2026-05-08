@@ -538,6 +538,7 @@
                                 (fsoId, isExpanded) =>
                                     toggleFolderExpansion(fsoId, isExpanded)
                             "
+                            @study-context-menu="onStudyContextMenu"
                         />
                     </div>
 
@@ -1463,6 +1464,45 @@
             </jet-secondary-button>
         </template>
     </jet-confirmation-modal>
+
+    <!-- Right-click context menu for sample folders. Rendered as fixed-
+         position so it floats over the file tree at the cursor. -->
+    <div
+        v-if="studyContextMenu.visible"
+        class="fixed z-50 min-w-[200px] rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+        :style="{
+            top: studyContextMenu.y + 'px',
+            left: studyContextMenu.x + 'px',
+        }"
+        @click.stop
+        @contextmenu.prevent
+    >
+        <button
+            type="button"
+            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="studyContextMenu.busy"
+            @click="resetSelectedSampleFolder"
+        >
+            <ArrowPathIcon
+                :class="[
+                    'h-4 w-4 text-gray-500',
+                    studyContextMenu.busy ? 'animate-spin' : '',
+                ]"
+                aria-hidden="true"
+            />
+            <span class="flex-1">
+                {{
+                    studyContextMenu.busy
+                        ? "Resetting…"
+                        : "Refresh & re-process"
+                }}
+            </span>
+        </button>
+        <p class="px-3 pb-2 pt-1 text-[11px] leading-4 text-gray-400">
+            Clears the cached zip and NMRium info so the next "Proceed" run
+            reprocesses this sample folder.
+        </p>
+    </div>
 </template>
 
 <script>
@@ -1509,6 +1549,7 @@ import {
     InformationCircleIcon,
     EllipsisVerticalIcon,
     ArrowUpTrayIcon,
+    ArrowPathIcon,
     CheckIcon,
     ExclamationCircleIcon,
     TrashIcon,
@@ -1572,6 +1613,7 @@ export default {
         ChevronUpOutlineIcon,
         ChevronDownOutlineIcon,
         Squares2X2OutlineIcon,
+        ArrowPathIcon,
         HeadlessMenu,
         MenuButton,
         MenuItems,
@@ -1653,6 +1695,15 @@ export default {
 
             // Debounce: folder drag/drop adds files asynchronously; wait before checksums
             checksumScheduleTimer: null,
+
+            // Right-click context menu for sample (study) folders
+            studyContextMenu: {
+                visible: false,
+                x: 0,
+                y: 0,
+                file: null,
+                busy: false,
+            },
         };
     },
     /**
@@ -1895,6 +1946,11 @@ export default {
 
         // Prevent page refresh/navigation during upload
         window.addEventListener("beforeunload", this.handleBeforeUnload);
+
+        // Close the study context menu on outside click / scroll / escape
+        document.addEventListener("click", this.closeStudyContextMenu);
+        document.addEventListener("scroll", this.closeStudyContextMenu, true);
+        document.addEventListener("keydown", this.handleStudyContextMenuKey);
     },
 
     beforeUnmount() {
@@ -1909,6 +1965,18 @@ export default {
         // Clean up resize listeners
         document.removeEventListener("mousemove", this.onResize);
         document.removeEventListener("mouseup", this.stopResize);
+
+        // Tear down context-menu listeners
+        document.removeEventListener("click", this.closeStudyContextMenu);
+        document.removeEventListener(
+            "scroll",
+            this.closeStudyContextMenu,
+            true
+        );
+        document.removeEventListener(
+            "keydown",
+            this.handleStudyContextMenuKey
+        );
     },
     /**
      * Component methods
@@ -2749,6 +2817,104 @@ export default {
          */
         updateBusyStatus(status) {
             this.busy = status;
+        },
+
+        /**
+         * Open the right-click context menu for a sample folder.
+         *
+         * Children.vue only emits this for folders that are tagged as a study
+         * (model_type === 'study'), so we just need to position and show.
+         */
+        onStudyContextMenu(payload) {
+            if (!payload || !payload.file) {
+                return;
+            }
+
+            // Clamp to viewport so the menu doesn't overflow the right edge.
+            const menuWidth = 220;
+            const menuHeight = 110;
+            const x = Math.min(
+                payload.x,
+                window.innerWidth - menuWidth - 8
+            );
+            const y = Math.min(
+                payload.y,
+                window.innerHeight - menuHeight - 8
+            );
+
+            this.studyContextMenu = {
+                visible: true,
+                x: Math.max(8, x),
+                y: Math.max(8, y),
+                file: payload.file,
+                busy: false,
+            };
+        },
+
+        /**
+         * Close the study context menu, unless an in-flight reset request is
+         * still running (the menu shows the busy spinner during that time).
+         */
+        closeStudyContextMenu() {
+            if (this.studyContextMenu.busy) {
+                return;
+            }
+
+            this.studyContextMenu = {
+                visible: false,
+                x: 0,
+                y: 0,
+                file: null,
+                busy: false,
+            };
+        },
+
+        /**
+         * Keyboard handler so the menu closes on Escape.
+         */
+        handleStudyContextMenuKey(event) {
+            if (event.key === "Escape" && this.studyContextMenu.visible) {
+                this.closeStudyContextMenu();
+            }
+        },
+
+        /**
+         * POST to the reset endpoint for the currently-targeted sample folder
+         * and reload the file tree on success so cleared state (model_type,
+         * study tagging) is reflected in the UI immediately.
+         */
+        resetSelectedSampleFolder() {
+            const target = this.studyContextMenu.file;
+
+            if (!target || !this.draft) {
+                return;
+            }
+
+            this.studyContextMenu.busy = true;
+            this.updateBusyStatus(true);
+
+            axios
+                .post(
+                    "/dashboard/drafts/" +
+                        this.draft.id +
+                        "/sample-folders/" +
+                        target.id +
+                        "/reset"
+                )
+                .then(() => {
+                    this.studyContextMenu.busy = false;
+                    this.closeStudyContextMenu();
+                    this.loadFiles();
+                })
+                .catch((error) => {
+                    this.studyContextMenu.busy = false;
+                    this.updateBusyStatus(false);
+                    this.closeStudyContextMenu();
+                    console.error(
+                        "Failed to reset sample folder",
+                        error?.response?.data || error
+                    );
+                });
         },
 
         /**

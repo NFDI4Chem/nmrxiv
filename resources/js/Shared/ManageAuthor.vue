@@ -1325,6 +1325,7 @@ export default {
 
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
+                preserveState: true,
                 onSuccess: () => this.onSaveSuccess(),
                 onError: (err) => console.error(err),
             });
@@ -1385,6 +1386,7 @@ export default {
         deleteAuthor() {
             this.authorsForm.delete(route("author.delete", this.project.id), {
                 preserveScroll: true,
+                preserveState: true,
                 onSuccess: () => {
                     router.reload({ only: ["project"] });
                     this.loadInitial();
@@ -1464,6 +1466,7 @@ export default {
                 route("author.updateRole", this.project.id),
                 {
                     preserveScroll: true,
+                    preserveState: true,
                     onSuccess: () => {
                         router.reload({ only: ["project"] });
                         this.loadInitial();

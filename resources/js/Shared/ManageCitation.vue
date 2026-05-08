@@ -823,6 +823,7 @@ export default {
         submitCitationsToBackend() {
             this.citationsForm.post(route("citation.save", this.project.id), {
                 preserveScroll: true,
+                preserveState: true,
                 onSuccess: () => this.handleSaveSuccess(),
                 onError: (err) => this.handleSaveError(err),
             });
@@ -1015,6 +1016,7 @@ export default {
                 route("citation.delete", this.project.id),
                 {
                     preserveScroll: true,
+                    preserveState: true,
                     onSuccess: () => {
                         router.reload({ only: ["project"] });
                         this.loadInitial();

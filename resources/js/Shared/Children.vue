@@ -39,6 +39,7 @@
                         'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                     ]"
                     @click.stop="handleFolderClick(file)"
+                    @contextmenu="onSampleFolderContextMenu($event, file)"
                 >
                     <!-- Disclosure button for expanding/collapsing -->
                     <DisclosureButton
@@ -199,6 +200,12 @@
                                                 ]"
                                                 @click.stop="
                                                     handleFolderClick(sfile)
+                                                "
+                                                @contextmenu="
+                                                    onSampleFolderContextMenu(
+                                                        $event,
+                                                        sfile
+                                                    )
                                                 "
                                             >
                                                 <!-- Nested disclosure button -->
@@ -395,6 +402,13 @@
                                                                         isOpen
                                                                     )
                                                             "
+                                                            @study-context-menu="
+                                                                (payload) =>
+                                                                    $emit(
+                                                                        'study-context-menu',
+                                                                        payload
+                                                                    )
+                                                            "
                                                         />
                                                     </span>
 
@@ -566,7 +580,7 @@ export default {
     /**
      * Events emitted by this component
      */
-    emits: ["toggle-expansion"],
+    emits: ["toggle-expansion", "study-context-menu"],
 
     /**
      * Composition API setup function
@@ -704,6 +718,29 @@ export default {
         handleFolderClick(file) {
             // Select the folder to show its contents in right panel
             this.displaySelected(file);
+        },
+
+        /**
+         * Right-click handler for folders. Only sample folders (those with
+         * `model_type == 'study'`) can be reset, so we only emit for those
+         * — all other folders fall through to the browser's native menu.
+         *
+         * @param {MouseEvent} event - Native contextmenu event
+         * @param {Object} file - The folder object the user right-clicked
+         */
+        onSampleFolderContextMenu(event, file) {
+            if (!file || file.model_type !== "study") {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.$emit("study-context-menu", {
+                file,
+                x: event.clientX,
+                y: event.clientY,
+            });
         },
 
         /**

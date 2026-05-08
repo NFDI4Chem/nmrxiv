@@ -3,7 +3,7 @@
         class="primer-root mx-auto max-w-4xl text-gray-900"
         aria-labelledby="primer-heading"
     >
-        <header class="border-b border-gray-200/80 pb-6 mb-8">
+        <header class="border-b border-gray-200/80 pb-3 mb-4">
             <p
                 class="text-xs font-semibold uppercase tracking-[0.2em] text-teal-600"
             >
@@ -15,7 +15,7 @@
             >
                 Basic concepts
             </h1>
-            <p class="mt-3 max-w-3xl text-base text-gray-600 leading-relaxed">
+            <p class="mt-3 max-w-3xl text-sm text-gray-600 leading-relaxed">
                 A short overview of how submission works on nmrXiv and how your
                 NMR data is structured before you upload files.
             </p>
@@ -65,7 +65,7 @@
         </section>
 
         <section
-            class="mb-10"
+            class="mb-5"
             aria-labelledby="primer-model-heading"
         >
             <h2
@@ -96,7 +96,7 @@
             </div>
             <p class="mt-4 text-sm text-gray-600 leading-relaxed max-w-3xl">
                 You can also publish
-                <span class="font-medium text-gray-900">studies</span>
+                <span class="font-medium text-gray-900">samples</span>
                 on their own without creating a project.
             </p>
         </section>
@@ -112,7 +112,7 @@
                 Visual overview
             </h2>
             <figure
-                class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/50 p-4 sm:p-6 shadow-sm ring-1 ring-gray-900/5"
+                class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5"
             >
                 <img
                     src="/img/primer.png"
@@ -127,7 +127,7 @@
         </section>
 
         <footer
-            class="rounded-xl border border-teal-100 bg-teal-50/40 p-5 sm:p-6"
+            class="rounded-xl border border-gray-200 bg-gray-50/40 p-5 sm:p-6"
         >
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div class="flex gap-3 min-w-0">
@@ -171,9 +171,9 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-teal-200/60 pt-4">
+            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-200/60 pt-4">
                 <a
-                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 hover:text-teal-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 rounded"
+                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded"
                     href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -187,7 +187,7 @@
                     >|</span
                 >
                 <a
-                    class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 rounded"
+                    class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded"
                     href="https://docs.nmrxiv.org/submission-guides/submission/folder-structure"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -197,6 +197,33 @@
                 </a>
             </div>
         </footer>
+
+        <div
+            v-if="showActions"
+            class="mt-8 mb-10 flex flex-col-reverse gap-3 border-t border-gray-200/80 pt-6 sm:flex-row sm:items-center sm:justify-end"
+        >
+            <div class="flex items-center gap-2">
+                <input
+                    id="primer-dont-show-again"
+                    type="checkbox"
+                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    @change="$emit('dont-show-again')"
+                />
+                <label
+                    for="primer-dont-show-again"
+                    class="text-sm font-medium text-gray-700"
+                >
+                    Don't show this again
+                </label>
+            </div>
+            <JetButton
+                :class="{ 'opacity-25': processing }"
+                :disabled="processing"
+                @click="$emit('proceed')"
+            >
+                Proceed
+            </JetButton>
+        </div>
     </article>
 </template>
 
@@ -207,24 +234,38 @@ import {
     RocketLaunchIcon,
     ArrowTopRightOnSquareIcon,
 } from "@heroicons/vue/24/outline";
+import JetButton from "@/Jetstream/Button.vue";
+
+defineProps({
+    showActions: {
+        type: Boolean,
+        default: false,
+    },
+    processing: {
+        type: Boolean,
+        default: false,
+    },
+});
+
+defineEmits(["proceed", "dont-show-again"]);
 
 const steps = [
     {
         title: "File upload",
         description:
-            "Add your raw or processed NMR data using the guided upload flow.",
+            "Upload your raw or processed NMR data either by dragging and dropping files or by using the file browser.",
         icon: ArrowUpTrayIcon,
     },
     {
         title: "Processing & validation",
         description:
-            "Automatic processing, assignments, and checks help you prepare a complete record.",
+            "nmrXiv workflows archives your data, processes and extracts metadata from the files. Validation is performed to ensure the data is reusable and meets the recommended MiChI standards.",
         icon: Cog6ToothIcon,
     },
     {
         title: "Publish",
         description:
-            "When you are ready, publish your project or studies with citation-ready metadata.",
+            "Publish your data or move it to embargo status to keep it private until you are ready to share it.",
         icon: RocketLaunchIcon,
     },
 ];
@@ -232,11 +273,11 @@ const steps = [
 const conceptCards = [
     {
         term: "Project",
-        body: "Think of a project like your publication container: the title, description, and all related NMR data you want to share on nmrXiv in one place. A project can include multiple studies.",
-    },
+        body: "Think of a project like your publication container: the title, description, and all related NMR data you want to share on nmrXiv in one place. A project includes multiple samples.",
+    },  
     {
         term: "Study",
-        body: "A study is the set of NMR experiments for one sample—for example 1H, 13C, COSY, HSQC, HMBC, and NOESY together—whether in Bruker format, JCAMP-DX, Varian, or another supported layout.",
+        body: "A study is the set of NMR experiments for one sample—for example 1H, 13C, COSY, HSQC, HMBC, and NOESY together.",
     },
     {
         term: "Dataset",

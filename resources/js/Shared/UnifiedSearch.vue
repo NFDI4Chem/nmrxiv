@@ -377,7 +377,8 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/outline";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
+import { createStructureEditor } from "@/Utils/structureEditor";
 import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
 import SpectraUploadContent from "@/Shared/SpectraUploadContent.vue";
 import PeakListSearchContent from "@/Shared/PeakListSearchContent.vue";
@@ -538,9 +539,8 @@ export default {
 
         const initializeStructureEditor = () => {
             if (document.getElementById("structureSearchEditor")) {
-                structureEditor.value = OCL.StructureEditor.createSVGEditor(
-                    "structureSearchEditor",
-                    1
+                structureEditor.value = createStructureEditor(
+                    "structureSearchEditor"
                 );
 
                 // Check if there's a query parameter in URL and load it

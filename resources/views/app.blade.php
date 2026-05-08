@@ -11,6 +11,21 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        @php
+            $nmriumHref = config('external-links.nmrium_url');
+            $nmriumParsed = is_string($nmriumHref) ? parse_url($nmriumHref) : false;
+            $nmriumOrigin = null;
+            if (is_array($nmriumParsed) && isset($nmriumParsed['host'])) {
+                $scheme = $nmriumParsed['scheme'] ?? 'https';
+                $nmriumOrigin = $scheme.'://'.$nmriumParsed['host'];
+            }
+        @endphp
+        @if ($nmriumOrigin)
+            <link rel="preconnect" href="{{ $nmriumOrigin }}" crossorigin>
+            <link rel="dns-prefetch" href="{{ $nmriumOrigin }}">
+        @endif
+        <link rel="dns-prefetch" href="https://nodejs.nmrxiv.org">
+
         <!-- Styles / Scripts -->
         @vite(['resources/js/app.js'])
 
@@ -49,9 +64,9 @@
         
         @inertia
 
-        @env ('local')
-            <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script>
-        @endenv
+        @if (app()->environment('local') && config('app.browser_sync_client_url'))
+            <script src="{{ rtrim((string) config('app.browser_sync_client_url'), '/') }}/browser-sync/browser-sync-client.js"></script>
+        @endif
 
         <x-support-bubble />
     </body>

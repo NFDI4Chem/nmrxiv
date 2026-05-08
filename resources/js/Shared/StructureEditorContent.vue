@@ -234,7 +234,7 @@ export default {
 
                 // Try as SMILES first
                 try {
-                    const OCL = (await import("openchemlib/full")).default;
+                    const OCL = (await import("openchemlib")).default;
                     const mol = OCL.Molecule.fromSmiles(text.trim());
                     props.editor.setMolFile(mol.toMolfile());
                     return;

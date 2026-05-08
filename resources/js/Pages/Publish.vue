@@ -40,32 +40,84 @@
             </div>
         </template>
         <div class="mb-10">
-            <div
-                v-if="publishForm.processing"
-                class="absolute w-full h-full text-center py-12 pt-24 bg-opacity-90 bg-white z-50"
+            <transition
+                enter-active-class="transition ease-out duration-150"
+                enter-from-class="opacity-0 translate-y-1"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 translate-y-1"
             >
-                <svg
-                    class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark flex-inline inline"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
+                <div
+                    v-if="saveStatus !== 'idle'"
+                    class="fixed right-4 top-20 z-50 flex items-center gap-2 rounded-full border bg-white/95 px-3 py-1.5 text-sm shadow-md backdrop-blur-sm"
+                    :class="
+                        saveStatus === 'error'
+                            ? 'border-red-200 text-red-700'
+                            : saveStatus === 'saved'
+                              ? 'border-emerald-200 text-emerald-700'
+                              : 'border-gray-200 text-gray-700'
+                    "
+                    role="status"
+                    aria-live="polite"
                 >
-                    <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                    ></circle>
-                    <path
-                        class="opacity-75"
+                    <svg
+                        v-if="saveStatus === 'saving'"
+                        class="h-3.5 w-3.5 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    <svg
+                        v-else-if="saveStatus === 'saved'"
+                        class="h-3.5 w-3.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
                         fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                </svg>
-                Saving...
-            </div>
+                        aria-hidden="true"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 011.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                    <svg
+                        v-else
+                        class="h-3.5 w-3.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                    <span class="font-medium">
+                        <span v-if="saveStatus === 'saving'">Saving…</span>
+                        <span v-else-if="saveStatus === 'saved'">Saved</span>
+                        <span v-else>Couldn't save changes</span>
+                    </span>
+                </div>
+            </transition>
             <div v-if="status == 'draft'">
                 <div id="project-details" class="p-4">
                     <div class="p-8">
@@ -83,9 +135,13 @@
                                 @blur="updateDraft"
                             />
                         </div>
-                        <div v-if="publishForm.enableProjectMode">
+                        <div>
                             <div class="p-4 bg-gray-100 rounded-md">
-                                <div id="project-name" class="mb-3">
+                                <div
+                                    v-if="publishForm.enableProjectMode"
+                                    id="project-name"
+                                    class="mb-3"
+                                >
                                     <label
                                         for="project-name"
                                         class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -131,7 +187,11 @@
                                         >
                                     </div>
                                 </div>
-                                <div id="project-desc" class="mb-3">
+                                <div
+                                    v-if="publishForm.enableProjectMode"
+                                    id="project-desc"
+                                    class="mb-3"
+                                >
                                     <label
                                         for="description"
                                         class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -165,7 +225,12 @@
                                 <div id="project-keywords" class="mb-3">
                                     <label
                                         for="description"
-                                        class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        class="block text-sm font-medium text-gray-500"
+                                        :class="
+                                            publishForm.enableProjectMode
+                                                ? `after:content-['*'] after:ml-0.5 after:text-red-500`
+                                                : `after:content-['(Optional)'] after:ml-0.5 after:text-gray-500`
+                                        "
                                     >
                                         Keywords
                                     </label>
@@ -288,7 +353,12 @@
                                             class="relative flex items-center justify-between"
                                         >
                                             <span
-                                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                                :class="
+                                                    publishForm.enableProjectMode
+                                                        ? `after:content-['*'] after:ml-0.5 after:text-red-500`
+                                                        : `after:content-['(Optional)'] after:ml-0.5 after:text-gray-500`
+                                                "
                                             >
                                                 Citation
                                             </span>
@@ -330,7 +400,12 @@
                                             class="relative flex items-center justify-between"
                                         >
                                             <span
-                                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                                :class="
+                                                    publishForm.enableProjectMode
+                                                        ? `after:content-['*'] after:ml-0.5 after:text-red-500`
+                                                        : `after:content-['(Optional)'] after:ml-0.5 after:text-gray-500`
+                                                "
                                             >
                                                 Author
                                             </span>
@@ -358,7 +433,10 @@
                                         </div>
                                     </dd>
                                 </div>
-                                <div class="px-2">
+                                <div
+                                    v-if="publishForm.enableProjectMode"
+                                    class="px-2"
+                                >
                                     <div
                                         class="relative flex items-center justify-between"
                                     >
@@ -547,6 +625,8 @@
                                                 v-model:selected="license"
                                                 label="License"
                                                 :items="licenses"
+                                                searchable
+                                                placeholder="Search a license"
                                                 @update:selected="updateProject"
                                             />
                                         </div>
@@ -1018,6 +1098,7 @@ export default {
         return {
             publishForm: this.$inertia.form({
                 _method: "PUT",
+                suppress_project_updated_flash: true,
                 name: "",
                 description: "",
                 error_message: null,
@@ -1045,7 +1126,19 @@ export default {
             showSingleSampleModal: false,
             draftWarningConfirmed: false,
             photoPreview: null,
+            /**
+             * Status of background autosaves driven by blur/change events.
+             * One of: 'idle' | 'saving' | 'saved' | 'error'.
+             */
+            saveStatus: "idle",
+            saveStatusTimer: null,
         };
+    },
+    beforeUnmount() {
+        if (this.saveStatusTimer) {
+            clearTimeout(this.saveStatusTimer);
+            this.saveStatusTimer = null;
+        }
     },
     computed: {
         url() {
@@ -1168,18 +1261,34 @@ export default {
                 }, 2500);
             });
         },
+        setSaveStatus(status) {
+            if (this.saveStatusTimer) {
+                clearTimeout(this.saveStatusTimer);
+                this.saveStatusTimer = null;
+            }
+            this.saveStatus = status;
+            if (status === "saved" || status === "error") {
+                this.saveStatusTimer = setTimeout(() => {
+                    this.saveStatus = "idle";
+                }, 2500);
+            }
+        },
         updateDraft() {
-            axios.put("/dashboard/drafts/" + this.draft.id, {
-                project_enabled: this.publishForm.enableProjectMode ? 1 : 0,
-            });
+            this.setSaveStatus("saving");
+            axios
+                .put("/dashboard/drafts/" + this.draft.id, {
+                    project_enabled: this.publishForm.enableProjectMode
+                        ? 1
+                        : 0,
+                })
+                .then(() => this.setSaveStatus("saved"))
+                .catch(() => this.setSaveStatus("error"));
         },
         updateProject(callbacks = {}) {
             const { onSuccess = null, onError = null } = callbacks;
 
-            // Reset draft warning when name changes
             this.draftWarningConfirmed = false;
 
-            // if (this.publishForm.enableProjectMode) {
             if (this.$refs.photo) {
                 this.publishForm.photo = this.$refs.photo.files[0];
             }
@@ -1207,16 +1316,21 @@ export default {
             this.publishForm.tags_array = this.publishForm.tags
                 ? this.publishForm.tags.map((a) => a.text)
                 : [];
+
+            this.setSaveStatus("saving");
             this.publishForm.post(
                 route("dashboard.project.update", this.project.id),
                 {
                     preserveScroll: true,
+                    preserveState: true,
                     onSuccess: () => {
+                        this.setSaveStatus("saved");
                         if (onSuccess) {
                             onSuccess();
                         }
                     },
                     onError: () => {
+                        this.setSaveStatus("error");
                         if (onError) {
                             onError();
                         }

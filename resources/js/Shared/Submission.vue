@@ -142,56 +142,9 @@
                                             >
                                                 {{ draft.eln.toUpperCase() }}
                                             </span>
-                                            <span
-                                                v-if="draft.status"
-                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                                :class="{
-                                                    'bg-blue-100 text-blue-800':
-                                                        ['received'].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                    'bg-yellow-100 text-yellow-800':
-                                                        [
-                                                            'zip_processed',
-                                                            'processing',
-                                                            'pending',
-                                                            'job_dispatched',
-                                                        ].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                    'bg-green-100 text-green-800':
-                                                        [
-                                                            'validated',
-                                                            'processed',
-                                                            'successful',
-                                                            'published',
-                                                        ].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                    'bg-red-100 text-red-800': [
-                                                        'failed',
-                                                    ].includes(
-                                                        draft.status.toLowerCase()
-                                                    ),
-                                                    'bg-gray-100 text-gray-800':
-                                                        ![
-                                                            'received',
-                                                            'zip_processed',
-                                                            'validated',
-                                                            'processed',
-                                                            'successful',
-                                                            'published',
-                                                            'failed',
-                                                            'processing',
-                                                            'pending',
-                                                            'job_dispatched',
-                                                        ].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                }"
-                                            >
-                                                {{ formatStatus(draft.status) }}
-                                            </span>
+                                            <DraftStatusBadge
+                                                :draft="draft"
+                                            />
                                         </div>
                                         <p
                                             class="text-sm font-medium text-gray-600 truncate pr-10"
@@ -1799,12 +1752,14 @@ import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
 import slider from "vue3-slider";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
+import { createStructureEditor } from "@/Utils/structureEditor";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
 import Primer from "@/Shared/Primer.vue";
+import DraftStatusBadge from "@/Shared/DraftStatusBadge.vue";
 import {
     ExclamationTriangleIcon,
     ExclamationCircleIcon,
@@ -1828,6 +1783,7 @@ export default {
         JetInputError,
         FileSystemBrowser,
         Primer,
+        DraftStatusBadge,
         ExclamationTriangleIcon,
         ArrowDownOnSquareStackIcon,
         TrashIcon,
@@ -2133,8 +2089,16 @@ export default {
             }
         },
 
-        updateLoadingStatus(status) {
-            this.loadingStep = status;
+        updateLoadingStatus(payload) {
+            if (
+                payload &&
+                typeof payload === "object" &&
+                typeof payload.status === "boolean"
+            ) {
+                this.loadingStep = payload.status;
+            } else {
+                this.loadingStep = !!payload;
+            }
         },
 
         deleteMolecule(mol) {
@@ -2293,9 +2257,8 @@ export default {
                 if (t.name == tab.name) {
                     t.current = true;
                     this.$nextTick(() => {
-                        this.editor = OCL.StructureEditor.createSVGEditor(
-                            "structureSearchEditor",
-                            1
+                        this.editor = createStructureEditor(
+                            "structureSearchEditor"
                         );
                     });
                 } else {
@@ -2593,28 +2556,80 @@ export default {
                 let ownerUserName = this.$page.props.team
                     ? this.$page.props.team.owner.username
                     : this.project.owner.username;
+                const spectraParserUrl =
+                    this.$page.props.spectraParserUrl ||
+                    "https://dev.nmrkit.nmrxiv.org/latest/spectra/parse/url";
+                const datasetUrl =
+                    this.url +
+                    "/" +
+                    ownerUserName +
+                    "/datasets/" +
+                    datasetDetails.projectSlug +
+                    "/" +
+                    datasetDetails.studySlug +
+                    "/" +
+                    datasetDetails.datasetSlug;
+                let safeDatasetUrl = datasetUrl;
+                try {
+                    safeDatasetUrl = encodeURI(decodeURI(datasetUrl));
+                } catch (e) {
+                    safeDatasetUrl = encodeURI(datasetUrl);
+                }
                 axios
-                    .post("https://nodejs.nmrxiv.org/spectra-parser", {
-                        urls: [
-                            this.url +
-                                "/" +
-                                ownerUserName +
-                                "/datasets/" +
-                                datasetDetails.projectSlug +
-                                "/" +
-                                datasetDetails.studySlug +
-                                "/" +
-                                datasetDetails.datasetSlug,
-                        ],
-                        snapshot: false,
+                    .post(spectraParserUrl, {
+                        url: safeDatasetUrl,
+                        capture_snapshot: false,
                     })
                     .then((response) => {
+                        const nmriumState =
+                            response.data?.nmriumState ?? response.data ?? {};
+                        const parsedSpectra = nmriumState.data ?? {};
+                        if (
+                            !parsedSpectra.source &&
+                            Array.isArray(parsedSpectra.sources) &&
+                            parsedSpectra.sources.length > 0
+                        ) {
+                            const mergedEntries = [];
+                            parsedSpectra.sources.forEach((src) => {
+                                const baseURL = src?.baseURL ?? "";
+                                const entries = Array.isArray(src?.entries)
+                                    ? src.entries
+                                    : [];
+                                entries.forEach((entry) => {
+                                    mergedEntries.push({
+                                        baseURL,
+                                        relativePath:
+                                            entry?.relativePath ?? "",
+                                    });
+                                });
+                            });
+                            if (mergedEntries.length > 0) {
+                                parsedSpectra.source = {
+                                    entries: mergedEntries,
+                                };
+                            }
+                        }
+                        if (Array.isArray(parsedSpectra.spectra)) {
+                            parsedSpectra.spectra.forEach((spec) => {
+                                if (!spec || typeof spec !== "object") {
+                                    return;
+                                }
+                                if (!spec.sourceSelector && spec.selector) {
+                                    spec.sourceSelector = spec.selector;
+                                }
+                            });
+                        }
+                        const version =
+                            nmriumState.version ?? parsedSpectra.version ?? null;
+                        if (version) {
+                            parsedSpectra.version = version;
+                        }
                         axios
                             .post(
                                 "/dashboard/datasets/" +
                                     datasetDetails.datasetId +
                                     "/nmriumInfo",
-                                response.data.data
+                                parsedSpectra
                             )
                             .then(() => {
                                 this.loadingStep = false;
@@ -2652,30 +2667,6 @@ export default {
             this.loading = true;
             return axios.get("/dashboard/drafts");
         },
-        formatStatus(status) {
-            if (!status) return "";
-
-            const statusMap = {
-                received: "Received",
-                zip_processed: "ZIP Processed",
-                validated: "Validated",
-                processed: "Processed",
-                successful: "Successful",
-                published: "Published",
-                failed: "Failed",
-                processing: "Processing",
-                pending: "Pending",
-                job_dispatched: "Job Dispatched",
-            };
-
-            return (
-                statusMap[status.toLowerCase()] ||
-                status
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())
-            );
-        },
-
         selectDraft(draft) {
             this.currentDraft = draft;
             this.draftForm.name = this.currentDraft.name;
