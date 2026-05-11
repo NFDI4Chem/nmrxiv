@@ -406,7 +406,7 @@
                                         <div class="py-16">
                                             <div class="text-center">
                                                 <p
-                                                    class="text-sm font-semibold text-indigo-600 uppercase tracking-wide"
+                                                    class="text-sm font-semibold text-primary-600 uppercase tracking-wide"
                                                 >
                                                     {{ project.name }}
                                                 </p>
@@ -429,7 +429,7 @@
                                                         :href="
                                                             route('dashboard')
                                                         "
-                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                                     >
                                                         Go to Dashboard
                                                     </Link>
@@ -465,7 +465,7 @@
                                                         :href="
                                                             route('dashboard')
                                                         "
-                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                                     >
                                                         Go to Dashboard
                                                     </Link>
@@ -499,7 +499,7 @@
                                                         :href="
                                                             route('dashboard')
                                                         "
-                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                                     >
                                                         Go to Dashboard
                                                     </Link>
@@ -587,7 +587,7 @@
                                                                     project.conditions
                                                                 "
                                                                 type="checkbox"
-                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                class="rounded mt-1 border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
                                                                 name="conditions"
                                                             />
                                                             <div
@@ -617,7 +617,7 @@
                                                                     project.terms
                                                                 "
                                                                 type="checkbox"
-                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
                                                                 name="terms"
                                                             />
                                                             <div

@@ -93,7 +93,7 @@
                         <p class="text-xs text-gray-600">Public</p>
                     </div>
                     <div v-else class="flex items-center mt-1">
-                        <LockClosedIcon class="w-3 h-3 mr-1 text-teal-600" />
+                        <LockClosedIcon class="w-3 h-3 mr-1 text-primary-600" />
                         <p class="text-xs text-gray-600">Private</p>
                     </div>
                 </div>

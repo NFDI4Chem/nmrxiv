@@ -5,11 +5,11 @@
             <!-- Animated mesh gradient background -->
             <div class="relative border-b border-zinc-900/5 overflow-hidden">
                 <div
-                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                    class="absolute inset-0 bg-gradient-to-br from-sky-50/30 via-teal-50/30 to-cyan-50/30"
                 ></div>
                 <div class="absolute inset-0 opacity-20">
                     <div
-                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                        class="absolute top-0 left-1/4 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
                     ></div>
                     <div
                         class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
@@ -2160,7 +2160,7 @@
                                                                                                             v-if="
                                                                                                                 chemicalInput
                                                                                                             "
-                                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                                                                                                             @click="
                                                                                                                 clearInput
                                                                                                             "
@@ -2263,7 +2263,7 @@
                                                                                                         class="mt-2 flex justify-between"
                                                                                                     >
                                                                                                         <button
-                                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                                                                                                             @click="
                                                                                                                 clearCasInput
                                                                                                             "

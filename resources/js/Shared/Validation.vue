@@ -5,7 +5,7 @@
             ><span v-else>samples meta-data</span> compares to
             <a
                 target="_blank"
-                class="text-blue-800"
+                class="text-primary-700 hover:text-primary-800"
                 :href="$page.props.michiStandardsUrl"
                 >recommended community standards</a
             >.
@@ -76,7 +76,7 @@
                                     :status="validation.project.status"
                                 ></ValidationStatus>
                                 <p
-                                    class="truncate text-md font-bold text-indigo-600"
+                                    class="truncate text-md font-bold text-primary-600"
                                 >
                                     Project
                                 </p>
@@ -264,7 +264,7 @@
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"
                             >
                                 <p
-                                    class="truncate text-md font-bold text-indigo-600"
+                                    class="truncate text-md font-bold text-primary-600"
                                 >
                                     Samples
                                 </p>

@@ -8,7 +8,7 @@
         >
         <div class="mt-1 relative">
             <div
-                class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm focus-within:ring-1 focus-within:ring-teal-500 focus-within:border-teal-500"
+                class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm focus-within:ring-1 focus-within:ring-primary-500 focus-within:border-primary-500"
             >
                 <ComboboxInput
                     class="w-full border-none bg-transparent pl-3 pr-10 py-2 text-sm text-gray-900 focus:ring-0 focus:outline-none"
@@ -172,7 +172,7 @@
         >
         <div class="mt-1 relative">
             <ListboxButton
-                class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
             >
                 <span v-if="selected" class="block truncate">{{
                     selected.title
