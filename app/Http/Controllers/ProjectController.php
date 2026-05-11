@@ -17,11 +17,13 @@ use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
@@ -325,38 +327,74 @@ class ProjectController extends Controller
     public function publish(Request $request, Project $project, PublishProject $publisher, UpdateProject $updater)
     {
         if (! Gate::forUser($request->user())->allows('publishProject', $project)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+
+            throw new AuthorizationException;
         }
 
         if ($project) {
-            $input = $request->all();
-            $release_date = $request->get('release_date');
             $enableProjectMode = $request->get('enableProjectMode');
             if ($enableProjectMode) {
                 $validation = $project->validation;
                 if (! $validation) {
-                    return response()->json([
-                        'errors' => 'Project validation not found. Please ensure the project is properly configured.',
-                    ], 422);
+                    if ($this->publishPrefersJsonResponse($request)) {
+                        return response()->json([
+                            'errors' => 'Project validation not found. Please ensure the project is properly configured.',
+                        ], 422);
+                    }
+
+                    throw ValidationException::withMessages([
+                        'publish' => 'Project validation not found. Please ensure the project is properly configured.',
+                    ]);
                 }
+
+                $project->release_date = $request->get('release_date');
                 $validation->process();
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
-                    $project->release_date = $request->get('release_date');
                     $project->status = 'queued';
                     $project->save();
 
+                    Log::info('embargo_publish_trace', [
+                        'stage' => 'publish_controller_dispatch_process_submission',
+                        'branch' => 'enable_project_mode',
+                        'project_id' => $project->id,
+                        'release_date' => $this->formatReleaseDateForLog($project->release_date),
+                        'status' => $project->status,
+                    ]);
+
                     ProcessSubmission::dispatch($project);
 
-                    return response()->json([
-                        'project' => $project,
-                        'validation' => $validation,
-                    ]);
+                    if ($this->publishPrefersJsonResponse($request)) {
+                        return response()->json([
+                            'project' => $project,
+                            'validation' => $validation,
+                        ]);
+                    }
+
+                    return redirect()
+                        ->route('dashboard.projects', $project)
+                        ->with('success', 'Your submission has been queued for processing.');
                 } else {
-                    return response()->json([
-                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                        'validation' => $validation,
-                    ], 422);
+                    $project->refresh();
+
+                    if ($this->publishPrefersJsonResponse($request)) {
+                        return response()->json([
+                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                            'validation' => $validation,
+                        ], 422);
+                    }
+
+                    session()->now(
+                        'publish_validation_hints',
+                        $this->publishValidationHintsFromReport($validation->report)
+                    );
+
+                    throw ValidationException::withMessages([
+                        'publish' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                    ]);
                 }
             } else {
                 $draft = $project->draft;
@@ -365,14 +403,40 @@ class ProjectController extends Controller
                     $draft->save();
                 }
 
-                $project->release_date = $request->get('release_date');
-                $project->status = 'queued';
-                $project->save();
+                // Sample collection mode: always immediate public release (no embargo).
+                $project->release_date = now()->startOfDay()->toDateString();
 
                 $validation = $project->validation;
                 if ($validation) {
                     $validation->process();
                     $validation = $validation->fresh();
+                }
+
+                $status = true;
+                if ($validation) {
+                    $status = (bool) ($validation->report['project']['status'] ?? false);
+                }
+
+                if (! $status) {
+                    $project->refresh();
+
+                    $message = 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.';
+
+                    if ($this->publishPrefersJsonResponse($request)) {
+                        return response()->json([
+                            'errors' => $message,
+                            'validation' => $validation,
+                        ], 422);
+                    }
+
+                    session()->now(
+                        'publish_validation_hints',
+                        $this->publishValidationHintsFromReport($validation?->report)
+                    );
+
+                    throw ValidationException::withMessages([
+                        'publish' => $message,
+                    ]);
                 }
 
                 foreach ($project->studies as $study) {
@@ -384,31 +448,99 @@ class ProjectController extends Controller
                     }
                 }
 
-                $status = true;
+                $project->status = 'queued';
+                $project->save();
 
-                if ($validation && isset($validation['report']['project']['studies'])) {
-                    foreach ($validation['report']['project']['studies'] as $study) {
-                        if (! $study['status']) {
-                            $status = false;
-                        }
-                    }
-                }
-                // add license check
-                if ($status) {
-                    ProcessSubmission::dispatch($project);
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'publish_controller_dispatch_process_submission',
+                    'branch' => 'default_samples_mode',
+                    'project_id' => $project->id,
+                    'release_date' => $this->formatReleaseDateForLog($project->release_date),
+                    'status' => $project->status,
+                ]);
 
+                ProcessSubmission::dispatch($project);
+
+                if ($this->publishPrefersJsonResponse($request)) {
                     return response()->json([
                         'project' => $project,
                         'validation' => $validation,
                     ]);
-                } else {
-                    return response()->json([
-                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                    ], 422);
+                }
+
+                return redirect()
+                    ->route('dashboard.projects', $project)
+                    ->with('success', 'Your submission has been queued for processing.');
+            }
+        }
+
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $report
+     * @return array<int, string>
+     */
+    protected function publishValidationHintsFromReport(?array $report): array
+    {
+        if ($report === null || ! isset($report['project']) || ! is_array($report['project'])) {
+            return [];
+        }
+
+        $hints = [];
+        $project = $report['project'];
+
+        $citations = $project['citations'] ?? null;
+        if (is_string($citations) && str_starts_with($citations, 'false|')) {
+            $hints[] = 'Add a DOI to every citation, or choose a future release date if you are not ready to publish immediately.';
+        }
+
+        $labels = [
+            'title' => 'project name',
+            'description' => 'description',
+            'authors' => 'authors',
+            'license' => 'license',
+            'keywords' => 'keywords',
+        ];
+
+        foreach ($labels as $field => $label) {
+            $value = $project[$field] ?? null;
+            if (is_string($value) && str_starts_with($value, 'false|')) {
+                $hints[] = 'Complete the '.$label.' on the project before publishing.';
+            }
+        }
+
+        if (isset($project['studies']) && is_array($project['studies'])) {
+            foreach ($project['studies'] as $study) {
+                if (isset($study['status']) && $study['status'] === false) {
+                    $hints[] = 'One or more samples or datasets are incomplete. Open each sample and check metadata, structure, and spectral data.';
+
+                    break;
                 }
             }
         }
 
+        if ($hints === [] && isset($project['status']) && $project['status'] === false) {
+            $hints[] = 'Review project metadata and samples, then try again. You can also open the publish wizard for a full validation view.';
+        }
+
+        return array_values(array_unique($hints));
+    }
+
+    protected function publishPrefersJsonResponse(Request $request): bool
+    {
+        return ! $request->header('X-Inertia');
+    }
+
+    /**
+     * @param  Carbon|string|null  $value
+     */
+    protected function formatReleaseDateForLog(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return Carbon::parse($value)->toIso8601String();
     }
 
     public function store(Request $request, CreateNewProject $creator)

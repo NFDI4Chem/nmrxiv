@@ -220,7 +220,7 @@
                                 v-else
                                 class="text-sm leading-snug text-gray-400 dark:text-gray-500"
                             >
-                                No description yet.
+                                No description has been provided.
                             </p>
                             <div v-if="project.tags && project.tags.length">
                                 <Tag size="sm" :tags="project.tags" />
@@ -241,37 +241,246 @@
                                 :created_at="project.created_at"
                                 :updated_at="project.updated_at"
                             />
-                            <span
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium tabular-nums"
-                                :class="
-                                    project.is_public
-                                        ? 'border-emerald-200/80 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200'
-                                        : 'border-gray-200 bg-gray-100 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200'
-                                "
+                            <div
+                                class="flex shrink-0 items-center gap-2"
+                                @click.stop
                             >
-                                <GlobeAltIcon
-                                    v-if="project.is_public"
-                                    class="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400"
-                                />
-                                <LockClosedIcon
-                                    v-else
-                                    class="h-3.5 w-3.5 shrink-0 text-gray-600 dark:text-gray-400"
-                                />
-                                {{ project.is_public ? "Public" : "Private" }}
-                            </span>
+                                <button
+                                    v-if="
+                                        showFooterProvisionalDoiShare(project) &&
+                                        statusRibbonKey(project) !== 'embargo'
+                                    "
+                                    type="button"
+                                    class="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-black/[0.04] hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:ring-white/10 dark:hover:bg-gray-700/80"
+                                    :class="
+                                        isDashboardFooterShareOpen(project)
+                                            ? 'border-primary-200 bg-primary-50/80 text-primary-900 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-100'
+                                            : ''
+                                    "
+                                    :aria-expanded="
+                                        isDashboardFooterShareOpen(project)
+                                    "
+                                    :aria-controls="
+                                        'footer-share-doi-' + project.uuid
+                                    "
+                                    @click="
+                                        toggleDashboardFooterShare(project)
+                                    "
+                                >
+                                    <ShareIcon
+                                        class="h-3.5 w-3.5 shrink-0"
+                                        aria-hidden="true"
+                                    />
+                                    Share
+                                </button>
+                                <span
+                                    class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium tabular-nums"
+                                    :class="
+                                        project.is_public
+                                            ? 'border-emerald-200/80 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200'
+                                            : 'border-gray-200 bg-gray-100 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200'
+                                    "
+                                >
+                                    <GlobeAltIcon
+                                        v-if="project.is_public"
+                                        class="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400"
+                                    />
+                                    <LockClosedIcon
+                                        v-else
+                                        class="h-3.5 w-3.5 shrink-0 text-gray-600 dark:text-gray-400"
+                                    />
+                                    {{
+                                        project.is_public ? "Public" : "Private"
+                                    }}
+                                </span>
+                            </div>
                         </div>
                         <div
-                            v-if="
-                                !project.is_public &&
-                                project.release_date &&
-                                project.doi
-                            "
-                            class="mt-3 flex items-center gap-2 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                            v-show="isDashboardFooterShareOpen(project)"
+                            :id="'footer-share-doi-' + project.uuid"
+                            class="mt-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-900 shadow-sm dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-100"
                         >
-                            <span class="font-semibold">Scheduled release</span>
-                            <span class="tabular-nums">{{
-                                formatRecordTimestamp(project.release_date)
-                            }}</span>
+                            <dl class="text-left">
+                                <dt
+                                    class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                                >
+                                    {{ dashboardDoiHeadingLabel(project) }}
+                                </dt>
+                                <dd class="mt-0.5 min-w-0">
+                                    <a
+                                        :href="dashboardDoiLinkHref(project)"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center gap-1 break-all font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
+                                        @click.stop
+                                    >
+                                        {{ dashboardDoiLinkText(project) }}
+                                        <ArrowTopRightOnSquareIcon
+                                            class="h-3.5 w-3.5 shrink-0 opacity-80"
+                                            aria-hidden="true"
+                                        />
+                                    </a>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div
+                            v-if="showScheduledReleaseCard(project)"
+                            class="mt-3 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-3 text-xs text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                        >
+                            <div
+                                class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2"
+                            >
+                                <div
+                                    class="min-w-0 flex flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 font-medium"
+                                >
+                                    <span class="font-semibold">Scheduled release</span>
+                                    <span
+                                        class="tabular-nums text-amber-900 dark:text-amber-50"
+                                    >
+                                        {{
+                                            formatRecordTimestamp(
+                                                project.release_date
+                                            )
+                                        }}
+                                    </span>
+                                    <span
+                                        v-if="project.status === 'embargo'"
+                                        class="rounded-full bg-amber-100/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-900 ring-1 ring-amber-200/80 dark:bg-amber-900/60 dark:text-amber-100 dark:ring-amber-800"
+                                    >
+                                        Embargo
+                                    </span>
+                                </div>
+                                <div
+                                    class="ml-auto flex shrink-0 items-center gap-1"
+                                    @click.stop
+                                >
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center gap-1 rounded-lg border border-amber-200/80 bg-white/90 px-2 py-1.5 text-[11px] font-medium text-amber-950 shadow-sm ring-1 ring-amber-100/80 hover:bg-amber-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1 dark:border-amber-800 dark:bg-amber-900/50 dark:text-amber-100 dark:ring-amber-800/60 dark:hover:bg-amber-900/80"
+                                        :aria-expanded="
+                                            isScheduledReleaseShareOpen(
+                                                project
+                                            )
+                                        "
+                                        :aria-controls="
+                                            'scheduled-release-details-' +
+                                            project.uuid
+                                        "
+                                        :class="
+                                            isScheduledReleaseShareOpen(project)
+                                                ? 'border-amber-300 bg-amber-100 dark:border-amber-700 dark:bg-amber-900'
+                                                : ''
+                                        "
+                                        @click.stop="
+                                            toggleScheduledReleaseShare(project)
+                                        "
+                                    >
+                                        <ShareIcon
+                                            class="h-3.5 w-3.5 shrink-0"
+                                            aria-hidden="true"
+                                        />
+                                        Share
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center gap-1 rounded-lg border border-amber-200/80 bg-white/90 px-2 py-1.5 text-[11px] font-medium text-amber-950 shadow-sm ring-1 ring-amber-100/80 hover:bg-amber-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1 dark:border-amber-800 dark:bg-amber-900/50 dark:text-amber-100 dark:ring-amber-800/60 dark:hover:bg-amber-900/80"
+                                        @click.stop="
+                                            openReleaseDateModalForProject(
+                                                project
+                                            )
+                                        "
+                                    >
+                                        <PencilSquareIcon
+                                            class="h-3.5 w-3.5 shrink-0"
+                                            aria-hidden="true"
+                                        />
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                v-show="
+                                    isScheduledReleaseShareOpen(project)
+                                "
+                                class="mt-2 border-t border-amber-200/70 pt-2 dark:border-amber-800/80"
+                            >
+                                <dl
+                                    :id="
+                                        'scheduled-release-details-' +
+                                        project.uuid
+                                    "
+                                    class="grid gap-2.5 text-left dark:border-amber-800/80"
+                                >
+                                <div
+                                    v-if="hasDashboardDoiToShare(project)"
+                                >
+                                    <dt class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90">
+                                        {{ dashboardDoiHeadingLabel(project) }}
+                                    </dt>
+                                    <dd class="mt-0.5 min-w-0">
+                                        <a
+                                            :href="dashboardDoiLinkHref(project)"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-1 break-all font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
+                                            @click.stop
+                                        >
+                                            {{ dashboardDoiLinkText(project) }}
+                                            <ArrowTopRightOnSquareIcon
+                                                class="h-3.5 w-3.5 shrink-0 opacity-80"
+                                                aria-hidden="true"
+                                            />
+                                        </a>
+                                    </dd>
+                                </div>
+                                <div v-if="project.obfuscationcode">
+                                    <dt class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90">
+                                        Reviewer access (no login)
+                                    </dt>
+                                    <dd class="mt-1">
+                                        <div
+                                            class="flex min-w-0 rounded-md border border-amber-200/80 bg-white/90 shadow-sm dark:border-amber-800 dark:bg-gray-950/50"
+                                        >
+                                            <input
+                                                type="text"
+                                                readonly
+                                                class="min-w-0 flex-1 truncate border-0 bg-transparent px-2 py-1.5 text-[11px] text-gray-800 focus:ring-0 dark:text-gray-200 rounded-l-md"
+                                                :value="reviewerPreviewUrl(project)"
+                                                :aria-label="'Reviewer preview URL for ' + project.name"
+                                                @focus="$event.target.select()"
+                                                @click.stop
+                                            />
+                                            <button
+                                                type="button"
+                                                class="inline-flex shrink-0 items-center justify-center border-l border-amber-200/80 bg-amber-100/50 px-2 py-1.5 text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-100 dark:hover:bg-amber-900/70"
+                                                :aria-label="'Open reviewer preview for ' + project.name + ' in a new tab'"
+                                                @click.stop="openReviewerPreviewInNewTab(project)"
+                                            >
+                                                <ArrowTopRightOnSquareIcon
+                                                    class="h-3.5 w-3.5"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="inline-flex shrink-0 items-center gap-1 border-l border-amber-200/80 bg-amber-100/50 px-2 py-1.5 text-[11px] font-medium text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-100 dark:hover:bg-amber-900/70 rounded-r-md"
+                                                @click.stop="
+                                                    copyText(
+                                                        reviewerPreviewUrl(project)
+                                                    )
+                                                "
+                                            >
+                                                <ClipboardDocumentIcon
+                                                    class="h-3.5 w-3.5"
+                                                    aria-hidden="true"
+                                                />
+                                                Copy
+                                            </button>
+                                        </div>
+                                    </dd>
+                                </div>
+                            </dl>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -281,12 +490,13 @@
 </template>
 <script>
 import { router } from "@inertiajs/vue3";
-import { StarIcon } from "@heroicons/vue/24/solid";
+import { StarIcon, ShareIcon, PencilSquareIcon } from "@heroicons/vue/24/solid";
 import {
     ArchiveBoxIcon,
     ArrowPathIcon,
     ArrowTopRightOnSquareIcon,
     CheckCircleIcon,
+    ClipboardDocumentIcon,
     Cog6ToothIcon,
     DocumentTextIcon,
     GlobeAltIcon,
@@ -300,7 +510,10 @@ import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 export default {
     components: {
         StarIcon,
+        ShareIcon,
+        PencilSquareIcon,
         ArrowTopRightOnSquareIcon,
+        ClipboardDocumentIcon,
         Cog6ToothIcon,
         ArchiveBoxIcon,
         ArrowPathIcon,
@@ -317,7 +530,12 @@ export default {
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},
     data() {
-        return {};
+        return {
+            /** UUID → whether share details (DOI / provisional DOI, reviewer URL) are expanded */
+            scheduledReleaseShareOpenByUuid: {},
+            /** UUID → whether dashboard footer “Share” (DOI / provisional DOI) is expanded */
+            dashboardFooterShareOpenByUuid: {},
+        };
     },
     methods: {
         openDatasetCreateDialog(data) {
@@ -370,6 +588,118 @@ export default {
         },
         getProjectSettingsLink(project) {
             return route("dashboard.project.settings", [project.id]);
+        },
+        /**
+         * Private project with a future release shown as embargo on the dashboard ribbon.
+         */
+        showScheduledReleaseCard(project) {
+            if (!project || project.is_public || !project.release_date) {
+                return false;
+            }
+
+            return this.statusRibbonKey(project) === "embargo";
+        },
+        isScheduledReleaseShareOpen(project) {
+            return !!this.scheduledReleaseShareOpenByUuid[project.uuid];
+        },
+        toggleScheduledReleaseShare(project) {
+            const id = project.uuid;
+            const next = !this.scheduledReleaseShareOpenByUuid[id];
+
+            this.scheduledReleaseShareOpenByUuid = {
+                ...this.scheduledReleaseShareOpenByUuid,
+                [id]: next,
+            };
+        },
+        showFooterProvisionalDoiShare(project) {
+            return this.hasDashboardDoiToShare(project);
+        },
+        hasDashboardDoiToShare(project) {
+            const hasProvisional =
+                project?.provisional_doi && project?.provisional_doi_url;
+            const hasPublishedDoi = project?.is_published && project?.doi;
+
+            return !!(hasProvisional || hasPublishedDoi);
+        },
+        dashboardDoiHeadingLabel(project) {
+            return project?.is_published ? "DOI" : "Provisional DOI";
+        },
+        dashboardDoiLinkHref(project) {
+            if (project?.is_published && project?.doi) {
+                const raw = String(project.doi).trim();
+
+                if (/^https?:\/\//i.test(raw)) {
+                    return raw;
+                }
+
+                return `https://doi.org/${raw}`;
+            }
+
+            return project?.provisional_doi_url ?? "#";
+        },
+        dashboardDoiLinkText(project) {
+            if (project?.is_published && project?.doi) {
+                return String(project.doi)
+                    .trim()
+                    .replace(/^https?:\/\/doi\.org\//i, "");
+            }
+
+            return project?.provisional_doi ?? "";
+        },
+        isDashboardFooterShareOpen(project) {
+            return !!this.dashboardFooterShareOpenByUuid[project.uuid];
+        },
+        toggleDashboardFooterShare(project) {
+            const id = project.uuid;
+            const next = !this.dashboardFooterShareOpenByUuid[id];
+
+            this.dashboardFooterShareOpenByUuid = {
+                ...this.dashboardFooterShareOpenByUuid,
+                [id]: next,
+            };
+        },
+        openReleaseDateModalForProject(project) {
+            const url =
+                this.route("dashboard.projects", [project.id]) +
+                "?edit=release_date";
+            window.open(url, "_blank");
+        },
+        reviewerPreviewUrl(project) {
+            if (!project?.obfuscationcode) {
+                return "";
+            }
+
+            return this.route("project.preview", [project.obfuscationcode]);
+        },
+        openReviewerPreviewInNewTab(project) {
+            const url = this.reviewerPreviewUrl(project);
+            if (!url) {
+                return;
+            }
+            window.open(url, "_blank");
+        },
+        async copyText(text) {
+            if (!text) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch {
+                try {
+                    const el = document.createElement("textarea");
+                    el.value = text;
+                    el.setAttribute("readonly", "");
+                    el.style.position = "fixed";
+                    el.style.left = "-9999px";
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(el);
+                } catch {
+                    /* ignore */
+                }
+            }
         },
         toggleProjectStarred(project) {
             window.axios

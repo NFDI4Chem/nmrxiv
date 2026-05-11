@@ -1,16 +1,18 @@
 <template>
-    <div v-if="citationText" class="p-2 sm:p-3">
-        <div class="rounded-md bg-blue-50 border border-blue-200">
-            <!-- Compact header section -->
+    <div v-if="doi" class="w-full min-w-0 p-1.5 sm:p-2">
+        <div
+            class="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30"
+        >
             <div
-                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 px-2 sm:px-2 pt-2"
+                class="flex flex-col gap-2 px-2 pt-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-2 sm:pt-2"
             >
-                <!-- Title and icon section with copy button -->
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
+                <div
+                    class="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3"
+                >
+                    <div class="flex min-w-0 items-center gap-2">
+                        <div class="shrink-0">
                             <svg
-                                class="h-4 w-4 text-blue-400"
+                                class="h-5 w-5 text-blue-500 dark:text-blue-400"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
@@ -23,36 +25,39 @@
                                 />
                             </svg>
                         </div>
-                        <div class="ml-2">
-                            <h3 class="text-sm font-medium text-blue-700">
-                                <span v-if="model == 'study'"
-                                    >Cite this sample</span
-                                >
-                                <span v-else>Cite this {{ model }}</span>
-                            </h3>
-                        </div>
+                        <h3
+                            id="citation-heading"
+                            class="text-base font-semibold leading-snug tracking-tight text-blue-900 sm:text-[1.0625rem] dark:text-blue-100"
+                        >
+                            {{ headingTitle }}
+                        </h3>
                     </div>
-
-                    <!-- Copy button next to title -->
                     <button
+                        type="button"
                         :class="[
-                            'inline-flex items-center justify-center p-1.5 rounded-md border transition-all duration-200',
+                            'inline-flex shrink-0 items-center justify-center rounded-md border p-1.5 transition-all duration-200',
                             copied
-                                ? 'border-green-300 bg-green-50 text-green-600'
-                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-400',
+                                ? 'border-green-300 bg-green-50 text-green-600 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400'
+                                : 'border-transparent bg-blue-100/80 text-blue-600 hover:border-blue-300 hover:bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:border-blue-600 dark:hover:bg-blue-900/70',
                         ]"
                         :title="
                             copied ? 'Copied!' : 'Copy citation to clipboard'
                         "
+                        :aria-label="
+                            copied
+                                ? 'Citation copied to clipboard'
+                                : 'Copy citation to clipboard'
+                        "
+                        :disabled="!citationText"
                         @click="copyCitation"
                     >
-                        <!-- Copy icon -->
                         <svg
                             v-if="!copied"
                             class="h-3.5 w-3.5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
+                            aria-hidden="true"
                         >
                             <path
                                 stroke-linecap="round"
@@ -61,13 +66,13 @@
                                 d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                             />
                         </svg>
-                        <!-- Check icon when copied -->
                         <svg
                             v-else
                             class="h-3.5 w-3.5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
+                            aria-hidden="true"
                         >
                             <path
                                 stroke-linecap="round"
@@ -79,40 +84,75 @@
                     </button>
                 </div>
 
-                <!-- Compact format selector -->
-                <div class="flex items-center gap-2">
+                <div class="flex shrink-0 items-center gap-2">
                     <label
-                        class="text-xs font-medium text-blue-600 hidden sm:block"
+                        class="hidden text-[0.6875rem] font-semibold uppercase tracking-wide text-blue-700 sm:inline dark:text-blue-300"
+                        for="citation-style-select"
+                        >Format:</label
                     >
-                        Format:
-                    </label>
                     <select
+                        id="citation-style-select"
                         v-model="selectedFormat"
-                        class="block rounded-md border-gray-300 py-1.5 px-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white shadow-sm min-w-[120px]"
+                        class="block min-w-[8.5rem] rounded-md border-gray-300 bg-white py-1.5 pl-2 pr-8 text-sm font-medium text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                        :disabled="loading && !citationText"
                         @change="queryDataCite"
                     >
-                        <option name="citation" value="APA">APA</option>
-                        <option name="citation" value="Harvard">Harvard</option>
-                        <option name="citation" value="MLA">MLA</option>
-                        <option name="citation" value="Vancouver">
-                            Vancouver
-                        </option>
-                        <option name="citation" value="Chicago">Chicago</option>
-                        <option name="citation" value="IEEE">IEEE</option>
-                        <option name="citation" value="ACS">ACS</option>
-                        <option name="citation" value="RSC">RSC</option>
-                        <option name="citation" value="Wiley">Wiley</option>
-                        <option name="citation" value="Springer">
-                            Springer Nature
-                        </option>
+                        <option value="APA">APA</option>
+                        <option value="Harvard">Harvard</option>
+                        <option value="MLA">MLA</option>
+                        <option value="Vancouver">Vancouver</option>
+                        <option value="Chicago">Chicago</option>
+                        <option value="IEEE">IEEE</option>
+                        <option value="ACS">ACS</option>
+                        <option value="RSC">RSC</option>
+                        <option value="Wiley">Wiley</option>
+                        <option value="Springer">Springer Nature</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Citation text section -->
-            <div class="mt-3 pt-3 border-t border-blue-200 p-3 sm:p-4">
+            <div
+                class="mt-2 border-t border-blue-200 px-2 pb-2 pt-2 sm:px-3 sm:pb-2.5 sm:pt-2.5 dark:border-blue-900/50"
+                role="region"
+                :aria-busy="loading ? 'true' : 'false'"
+                aria-live="polite"
+            >
+                <div
+                    v-if="loading && !citationText"
+                    class="space-y-2 px-0.5"
+                    aria-hidden="true"
+                >
+                    <div
+                        class="h-2.5 max-w-xl animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
+                    ></div>
+                    <div
+                        class="h-2.5 max-w-lg animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
+                    ></div>
+                    <div
+                        class="h-2.5 max-w-md animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
+                    ></div>
+                </div>
+
+                <div
+                    v-else-if="loadError"
+                    class="rounded border border-amber-200 bg-amber-50 p-2 text-xs leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100"
+                >
+                    <p class="text-sm font-semibold">Could not load citation.</p>
+                    <p class="mt-0.5 font-normal opacity-90">
+                        Try another format or open
+                        <a
+                            :href="doiResolverUrl"
+                            class="font-semibold text-amber-800 underline dark:text-amber-200"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            >the DOI page</a
+                        >.
+                    </p>
+                </div>
+
                 <p
-                    class="text-sm font-medium text-gray-900 leading-relaxed break-words"
+                    v-else-if="citationText"
+                    class="max-h-[min(22rem,50vh)] overflow-y-auto overflow-x-auto break-words text-sm font-normal leading-relaxed text-gray-900 antialiased sm:text-[0.9375rem] dark:text-gray-100"
                     v-html="sanitizeHtml(citationText)"
                 ></p>
             </div>
@@ -122,8 +162,8 @@
 
 <script>
 import axios from "axios";
+
 export default {
-    components: {},
     props: ["doi", "model"],
     data() {
         return {
@@ -143,6 +183,8 @@ export default {
             citationText: null,
             processedResponse: null,
             copied: false,
+            loading: false,
+            loadError: false,
         };
     },
     computed: {
@@ -151,10 +193,25 @@ export default {
                 ? String(this.$page.props.dataciteURL) + "/dois/"
                 : "https://api.datacite.org/dois/";
         },
+        doiResolverUrl() {
+            return "https://doi.org/" + this.doi;
+        },
+        headingTitle() {
+            if (this.model === "study") {
+                return "Cite this study";
+            }
+            if (this.model === "sample") {
+                return "Cite this sample";
+            }
+            if (this.model === "project") {
+                return "Cite this project";
+            }
+            return "Cite this " + this.model;
+        },
     },
     watch: {
         doi(newDOI, oldDOI) {
-            if (newDOI != oldDOI) {
+            if (newDOI !== oldDOI) {
                 this.queryDataCite();
             }
         },
@@ -166,7 +223,14 @@ export default {
     },
     methods: {
         queryDataCite() {
-            let config = {
+            if (!this.doi) {
+                return;
+            }
+
+            this.loading = true;
+            this.loadError = false;
+
+            const config = {
                 headers: {
                     Accept: "text/x-bibliography; charset=utf-8",
                 },
@@ -180,43 +244,40 @@ export default {
                         this.formats[this.selectedFormat],
                     config
                 )
-                .then(
-                    (response) => {
-                        this.processedResponse = response.data;
-                        if (this.selectedFormat == "ACS") {
-                            var pattern = /20(\d{2})(?=\.)/;
-                            var matchIndex =
-                                this.processedResponse.search(pattern);
-                            this.processedResponse =
-                                this.processedResponse.substring(
-                                    0,
-                                    matchIndex - 2
-                                ) +
-                                ". nmrXiv. " +
-                                this.processedResponse.substring(matchIndex);
-                        } else if (this.selectedFormat == "RSC") {
-                            var id = this.doi.substring(
-                                this.doi.lastIndexOf(".") + 1
+                .then((response) => {
+                    this.processedResponse = response.data;
+                    if (this.selectedFormat === "ACS") {
+                        const pattern = /20(\d{2})(?=\.)/;
+                        const matchIndex =
+                            this.processedResponse.search(pattern);
+                        this.processedResponse =
+                            this.processedResponse.substring(0, matchIndex - 2) +
+                            ". nmrXiv. " +
+                            this.processedResponse.substring(matchIndex);
+                    } else if (this.selectedFormat === "RSC") {
+                        const id = this.doi.substring(
+                            this.doi.lastIndexOf(".") + 1
+                        );
+                        this.processedResponse =
+                            this.processedResponse.slice(0, -1) +
+                            ", nmrXiv Data set:" +
+                            id +
+                            ", DOI:" +
+                            this.doi;
+                    } else if (this.selectedFormat === "Wiley") {
+                        this.processedResponse =
+                            "[dataset] " +
+                            this.processedResponse.replace(
+                                " [Data set]",
+                                ""
                             );
-                            this.processedResponse =
-                                this.processedResponse.slice(0, -1) +
-                                ", nmrXiv Data set:" +
-                                id +
-                                ", DOI:" +
-                                this.doi;
-                        } else if (this.selectedFormat == "Wiley") {
-                            this.processedResponse =
-                                "[dataset] " +
-                                this.processedResponse.replace(
-                                    " [Data set]",
-                                    ""
-                                );
-                        } else if (this.selectedFormat == "Springer") {
-                            var springerPattern = /\(20(\d{2})\)/;
-                            var match =
-                                this.processedResponse.match(springerPattern);
-                            var springerMatchIndex =
-                                this.processedResponse.search(springerPattern);
+                    } else if (this.selectedFormat === "Springer") {
+                        const springerPattern = /\(20(\d{2})\)/;
+                        const match =
+                            this.processedResponse.match(springerPattern);
+                        const springerMatchIndex =
+                            this.processedResponse.search(springerPattern);
+                        if (match) {
                             this.processedResponse =
                                 this.processedResponse.substring(
                                     0,
@@ -228,16 +289,19 @@ export default {
                                 " " +
                                 match[0];
                         }
-                        this.citationText = this.processedResponse;
-                    },
-                    (error) => {
-                        console.log(error);
                     }
-                );
+                    this.citationText = this.processedResponse;
+                    this.loadError = false;
+                })
+                .catch(() => {
+                    this.loadError = true;
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         async copyCitation() {
             try {
-                // Create a temporary element to extract plain text from HTML
                 const tempDiv = document.createElement("div");
                 tempDiv.innerHTML = this.citationText;
                 const plainText =
@@ -246,7 +310,6 @@ export default {
                 if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(plainText);
                 } else {
-                    // Fallback for older browsers
                     const textArea = document.createElement("textarea");
                     textArea.value = plainText;
                     textArea.style.position = "fixed";
@@ -259,10 +322,8 @@ export default {
                     textArea.remove();
                 }
 
-                // Show visual feedback
                 this.copied = true;
 
-                // Reset the copied state after 2 seconds
                 setTimeout(() => {
                     this.copied = false;
                 }, 2000);

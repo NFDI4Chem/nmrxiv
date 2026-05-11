@@ -10,6 +10,9 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -549,5 +552,35 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Showing 11 to 11', false);
         $response->assertSee('PaginatedProj11', false);
+    }
+
+    public function test_dashboard_inertia_payload_includes_embargo_project_fields_for_scheduled_release_ui(): void
+    {
+        $provisionalDoi = '10.5281/nmrxiv.dashboard-prov-'.Str::lower(Str::random(8));
+        $obfuscation = 'obf-dashboard-embargo-'.Str::lower(Str::random(8));
+
+        Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'is_public' => false,
+            'status' => 'embargo',
+            'release_date' => now()->addDays(30),
+            'obfuscationcode' => $obfuscation,
+        ])->forceFill(['provisional_doi' => $provisionalDoi])->save();
+
+        $response = $this->actingAs($this->user)->get('/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+            ->has('projects.data', 1, fn (AssertableJson $json) => $json
+                ->where('status', 'embargo')
+                ->where('provisional_doi', $provisionalDoi)
+                ->where('provisional_doi_url', fn (mixed $url): bool => is_string($url) && str_contains((string) $url, $provisionalDoi))
+                ->where('obfuscationcode', $obfuscation)
+                ->where('is_public', false)
+            )
+        );
     }
 }

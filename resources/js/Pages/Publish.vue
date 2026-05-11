@@ -126,22 +126,149 @@
             <div v-if="status == 'draft'">
                 <div id="project-details" class="p-4">
                     <div class="p-8">
-                        <div>
-                            <label
-                                class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                        <div class="mb-6">
+                            <p
+                                id="publish-mode-heading"
+                                class="mb-3 text-base font-semibold leading-snug text-gray-900 dark:text-gray-100"
                             >
-                                <small v-if="publishForm.enableProjectMode"
-                                    >PUBLISH AS PROJECT</small
+                                How should this submission be published?
+                            </p>
+                            <div
+                                class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-6 lg:gap-8"
+                            >
+                                <div class="shrink-0 flex flex-col gap-3">
+                                    <div class="sm:hidden">
+                                    <select
+                                        id="publish-mode-tab-select"
+                                        name="publish-mode"
+                                        class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+                                        aria-labelledby="publish-mode-heading"
+                                        :value="
+                                            publishForm.enableProjectMode
+                                                ? 'project'
+                                                : 'samples'
+                                        "
+                                        @change="onPublishModeSelect($event)"
+                                    >
+                                        <option value="project">
+                                            Group as one publication
+                                        </option>
+                                        <option value="samples">
+                                            Publish each sample on its own
+                                        </option>
+                                    </select>
+                                </div>
+                                <div
+                                    class="hidden sm:flex sm:items-center sm:gap-4"
                                 >
-                                <small v-else>PUBLISH SAMPLES</small>
-                            </label>
-                            <toggle-button
-                                v-model:enabled="publishForm.enableProjectMode"
-                                @blur="updateDraft"
-                            />
+                                    <div
+                                        class="inline-flex rounded-lg bg-gray-100 p-1 ring-1 ring-inset ring-gray-200/80 dark:bg-gray-800 dark:ring-gray-700/80"
+                                        role="tablist"
+                                        aria-labelledby="publish-mode-heading"
+                                    >
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            :aria-selected="
+                                                publishForm.enableProjectMode
+                                            "
+                                            :class="[
+                                                publishForm.enableProjectMode
+                                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                                                    : 'text-gray-600 hover:bg-white/60 hover:text-gray-900',
+                                                'rounded-lg px-3 py-2.5 text-left text-xs font-medium leading-snug transition-colors sm:px-4 sm:text-sm',
+                                            ]"
+                                            @click="setPublishProjectMode(true)"
+                                        >
+                                            Group as one publication
+                                        </button>
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            :aria-selected="
+                                                !publishForm.enableProjectMode
+                                            "
+                                            :class="[
+                                                !publishForm.enableProjectMode
+                                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                                                    : 'text-gray-600 hover:bg-white/60 hover:text-gray-900',
+                                                'rounded-lg px-3 py-2.5 text-left text-xs font-medium leading-snug transition-colors sm:px-4 sm:text-sm',
+                                            ]"
+                                            @click="
+                                                setPublishProjectMode(false)
+                                            "
+                                        >
+                                            Publish each sample on its own
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p
+                                class="text-sm text-gray-600 leading-relaxed sm:flex-1 sm:min-w-0 sm:pt-0.5"
+                            >
+                                <span v-if="publishForm.enableProjectMode">
+                                    <strong>Group as one publication</strong>
+                                    puts your samples under one nmrXiv project with
+                                    shared metadata and a canonical DOI — use this
+                                    when samples belong to the same study or
+                                    publication.
+                                </span>
+                                <span v-else>
+                                    <strong>Publish each sample on its own</strong>
+                                    creates a separate record for each sample instead
+                                    of one grouped project—use this when measurements
+                                    are unrelated or add samples to your spectral
+                                    library.
+                                </span>
+                            </p>
+                            </div>
                         </div>
                         <div>
                             <div class="p-4 bg-gray-100 rounded-md">
+                                <div
+                                    v-if="!publishForm.enableProjectMode"
+                                    class="mb-3"
+                                >
+                                    <button
+                                        type="button"
+                                        class="flex w-full items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-left shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                        :aria-expanded="samplesMetadataExpanded"
+                                        aria-controls="publish-optional-metadata"
+                                        @click="
+                                            samplesMetadataExpanded =
+                                                !samplesMetadataExpanded
+                                        "
+                                    >
+                                        <span class="min-w-0">
+                                            <span
+                                                class="block text-sm font-medium text-gray-900"
+                                                >Optional metadata</span
+                                            >
+                                            <span
+                                                class="mt-0.5 block text-xs text-gray-500"
+                                                >Keywords, organism, citations,
+                                                and authors</span
+                                            >
+                                        </span>
+                                        <ChevronDownIcon
+                                            v-if="!samplesMetadataExpanded"
+                                            class="h-5 w-5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <ChevronUpIcon
+                                            v-else
+                                            class="h-5 w-5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
+                                </div>
+                                <div
+                                    v-show="
+                                        publishForm.enableProjectMode ||
+                                        samplesMetadataExpanded
+                                    "
+                                    id="publish-optional-metadata"
+                                >
                                 <div
                                     v-if="publishForm.enableProjectMode"
                                     id="project-name"
@@ -247,10 +374,7 @@
                                             max-width="100%"
                                             :tags="publishForm.tags"
                                             @blur="updateProject"
-                                            @tags-changed="
-                                                (newTags) =>
-                                                    (publishForm.tags = newTags)
-                                            "
+                                            @tags-changed="onPublishKeywordsChanged"
                                         />
                                     </div>
                                     <jet-input-error
@@ -635,6 +759,7 @@
                                                         Remove Photo
                                                     </jet-secondary-button> -->
                                 </div>
+                                </div>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -660,19 +785,93 @@
                             </div>
                         </div>
                         <div class="mt-3 p-4 bg-gray-100 rounded-md">
-                            <div id="release">
+                            <div v-if="publishForm.enableProjectMode" id="release">
                                 <label
-                                    class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                                    class="block text-sm font-medium text-gray-700"
                                 >
-                                    Release Date
+                                    Release
                                 </label>
-                                <Datepicker
-                                    v-model="publishForm.release_date"
-                                    :min-date="new Date()"
-                                    :format="customDateFormat"
-                                    :preview-format="customDateFormat"
-                                    @update:model-value="updateProject"
-                                ></Datepicker>
+                                <div class="sm:hidden mt-2">
+                                    <label
+                                        for="release-visibility-select"
+                                        class="sr-only"
+                                        >Choose public release or embargo</label
+                                    >
+                                    <select
+                                        id="release-visibility-select"
+                                        class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        :value="releaseVisibility"
+                                        @change="
+                                            setReleaseVisibility(
+                                                $event.target.value
+                                            )
+                                        "
+                                    >
+                                        <option value="public">Public</option>
+                                        <option value="embargo">Embargo</option>
+                                    </select>
+                                </div>
+                                <div
+                                    class="hidden sm:flex sm:items-center sm:gap-4 mt-2"
+                                >
+                                    <div
+                                        class="inline-flex rounded-lg bg-gray-100 p-1 ring-1 ring-inset ring-gray-200/80"
+                                        role="tablist"
+                                        aria-label="Release as public or under embargo"
+                                    >
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            :aria-selected="
+                                                releaseVisibility === 'public'
+                                            "
+                                            :class="[
+                                                releaseVisibility === 'public'
+                                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                                                    : 'text-gray-600 hover:bg-white/60 hover:text-gray-900',
+                                                'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors',
+                                            ]"
+                                            @click="setReleaseVisibility('public')"
+                                        >
+                                            Public
+                                        </button>
+                                        <button
+                                            type="button"
+                                            role="tab"
+                                            :aria-selected="
+                                                releaseVisibility === 'embargo'
+                                            "
+                                            :class="[
+                                                releaseVisibility === 'embargo'
+                                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                                                    : 'text-gray-600 hover:bg-white/60 hover:text-gray-900',
+                                                'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors',
+                                            ]"
+                                            @click="
+                                                setReleaseVisibility('embargo')
+                                            "
+                                        >
+                                            Embargo
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    v-if="releaseVisibility === 'embargo'"
+                                    class="mt-3"
+                                >
+                                    <label
+                                        class="block text-sm font-medium text-gray-700"
+                                    >
+                                        Embargo until
+                                    </label>
+                                    <Datepicker
+                                        v-model="publishForm.release_date"
+                                        :min-date="new Date()"
+                                        :format="customDateFormat"
+                                        :preview-format="customDateFormat"
+                                        @update:model-value="updateProject"
+                                    ></Datepicker>
+                                </div>
                                 <div
                                     class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4"
                                 >
@@ -683,9 +882,10 @@
                                     >
                                         <p class="text-sm text-gray-600">
                                             Your data becomes publicly accessible
-                                            right away with a DOI. Please select a
-                                            future date if you would like to embargo
-                                            your data for peer review. Need help?
+                                            right away with a DOI. Choose
+                                            <strong>Embargo</strong> above if you
+                                            want a scheduled release for peer
+                                            review. Need help?
                                             <a
                                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
                                                 target="_blank"
@@ -743,6 +943,19 @@
                                         </ul>
                                     </div>
                                 </div>
+                            </div>
+                            <div v-else id="release">
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Release
+                                </label>
+                                <p class="mt-2 text-sm text-gray-600">
+                                    Publishing as individual samples always uses
+                                    immediate public release. Embargo scheduling
+                                    is only available when you publish as a
+                                    project.
+                                </p>
                             </div>
                             <div class="mt-6">
                                 <!--License -->
@@ -1023,6 +1236,7 @@
             <!-- Single Sample Modal -->
             <jet-confirmation-modal
                 :show="showSingleSampleModal"
+                max-width="5xl"
                 @close="showSingleSampleModal = false"
             >
                 <template #title> Single sample detected in project </template>
@@ -1052,11 +1266,11 @@
                     >
                         Cancel
                     </jet-secondary-button>
-                    <jet-secondary-button class="ml-2" @click="publishAsSample">
-                        Publish as Sample
+                    <jet-secondary-button @click="publishAsSample">
+                        Publish each sample on its own
                     </jet-secondary-button>
-                    <jet-success-button class="ml-2" @click="publishAsProject">
-                        Publish as Project
+                    <jet-success-button @click="publishAsProject">
+                        Group as one publication
                     </jet-success-button>
                 </template>
             </jet-confirmation-modal>
@@ -1110,10 +1324,7 @@
                     >
                         Cancel
                     </jet-secondary-button>
-                    <jet-success-button
-                        class="ml-2"
-                        @click="confirmDraftWarning"
-                    >
+                    <jet-success-button @click="confirmDraftWarning">
                         Yes, Proceed
                     </jet-success-button>
                 </template>
@@ -1134,8 +1345,8 @@
                         </span>
                         <span v-else>
                             Once the data is published you will no longer be
-                            able to change the data uploaded! This sample will
-                            be published as an individual sample.
+                            able to change the data uploaded! These samples will
+                            be published as individual records.
                         </span>
                     </div>
                     <div v-else class="text-sm text-gray-600">
@@ -1151,13 +1362,9 @@
                             project later if desired.
                         </span>
                         <span v-else>
-                            Opting for an Embargo publication grants your sample
-                            a DOI, yet it stays private exclusively for you. You
-                            have the option to share the sample with others and
-                            can adjust the release date or promptly make it
-                            public through the sample's dashboard view. But once
-                            the data is published you will no longer be able to
-                            change the data uploaded!
+                            Individual samples publish with immediate public
+                            release when processing completes. Uploaded content
+                            can no longer be edited after publication.
                         </span>
                     </div>
                 </template>
@@ -1169,12 +1376,11 @@
                     </jet-secondary-button>
                     <jet-success-button
                         v-if="isReleasedToday()"
-                        class="ml-2"
                         @click="publish"
                     >
                         Publish Now
                     </jet-success-button>
-                    <jet-success-button v-else class="ml-2" @click="publish">
+                    <jet-success-button v-else @click="publish">
                         Publish with Embargo
                     </jet-success-button>
                 </template>
@@ -1203,11 +1409,12 @@ import CitationCard from "@/Shared/CitationCard.vue";
 import { PlusIcon } from "@heroicons/vue/24/solid";
 import {
     Bars3Icon,
+    ChevronDownIcon,
+    ChevronUpIcon,
     DocumentTextIcon,
     UserGroupIcon,
 } from "@heroicons/vue/24/outline";
 import Draggable from "vuedraggable";
-import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
@@ -1230,11 +1437,12 @@ export default {
         DocumentTextIcon,
         UserGroupIcon,
         Validation,
-        ToggleButton,
         StudyInfo,
         CitationCard,
         Draggable,
         Bars3Icon,
+        ChevronDownIcon,
+        ChevronUpIcon,
     },
     props: ["user", "team", "project", "teamRole", "draft"],
 
@@ -1258,6 +1466,8 @@ export default {
                 tags: [],
                 tag: "",
                 tags_array: [],
+                project_tags_updated: true,
+                project_species_updated: true,
                 owner_id: null,
                 species: [],
                 photo: null,
@@ -1292,6 +1502,10 @@ export default {
             /** Author ids in order when a drag started (to detect real changes) */
             publishAuthorsOrderBeforeDrag: [],
             authorOrderSaveInProgress: false,
+            /** 'public' = immediate release; 'embargo' = date picker shown */
+            releaseVisibility: "public",
+            /** When publishing as samples, optional metadata starts collapsed */
+            samplesMetadataExpanded: false,
         };
     },
     beforeUnmount() {
@@ -1307,8 +1521,20 @@ export default {
                 this.syncOrderedAuthorsFromProject();
             },
         },
+        "publishForm.enableProjectMode"(enabled) {
+            if (!enabled) {
+                this.samplesMetadataExpanded = false;
+                this.applySampleModeReleaseSchedule();
+            }
+        },
     },
     created() {
+        this.releaseVisibility = this.computeInitialReleaseVisibility();
+        if (this.releaseVisibility === "public") {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            this.publishForm.release_date = d;
+        }
         this.syncOrderedAuthorsFromProject();
     },
     computed: {
@@ -1333,6 +1559,9 @@ export default {
             return this.tabs.find((t) => t.current);
         },
         isImmediatePublication() {
+            if (this.releaseVisibility === "public") {
+                return true;
+            }
             if (!this.publishForm.release_date) return true;
             const today = new Date();
             const releaseDate = new Date(this.publishForm.release_date);
@@ -1342,6 +1571,10 @@ export default {
             return releaseDate.getTime() === today.getTime();
         },
         hasDraftInName() {
+            if (!this.publishForm.enableProjectMode) {
+                return false;
+            }
+
             return (
                 this.publishForm.name &&
                 this.publishForm.name.toLowerCase().includes("draft")
@@ -1409,10 +1642,19 @@ export default {
         }
         this.loadLicenses();
 
+        this.applySampleModeReleaseSchedule();
+
         this.$nextTick(() => {
             const urlSearchParams = new URLSearchParams(window.location.search);
             const params = Object.fromEntries(urlSearchParams.entries());
             let edit = params["edit"];
+
+            if (
+                !this.publishForm.enableProjectMode &&
+                ["citation", "keywords", "organism", "authors"].includes(edit)
+            ) {
+                this.samplesMetadataExpanded = true;
+            }
 
             if (edit == "citation") {
                 this.$nextTick(() => {
@@ -1446,6 +1688,17 @@ export default {
         });
     },
     methods: {
+        setPublishProjectMode(enabled) {
+            if (this.publishForm.enableProjectMode === enabled) {
+                return;
+            }
+            this.publishForm.enableProjectMode = enabled;
+            this.updateDraft();
+        },
+        onPublishModeSelect(event) {
+            const value = event.target.value;
+            this.setPublishProjectMode(value === "project");
+        },
         selectNewPhoto() {
             this.$refs.photo.click();
         },
@@ -1550,6 +1803,15 @@ export default {
                 }
             );
         },
+        onPublishKeywordsChanged(newTags) {
+            const list = Array.isArray(newTags) ? newTags : [];
+            this.publishForm.tags = list.map((t) =>
+                typeof t === "object" && t !== null ? { ...t } : { text: String(t) }
+            );
+            this.$nextTick(() => {
+                this.updateProject();
+            });
+        },
         updateSpecies(species) {
             if (species && species != "") {
                 this.publishForm.species.push(species);
@@ -1560,6 +1822,7 @@ export default {
         removeSpecies(index) {
             if (index > -1) {
                 this.publishForm.species.splice(index, 1);
+                this.updateProject();
             }
         },
         getTarget(id) {
@@ -1585,6 +1848,43 @@ export default {
             } else {
                 return this.project.release_date;
             }
+        },
+        computeInitialReleaseVisibility() {
+            if (!this.project.release_date) {
+                return "public";
+            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const release = new Date(this.project.release_date);
+            release.setHours(0, 0, 0, 0);
+            return release.getTime() > today.getTime() ? "embargo" : "public";
+        },
+        setReleaseVisibility(mode) {
+            if (!this.publishForm.enableProjectMode) {
+                return;
+            }
+            if (this.releaseVisibility === mode) {
+                return;
+            }
+            this.releaseVisibility = mode;
+            if (mode === "public") {
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                this.publishForm.release_date = d;
+            } else {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const release = this.publishForm.release_date
+                    ? new Date(this.publishForm.release_date)
+                    : new Date();
+                release.setHours(0, 0, 0, 0);
+                if (release.getTime() <= today.getTime()) {
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    this.publishForm.release_date = tomorrow;
+                }
+            }
+            this.updateProject();
         },
         loadLicenses() {
             if (this.$page.props.licenses) {
@@ -1779,7 +2079,33 @@ export default {
                 });
             }
         },
+        applySampleModeReleaseSchedule() {
+            if (this.publishForm.enableProjectMode) {
+                return;
+            }
+            this.releaseVisibility = "public";
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            const prev = this.publishForm.release_date
+                ? new Date(this.publishForm.release_date)
+                : null;
+            if (prev) {
+                prev.setHours(0, 0, 0, 0);
+            }
+            const needsPersist =
+                !prev || prev.getTime() !== d.getTime();
+            this.publishForm.release_date = d;
+            if (needsPersist) {
+                this.updateProject();
+            }
+        },
         isReleasedToday() {
+            if (!this.publishForm.enableProjectMode) {
+                return true;
+            }
+            if (this.releaseVisibility === "public") {
+                return true;
+            }
             var currentDate = new Date();
             var releaseDate = new Date(this.publishForm.release_date);
             if (releaseDate > currentDate) {

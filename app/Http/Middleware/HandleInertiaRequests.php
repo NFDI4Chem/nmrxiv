@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'message' => $request->session()->get('message'),
                     'success' => $request->session()->get('success'),
                     'error' => $request->session()->get('error'),
+                    'publish_validation_hints' => $request->session()->get('publish_validation_hints'),
                 ];
             },
             'auth.user.permissions' => fn () => $user ?
