@@ -50,10 +50,47 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     {
         $project = $this->project;
 
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_start',
+            'project_id' => $project->id,
+            'status' => $project->status,
+            'release_date' => filled($project->release_date) ? Carbon::parse($project->release_date)->toIso8601String() : null,
+            'draft_id' => $project->draft_id,
+        ]);
+
         $project->status = 'processing';
         $project->save();
 
         $draft = $project->draft;
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_draft_loaded',
+            'project_id' => $project->id,
+            'draft_present' => $draft !== null,
+            'draft_project_enabled' => $draft?->project_enabled,
+        ]);
+
+        if ($draft === null) {
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_submission_missing_draft_republish_path',
+                'project_id' => $project->id,
+            ]);
+
+            $project = $project->fresh();
+
+            if (! $project || $project->studies()->doesntExist()) {
+                Log::warning('embargo_publish_trace', [
+                    'stage' => 'process_submission_missing_draft_aborted',
+                    'project_id' => $this->project->id,
+                ]);
+
+                return;
+            }
+
+            $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater);
+
+            return;
+        }
 
         if ($draft->project_enabled) {
             $logs = 'Moving files in progress';
@@ -101,29 +138,14 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                 $project->draft_id = null;
 
-                $release_date = Carbon::parse($project->release_date);
-                if ($release_date->isFuture()) {
-                    $project->status = 'embargo';
-                } else {
-                    $project->status = 'published';
-                }
-
-                $project->save();
-
-                $assigner->assign($project->fresh());
-
-                if ($release_date->isPast()) {
-                    $projectPublisher->publish($project);
-                }
-                $updater->update($project->fresh());
-
-                $this->linkProvisionalDoiSafely($project->fresh());
-
-                $this->dispatchArchives($project->fresh());
-
-                $project->sendNotification('publish', $this->prepareSendList($project));
+                $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater);
             }
         } else {
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_submission_samples_mode_branch',
+                'project_id' => $project->id,
+            ]);
+
             $logs = 'Moving files in progress';
 
             if ($project) {
@@ -191,21 +213,118 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     }
                 }
                 $assigner->assign($_studies);
-                $release_date = Carbon::parse($project->release_date);
 
-                if ($release_date->isPast()) {
-                    foreach ($_studies as $study) {
-                        $studyPublisher->publish($study);
-                    }
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_submission_samples_mode_immediate_publish_all',
+                    'project_id' => $project->id,
+                    'release_date' => filled($project->release_date)
+                        ? Carbon::parse($project->release_date)->toIso8601String()
+                        : null,
+                    'studies_count' => $_studies->count(),
+                ]);
+
+                foreach ($_studies as $study) {
+                    Log::info('embargo_publish_trace', [
+                        'stage' => 'process_submission_samples_mode_publish_study',
+                        'project_id' => $project->id,
+                        'study_id' => $study->id,
+                    ]);
+                    $studyPublisher->publish($study);
                 }
                 $updater->update($_studies);
                 // Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_submission_samples_mode_before_study_publish_event',
+                    'project_id' => $project->id,
+                ]);
                 event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_submission_samples_mode_before_delete_project_draft',
+                    'project_id' => $project->id,
+                ]);
                 $project->delete();
                 $draft->delete();
 
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_submission_samples_mode_complete',
+                    'project_id' => $project->id,
+                ]);
+
             }
         }
+    }
+
+    /**
+     * After files are on canonical storage (or on a republish with no draft),
+     * resolve embargo vs published from {@see Project::$release_date}, then assign
+     * identifiers, optionally call {@see PublishProject::publish}, update DOIs,
+     * link provisional DOI, rebuild archives, and notify.
+     */
+    private function finalizeProjectModeFromReleaseDate(
+        Project $project,
+        PublishProject $projectPublisher,
+        AssignIdentifier $assigner,
+        UpdateDOI $updater,
+    ): void {
+        $release_date = Carbon::parse($project->release_date);
+        if ($release_date->isFuture()) {
+            $project->status = 'embargo';
+        } else {
+            $project->status = 'published';
+        }
+
+        $project->save();
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_project_mode_release_resolved',
+            'project_id' => $project->id,
+            'release_date' => $release_date->toIso8601String(),
+            'release_is_future' => $release_date->isFuture(),
+            'release_is_past' => $release_date->isPast(),
+            'resolved_status' => $project->status,
+        ]);
+
+        $assigner->assign($project->fresh());
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_project_mode_after_assign',
+            'project_id' => $project->id,
+        ]);
+
+        if ($release_date->isPast()) {
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_submission_project_mode_immediate_publish',
+                'project_id' => $project->id,
+            ]);
+            $projectPublisher->publish($project);
+        } else {
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_submission_project_mode_skip_publish_embargo',
+                'project_id' => $project->id,
+            ]);
+        }
+        $updater->update($project->fresh());
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_project_mode_after_update_doi',
+            'project_id' => $project->id,
+        ]);
+
+        $this->linkProvisionalDoiSafely($project->fresh());
+
+        $this->dispatchArchives($project->fresh());
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_project_mode_before_publish_notification',
+            'project_id' => $project->id,
+        ]);
+
+        $project->sendNotification('publish', $this->prepareSendList($project));
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_submission_project_mode_complete',
+            'project_id' => $project->id,
+        ]);
     }
 
     /**
@@ -254,6 +373,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
     private function dispatchArchives(Project $project): void
     {
+        Log::info('embargo_publish_trace', [
+            'stage' => 'dispatch_archives',
+            'project_id' => $project->id,
+            'project_status' => $project->status,
+        ]);
+
         $project->forceFill(['download_url' => null])->save();
 
         $project->studies()->update(['download_url' => null]);
@@ -262,7 +387,22 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         ArchiveStudy::dispatch($project->fresh());
     }
 
-    public function moveFolder($fsObject, $draft, $path)
+    /**
+     * Move draft-prefixed storage into canonical publish paths.
+     *
+     * Wrapped in {@see FileSystemObject::withoutEvents()} so path rewrites do not
+     * run `FileSystemObjectObserver` invalidation (which would reset study archives,
+     * NMRium rows, and the has_nmrium flag). Publish flows enqueue a single
+     * post-move archive rebuild after relocation completes.
+     */
+    public function moveFolder($fsObject, $draft, $path): void
+    {
+        FileSystemObject::withoutEvents(function () use ($fsObject, $draft, $path): void {
+            $this->relocateFolderTreeDuringPublish($fsObject, $draft, $path);
+        });
+    }
+
+    private function relocateFolderTreeDuringPublish($fsObject, $draft, $path): void
     {
         $newPath = str_replace($draft->path, $path, $fsObject->path);
         $fsObject->path = $newPath;
@@ -280,7 +420,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $fsObjectChild->path = $newPath;
                 $fsObjectChild->save();
             } else {
-                $this->moveFolder($fsObjectChild, $draft, $path);
+                $this->relocateFolderTreeDuringPublish($fsObjectChild, $draft, $path);
             }
         }
     }

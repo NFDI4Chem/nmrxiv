@@ -50,6 +50,13 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
     {
         $project = $this->project;
 
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_project_start',
+            'project_id' => $project->id,
+            'status' => $project->status,
+            'release_date' => filled($project->release_date) ? Carbon::parse($project->release_date)->toIso8601String() : null,
+        ]);
+
         $project->status = 'processing';
 
         $project->save();
@@ -103,18 +110,54 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
 
             $project->save();
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_files_moved',
+                'project_id' => $project->id,
+                'had_draft' => $draft !== null,
+            ]);
+
             $assigner->assign($project->fresh());
 
             $release_date = Carbon::parse($project->release_date);
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_release_check',
+                'project_id' => $project->id,
+                'release_is_past' => $release_date->isPast(),
+            ]);
+
             if ($release_date->isPast()) {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_project_immediate_publish',
+                    'project_id' => $project->id,
+                ]);
                 $publisher->publish($project);
+            } else {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_project_skip_publish_future_release',
+                    'project_id' => $project->id,
+                ]);
             }
             $updater->update($project->fresh());
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_after_update_doi',
+                'project_id' => $project->id,
+            ]);
+
             $this->linkProvisionalDoiSafely($project->fresh());
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_before_owner_notification',
+                'project_id' => $project->id,
+            ]);
+
             Notification::send($project->owner, new DraftProcessedNotification($project));
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_complete',
+                'project_id' => $project->id,
+            ]);
         }
     }
 
@@ -139,7 +182,17 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
         }
     }
 
-    public function moveFolder($fsObject, $draft, $path)
+    /**
+     * @see ProcessSubmission::moveFolder()
+     */
+    public function moveFolder($fsObject, $draft, $path): void
+    {
+        FileSystemObject::withoutEvents(function () use ($fsObject, $draft, $path): void {
+            $this->relocateFolderTreeDuringPublish($fsObject, $draft, $path);
+        });
+    }
+
+    private function relocateFolderTreeDuringPublish($fsObject, $draft, $path): void
     {
         $newPath = str_replace($draft->path, $path, $fsObject->path);
         $fsObject->path = $newPath;
@@ -157,7 +210,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
                 $fsObjectChild->path = $newPath;
                 $fsObjectChild->save();
             } else {
-                $this->moveFolder($fsObjectChild, $draft, $path);
+                $this->relocateFolderTreeDuringPublish($fsObjectChild, $draft, $path);
             }
         }
     }

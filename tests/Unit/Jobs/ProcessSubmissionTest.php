@@ -86,6 +86,44 @@ class ProcessSubmissionTest extends TestCase
         $this->assertEquals($this->project->id, $job->project->id);
     }
 
+    public function test_handle_finalizes_project_mode_when_draft_is_already_gone(): void
+    {
+        Storage::fake('local');
+        Bus::fake([ArchiveProject::class, ArchiveStudy::class]);
+        Event::fake();
+
+        Study::factory()->create(['project_id' => $this->project->id]);
+
+        $this->project->draft_id = null;
+        $this->project->save();
+        $this->draft->delete();
+
+        $this->project->update([
+            'release_date' => now()->subDay(),
+            'status' => 'queued',
+        ]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('assign')->once()->with(Mockery::type(Project::class));
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once()->with(Mockery::type(Project::class));
+
+        $projectPublisher = Mockery::mock(PublishProject::class);
+        $projectPublisher->shouldReceive('publish')->once()->with(Mockery::type(Project::class));
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->never();
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+
+        $this->project->refresh();
+        $this->assertSame('published', $this->project->status);
+        Bus::assertDispatched(ArchiveProject::class);
+        Bus::assertDispatched(ArchiveStudy::class);
+    }
+
     public function test_handle_deletes_project_after_study_mode_processing(): void
     {
         Storage::fake('local');
@@ -124,7 +162,7 @@ class ProcessSubmissionTest extends TestCase
         $projectPublisher = Mockery::mock(PublishProject::class);
 
         $studyPublisher = Mockery::mock(PublishStudy::class);
-        $studyPublisher->shouldReceive('publish')->never();
+        $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
         $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
@@ -174,7 +212,7 @@ class ProcessSubmissionTest extends TestCase
         $projectPublisher = Mockery::mock(PublishProject::class);
 
         $studyPublisher = Mockery::mock(PublishStudy::class);
-        $studyPublisher->shouldReceive('publish')->never();
+        $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
         $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
@@ -187,14 +225,21 @@ class ProcessSubmissionTest extends TestCase
     public function test_move_folder_updates_nested_file_structure(): void
     {
         Storage::fake('local');
+        Bus::fake([ArchiveStudy::class]);
 
         $environment = env('APP_ENV', 'local');
         $draftPath = $environment.'/draft-'.$this->draft->id;
         $this->draft->path = $draftPath;
         $this->draft->save();
 
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+        ]);
+        $study->forceFill(['has_nmrium' => true])->saveQuietly();
+
         $parentFolder = FileSystemObject::create([
             'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
             'level' => 0,
             'type' => 'directory',
             'name' => 'parent',
@@ -207,6 +252,7 @@ class ProcessSubmissionTest extends TestCase
 
         $childFile = FileSystemObject::create([
             'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
             'level' => 1,
             'type' => 'file',
             'name' => 'child.txt',
@@ -231,6 +277,9 @@ class ProcessSubmissionTest extends TestCase
         $this->assertStringContainsString($this->project->uuid, $parentFolder->path);
         $this->assertStringContainsString($this->project->uuid, $childFile->path);
         $this->assertTrue(Storage::disk('local')->exists($childFile->path));
+
+        $this->assertTrue((bool) $study->fresh()->has_nmrium);
+        Bus::assertNotDispatched(ArchiveStudy::class);
     }
 
     public function test_sample_mode_propagates_project_authors_and_citations_to_each_study(): void
@@ -281,7 +330,7 @@ class ProcessSubmissionTest extends TestCase
         $projectPublisher = Mockery::mock(PublishProject::class);
 
         $studyPublisher = Mockery::mock(PublishStudy::class);
-        $studyPublisher->shouldReceive('publish')->never();
+        $studyPublisher->shouldReceive('publish')->twice()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
         $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
