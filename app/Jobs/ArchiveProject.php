@@ -66,6 +66,11 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_project_job_started',
+            'project_id' => $this->project->id,
+        ]);
+
         $project = $this->project;
         if ($project) {
             $archiveDownloadURL = $project->download_url;
@@ -185,14 +190,36 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $project->download_url = $url;
                         $project->internal_status = 'complete';
                         $project->save();
+
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'archive_project_zip_built',
+                            'project_id' => $project->id,
+                            'download_url_set' => true,
+                        ]);
+                    } else {
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'archive_project_skip_zip',
+                            'project_id' => $project->id,
+                            'reason' => ! $fsObject ? 'no_fs_object' : 'fs_status_missing',
+                        ]);
                     }
                 } else {
+                    Log::info('embargo_publish_trace', [
+                        'stage' => 'archive_project_skip_existing_download_url',
+                        'project_id' => $project->id,
+                    ]);
+
                     $project->internal_status = 'complete';
                     $project->save();
                 }
             }
 
         }
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_project_job_finished',
+            'project_id' => $this->project->id,
+        ]);
     }
 
     /**

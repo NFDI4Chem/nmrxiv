@@ -8,6 +8,7 @@ use App\Notifications\DraftProcessedNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class PublishReleasedProjects extends Command
@@ -40,6 +41,17 @@ class PublishReleasedProjects extends Command
 
             foreach ($projects as $project) {
                 $release_date = Carbon::parse($project->release_date);
+
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'publish_released_projects_candidate',
+                    'project_id' => $project->id,
+                    'identifier' => $project->identifier,
+                    'release_date' => $release_date->toIso8601String(),
+                    'release_is_past' => $release_date->isPast(),
+                    'doi_present' => $project->doi !== null,
+                    'is_archived' => $project->is_archived,
+                ]);
+
                 if ($release_date->isPast()) {
                     if (! is_null($project->doi) && ! $project->is_archived) {
                         echo $project->identifier;
@@ -47,6 +59,18 @@ class PublishReleasedProjects extends Command
                         $publisher->publish($project);
                         Notification::send($project->owner, new DraftProcessedNotification($project));
                         $publishedCount++;
+
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'publish_released_projects_published_via_command',
+                            'project_id' => $project->id,
+                            'identifier' => $project->identifier,
+                        ]);
+                    } else {
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'publish_released_projects_skipped',
+                            'project_id' => $project->id,
+                            'reason' => is_null($project->doi) ? 'missing_doi' : 'is_archived',
+                        ]);
                     }
                 }
             }

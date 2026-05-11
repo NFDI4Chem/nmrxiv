@@ -176,6 +176,12 @@ class FileSystemObjectObserver
 
         try {
             ArchiveStudy::dispatch($project);
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'file_system_object_observer_dispatch_archive_study',
+                'project_id' => $project->id,
+                'study_id' => $study->id,
+            ]);
         } catch (\Throwable $e) {
             Log::warning('FileSystemObjectObserver: failed to dispatch ArchiveStudy', [
                 'study_id' => $study->id,

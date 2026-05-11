@@ -67,6 +67,11 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
      */
     public function handle(): void
     {
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_study_job_started',
+            'project_id' => $this->project->id,
+        ]);
+
         // Debug logging - immediate write to log file
         Log::info('=== ArchiveStudy job STARTED for project: '.$this->project->id.' ===');
         Log::info('Project ID: '.$this->project->id);
@@ -79,6 +84,13 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
         $project = Project::with('studies')->find($this->project->id);
         if ($project) {
             Log::info("Project {$project->id} studies count: ".$project->studies->count());
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'archive_study_project_loaded',
+                'project_id' => $project->id,
+                'studies_count' => $project->studies->count(),
+            ]);
+
             foreach ($project->studies as $study) {
                 Log::info("Processing study {$study->id}");
                 // Refresh study state. The earlier reference held by `$project`
@@ -250,6 +262,12 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
                                 $s3Url = $this->generateS3Url($zipFilePath, $filesystemDriver, $bucket);
                                 $study->download_url = $s3Url;
                                 Log::info("Study {$study->id}: Archive created successfully at: {$s3Url}");
+
+                                Log::info('embargo_publish_trace', [
+                                    'stage' => 'archive_study_zip_built',
+                                    'project_id' => $project->id,
+                                    'study_id' => $study->id,
+                                ]);
                             } catch (\Exception $e) {
                                 // Clean up the partial file if it exists
                                 if (Storage::disk($filesystemDriver)->exists($zipFilePath)) {
@@ -267,20 +285,44 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
                         $study->save();
                     } else {
                         Log::info("Study {$study->id}: No fsObject found, marking complete");
+
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'archive_study_skip_no_fs_object',
+                            'project_id' => $project->id,
+                            'study_id' => $study->id,
+                        ]);
+
                         $study->internal_status = 'complete';
                         $study->save();
                     }
                 } else {
                     Log::info("Study {$study->id}: Already has download URL, marking complete");
+
+                    Log::info('embargo_publish_trace', [
+                        'stage' => 'archive_study_skip_existing_download_url',
+                        'project_id' => $project->id,
+                        'study_id' => $study->id,
+                    ]);
+
                     $study->internal_status = 'complete';
                     $study->save();
                 }
             }
         } else {
             Log::info('No project found');
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'archive_study_project_not_found',
+                'project_id' => $this->project->id,
+            ]);
         }
 
         Log::info('=== ArchiveStudy job COMPLETED for project: '.$this->project->id.' ===');
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_study_job_finished',
+            'project_id' => $this->project->id,
+        ]);
     }
 
     /**

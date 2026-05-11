@@ -375,6 +375,12 @@ class ProcessDraft
         Log::info('Finalizing processing for draft '.$draft->id);
         Log::info('Studies count: '.count($studies));
 
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_draft_finalize_dispatch_archive_study',
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+        ]);
+
         ArchiveStudy::dispatch($project);
 
         // log archiving study dispatch

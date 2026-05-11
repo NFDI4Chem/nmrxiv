@@ -295,6 +295,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 }
 
                 $logger->log($draft, 'info', 'Dispatching Archiving Jobs, Auto-Processing ELN Spectra, Validation And Submission Of ELN Draft');
+
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_draft_eln_submission_dispatch_chain',
+                    'project_id' => $project->id,
+                    'draft_id' => $draft->id,
+                    'chained_jobs' => ['ArchiveStudy', 'ProcessELNSpectra', 'ValidateAndSubmitELNDraft'],
+                ]);
+
                 ArchiveStudy::dispatch($project)
                     ->chain([
                         new ProcessELNSpectra($project->id),
