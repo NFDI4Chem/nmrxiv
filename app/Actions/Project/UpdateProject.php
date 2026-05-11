@@ -49,6 +49,23 @@ class UpdateProject
             $licenseExists = array_key_exists('license_id', $input);
             $license_id = $licenseExists ? $input['license_id'] : $project->license_id;
 
+            $projectSpeciesUpdated = isset($input['project_species_updated'])
+                && filter_var($input['project_species_updated'], FILTER_VALIDATE_BOOLEAN);
+
+            $speciesValue = $project->species;
+            if ($projectSpeciesUpdated) {
+                $raw = $input['species'] ?? [];
+                if (is_array($raw)) {
+                    $speciesValue = json_encode($raw);
+                } elseif (is_string($raw)) {
+                    $speciesValue = $raw;
+                } else {
+                    $speciesValue = json_encode([]);
+                }
+            } elseif (array_key_exists('species', $input)) {
+                $speciesValue = $input['species'];
+            }
+
             $project
                 ->forceFill([
                     'name' => array_key_exists('name', $input) ? $input['name'] : $project->name,
@@ -75,13 +92,20 @@ class UpdateProject
                     'team_id' => array_key_exists('team_id', $input) ? $input['team_id'] : $project->team_id,
                     'owner_id' => array_key_exists('owner_id', $input) ? $input['owner_id'] : $project->owner_id,
                     'license_id' => $license_id,
-                    'species' => array_key_exists('species', $input) ? $input['species'] : $project->species,
+                    'species' => $speciesValue,
                     'release_date' => $release_date,
                     'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
                 ->save();
 
-            if (array_key_exists('tags_array', $input)) {
+            $projectTagsUpdated = isset($input['project_tags_updated'])
+                && filter_var($input['project_tags_updated'], FILTER_VALIDATE_BOOLEAN);
+
+            if ($projectTagsUpdated) {
+                $raw = $input['tags_array'] ?? [];
+                $tagsArray = is_array($raw) ? $raw : [];
+                $project->syncTagsWithType($tagsArray, 'Project');
+            } elseif (array_key_exists('tags_array', $input)) {
                 $project->syncTagsWithType($input['tags_array'], 'Project');
             }
 
