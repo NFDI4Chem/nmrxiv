@@ -925,7 +925,7 @@
                 <!-- Citation -->
                 <div
                     v-if="canUpdateProject || project.citations.length > 0"
-                    class="mb-8"
+                    class="border-b border-gray-200 pb-8"
                 >
                     <div class="relative">
                         <div
@@ -957,7 +957,12 @@
                         class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
                     >
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <citation-card :citations="project.citations" />
+                            <citation-card
+                                :citations="project.citations"
+                                :show-edit-delete="canUpdateProject"
+                                @edit="onCitationCardEdit"
+                                @delete="onCitationCardDelete"
+                            />
                         </div>
                     </dd>
                 </div>
@@ -965,7 +970,7 @@
                 <!-- Author -->
                 <div
                     v-if="canUpdateProject || project.authors.length > 0"
-                    class="mb-8"
+                    class="mb-8 pt-8"
                 >
                     <div class="relative">
                         <div
@@ -995,7 +1000,12 @@
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <author-card :authors="project.authors" />
+                            <author-card
+                                :authors="project.authors"
+                                :show-edit-delete="canUpdateProject"
+                                @edit="onAuthorCardEdit"
+                                @delete="onAuthorCardDelete"
+                            />
                         </div>
                     </dd>
                 </div>
@@ -1182,7 +1192,30 @@ export default {
         },
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
-            //this.emitter.emit("openAddCitationDialog", {});
+        },
+        onCitationCardEdit(citation) {
+            const modal = this.manageCitationElement;
+            if (!modal.showDialog) {
+                modal.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal.edit(citation);
+            });
+        },
+        onCitationCardDelete(citation) {
+            this.manageCitationElement.confirmDeletion(citation);
+        },
+        onAuthorCardEdit(author) {
+            const modal = this.manageAuthorElement;
+            if (!modal.showDialog) {
+                modal.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal.edit(author);
+            });
+        },
+        onAuthorCardDelete(author) {
+            this.manageAuthorElement.confirmDeletion(author);
         },
         publish() {
             this.showPublishConfirmationModal = false;

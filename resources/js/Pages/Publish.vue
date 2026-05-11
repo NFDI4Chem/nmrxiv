@@ -6,7 +6,7 @@
                     <div class="py-4">
                         <div>
                             <span
-                                class="ml-12 text-sm font-bold text-teal-600 group-hover:text-teal-800"
+                                class="ml-12 text-sm font-bold text-primary-600 group-hover:text-primary-800"
                                 >Step 3 / 3 -
 
                                 <span> Publish data </span>
@@ -18,11 +18,12 @@
                                     class="text-sm text-gray-700 uppercase font-bold tracking-widest"
                                 >
                                     <Link
-                                        class="ml-1 mr-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        class="ml-1 mr-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                                         :href="
-                                            '/upload?draft_id=' +
-                                            draft.id +
-                                            '&step=2'
+                                            route('upload', {
+                                                draft_id: draft.id,
+                                                step: 2,
+                                            })
                                         "
                                     >
                                         ←
@@ -112,9 +113,13 @@
                         />
                     </svg>
                     <span class="font-medium">
-                        <span v-if="saveStatus === 'saving'">Saving…</span>
-                        <span v-else-if="saveStatus === 'saved'">Saved</span>
-                        <span v-else>Couldn't save changes</span>
+                        <span v-if="saveStatus === 'saving'">{{
+                            saveStatusSavingLabel
+                        }}</span>
+                        <span v-else-if="saveStatus === 'saved'">{{
+                            saveStatusSavedLabel
+                        }}</span>
+                        <span v-else>{{ saveStatusErrorLabel }}</span>
                     </span>
                 </div>
             </transition>
@@ -153,7 +158,7 @@
                                             v-model="publishForm.name"
                                             type="text"
                                             name="project-name"
-                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                                            class="block w-full shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm border-gray-300 rounded-md"
                                             @blur="updateProject"
                                         />
                                     </div>
@@ -211,7 +216,7 @@
                                             name="project-description"
                                             placeholder="Describe this project"
                                             rows="3"
-                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                            class="block w-full shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm border border-gray-300 rounded-md"
                                             @blur="updateProject"
                                         ></textarea>
                                     </div>
@@ -311,7 +316,7 @@
                                                     species, $index
                                                 ) in publishForm.species"
                                                 :key="$index"
-                                                class="bg-gray-100 border text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                                                class="bg-gray-100 border text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1 bg-white"
                                             >
                                                 <ontology-term-annotation
                                                     :annotation="species"
@@ -339,7 +344,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mb-2">
+                                <div
+                                    id="project-citations"
+                                    class="mb-2 pb-4"
+                                >
                                     <div class="relative pl-2">
                                         <div
                                             class="absolute inset-0 flex items-center"
@@ -350,7 +358,7 @@
                                             ></div>
                                         </div>
                                         <div
-                                            class="relative flex items-center justify-between"
+                                            class="relative flex items-center"
                                         >
                                             <span
                                                 class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
@@ -362,31 +370,73 @@
                                             >
                                                 Citation
                                             </span>
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                @click="toggleManageCitation"
-                                            >
-                                                <PencilIcon
-                                                    class="w-4 h-4 mr-1 text-gray-600"
-                                                />
-                                                <span>Edit</span>
-                                            </button>
                                         </div>
                                     </div>
                                     <dd
-                                        class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                                        class="mt-2 text-md text-gray-900 focus:pointer-events-auto"
                                     >
                                         <div
-                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
+                                            v-if="!hasPublicationCitations"
+                                            class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-10 text-center sm:px-10"
+                                        >
+                                            <DocumentTextIcon
+                                                class="mx-auto h-12 w-12 text-gray-300"
+                                                aria-hidden="true"
+                                            />
+                                            <h4
+                                                class="mt-4 text-sm font-semibold text-gray-900"
+                                            >
+                                                No publication citations yet
+                                            </h4>
+                                            <p
+                                                class="mt-2 text-sm text-gray-500 max-w-md mx-auto leading-relaxed"
+                                            >
+                                                Link the paper or preprint this
+                                                dataset supports. Import metadata
+                                                from a DOI or enter details
+                                                manually—ideal before going
+                                                public or when your article is
+                                                still in review.
+                                            </p>
+                                            <button
+                                                type="button"
+                                                class="mt-6 inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                                @click="toggleManageCitation"
+                                            >
+                                                <PlusIcon
+                                                    class="w-5 h-5 mr-2 -ml-0.5"
+                                                    aria-hidden="true"
+                                                />
+                                                Add citation
+                                            </button>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="mt-1 flex flex-col gap-3"
                                         >
                                             <citation-card
                                                 :citations="project.citations"
+                                                show-edit-delete
+                                                @edit="onCitationCardEdit"
+                                                @delete="onCitationCardDelete"
                                             />
+                                            <div class="pt-1">
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                                    @click="toggleManageCitation"
+                                                >
+                                                    <PlusIcon
+                                                        class="w-5 h-5 mr-2 -ml-0.5"
+                                                        aria-hidden="true"
+                                                    />
+                                                    Add citation
+                                                </button>
+                                            </div>
                                         </div>
                                     </dd>
                                 </div>
-                                <div class="mb-2">
+                                <div id="project-authors" class="mb-2 pt-4 pb-4">
                                     <div class="relative pl-2">
                                         <div
                                             class="absolute inset-0 flex items-center"
@@ -397,7 +447,7 @@
                                             ></div>
                                         </div>
                                         <div
-                                            class="relative flex items-center justify-between"
+                                            class="relative flex items-center"
                                         >
                                             <span
                                                 class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
@@ -409,27 +459,117 @@
                                             >
                                                 Author
                                             </span>
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                @click="toggleManageAuthor"
-                                            >
-                                                <PencilIcon
-                                                    class="w-4 h-4 mr-1 text-gray-600"
-                                                />
-                                                <span>Edit</span>
-                                            </button>
                                         </div>
                                     </div>
                                     <dd
-                                        class="mt-2 text-md text-gray-900 space-y-5"
+                                        class="mt-2 text-md text-gray-900"
                                     >
                                         <div
-                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
+                                            v-if="!hasPublicationAuthors"
+                                            class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-10 text-center sm:px-10"
                                         >
-                                            <author-card
-                                                :authors="project.authors"
+                                            <UserGroupIcon
+                                                class="mx-auto h-12 w-12 text-gray-300"
+                                                aria-hidden="true"
                                             />
+                                            <h4
+                                                class="mt-4 text-sm font-semibold text-gray-900"
+                                            >
+                                                No authors listed yet
+                                            </h4>
+                                            <p
+                                                class="mt-2 text-sm text-gray-500 max-w-md mx-auto leading-relaxed"
+                                            >
+                                                Credit everyone who contributed
+                                                to this deposition—names,
+                                                affiliations, and ORCID iDs when
+                                                available. You can set roles and
+                                                reorder the list after adding
+                                                people.
+                                            </p>
+                                            <button
+                                                type="button"
+                                                class="mt-6 inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                                @click="toggleManageAuthor"
+                                            >
+                                                <PlusIcon
+                                                    class="w-5 h-5 mr-2 -ml-0.5"
+                                                    aria-hidden="true"
+                                                />
+                                                Add authors
+                                            </button>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="mt-1 flex flex-col gap-3"
+                                        >
+                                            <p
+                                                v-if="orderedAuthors.length > 1"
+                                                class="text-xs text-gray-500"
+                                            >
+                                                Use the grip to drag authors
+                                                into the order they should
+                                                appear in the publication.
+                                            </p>
+                                            <draggable
+                                                v-model="orderedAuthors"
+                                                item-key="id"
+                                                handle=".publish-author-drag-handle"
+                                                :animation="200"
+                                                ghost-class="opacity-60"
+                                                chosen-class="publish-author-draggable-chosen"
+                                                class="flex flex-col gap-3"
+                                                :disabled="
+                                                    authorOrderSaveInProgress
+                                                "
+                                                @start="
+                                                    onPublishAuthorDragStart
+                                                "
+                                                @end="onPublishAuthorDragEnd"
+                                            >
+                                                <template #item="{ element }">
+                                                    <div
+                                                        class="flex items-stretch overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm transition-all duration-200 hover:border-gray-400 hover:shadow-md focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            class="publish-author-drag-handle flex shrink-0 cursor-grab items-center justify-center self-stretch border-0 border-r border-gray-200 bg-gray-50 px-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 active:cursor-grabbing sm:px-2.5"
+                                                            aria-label="Drag to reorder authors"
+                                                        >
+                                                            <Bars3Icon
+                                                                class="h-5 w-5"
+                                                                aria-hidden="true"
+                                                            />
+                                                        </button>
+                                                        <author-card
+                                                            :authors="[
+                                                                element,
+                                                            ]"
+                                                            flush
+                                                            show-edit-delete
+                                                            @edit="
+                                                                onAuthorCardEdit
+                                                            "
+                                                            @delete="
+                                                                onAuthorCardDelete
+                                                            "
+                                                        />
+                                                    </div>
+                                                </template>
+                                            </draggable>
+                                            <div class="pt-1">
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                                    @click="toggleManageAuthor"
+                                                >
+                                                    <PlusIcon
+                                                        class="h-5 w-5 mr-2 -ml-0.5"
+                                                        aria-hidden="true"
+                                                    />
+                                                    Add author
+                                                </button>
+                                            </div>
                                         </div>
                                     </dd>
                                 </div>
@@ -519,116 +659,119 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="release" class="mt-3">
-                            <label
-                                class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
-                            >
-                                Release Date
-                            </label>
-                            <Datepicker
-                                v-model="publishForm.release_date"
-                                :min-date="new Date()"
-                                :format="customDateFormat"
-                                :preview-format="customDateFormat"
-                                @update:model-value="updateProject"
-                            ></Datepicker>
-                            <div
-                                class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4"
-                            >
-                                <!-- Immediate Publication -->
-                                <div
-                                    v-if="isImmediatePublication"
-                                    class="space-y-3"
+                        <div class="mt-3 p-4 bg-gray-100 rounded-md">
+                            <div id="release">
+                                <label
+                                    class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                 >
-                                    <p class="text-sm text-gray-600">
-                                        Your data becomes publicly accessible
-                                        right away with a DOI. Please select a
-                                        future date if you would like to embargo
-                                        your data for peer review. Need help?
-                                        <a
-                                            href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
-                                            target="_blank"
-                                            class="text-blue-600 hover:text-blue-700"
-                                            >Read more</a
-                                        >
-                                    </p>
-                                </div>
-
-                                <!-- Scheduled Release (Embargo) -->
-                                <div v-else class="space-y-3">
-                                    <p class="text-sm text-gray-600">
-                                        <strong
-                                            >Scheduled Release
-                                            (Embargo):</strong
-                                        >
-                                        You have selected a future date for
-                                        publication. Your data remains private
-                                        until then.
-                                    </p>
-                                    <p class="text-sm text-gray-600">
-                                        You can:
-                                    </p>
-                                    <ul
-                                        class="ml-4 text-sm text-gray-500 space-y-1"
+                                    Release Date
+                                </label>
+                                <Datepicker
+                                    v-model="publishForm.release_date"
+                                    :min-date="new Date()"
+                                    :format="customDateFormat"
+                                    :preview-format="customDateFormat"
+                                    @update:model-value="updateProject"
+                                ></Datepicker>
+                                <div
+                                    class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4"
+                                >
+                                    <!-- Immediate Publication -->
+                                    <div
+                                        v-if="isImmediatePublication"
+                                        class="space-y-3"
                                     >
-                                        <li class="flex items-start">
-                                            <span
-                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
-                                            ></span>
-                                            <span
-                                                >Share reviewer access links for
-                                                confidential peer review</span
+                                        <p class="text-sm text-gray-600">
+                                            Your data becomes publicly accessible
+                                            right away with a DOI. Please select a
+                                            future date if you would like to embargo
+                                            your data for peer review. Need help?
+                                            <a
+                                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
+                                                target="_blank"
+                                                class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
+                                                >Read more</a
                                             >
-                                        </li>
-                                        <li class="flex items-start">
-                                            <span
-                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
-                                            ></span>
-                                            <span
-                                                >Receive advance notifications
-                                                before publication</span
+                                        </p>
+                                    </div>
+
+                                    <!-- Scheduled Release (Embargo) -->
+                                    <div v-else class="space-y-3">
+                                        <p class="text-sm text-gray-600">
+                                            <strong
+                                                >Scheduled Release
+                                                (Embargo):</strong
                                             >
-                                        </li>
-                                        <li class="flex items-start">
-                                            <span
-                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
-                                            ></span>
-                                            <span
-                                                >Modify the release date or
-                                                publish instantly from your
-                                                dashboard</span
-                                            >
-                                        </li>
-                                    </ul>
+                                            You have selected a future date for
+                                            publication. Your data remains private
+                                            until then.
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            You can:
+                                        </p>
+                                        <ul
+                                            class="ml-4 text-sm text-gray-500 space-y-1"
+                                        >
+                                            <li class="flex items-start">
+                                                <span
+                                                    class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                                ></span>
+                                                <span
+                                                    >Share reviewer access links for
+                                                    confidential peer review</span
+                                                >
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span
+                                                    class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                                ></span>
+                                                <span
+                                                    >Receive advance notifications
+                                                    before publication</span
+                                                >
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span
+                                                    class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                                ></span>
+                                                <span
+                                                    >Modify the release date or
+                                                    publish instantly from your
+                                                    dashboard</span
+                                                >
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mt-5">
-                            <!--License -->
-                            <div id="license" class="mb-4">
-                                <div>
-                                    <div
-                                        class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
-                                    >
-                                        <div v-if="licenses">
-                                            <span
-                                                class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
-                                            >
-                                                <a
-                                                    target="_blank"
-                                                    href="https://docs.nmrxiv.org/submission-guides/licenses"
-                                                    >How to choose the right
-                                                    license?</a
+                            <div class="mt-6">
+                                <!--License -->
+                                <div id="license" class="mb-0">
+                                    <div>
+                                        <div
+                                            class="mt-0 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
+                                        >
+                                            <div v-if="licenses">
+                                                <span
+                                                    class="float-right text-xs cursor-pointer hover:text-primary-700 mt-2"
                                                 >
-                                            </span>
-                                            <select-rich
-                                                v-model:selected="license"
-                                                label="License"
-                                                :items="licenses"
-                                                searchable
-                                                placeholder="Search a license"
-                                                @update:selected="updateProject"
-                                            />
+                                                    <a
+                                                        target="_blank"
+                                                        href="https://docs.nmrxiv.org/submission-guides/licenses"
+                                                        class="text-primary-600 hover:text-primary-800 underline"
+                                                        >How to choose the right
+                                                        license?</a
+                                                    >
+                                                </span>
+                                                <select-rich
+                                                    v-model:selected="license"
+                                                    label="License"
+                                                    :items="licenses"
+                                                    searchable
+                                                    placeholder="Search a license"
+                                                    @update:selected="updateProject"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -646,7 +789,7 @@
                                             id="conditions"
                                             v-model="publishForm.conditions"
                                             type="checkbox"
-                                            class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            class="rounded mt-1 border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
                                             name="conditions"
                                         />
                                         <div class="ml-2 text-sm">
@@ -679,7 +822,7 @@
                                             id="terms"
                                             v-model="publishForm.terms"
                                             type="checkbox"
-                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
                                             name="terms"
                                         />
                                         <div class="ml-2 text-sm">
@@ -687,14 +830,14 @@
                                             <a
                                                 target="_blank"
                                                 :href="route('terms.show')"
-                                                class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                class="text-sm font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 hover:decoration-primary-500"
                                                 >Terms of Service</a
                                             >
                                             and
                                             <a
                                                 target="_blank"
                                                 :href="route('policy.show')"
-                                                class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                class="text-sm font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 hover:decoration-primary-500"
                                                 >Privacy Policy</a
                                             >
                                             and hereby also grant nmrXiv
@@ -740,7 +883,7 @@
                             </jet-success-button>
                             <Link
                                 type="button"
-                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                 :href="route('dashboard')"
                             >
                                 NOT RIGHT YET
@@ -840,7 +983,7 @@
                             class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
                         >
                             <span
-                                class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
+                                class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-primary-600 bg-white transition ease-in-out duration-150 cursor-not-allowed"
                                 disabled=""
                                 ><h1
                                     class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
@@ -852,7 +995,7 @@
                         <Link
                             type="button"
                             :href="route('dashboard')"
-                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                         >
                             Go to Dashboard
                         </Link>
@@ -894,7 +1037,7 @@
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
                                 target="_blank"
-                                class="text-blue-600 hover:text-blue-700"
+                                class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
                                 >Click to read more.</a
                             >
                         </p>
@@ -1057,7 +1200,13 @@ import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
-import { PencilIcon } from "@heroicons/vue/24/solid";
+import { PlusIcon } from "@heroicons/vue/24/solid";
+import {
+    Bars3Icon,
+    DocumentTextIcon,
+    UserGroupIcon,
+} from "@heroicons/vue/24/outline";
+import Draggable from "vuedraggable";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
@@ -1077,11 +1226,15 @@ export default {
         JetSecondaryButton,
         JetSuccessButton,
         JetConfirmationModal,
-        PencilIcon,
+        PlusIcon,
+        DocumentTextIcon,
+        UserGroupIcon,
         Validation,
         ToggleButton,
         StudyInfo,
         CitationCard,
+        Draggable,
+        Bars3Icon,
     },
     props: ["user", "team", "project", "teamRole", "draft"],
 
@@ -1116,7 +1269,7 @@ export default {
             }),
             licenses: null,
             license: null,
-            returnUrl: "/dashboard",
+            returnUrl: route("dashboard"),
             errors: null,
             projectSpecies: "",
             status: "draft",
@@ -1131,7 +1284,14 @@ export default {
              * One of: 'idle' | 'saving' | 'saved' | 'error'.
              */
             saveStatus: "idle",
+            /** 'default' | 'authorOrder' — drives copy in the save-status pill */
+            saveStatusVariant: "default",
             saveStatusTimer: null,
+            /** Local list for drag-and-drop author order on this page */
+            orderedAuthors: [],
+            /** Author ids in order when a drag started (to detect real changes) */
+            publishAuthorsOrderBeforeDrag: [],
+            authorOrderSaveInProgress: false,
         };
     },
     beforeUnmount() {
@@ -1139,6 +1299,17 @@ export default {
             clearTimeout(this.saveStatusTimer);
             this.saveStatusTimer = null;
         }
+    },
+    watch: {
+        "project.authors": {
+            deep: true,
+            handler() {
+                this.syncOrderedAuthorsFromProject();
+            },
+        },
+    },
+    created() {
+        this.syncOrderedAuthorsFromProject();
     },
     computed: {
         url() {
@@ -1184,6 +1355,33 @@ export default {
                 (!this.hasDraftInName || this.draftWarningConfirmed)
             );
         },
+        hasPublicationCitations() {
+            return (
+                Array.isArray(this.project?.citations) &&
+                this.project.citations.length > 0
+            );
+        },
+        hasPublicationAuthors() {
+            return (
+                Array.isArray(this.project?.authors) &&
+                this.project.authors.length > 0
+            );
+        },
+        saveStatusSavingLabel() {
+            return this.saveStatusVariant === "authorOrder"
+                ? "Updating author order…"
+                : "Saving…";
+        },
+        saveStatusSavedLabel() {
+            return this.saveStatusVariant === "authorOrder"
+                ? "Author order updated"
+                : "Saved";
+        },
+        saveStatusErrorLabel() {
+            return this.saveStatusVariant === "authorOrder"
+                ? "Couldn't update author order"
+                : "Couldn't save changes";
+        },
     },
 
     mounted() {
@@ -1217,6 +1415,12 @@ export default {
             let edit = params["edit"];
 
             if (edit == "citation") {
+                this.$nextTick(() => {
+                    const el = document.getElementById("project-citations");
+                    if (el) {
+                        this.scrollTo(el);
+                    }
+                });
                 this.toggleManageCitation();
             } else if (edit == "title") {
                 this.scrollTo(document.getElementById("project-name"));
@@ -1231,6 +1435,12 @@ export default {
             } else if (edit == "release") {
                 this.scrollTo(document.getElementById("release"));
             } else if (edit == "authors") {
+                this.$nextTick(() => {
+                    const el = document.getElementById("project-authors");
+                    if (el) {
+                        this.scrollTo(el);
+                    }
+                });
                 this.toggleManageAuthor();
             }
         });
@@ -1261,22 +1471,24 @@ export default {
                 }, 2500);
             });
         },
-        setSaveStatus(status) {
+        setSaveStatus(status, variant = "default") {
             if (this.saveStatusTimer) {
                 clearTimeout(this.saveStatusTimer);
                 this.saveStatusTimer = null;
             }
+            this.saveStatusVariant = variant;
             this.saveStatus = status;
             if (status === "saved" || status === "error") {
                 this.saveStatusTimer = setTimeout(() => {
                     this.saveStatus = "idle";
+                    this.saveStatusVariant = "default";
                 }, 2500);
             }
         },
         updateDraft() {
             this.setSaveStatus("saving");
             axios
-                .put("/dashboard/drafts/" + this.draft.id, {
+                .put(route("dashboard.draft.update", this.draft.id), {
                     project_enabled: this.publishForm.enableProjectMode
                         ? 1
                         : 0,
@@ -1397,6 +1609,105 @@ export default {
         },
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
+        },
+        onCitationCardEdit(citation) {
+            const modal = this.manageCitationElement;
+            if (!modal.showDialog) {
+                modal.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal.edit(citation);
+            });
+        },
+        onCitationCardDelete(citation) {
+            this.manageCitationElement.confirmDeletion(citation);
+        },
+        onAuthorCardEdit(author) {
+            const modal = this.manageAuthorElement;
+            if (!modal.showDialog) {
+                modal.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal.edit(author);
+            });
+        },
+        onAuthorCardDelete(author) {
+            this.manageAuthorElement.confirmDeletion(author);
+        },
+
+        syncOrderedAuthorsFromProject() {
+            const raw = this.project?.authors;
+            if (!Array.isArray(raw) || raw.length === 0) {
+                this.orderedAuthors = [];
+
+                return;
+            }
+            this.orderedAuthors = [...raw].sort((a, b) => {
+                const ao = a.pivot?.sort_order ?? 0;
+                const bo = b.pivot?.sort_order ?? 0;
+
+                return ao - bo;
+            });
+        },
+
+        serializeAuthorForSync(author) {
+            return {
+                id: author.id,
+                title: author.title ?? null,
+                given_name: author.given_name,
+                family_name: author.family_name,
+                orcid_id: author.orcid_id ?? null,
+                email_id: author.email_id ?? null,
+                affiliation: author.affiliation ?? null,
+                ror_id: author.ror_id ?? null,
+                contributor_type:
+                    (author.pivot && author.pivot.contributor_type) ||
+                    author.contributor_type ||
+                    "Researcher",
+            };
+        },
+
+        onPublishAuthorDragStart() {
+            this.publishAuthorsOrderBeforeDrag = this.orderedAuthors.map(
+                (a) => a.id
+            );
+        },
+
+        onPublishAuthorDragEnd() {
+            const after = this.orderedAuthors.map((a) => a.id);
+            const before = this.publishAuthorsOrderBeforeDrag;
+            const unchanged =
+                after.length === before.length &&
+                after.every((id, i) => id === before[i]);
+            if (unchanged) {
+                return;
+            }
+            this.persistPublishAuthorOrder();
+        },
+
+        persistPublishAuthorOrder() {
+            this.authorOrderSaveInProgress = true;
+            this.setSaveStatus("saving", "authorOrder");
+            const form = this.$inertia.form({
+                authors: this.orderedAuthors.map((a) =>
+                    this.serializeAuthorForSync(a)
+                ),
+            });
+            form.post(route("author.save", this.project.id), {
+                preserveScroll: true,
+                preserveState: true,
+                only: ["project"],
+                onSuccess: () => {
+                    this.setSaveStatus("saved", "authorOrder");
+                },
+                onError: () => {
+                    this.syncOrderedAuthorsFromProject();
+                    this.setSaveStatus("error", "authorOrder");
+                },
+                onFinish: () => {
+                    this.authorOrderSaveInProgress = false;
+                },
+            });
         },
         handlePublishClick() {
             // Check if name contains "DRAFT" and hasn't been confirmed yet

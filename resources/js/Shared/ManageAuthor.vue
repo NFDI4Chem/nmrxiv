@@ -1,35 +1,31 @@
 <template>
-    <jet-dialog-modal
+    <div>
+        <jet-dialog-modal
         :show="showDialog"
         :max-width="'6xl'"
-        @close="showDialog = false"
+        @close="onClose"
     >
         <template #title>
-            {{ project.name }} - Manage Authors
-            <button
-                v-if="!displayAddAuthorForms"
-                type="button"
-                class="inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                @click="displayAddAuthorForms = true"
-            >
-                <PlusIcon class="w-5 h-5 mr-1 text-white" />
-                Add Author
-            </button>
-            <button
-                v-else
-                type="button"
-                :class="backButtonClasses"
-                @click="onBack"
-            >
-                <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
-                Back
-            </button>
+            <span class="text-base font-medium text-gray-900">
+                {{ project.name }} - Manage Authors
+            </span>
         </template>
         <template #content>
             <div>
+                <div
+                    v-if="authorOrderSaveNotice"
+                    class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                    role="status"
+                    aria-live="polite"
+                >
+                    {{ authorOrderSaveNotice }}
+                </div>
                 <div v-if="displayAddAuthorForms">
                     <div
-                        class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2"
+                        class="relative mx-auto grid grid-cols-1 gap-x-5"
+                        :class="
+                            isEdit ? 'max-w-3xl' : 'max-w-7xl lg:grid-cols-2'
+                        "
                     >
                         <!--Add Manual Section-->
                         <div
@@ -37,15 +33,19 @@
                         >
                             <div>
                                 <p
-                                    class="text-sm leading-6 font-bold text-gray-900"
+                                    class="text-sm font-semibold leading-6 text-gray-900"
                                 >
                                     <span v-if="!isEdit">Add</span
-                                    ><span v-else>Edit</span> Author
+                                    ><span v-else>Edit</span> author
+                                </p>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Title is optional (e.g. Dr., Prof.). Given
+                                    and family name are required.
                                 </p>
                                 <div
-                                    class="mt-1 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+                                    class="mt-4 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-12"
                                 >
-                                    <div class="sm:col-span-2">
+                                    <div class="sm:col-span-3">
                                         <label
                                             for="title"
                                             class="block text-sm font-medium text-gray-700"
@@ -58,18 +58,20 @@
                                                 v-model="form.title"
                                                 type="text"
                                                 name="title"
-                                                autocomplete="title"
+                                                autocomplete="honorific-prefix"
+                                                placeholder="Dr., Prof., …"
+                                                maxlength="32"
                                                 :class="inputClasses"
                                             />
                                         </div>
                                     </div>
 
-                                    <div class="sm:col-span-2">
+                                    <div class="sm:col-span-4">
                                         <label
                                             for="given-name"
                                             class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
-                                            First Name
+                                            First name
                                         </label>
                                         <div class="mt-1">
                                             <input
@@ -77,6 +79,7 @@
                                                 v-model="form.given_name"
                                                 type="text"
                                                 name="given-name"
+                                                autocomplete="given-name"
                                                 :class="inputClasses"
                                             />
                                         </div>
@@ -87,12 +90,12 @@
                                             class="mt-2"
                                         />
                                     </div>
-                                    <div class="sm:col-span-2">
+                                    <div class="sm:col-span-5">
                                         <label
                                             for="family-name"
                                             class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
-                                            Family Name
+                                            Family name
                                         </label>
                                         <div class="mt-1">
                                             <input
@@ -112,7 +115,7 @@
                                         />
                                     </div>
 
-                                    <div class="sm:col-span-3">
+                                    <div class="sm:col-span-7">
                                         <label
                                             for="email"
                                             class="block text-sm font-medium text-gray-700"
@@ -134,7 +137,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="sm:col-span-3">
+                                    <div class="sm:col-span-5">
                                         <label
                                             for="orcid"
                                             class="block text-sm font-medium text-gray-700"
@@ -146,8 +149,9 @@
                                                 id="orcid"
                                                 v-model="form.orcid_id"
                                                 name="orcid"
-                                                autocomplete="orcid"
+                                                autocomplete="off"
                                                 type="text"
+                                                placeholder="0000-0000-0000-0000"
                                                 :class="inputClasses"
                                             />
                                             <jet-input-error
@@ -156,7 +160,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="sm:col-span-6">
+                                    <div class="sm:col-span-12">
                                         <select-rich
                                             v-model:selected="
                                                 form.contributor_type
@@ -171,7 +175,7 @@
                                             class="mt-2"
                                         />
                                     </div>
-                                    <div class="sm:col-span-6">
+                                    <div class="sm:col-span-12">
                                         <label
                                             for="about"
                                             class="block text-sm font-medium text-gray-700"
@@ -201,17 +205,10 @@
                                     </div>
                                     <div
                                         v-if="!isEdit"
-                                        class="sm:col-span-6 float-left"
+                                        class="sm:col-span-12 flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 pt-5"
                                     >
                                         <jet-secondary-button
-                                            class="float-right"
-                                            :disabled="!isFormValid"
-                                            @click="save('addManually')"
-                                        >
-                                            Add
-                                        </jet-secondary-button>
-                                        <jet-secondary-button
-                                            class="float-right mr-2"
+                                            type="button"
                                             :disabled="
                                                 !(
                                                     form &&
@@ -226,38 +223,35 @@
                                         >
                                             Clear
                                         </jet-secondary-button>
-                                    </div>
-                                    <div
-                                        v-else
-                                        class="sm:col-span-6 float-left"
-                                    >
-                                        <jet-secondary-button
-                                            class="float-right"
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                             :disabled="!isFormValid"
                                             @click="save('addManually')"
                                         >
-                                            Update
-                                        </jet-secondary-button>
-                                        <jet-secondary-button
-                                            class="float-right mr-2"
-                                            :disabled="
-                                                !(
-                                                    form &&
-                                                    form.given_name &&
-                                                    form.family_name
-                                                )
-                                            "
-                                            @click="onCancelEdit()"
+                                            Add author
+                                        </button>
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="sm:col-span-12 flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 pt-5"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            :disabled="!isFormValid"
+                                            @click="save('addManually')"
                                         >
-                                            Cancel
-                                        </jet-secondary-button>
+                                            Update author
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Import Section -->
+                        <!-- Import Section (hidden while editing an author) -->
                         <div
-                            class="pb-36 lg:px-1 lg:row-start-1 lg:col-start-2 border-l"
+                            v-if="!isEdit"
+                            class="border-l pb-36 lg:col-start-2 lg:row-start-1 lg:px-1"
                         >
                             <div class="pl-2">
                                 <p
@@ -266,7 +260,7 @@
                                     Import From
                                 </p>
                                 <div
-                                    class="mt-1 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+                                    class="mt-1 grid grid-cols-1 gap-y-5 gap-x-4 sm:grid-cols-2"
                                 >
                                     <div class="sm:col-span-2">
                                         <label
@@ -285,7 +279,7 @@
                                                 name="name"
                                                 autocomplete="off"
                                                 placeholder="DOI or ORCID iD e.g. 10.1186/s19991-022-00987-0 or 0000-0001-6033-8976"
-                                                class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
+                                                class="flex-1 focus:ring-primary-500 focus:border-primary-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
                                         </div>
                                         <!-- <jet-input-error :message="importAuthorsForm.errors.input" class="mt-2" /> -->
@@ -369,7 +363,7 @@
                                             "
                                             :class="
                                                 author.selected
-                                                    ? 'ring-2 ring-teal-500 rounded-md'
+                                                    ? 'ring-2 ring-primary-500 rounded-md'
                                                     : ''
                                             "
                                             @click="
@@ -424,13 +418,37 @@
                             </div>
                         </div>
                     </div>
+                    <div
+                        v-if="!isEdit && authors.length > 0"
+                        class="mt-8 flex justify-start px-4 sm:px-6"
+                    >
+                        <jet-secondary-button
+                            type="button"
+                            @click="goToReorderAuthors"
+                        >
+                            Reorder authors
+                        </jet-secondary-button>
+                    </div>
                 </div>
                 <div
                     v-if="authors.length > 0 && !displayAddAuthorForms"
                     style="height: 60vh"
-                    class="sm:rounded-md overflow-y-scroll"
+                    class="overflow-y-scroll sm:rounded-md"
                 >
-                    <p class="text-xs font-large text-red-800 mb-1">
+                    <div class="mb-4 flex justify-end px-2">
+                        <button
+                            type="button"
+                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                            @click="openAddAuthorForm"
+                        >
+                            <PlusIcon
+                                class="-ml-0.5 mr-2 h-5 w-5 text-white"
+                                aria-hidden="true"
+                            />
+                            Add author
+                        </button>
+                    </div>
+                    <p class="mb-1 text-xs font-medium text-red-800">
                         *Click and drag authors to sort order.
                     </p>
                     <draggable
@@ -489,69 +507,44 @@
                     </draggable>
                 </div>
             </div>
-            <div
-                v-if="authors.length == 0 && !displayAddAuthorForms"
-                class="py-5"
-            >
-                <div class="text-center">
-                    <FolderPlusIcon class="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No Authors Listed
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Get started by adding a new author.
-                    </p>
-                    <div class="mt-6">
-                        <button
-                            type="button"
-                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            @click="displayAddAuthorForms = true"
-                        >
-                            <!-- Heroicon name: mini/plus -->
-                            <PlusIcon class="w-5 h-5 mr-1 text-white" />
-                            Add Author
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!-- Delete confirmation dialog -->
-            <jet-dialog-modal
-                :show="confirmDelete"
-                @close="confirmDelete = false"
-            >
-                <template #title> Delete Author </template>
-
-                <template #content>
-                    Are you sure you want to delete this author?
-                    <div class="mt-4"></div>
-                </template>
-
-                <template #footer>
-                    <jet-secondary-button
-                        @click="confirmDelete = false && authorsForm.reset()"
-                    >
-                        Cancel
-                    </jet-secondary-button>
-
-                    <jet-danger-button
-                        class="ml-2"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
-                        @click="deleteAuthor()"
-                    >
-                        Delete Author
-                    </jet-danger-button>
-                </template>
-            </jet-dialog-modal>
         </template>
         <template #footer>
-            <div class="flex">
-                <jet-secondary-button class="float-left" @click="onClose()">
+            <div class="flex justify-end">
+                <jet-secondary-button type="button" @click="onClose">
                     Close
                 </jet-secondary-button>
             </div>
         </template>
     </jet-dialog-modal>
+
+    <jet-dialog-modal
+        :show="confirmDelete"
+        max-width="md"
+        @close="closeDeleteConfirm"
+    >
+        <template #title> Delete Author </template>
+
+        <template #content>
+            Are you sure you want to delete this author?
+            <div class="mt-4"></div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click="closeDeleteConfirm">
+                Cancel
+            </jet-secondary-button>
+
+            <jet-danger-button
+                class="ml-2"
+                :class="{ 'opacity-25': form.processing }"
+                :disabled="form.processing"
+                @click="deleteAuthor()"
+            >
+                Delete Author
+            </jet-danger-button>
+        </template>
+    </jet-dialog-modal>
+
     <!-- Manage Role Dialog Modal-->
     <jet-dialog-modal
         :show="showManageRoleDialog"
@@ -592,6 +585,7 @@
             </jet-secondary-button>
         </template>
     </jet-dialog-modal>
+    </div>
 </template>
 
 <script>
@@ -600,9 +594,7 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import {
     TrashIcon,
     PencilIcon,
-    ArrowSmallRightIcon,
     PlusIcon,
-    FolderPlusIcon,
 } from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
@@ -620,8 +612,6 @@ export default {
         JetSecondaryButton,
         JetDangerButton,
         PencilIcon,
-        ArrowSmallRightIcon,
-        FolderPlusIcon,
         PlusIcon,
         TrashIcon,
         JetInputError,
@@ -667,6 +657,9 @@ export default {
             error: "",
             showManageRoleDialog: false,
             drag: false,
+            /** Shown after a successful drag-reorder save (modal stays open). */
+            authorOrderSaveNotice: null,
+            authorOrderSaveNoticeTimer: null,
             formattedAuthors: [],
             // todo : dynamically load this from the config
             contributorType: [
@@ -771,45 +764,11 @@ export default {
 
     computed: {
         /**
-         * Returns CSS classes for input fields based on edit state
+         * Shared input styling for author form fields (add and edit).
          * @returns {string} CSS class string for input styling
          */
         inputClasses() {
-            const baseClasses =
-                "shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md";
-            const editClasses =
-                "shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100";
-
-            return this.isEdit ? editClasses : baseClasses;
-        },
-
-        /**
-         * Returns CSS classes for textarea fields based on edit state
-         * @returns {string} CSS class string for textarea styling
-         */
-        textareaClasses() {
-            const baseClasses =
-                "shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md";
-            const editClasses =
-                "shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100";
-
-            return this.isEdit ? editClasses : baseClasses;
-        },
-
-        /**
-         * Returns CSS classes for add button styling
-         * @returns {string} CSS class string for add button
-         */
-        addButtonClasses() {
-            return "inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2";
-        },
-
-        /**
-         * Returns CSS classes for back button styling
-         * @returns {string} CSS class string for back button
-         */
-        backButtonClasses() {
-            return "inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2";
+            return "block w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm";
         },
 
         /**
@@ -866,6 +825,12 @@ export default {
     mounted() {
         this.loadInitial();
     },
+    beforeUnmount() {
+        if (this.authorOrderSaveNoticeTimer) {
+            clearTimeout(this.authorOrderSaveNoticeTimer);
+            this.authorOrderSaveNoticeTimer = null;
+        }
+    },
     methods: {
         /**
          * Returns filtered list of fetched authors based on selection criteria
@@ -893,6 +858,38 @@ export default {
         },
 
         /**
+         * Opens the add-author form (from reorder list view).
+         */
+        openAddAuthorForm() {
+            this.displayAddAuthorForms = true;
+            this.isEdit = false;
+            this.selectedAuthor = null;
+            this.form.reset();
+            this.form.errors = {};
+            this.form.hasErrors = false;
+            this.form.contributor_type = this.contributorType[0];
+            this.fetchedAuthors = [];
+            this.query = "";
+            this.error = "";
+            this.formattedAuthors = [];
+        },
+
+        /**
+         * Returns to the saved-authors list for drag-and-drop ordering.
+         */
+        goToReorderAuthors() {
+            this.onBack();
+            this.form.reset();
+            this.form.errors = {};
+            this.form.hasErrors = false;
+            this.form.contributor_type = this.contributorType[0];
+            this.fetchedAuthors = [];
+            this.query = "";
+            this.error = "";
+            this.formattedAuthors = [];
+        },
+
+        /**
          * Initializes component with default values and loads existing authors
          * Sets up the initial state for the component
          */
@@ -907,10 +904,36 @@ export default {
         },
 
         /**
-         * Toggles the visibility state of the main dialog
+         * Opens the dialog on add/import; reorder list is available when authors exist.
          */
         toggleDialog() {
-            this.showDialog = !this.showDialog;
+            if (this.showDialog) {
+                this.onClose();
+            } else {
+                this.loadInitial();
+                this.form.reset();
+                this.form.errors = {};
+                this.form.hasErrors = false;
+                this.fetchedAuthors = [];
+                this.query = "";
+                this.formattedAuthors = [];
+                this.form.contributor_type = {};
+                this.form.contributor_type = this.contributorType[0];
+                this.isEdit = false;
+                this.selectedAuthor = null;
+                this.error = "";
+                this.confirmDelete = false;
+                this.displayAddAuthorForms = true;
+                this.showDialog = true;
+            }
+        },
+
+        /**
+         * Dismiss delete confirmation without deleting.
+         */
+        closeDeleteConfirm() {
+            this.confirmDelete = false;
+            this.authorsForm.reset();
         },
 
         /**
@@ -918,7 +941,23 @@ export default {
          * Clears form data, errors, and temporary state
          */
         onClose() {
+            if (this.isEdit && this.selectedAuthor) {
+                this.authors.splice(
+                    this.selectedAuthor.pivot.sort_order,
+                    0,
+                    this.selectedAuthor
+                );
+            }
+            if (this.authorOrderSaveNoticeTimer) {
+                clearTimeout(this.authorOrderSaveNoticeTimer);
+                this.authorOrderSaveNoticeTimer = null;
+            }
+            this.authorOrderSaveNotice = null;
+            this.closeDeleteConfirm();
             this.showDialog = false;
+            this.displayAddAuthorForms = false;
+            this.isEdit = false;
+            this.selectedAuthor = null;
             this.form.reset();
             this.form.errors = {};
             this.form.hasErrors = false;
@@ -926,7 +965,6 @@ export default {
             this.query = "";
             this.form.contributor_type = {};
             this.form.contributor_type = this.contributorType[0];
-            this.isEdit = false;
             this.error = "";
             this.formattedAuthors = [];
         },
@@ -1317,8 +1355,12 @@ export default {
         /**
          * Executes the API call to save authors to the backend
          * Handles deduplication and API communication
+         *
+         * @param {{ closeModalOnSuccess?: boolean }} options When closeModalOnSuccess is false (e.g. drag reorder), keep the modal open and show a short notice.
          */
-        executeQuery() {
+        executeQuery(options = {}) {
+            const closeModalOnSuccess = options.closeModalOnSuccess !== false;
+
             this.authorsForm.authors = this.deduplicateAuthorsList(
                 this.authors
             );
@@ -1326,24 +1368,62 @@ export default {
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
                 preserveState: true,
-                onSuccess: () => this.onSaveSuccess(),
+                onSuccess: () => {
+                    if (closeModalOnSuccess) {
+                        this.onSaveSuccess();
+                    } else {
+                        this.authorsForm.reset();
+                        if (this.authorOrderSaveNoticeTimer) {
+                            clearTimeout(this.authorOrderSaveNoticeTimer);
+                            this.authorOrderSaveNoticeTimer = null;
+                        }
+                        this.authorOrderSaveNotice =
+                            "Author order updated.";
+                        this.authorOrderSaveNoticeTimer = setTimeout(() => {
+                            this.authorOrderSaveNotice = null;
+                            this.authorOrderSaveNoticeTimer = null;
+                        }, 4000);
+                        router.reload({
+                            only: ["project"],
+                            preserveScroll: true,
+                            preserveState: true,
+                            onFinish: () => {
+                                this.loadInitial();
+                            },
+                        });
+                    }
+                },
                 onError: (err) => console.error(err),
             });
         },
 
         /**
-         * Handles successful save operation by resetting component state
-         * Reloads initial data and cleans up temporary variables
+         * Handles successful save operation: close modal, reset UI, reload project.
          */
         onSaveSuccess() {
-            this.loadInitial();
-            this.form.reset();
-            this.form.contributor_type = this.contributorType[0];
+            this.closeDeleteConfirm();
+            this.showDialog = false;
+            this.error = "";
             this.displayAddAuthorForms = false;
-            this.formattedAuthors = [];
-            this.fetchedAuthors = [];
             this.isEdit = false;
+            this.selectedAuthor = null;
+            this.fetchedAuthors = [];
             this.query = "";
+            this.formattedAuthors = [];
+            this.form.reset();
+            this.form.errors = {};
+            this.form.hasErrors = false;
+            this.form.contributor_type = this.contributorType[0];
+            this.authorsForm.reset();
+
+            router.reload({
+                only: ["project"],
+                preserveScroll: true,
+                preserveState: true,
+                onFinish: () => {
+                    this.loadInitial();
+                },
+            });
         },
 
         /**
@@ -1391,7 +1471,7 @@ export default {
                     router.reload({ only: ["project"] });
                     this.loadInitial();
                     this.authorsForm.reset();
-                    this.confirmDelete = false;
+                    this.closeDeleteConfirm();
                 },
                 onError: (err) => console.error(err),
             });
@@ -1484,25 +1564,7 @@ export default {
          * Called when drag-and-drop sorting is completed
          */
         onSort() {
-            this.executeQuery();
-        },
-
-        /**
-         * Cancels edit operation and restores component to initial state
-         * Restores previously selected author back to the list if applicable
-         */
-        onCancelEdit() {
-            if (this.selectedAuthor) {
-                this.authors.splice(
-                    this.selectedAuthor.pivot.sort_order,
-                    0,
-                    this.selectedAuthor
-                );
-            }
-            this.displayAddAuthorForms = false;
-            this.isEdit = false;
-            this.form.reset();
-            this.form.contributor_type = this.contributorType[0];
+            this.executeQuery({ closeModalOnSuccess: false });
         },
 
         /**
@@ -1519,6 +1581,7 @@ export default {
             }
             this.displayAddAuthorForms = false;
             this.isEdit = false;
+            this.selectedAuthor = null;
         },
 
         /**
