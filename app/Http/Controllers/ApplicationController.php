@@ -114,7 +114,10 @@ class ApplicationController extends Controller
                 $dataset = $model;
                 $dataset->loadMissing(['nmrium', 'study.sample']);
                 $study = $dataset->study;
-                $project = $dataset->project;
+                if (! $study) {
+                    abort(404, 'Page not found');
+                }
+                $project = $dataset->project ?? $study->project;
                 $tab = 'dataset';
             }
 
@@ -172,18 +175,29 @@ class ApplicationController extends Controller
                         'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors', 'citations']),
                     ]);
                 case 'dataset':
-                    return $this->renderPublicProject(
-                        'Public/Project/Dataset',
-                        [
-                            'project' => (new ProjectResource($project))->lite(false, []),
-                            'tab' => $tab,
-                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
-                            'dataset' => (new DatasetResource($dataset))->lite(false, ['nmrium']),
-                        ],
-                        $request,
-                        $project,
-                        $getLicense
-                    );
+                    $studyResource = (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']);
+                    $datasetResource = (new DatasetResource($dataset))->lite(false, ['nmrium']);
+
+                    if ($project) {
+                        return $this->renderPublicProject(
+                            'Public/Project/Dataset',
+                            [
+                                'project' => (new ProjectResource($project))->lite(false, []),
+                                'tab' => $tab,
+                                'study' => $studyResource,
+                                'dataset' => $datasetResource,
+                            ],
+                            $request,
+                            $project,
+                            $getLicense
+                        );
+                    }
+
+                    return Inertia::render('Public/Sample/Dataset', [
+                        'tab' => $tab,
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules', 'owner', 'license', 'authors', 'citations']),
+                        'dataset' => $datasetResource,
+                    ]);
                 default:
                     return $this->renderPublicProject(
                         'Public/Project/Show',
@@ -204,12 +218,17 @@ class ApplicationController extends Controller
     /**
      * @param  array<string, mixed>  $props
      */
-    private function renderPublicProject(string $component, array $props, Request $request, Project $project, GetLicense $getLicense): InertiaResponse
+    private function renderPublicProject(string $component, array $props, Request $request, ?Project $project, GetLicense $getLicense): InertiaResponse
     {
-        return Inertia::render($component, array_merge(
-            $props,
-            ProjectWorkspace::inertiaPropsForPublicProject($request, $project, $getLicense)
-        ));
+        $mergedProps = $props;
+        if ($project) {
+            $mergedProps = array_merge(
+                $props,
+                ProjectWorkspace::inertiaPropsForPublicProject($request, $project, $getLicense)
+            );
+        }
+
+        return Inertia::render($component, $mergedProps);
     }
 
     /**

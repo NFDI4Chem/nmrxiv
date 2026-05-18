@@ -1,37 +1,31 @@
 <template>
     <Head :title="dataset.data.name + ' - ' + study.data.name" />
-    <project-layout
-        :project="project"
-        :selected-tab="tab"
-        :current-study="study"
-    >
-        <template #project-content>
-            <div class="pb-10 mb-10 py-6">
-                <PublicDatasetBody
-                    :study="study"
-                    :dataset="dataset"
-                    :project="project"
-                />
+    <sample-layout :study="study.data">
+        <template #sample-content>
+            <div
+                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+            >
+                <PublicDatasetBody :study="study" :dataset="dataset" />
             </div>
         </template>
-    </project-layout>
+    </sample-layout>
     <component :is="'script'" type="application/ld+json">{{
         schema
     }}</component>
 </template>
 
 <script>
-import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
+import SampleLayout from "@/Pages/Public/Sample/Layout.vue";
 import PublicDatasetBody from "@/Shared/Public/PublicDatasetBody.vue";
 import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
-        ProjectLayout,
+        SampleLayout,
         PublicDatasetBody,
         Head,
     },
-    props: ["project", "tab", "study", "dataset"],
+    props: ["tab", "study", "dataset"],
     data() {
         return {
             schema: {},

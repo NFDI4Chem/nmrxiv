@@ -253,6 +253,46 @@ class ApplicationControllerTest extends TestCase
         );
     }
 
+    public function test_resolve_dataset_uses_study_project_when_dataset_project_id_is_null(): void
+    {
+        $this->dataset->project_id = null;
+        $this->dataset->save();
+
+        $response = $this->get('/dataset/D1');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Project/Dataset')
+            ->has('project')
+        );
+    }
+
+    public function test_resolve_dataset_renders_without_project_when_neither_has_project(): void
+    {
+        $studyWithoutProject = Study::factory()->create([
+            'project_id' => null,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'identifier' => 3,
+        ]);
+
+        $datasetWithoutProject = Dataset::factory()->create([
+            'project_id' => null,
+            'study_id' => $studyWithoutProject->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'identifier' => 2,
+        ]);
+
+        $response = $this->get('/dataset/D2');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Sample/Dataset')
+            ->missing('project')
+        );
+    }
+
     public function test_resolve_dataset_includes_nmrium_info_when_nmrium_present(): void
     {
         NMRium::factory()->forDataset($this->dataset)->create([
