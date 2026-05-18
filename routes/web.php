@@ -409,16 +409,15 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-// Redirect old compound URLs to new structure
+// Legacy /spectra URLs
 Route::get('/spectra', function (Request $request) {
     $compound = $request->query('compound');
     if ($compound) {
         return redirect()->route('public.compound', ['id' => 'M'.$compound], 301);
     }
 
-    // If no compound parameter, show the spectra page as before
-    return app(StudyController::class)->publicStudiesView($request);
-})->name('public.spectra');
+    return redirect()->route('public.projects', [], 301);
+});
 
 // Keep the old generic resolver for backward compatibility but redirect to new URLs
 Route::get('{id}', function ($id) {
@@ -484,9 +483,6 @@ Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMR
 
 Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
-
-Route::get('spectra', [StudyController::class, 'publicStudiesView'])
-    ->name('public.spectra');
 
 // oEmbed service endpoint - returns oEmbed JSON response for external embedding
 // Supports oEmbed 1.0 specification for rich content embedding

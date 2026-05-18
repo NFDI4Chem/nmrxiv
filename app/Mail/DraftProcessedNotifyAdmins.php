@@ -50,7 +50,7 @@ class DraftProcessedNotifyAdmins extends Mailable
             ])->subject(__('A project has been published'.' - '.$this->project->name));
         } elseif ($this->studies) {
             return $this->markdown('vendor.mail.study-published-notify-admins', [
-                'url' => url(config('app.url').'/spectra'),
+                'url' => url(config('app.url').'/projects'),
                 'samples' => $this->studies,
                 'releasedToday' => $releasedToday,
             ])->subject(__('Sample(s) has been published.'));
