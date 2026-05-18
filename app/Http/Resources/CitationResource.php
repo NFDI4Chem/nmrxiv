@@ -21,9 +21,7 @@ class CitationResource extends JsonResource
             'title' => $this->title,
             'authors' => $this->authors,
             'citation_text' => $this->citation_text,
-            'user_id' => $this->whenPivotLoaded('citation_project', function () {
-                return $this->pivot->user ?? null;
-            }),
+            'user_id' => data_get($this->resource, 'pivot.user'),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

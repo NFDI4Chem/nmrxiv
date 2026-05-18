@@ -108,7 +108,7 @@ class ApplicationController extends Controller
                 }
             } elseif ($namespace == 'Study') {
                 $study = $model;
-                $study->load('studyAuthors'); // Eager load authors
+                $study->load(['studyAuthors', 'linkedCitations']);
                 $project = $study->project;
                 $tab = 'study';
             } elseif ($namespace == 'Dataset') {
@@ -160,7 +160,7 @@ class ApplicationController extends Controller
                             [
                                 'project' => (new ProjectResource($project))->lite(false, []),
                                 'tab' => $tab,
-                                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
+                                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'citations']),
                             ],
                             $request,
                             $project,
@@ -170,7 +170,7 @@ class ApplicationController extends Controller
 
                     return Inertia::render('Public/Sample/Show', [
                         'tab' => $tab,
-                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors']),
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors', 'citations']),
                     ]);
                 case 'dataset':
                     return $this->renderPublicProject(

@@ -72,12 +72,16 @@ class ProjectController extends Controller
         }
         if ($tab == 'study') {
             $studyId = $request->get('id');
-            $study = Study::where([['slug', $studyId], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+            $study = Study::with('linkedCitations')->where([
+                ['slug', $studyId],
+                ['owner_id', $user->id],
+                ['project_id', $project->id],
+            ])->firstOrFail();
 
             return $render('Public/Project/Study', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
-                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
+                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'citations']),
             ]);
         }
 

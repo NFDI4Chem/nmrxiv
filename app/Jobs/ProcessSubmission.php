@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Citation\SyncCitationPivot;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
@@ -214,6 +215,8 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 }
                 $assigner->assign($_studies);
 
+                $releaseDate = Carbon::parse($project->release_date);
+
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_immediate_publish_all',
                     'project_id' => $project->id,
@@ -223,13 +226,15 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'studies_count' => $_studies->count(),
                 ]);
 
-                foreach ($_studies as $study) {
-                    Log::info('embargo_publish_trace', [
-                        'stage' => 'process_submission_samples_mode_publish_study',
-                        'project_id' => $project->id,
-                        'study_id' => $study->id,
-                    ]);
-                    $studyPublisher->publish($study);
+                if ($releaseDate->lessThanOrEqualTo(now())) {
+                    foreach ($_studies as $study) {
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'process_submission_samples_mode_publish_study',
+                            'project_id' => $project->id,
+                            'study_id' => $study->id,
+                        ]);
+                        $studyPublisher->publish($study);
+                    }
                 }
                 $updater->update($_studies);
                 // Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
@@ -238,6 +243,10 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'project_id' => $project->id,
                 ]);
                 event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                $project->load('citations');
+                foreach ($_studies as $study) {
+                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
+                }
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_delete_project_draft',
                     'project_id' => $project->id,

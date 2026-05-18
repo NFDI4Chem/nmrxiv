@@ -20,6 +20,27 @@
                     ></Citation>
                 </div>
 
+                <div
+                    v-if="
+                        study.data.citations &&
+                        study.data.citations.length > 0
+                    "
+                    class="-mx-4 mt-6"
+                >
+                    <h2
+                        class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100 px-4 sm:px-6 lg:px-8"
+                    >
+                        Citation(s)
+                    </h2>
+                    <div
+                        class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2 px-4 sm:px-6 lg:px-8"
+                    >
+                        <citation-card
+                            :citations="study.data.citations"
+                        />
+                    </div>
+                </div>
+
                 <!-- Study header section -->
                 <div class="mt-2">
                     <!-- Study title -->
@@ -561,6 +582,7 @@ import Depictor2D from "@/Shared/Depictor2D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
 
 export default {
     name: "StudyDetail",
@@ -578,6 +600,7 @@ export default {
         DOIBadge,
         Head,
         Citation,
+        CitationCard,
     },
 
     props: {

@@ -3,7 +3,12 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Citation;
+use App\Models\License;
 use App\Models\Project;
+use App\Models\Study;
+use App\Models\Team;
+use App\Models\User;
+use App\Models\Validation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,6 +30,43 @@ class CitationModelTest extends TestCase
         $this->assertCount(2, $citation->projects);
         $this->assertTrue($citation->projects->contains($project1));
         $this->assertTrue($citation->projects->contains($project2));
+    }
+
+    public function test_it_belongs_to_many_studies(): void
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create(['user_id' => $user->id]);
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+        $project = Project::factory()->create([
+            'team_id' => $team->id,
+            'owner_id' => $user->id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+        $study1 = Study::factory()->create([
+            'project_id' => $project->id,
+            'owner_id' => $user->id,
+            'team_id' => $team->id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+        $study2 = Study::factory()->create([
+            'project_id' => $project->id,
+            'owner_id' => $user->id,
+            'team_id' => $team->id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $citation = Citation::factory()->create();
+
+        $citation->studies()->attach([$study1->id, $study2->id]);
+
+        $this->assertInstanceOf(Collection::class, $citation->studies);
+        $this->assertCount(2, $citation->studies);
+        $this->assertTrue($citation->studies->contains($study1));
+        $this->assertTrue($citation->studies->contains($study2));
     }
 
     public function test_it_has_correct_fillable_attributes()

@@ -9,6 +9,26 @@
                     :release_date="study.data.release_date"
                     :created_at="study.data.created_at"
                 />
+                <div
+                    v-if="
+                        study.data.citations &&
+                        study.data.citations.length > 0
+                    "
+                    class="mt-6"
+                >
+                    <h2
+                        class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
+                    >
+                        Citation(s)
+                    </h2>
+                    <div
+                        class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                    >
+                        <citation-card
+                            :citations="study.data.citations"
+                        />
+                    </div>
+                </div>
                 <div class="mt-2">
                     <!-- Study title -->
                     <h1 class="text-2xl font-bold break-words text-gray-900">
@@ -769,6 +789,7 @@ import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
 export default {
     components: {
         SampleLayout,
@@ -785,6 +806,7 @@ export default {
         Citation,
         ShowProjectDates,
         AuthorCard,
+        CitationCard,
     },
     props: ["project", "tab", "study"],
     data() {

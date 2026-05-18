@@ -2,10 +2,7 @@
     <div>
         <span v-if="mode == 'button'">
             <span v-if="!$page.props.auth.user?.email">
-                <Link
-                    href="/login"
-                    class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
-                >
+                <Link href="/login" :class="buttonClasses">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="mr-2 h-5 w-5"
@@ -25,7 +22,7 @@
                 <Link
                     id="tour-step-upload"
                     :href="route('upload')"
-                    class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    :class="buttonClasses"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -95,9 +92,21 @@ export default {
     },
     props: {
         mode: String,
+        compact: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup() {},
-    computed: {},
+    computed: {
+        buttonClasses() {
+            return [
+                this.compact
+                    ? "inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    : "w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg",
+            ];
+        },
+    },
     methods: {},
 };
 </script>

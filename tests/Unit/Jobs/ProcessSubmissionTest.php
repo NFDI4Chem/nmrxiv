@@ -22,6 +22,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Mockery;
@@ -169,6 +170,55 @@ class ProcessSubmissionTest extends TestCase
 
         $this->assertNull(Project::find($projectId));
         $this->assertNull(Draft::find($draftId));
+    }
+
+    public function test_handle_publishes_study_when_release_date_is_now(): void
+    {
+        Storage::fake('local');
+        Event::fake();
+        Queue::fake();
+
+        $this->draft->project_enabled = false;
+        $this->draft->save();
+
+        $environment = env('APP_ENV', 'local');
+        $this->draft->path = $environment.'/draft-'.$this->draft->id;
+        $this->draft->save();
+
+        $this->project->release_date = now();
+        $this->project->save();
+
+        $study = Study::factory()->create(['project_id' => $this->project->id]);
+
+        FileSystemObject::create([
+            'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
+            'type' => 'directory',
+            'name' => 'study',
+            'slug' => 'study',
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
+            'path' => $this->draft->path,
+            'status' => 'present',
+        ]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('assign')->once();
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once();
+
+        $projectPublisher = Mockery::mock(PublishProject::class);
+        $projectPublisher->shouldReceive('publish')->never();
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->once();
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+
+        $this->assertNull(Project::find($this->project->id));
+        $this->assertNull(Draft::find($this->draft->id));
     }
 
     public function test_handle_clears_dataset_draft_and_project_ids(): void

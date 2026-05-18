@@ -160,6 +160,12 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
         ->name('citation.delete');
 
+    Route::post('citations/study/{study}', [CitationController::class, 'saveStudy'])
+        ->name('citation.study.save');
+
+    Route::delete('citations/study/{study}/delete', [CitationController::class, 'destroyStudy'])
+        ->name('citation.study.delete');
+
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
         ->name('onboarding.complete');
 

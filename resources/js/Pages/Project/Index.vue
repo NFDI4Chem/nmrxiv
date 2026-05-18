@@ -41,10 +41,17 @@
                         class="mt-3 block w-full min-w-0 text-sm leading-relaxed text-gray-600"
                     >
                         nmrXiv is organized around projects. Projects can
-                        contain as many samples as you wish and each sample
-                        receives its very own URL. Use the "UPLOAD" button on
-                        the upper left side to start uploading projects or
-                        samples. To learn more, check out our documentation.
+                        include multiple samples, and each sample is assigned
+                        its own URL. To begin uploading projects or samples, use
+                        the Submit Data button. For more information, please
+                        refer to our
+                        <a
+                            href="https://docs.nmrxiv.org/introduction/intro"
+                            target="_blank"
+                            class="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
+                        >
+                            documentation </a
+                        >.
                     </div>
                     <!-- <button
                         type="button"

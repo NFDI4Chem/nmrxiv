@@ -353,6 +353,14 @@ class Study extends Model implements Auditable
     }
 
     /**
+     * Normalized citations (pivot `citation_study`). Named `linkedCitations` to avoid clashing with the JSON `citations` attribute.
+     */
+    public function linkedCitations(): BelongsToMany
+    {
+        return $this->belongsToMany(Citation::class)->withTimestamps();
+    }
+
+    /**
      * Accessor for authors attribute (alias for studyAuthors relationship).
      */
     protected function authors(): Attribute

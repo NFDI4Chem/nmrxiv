@@ -36,4 +36,12 @@ class Citation extends Model
     {
         return $this->belongsToMany(Project::class);
     }
+
+    /**
+     * Studies linked to this citation (normalized pivot; distinct from JSON `studies.citations`).
+     */
+    public function studies(): BelongsToMany
+    {
+        return $this->belongsToMany(Study::class);
+    }
 }

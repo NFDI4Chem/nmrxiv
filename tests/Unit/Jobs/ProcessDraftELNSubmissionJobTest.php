@@ -127,8 +127,8 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
         ]);
 
         $citations = [
-            ['doi' => '10.1234/test', 'title' => 'Test Citation'],
-            ['doi' => '10.5678/test2', 'title' => 'Another Citation'],
+            ['doi' => '10.1234/test', 'title' => 'Test Citation', 'authors' => 'A Author'],
+            ['doi' => '10.5678/test2', 'title' => 'Another Citation', 'authors' => 'B Author'],
         ];
 
         $logger = new DraftProcessingLogger;
@@ -139,6 +139,9 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
 
         $study->refresh();
         $this->assertEquals($citations, $study->citations);
+        $study->load('linkedCitations');
+        $this->assertCount(2, $study->linkedCitations);
+        $this->assertDatabaseCount('citation_study', 2);
     }
 
     public function test_attach_citations_to_study_with_empty_citations(): void

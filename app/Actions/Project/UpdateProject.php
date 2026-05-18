@@ -2,6 +2,7 @@
 
 namespace App\Actions\Project;
 
+use App\Actions\Citation\SyncCitationPivot;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Validation;
@@ -221,14 +222,7 @@ class UpdateProject
      */
     public function syncCitations(Project $project, $citations, $user)
     {
-        $citations_map = [];
-        foreach ($citations as $citation) {
-            $citations_map[$citation->id] = ['user' => $user->id];
-        }
-
-        $project->citations()->sync(
-            $citations_map
-        );
+        app(SyncCitationPivot::class)->sync($project, $citations, $user);
     }
 
     /**
@@ -239,8 +233,6 @@ class UpdateProject
      */
     public function detachCitation(Project $project, $citation_id)
     {
-        $project->citations()->detach(
-            $citation_id
-        );
+        app(SyncCitationPivot::class)->detach($project, (int) $citation_id);
     }
 }
