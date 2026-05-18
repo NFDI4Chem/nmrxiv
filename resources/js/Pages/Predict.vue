@@ -453,7 +453,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 import Footer from "@/Shared/Footer.vue";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 
 export default {
     components: {

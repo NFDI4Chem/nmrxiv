@@ -75,7 +75,7 @@
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import Depictor3D from "@/Shared/Depictor3D.vue";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 
 export default {
     components: {

@@ -2,7 +2,7 @@ import * as marked from "marked";
 import DOMPurify from "dompurify";
 import { copyText } from "vue3-clipboard";
 import pluralize from "pluralize";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 
 export default {
     methods: {

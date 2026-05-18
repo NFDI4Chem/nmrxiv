@@ -655,7 +655,7 @@ import {
 } from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";

@@ -639,7 +639,7 @@ import { router } from "@inertiajs/vue3";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
 import axiosRetry from "axios-retry";
-import OCL from "openchemlib/minimal";
+import OCL from "openchemlib";
 
 import {
     FolderIcon,

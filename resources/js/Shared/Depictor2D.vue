@@ -43,7 +43,7 @@
     </div>
 </template>
 <script>
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 
 export default {
     components: {},

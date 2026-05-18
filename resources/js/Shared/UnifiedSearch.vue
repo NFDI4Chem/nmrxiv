@@ -377,7 +377,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/outline";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
 import SpectraUploadContent from "@/Shared/SpectraUploadContent.vue";
 import PeakListSearchContent from "@/Shared/PeakListSearchContent.vue";

@@ -1913,7 +1913,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
 import slider from "vue3-slider";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";

@@ -103,7 +103,7 @@
 
 <script>
 import { ref } from "vue";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 import {
     Dialog as HeadlessUiDialog,
     DialogPanel,
