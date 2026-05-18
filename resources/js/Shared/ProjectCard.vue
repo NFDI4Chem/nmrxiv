@@ -108,32 +108,23 @@
                         v-if="mode != 'mini'"
                         class="mt-auto flex items-center gap-3 border-t border-gray-100 bg-gray-50/60 px-4 py-3"
                     >
-                        <img
-                            class="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-white"
-                            :src="project.owner.profile_photo_url"
-                            :alt="ownerDisplayName"
-                        />
-
                         <div class="min-w-0 flex-1">
                             <p
                                 class="truncate text-sm font-medium text-gray-900"
                             >
                                 {{ ownerDisplayName }}
                             </p>
-                            <p
-                                class="mt-0.5 truncate text-xs text-gray-500"
-                                :title="
-                                    licenseTitle
-                                        ? `${formatDate(project.created_at)} · ${licenseTitle}`
-                                        : formatDate(project.created_at)
-                                "
-                            >
+                            <p class="mt-0.5 text-xs text-gray-500">
                                 <time :datetime="project.created_at">
                                     {{ formatDate(project.created_at) }}
                                 </time>
-                                <span v-if="licenseTitle">
-                                    · {{ licenseTitle }}
-                                </span>
+                            </p>
+                            <p
+                                v-if="licenseTitle"
+                                class="mt-2.5 line-clamp-2 text-[11px] font-medium leading-snug text-gray-600"
+                                :title="licenseTitle"
+                            >
+                                {{ licenseTitle }}
                             </p>
                         </div>
 
@@ -299,27 +290,28 @@
                     </div>
 
                     <div
-                        class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500"
+                        class="mt-3 flex flex-col gap-1.5 text-sm text-gray-500"
                     >
-                        <p class="flex min-w-0 items-center gap-2">
-                            <img
-                                class="h-7 w-7 rounded-full object-cover ring-1 ring-gray-200"
-                                :src="project.owner.profile_photo_url"
-                                :alt="ownerDisplayName"
-                            />
-                            <span class="truncate font-medium text-gray-700">
-                                {{ ownerDisplayName }}
-                            </span>
+                        <p class="min-w-0 truncate font-medium text-gray-700">
+                            {{ ownerDisplayName }}
                         </p>
                         <p
                             v-if="licenseTitle"
-                            class="flex items-center gap-1.5"
+                            class="mt-1 flex min-w-0 items-center gap-1.5"
                         >
                             <ScaleIcon
                                 class="h-4 w-4 shrink-0 text-gray-400"
                             />
-                            <span class="truncate">{{ licenseTitle }}</span>
+                            <span
+                                class="line-clamp-2 text-xs font-medium text-gray-600"
+                                :title="licenseTitle"
+                            >
+                                {{ licenseTitle }}
+                            </span>
                         </p>
+                        <div
+                            class="flex flex-wrap items-center gap-x-4 gap-y-1"
+                        >
                         <p
                             v-if="project.download_url"
                             class="flex items-center"
@@ -353,6 +345,7 @@
                                 {{ formatDate(project.created_at) }}
                             </time>
                         </p>
+                        </div>
                     </div>
                 </div>
             </li>
