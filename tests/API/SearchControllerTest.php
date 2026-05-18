@@ -236,6 +236,49 @@ class SearchControllerTest extends TestCase
         $this->assertSame(1, $row['workspace_experiment_type_counts']['13C NMR - DEPT']);
     }
 
+    public function test_search_response_includes_iupac_name_when_present(): void
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create([
+            'iupac_name' => 'ethanol',
+            'name' => 'user label',
+        ]);
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        $response = $this->postJson('/api/v1/search', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('id', $molecule->id);
+
+        $this->assertNotNull($row);
+        $this->assertSame('ethanol', $row['iupac_name']);
+    }
+
     public function test_search_excludes_compounds_without_public_spectra(): void
     {
         $study = Study::factory()->create([

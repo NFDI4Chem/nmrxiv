@@ -413,8 +413,8 @@ class SearchController extends Controller
             } else {
                 if ($query) {
                     $hits = DB::select(
-                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
-                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
+                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
                     );
                 } else {
                     $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
