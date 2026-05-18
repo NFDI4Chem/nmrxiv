@@ -1,33 +1,27 @@
 <template>
-    <div v-if="doi" class="w-full min-w-0 p-1.5 sm:p-2">
+    <div v-if="doi" class="w-full min-w-0">
         <div
             class="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30"
         >
-            <div
-                class="flex flex-col gap-2 px-2 pt-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-2 sm:pt-2"
-            >
-                <div
-                    class="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3"
-                >
-                    <div class="flex min-w-0 items-center gap-2">
-                        <div class="shrink-0">
-                            <svg
-                                class="h-5 w-5 text-blue-500 dark:text-blue-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M19 10.5a8.5 8.5 0 11-17 0 8.5 8.5 0 0117 0zM8.25 9.75A.75.75 0 019 9h.253a1.75 1.75 0 011.709 2.13l-.46 2.066a.25.25 0 00.245.304H11a.75.75 0 010 1.5h-.253a1.75 1.75 0 01-1.709-2.13l.46-2.066a.25.25 0 00-.245-.304H9a.75.75 0 01-.75-.75zM10 7a1 1 0 100-2 1 1 0 000 2z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
-                        </div>
+            <div class="flex flex-col gap-3 p-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex min-w-0 items-start gap-2">
+                        <svg
+                            class="mt-0.5 h-5 w-5 shrink-0 text-blue-500 dark:text-blue-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M19 10.5a8.5 8.5 0 11-17 0 8.5 8.5 0 0117 0zM8.25 9.75A.75.75 0 019 9h.253a1.75 1.75 0 011.709 2.13l-.46 2.066a.25.25 0 00.245.304H11a.75.75 0 010 1.5h-.253a1.75 1.75 0 01-1.709-2.13l.46-2.066a.25.25 0 00-.245-.304H9a.75.75 0 01-.75-.75zM10 7a1 1 0 100-2 1 1 0 000 2z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
                         <h3
                             id="citation-heading"
-                            class="text-base font-semibold leading-snug tracking-tight text-blue-900 sm:text-[1.0625rem] dark:text-blue-100"
+                            class="min-w-0 text-sm font-semibold leading-snug text-blue-900 dark:text-blue-100"
                         >
                             {{ headingTitle }}
                         </h3>
@@ -84,16 +78,17 @@
                     </button>
                 </div>
 
-                <div class="flex shrink-0 items-center gap-2">
+                <div class="flex min-w-0 flex-col gap-1.5">
                     <label
-                        class="hidden text-[0.6875rem] font-semibold uppercase tracking-wide text-blue-700 sm:inline dark:text-blue-300"
+                        class="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300"
                         for="citation-style-select"
-                        >Format:</label
                     >
+                        Format
+                    </label>
                     <select
                         id="citation-style-select"
                         v-model="selectedFormat"
-                        class="block min-w-[8.5rem] rounded-md border-gray-300 bg-white py-1.5 pl-2 pr-8 text-sm font-medium text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                        class="block w-full min-w-0 rounded-md border-gray-300 bg-white py-1.5 pl-2 pr-8 text-sm font-medium text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                         :disabled="loading && !citationText"
                         @change="queryDataCite"
                     >
@@ -112,24 +107,22 @@
             </div>
 
             <div
-                class="mt-2 border-t border-blue-200 px-2 pb-2 pt-2 sm:px-3 sm:pb-2.5 sm:pt-2.5 dark:border-blue-900/50"
+                class="border-t border-blue-200 px-3 pb-3 pt-3 dark:border-blue-900/50"
                 role="region"
                 :aria-busy="loading ? 'true' : 'false'"
                 aria-live="polite"
             >
                 <div
                     v-if="loading && !citationText"
-                    class="space-y-2 px-0.5"
+                    class="space-y-2"
                     aria-hidden="true"
                 >
+                    <div class="h-2.5 w-full animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"></div>
                     <div
-                        class="h-2.5 max-w-xl animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
+                        class="h-2.5 w-5/6 animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
                     ></div>
                     <div
-                        class="h-2.5 max-w-lg animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
-                    ></div>
-                    <div
-                        class="h-2.5 max-w-md animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
+                        class="h-2.5 w-4/6 animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
                     ></div>
                 </div>
 
@@ -152,7 +145,7 @@
 
                 <p
                     v-else-if="citationText"
-                    class="max-h-[min(22rem,50vh)] overflow-y-auto overflow-x-auto break-words text-sm font-normal leading-relaxed text-gray-900 antialiased sm:text-[0.9375rem] dark:text-gray-100"
+                    class="max-h-[min(22rem,50vh)] overflow-y-auto break-words text-sm font-normal leading-relaxed text-gray-900 antialiased dark:text-gray-100"
                     v-html="sanitizeHtml(citationText)"
                 ></p>
             </div>

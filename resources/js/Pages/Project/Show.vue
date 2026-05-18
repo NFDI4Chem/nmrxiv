@@ -60,16 +60,25 @@
                 </div>
                 <div
                     v-else
-                    class="px-3 py-3 text-center text-green-800 bg-green-50 border-b dark:bg-green-950/40 dark:text-green-100 dark:border-green-900/50"
+                    class="border-b border-emerald-200/80 bg-emerald-50 px-4 py-3 text-center text-emerald-900 dark:border-emerald-800/50 dark:bg-emerald-950/55 dark:text-emerald-100"
                 >
-                    <p>
-                        <b>Info: </b> This project is published. You cannot edit
-                        a published project. Contact us at
-                        info.nmrxiv@uni-jena.de if you need to make changes.
+                    <p
+                        class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                    >
+                        <span
+                            class="font-semibold text-emerald-950 dark:text-emerald-50"
+                            >Published.</span
+                        >
+                        This project is read-only. To request changes, contact
+                        <a
+                            href="mailto:info.nmrxiv@uni-jena.de"
+                            class="font-medium text-emerald-800 underline decoration-emerald-600/45 underline-offset-2 hover:text-emerald-950 dark:text-emerald-200 dark:hover:text-white"
+                            >info.nmrxiv@uni-jena.de</a
+                        >.
                     </p>
                     <p
                         v-if="publicProjectRecordUrl"
-                        class="mt-2 text-sm text-green-900/90 dark:text-green-100/90"
+                        class="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-emerald-900/90 dark:text-emerald-100/90"
                     >
                         Share and cite the stable public page:
                         <Link

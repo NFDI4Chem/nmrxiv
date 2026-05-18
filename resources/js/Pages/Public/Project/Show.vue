@@ -5,23 +5,14 @@
         <template #project-content>
             <div class="pb-10 mb-10 pt-4 pb-6">
                 <div
-                    class="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-10 lg:gap-y-8 xl:gap-x-14"
+                    class="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6"
                 >
                     <div
                         :class="[
                             'min-w-0 space-y-4',
-                            hasInfoSidebar ? 'lg:col-span-8' : 'lg:col-span-12',
+                            hasInfoSidebar ? 'lg:col-span-9' : 'lg:col-span-12',
                         ]"
                     >
-                    <div
-                        v-if="project.data.is_public && project.data.doi != null"
-                        class="w-full min-w-0"
-                    >
-                        <Citation
-                            :model="'project'"
-                            :doi="project.data.doi"
-                        ></Citation>
-                    </div>
                     <!-- About project (original public layout + edit tools) -->
                     <div>
                         <div
@@ -112,7 +103,7 @@
                             <h2
                                 class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
                             >
-                                Submitter(s)
+                                {{ submittersLabel }}
                             </h2>
                         </div>
 
@@ -178,7 +169,7 @@
                                     <h2
                                         class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
                                     >
-                                        Author(s)
+                                        {{ authorsLabel }}
                                     </h2>
                                     <button
                                         v-if="canUpdateProject"
@@ -217,7 +208,7 @@
                                     <h2
                                         class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
                                     >
-                                        Citation(s)
+                                        {{ citationsLabel }}
                                     </h2>
                                     <button
                                         v-if="canUpdateProject"
@@ -253,10 +244,10 @@
 
                     <aside
                         v-if="hasInfoSidebar"
-                        class="mt-10 min-w-0 lg:mt-0 lg:col-span-4"
+                        class="mt-10 min-w-0 lg:mt-0 lg:col-span-3"
                     >
                         <div
-                            class="space-y-8 bg-white p-6 dark:bg-gray-900/80 lg:sticky lg:top-6"
+                            class="space-y-8 bg-white py-6 pl-0 pr-0 dark:bg-gray-900/80 lg:sticky lg:top-6"
                         >
                             <div
                                 v-if="
@@ -301,6 +292,16 @@
                                         "
                                     />
                                 </div>
+                            </div>
+
+                            <div
+                                v-if="showDoiCitation"
+                                class="w-full min-w-0"
+                            >
+                                <Citation
+                                    :model="'project'"
+                                    :doi="project.data.doi"
+                                />
                             </div>
 
                             <div v-if="licenseTitle">
@@ -534,6 +535,27 @@ export default {
 
             return license?.url ?? null;
         },
+        showDoiCitation() {
+            return (
+                this.project?.data?.is_public &&
+                this.project?.data?.doi != null
+            );
+        },
+        submittersLabel() {
+            const count = this.project?.data?.users?.length ?? 0;
+
+            return count === 1 ? "Submitter" : "Submitters";
+        },
+        authorsLabel() {
+            const count = this.project?.data?.authors?.length ?? 0;
+
+            return count === 1 ? "Author" : "Authors";
+        },
+        citationsLabel() {
+            const count = this.project?.data?.citations?.length ?? 0;
+
+            return count === 1 ? "Citation" : "Citations";
+        },
         hasInfoSidebar() {
             const hasId =
                 !!(this.project?.data?.identifier || this.project?.identifier);
@@ -550,6 +572,7 @@ export default {
             return (
                 hasId ||
                 hasDoi ||
+                this.showDoiCitation ||
                 this.licenseTitle ||
                 hasDates ||
                 hasTags

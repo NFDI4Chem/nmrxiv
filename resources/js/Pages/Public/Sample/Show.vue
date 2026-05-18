@@ -5,10 +5,6 @@
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
-                <ShowProjectDates
-                    :release_date="study.data.release_date"
-                    :created_at="study.data.created_at"
-                />
                 <div class="mt-2">
                     <!-- Study title -->
                     <h1 class="text-2xl font-bold break-words text-gray-900">
@@ -29,10 +25,7 @@
 
                         <!-- Desktop layout controls (right aligned) -->
                         <div class="hidden sm:block float-right">
-                            <!-- Share button (desktop) -->
-                            <div class="float-right">
-                                <!-- Share dropdown menu -->
-                                <Menu
+                            <Menu
                                     v-if="study.data.is_public"
                                     as="div"
                                     class="relative text-left"
@@ -112,21 +105,6 @@
                                         </MenuItems>
                                     </transition>
                                 </Menu>
-                            </div>
-
-                            <!-- Study identifier (desktop) -->
-                            <div class="text-sm float-right">
-                                <div
-                                    class="hover:text-blue-600 hover:cursor-pointer text-gray-500 mx-2 my-1"
-                                >
-                                    <p class="inline m-0 p-0">
-                                        #{{ study.data.identifier }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Clear floats -->
-                            <div class="clear-both"></div>
                         </div>
                     </div>
                     <div class="clear-both"></div>
@@ -134,11 +112,8 @@
                     <!-- Mobile layout section -->
                     <div class="mt-4">
                         <!-- Mobile controls (stacked vertically) -->
-                        <div class="flex flex-col gap-3 sm:hidden">
-                            <!-- Share button (mobile) -->
-                            <div>
-                                <!-- Share dropdown menu (mobile) -->
-                                <Menu
+                        <div class="sm:hidden">
+                            <Menu
                                     v-if="study.data.is_public"
                                     as="div"
                                     class="relative text-left"
@@ -212,129 +187,24 @@
                                         </MenuItems>
                                     </transition>
                                 </Menu>
-                            </div>
-                            <!-- Study identifier (mobile) -->
-                            <div class="text-sm">
-                                <div
-                                    class="inline hover:text-blue-600 hover:cursor-pointer text-gray-500"
-                                >
-                                    #{{ study.data.identifier }}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="study.data.tags.length > 0" class="relative mt-4">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Keywords
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <dd class="mt-1 text-md text-gray-900 space-y-5">
-                            <p>
-                                <span
-                                    v-for="tag in study.data.tags"
-                                    :key="tag.id"
-                                    class="mr-2"
-                                >
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
-                                    >
-                                        <svg
-                                            class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                            fill="currentColor"
-                                            viewBox="0 0 8 8"
-                                        >
-                                            <circle cx="4" cy="4" r="3" />
-                                        </svg>
-                                        {{ tag.name["en"] }}
-                                    </span>
-                                </span>
-                            </p>
-                        </dd>
-                    </div>
-                </div>
                 <div
-                    v-if="
-                        compositionMolecules.length > 0 ||
-                        study.data.sample?.description == ''
-                    "
-                    class="mt-4 md:grid md:grid-cols-12 md:gap-x-4 md:gap-y-8 lg:gap-x-5 xl:gap-x-6"
+                    class="mt-4 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6"
                 >
                     <div
                         :class="[
-                            'min-w-0 space-y-4',
-                            hasMolecularCompositionSidebar
-                                ? 'md:col-span-9'
-                                : 'md:col-span-12',
+                            'min-w-0 space-y-6 overflow-visible',
+                            hasInfoSidebar
+                                ? 'lg:col-span-9'
+                                : 'lg:col-span-12',
                         ]"
                     >
-                        <div
-                            v-if="study.data.is_public && study.data.doi != null"
-                        >
-                            <Citation
-                                :model="'sample'"
-                                :doi="study.data.doi"
-                            ></Citation>
-                        </div>
-
-                        <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
-                            <div class="pt-2 sm:col-span-6">
-                                <h2
-                                    class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
-                                >
-                                    Submitter
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div
-                            class="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
-                        >
-                            <div class="flex-shrink-0">
-                                <img
-                                    class="h-10 w-10 rounded-full"
-                                    :src="study.data.owner.profile_photo_url"
-                                    alt=""
-                                />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <a class="focus:outline-none">
-                                    <span
-                                        class="absolute inset-0"
-                                        aria-hidden="true"
-                                    ></span>
-                                    <p
-                                        class="text-sm font-medium text-gray-900"
-                                    >
-                                        {{
-                                            study.data.owner.first_name +
-                                            " " +
-                                            study.data.owner.last_name
-                                        }}
-                                    </p>
-                                    <p class="text-sm text-gray-500 truncate">
-                                        @ {{ study.data.owner.username }}
-                                    </p>
-                                </a>
-                            </div>
-                        </div>
-                        </div>
 
                         <!-- Submitted Through Information -->
-                        <div v-if="study.data.submitted_through" class="mt-4">
+                        <div v-if="study.data.submitted_through">
                         <div
                             class="flex items-center space-x-3 text-sm text-gray-600"
                         >
@@ -423,87 +293,34 @@
                         </div>
                         </div>
 
+
                         <div
                             v-if="
-                                study.data.citations &&
-                                study.data.citations.length > 0
+                                study.data.sample?.description &&
+                                study.data.sample.description.length > 0
                             "
-                            class="mt-6"
+                            class="rounded-lg border border-gray-100 bg-gray-50/80 p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
                         >
-                            <h2
-                                class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
-                            >
-                                Citation(s)
-                            </h2>
-                            <div
-                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                            >
-                                <citation-card
-                                    :citations="study.data.citations"
-                                />
-                            </div>
+                            <p class="whitespace-pre-wrap">
+                                {{ study.data.sample.description }}
+                            </p>
                         </div>
-                    </div>
 
-                    <aside
-                        v-if="hasMolecularCompositionSidebar"
-                        class="mt-10 min-w-0 md:mt-0 md:col-span-3"
-                    >
-                        <div
-                            class="space-y-6 bg-white p-6 dark:bg-gray-900/80 md:sticky md:top-6"
-                        >
-                            <ul role="list" class="space-y-8">
-                                <li
-                                    v-for="molecule in compositionMolecules"
-                                    :key="
-                                        molecule.standard_inchi ||
-                                        molecule.id
-                                    "
-                                    class="min-w-0"
-                                >
-                                    <p
-                                        class="text-sm font-medium break-all text-gray-900 dark:text-gray-100"
-                                    >
-                                        {{ molecule.standard_inchi }}
-                                    </p>
-                                    <div
-                                        v-if="molecule.canonical_smiles"
-                                        class="mt-3 flex justify-center"
-                                    >
-                                        <Depictor2D
-                                            class="max-h-52 max-w-full"
-                                            :molecule="
-                                                molecule.canonical_smiles
-                                            "
-                                        ></Depictor2D>
-                                    </div>
-                                    <p
-                                        v-else
-                                        class="mt-2 text-sm text-gray-500"
-                                    >
-                                        No structure available
-                                    </p>
-                                </li>
-                            </ul>
+                        <div class="min-w-0 max-w-full overflow-x-auto">
+                            <SpectraViewer
+                                ref="spectraViewerREF"
+                                :study="study.data"
+                            ></SpectraViewer>
                         </div>
-                    </aside>
-                </div>
 
-                <div class="mt-6">
-                    <SpectraViewer
-                        ref="spectraViewerREF"
-                        :study="study.data"
-                    ></SpectraViewer>
-
-                    <div class="my-6">
-                        <div>
+                        <div class="overflow-visible">
                             <div
                                 class="mb-5 flex flex-wrap items-center justify-between gap-3"
                             >
                                 <h2
                                     class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
                                 >
-                                    Datasets
+                                    Spectra Datasets
                                 </h2>
                                 <span
                                     class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium tabular-nums text-gray-700 ring-1 ring-inset ring-gray-900/5 dark:bg-gray-800/80 dark:text-gray-300 dark:ring-white/10"
@@ -511,8 +328,8 @@
                                     {{ study.data.datasets.length }}
                                     {{
                                         study.data.datasets.length === 1
-                                            ? "Dataset"
-                                            : "Datasets"
+                                            ? "dataset"
+                                            : "datasets"
                                     }}
                                 </span>
                             </div>
@@ -549,7 +366,7 @@
 
                             <div
                                 v-else
-                                class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                                class="grid grid-cols-1 gap-5 p-0.5 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
                             >
                                 <div
                                     v-for="dataset in study.data.datasets.sort(
@@ -559,10 +376,8 @@
                                     class="group relative"
                                 >
                                     <a
-                                        :href="dataset.external_url"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-900/[0.06] transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:ring-gray-900/[0.1] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-gray-950 dark:ring-white/[0.08] dark:hover:ring-white/[0.14] dark:focus-visible:ring-offset-gray-950"
+                                        :href="datasetHref(dataset)"
+                                        class="relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-inset ring-gray-900/[0.08] transition duration-300 ease-out hover:shadow-md hover:ring-gray-900/[0.12] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-gray-950 dark:ring-white/[0.1] dark:hover:ring-white/[0.16] dark:focus-visible:ring-offset-gray-950"
                                     >
                                         <div
                                             class="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-teal-500/0 via-teal-500/70 to-teal-500/0 opacity-0 transition duration-300 group-hover:opacity-100"
@@ -572,7 +387,7 @@
                                             class="flex flex-1 flex-col gap-3"
                                         >
                                             <h3
-                                                class="line-clamp-2 text-[0.9375rem] font-semibold capitalize leading-snug text-gray-900 transition-colors group-hover:text-teal-700 dark:text-gray-100 dark:group-hover:text-teal-400"
+                                                class="line-clamp-2 text-[0.9375rem] font-semibold leading-snug text-gray-900 transition-colors group-hover:text-teal-700 dark:text-gray-100 dark:group-hover:text-teal-400"
                                             >
                                                 {{ dataset.name }}
                                             </h3>
@@ -600,7 +415,7 @@
                                             <span
                                                 class="text-xs font-medium text-gray-500 dark:text-gray-400"
                                             >
-                                                Open external
+                                                Open dataset
                                             </span>
                                             <svg
                                                 class="h-4 w-4 shrink-0 text-gray-400 transition duration-300 group-hover:translate-x-0.5 group-hover:text-teal-600 dark:group-hover:text-teal-400"
@@ -621,156 +436,213 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- License Information Section -->
-                    <div v-if="study.data.license" class="mt-6">
+
+
                         <div
-                            class="bg-gray-50 rounded-lg p-6 border border-gray-200"
+                            v-if="
+                                study.data.description &&
+                                study.data.description.length > 0
+                            "
+                            class="overflow-hidden"
                         >
-                            <div class="flex items-start space-x-4">
-                                <!-- License Icon -->
-                                <div class="flex-shrink-0">
-                                    <svg
-                                        class="h-6 w-6 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                        />
-                                    </svg>
-                                </div>
-
-                                <!-- License Content -->
-                                <div class="flex-1 min-w-0">
-                                    <h3
-                                        class="text-lg font-semibold text-gray-900 mb-2"
-                                    >
-                                        License Information
-                                    </h3>
-
-                                    <!-- Desktop Layout -->
-                                    <div class="hidden sm:block">
-                                        <div
-                                            class="flex items-center space-x-2"
-                                        >
-                                            <span
-                                                class="text-sm font-medium text-gray-600"
-                                                >License:</span
-                                            >
-                                            <a
-                                                v-if="study.data.license.url"
-                                                :href="study.data.license.url"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150"
-                                                :title="
-                                                    'View ' +
-                                                    study.data.license.title +
-                                                    ' license details'
-                                                "
-                                            >
-                                                {{ study.data.license.title }}
-                                            </a>
-                                            <span
-                                                v-else
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ study.data.license.title }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Mobile Layout -->
-                                    <div class="sm:hidden space-y-2">
-                                        <div class="text-sm text-gray-600">
-                                            <span class="font-medium"
-                                                >License</span
-                                            >
-                                        </div>
-                                        <div>
-                                            <a
-                                                v-if="study.data.license.url"
-                                                :href="study.data.license.url"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="text-sm font-medium text-blue-600 hover:text-blue-800 underline"
-                                                :title="'View license details'"
-                                            >
-                                                {{ study.data.license.title }}
-                                            </a>
-                                            <span
-                                                v-else
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ study.data.license.title }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- License Description (if available) -->
-                                    <div
-                                        v-if="study.data.license.description"
-                                        class="mt-3"
-                                    >
-                                        <p
-                                            class="text-sm text-gray-600 leading-relaxed"
-                                            v-html="
-                                                sanitizeHtml(
-                                                    study.data.license
-                                                        .description
-                                                )
-                                            "
-                                        ></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="
-                            study.data.description &&
-                            study.data.description.length > 0
-                        "
-                        class="overflow-hidden w-full mt-5"
-                    >
-                        <div class="relative">
-                            <div
-                                class="absolute inset-0 flex items-center"
-                                aria-hidden="true"
-                            >
+                            <div class="relative">
                                 <div
-                                    class="w-full border-t border-gray-100"
-                                ></div>
-                            </div>
-                            <div
-                                class="relative flex items-center justify-between"
-                            >
-                                <span
-                                    class="pr-3 text-md bg-white font-medium text-gray-400"
+                                    class="absolute inset-0 flex items-center"
+                                    aria-hidden="true"
                                 >
-                                    Description
-                                </span>
+                                    <div
+                                        class="w-full border-t border-gray-100 dark:border-gray-700"
+                                    ></div>
+                                </div>
+                                <div
+                                    class="relative flex items-center justify-between"
+                                >
+                                    <span
+                                        class="bg-white pr-3 text-md font-medium text-gray-400 dark:bg-gray-900"
+                                    >
+                                        Description
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div>
                             <p
-                                class="overflow-scroll mt-1 px-0 relative text-sm text-blue-gray-500 h-64 pb-10"
+                                class="relative mt-1 max-h-64 overflow-scroll pb-10 text-sm text-blue-gray-500"
                                 v-html="sanitizeHtml(study.data.description)"
                             ></p>
                             <div class="relative" aria-hidden="true">
                                 <div
-                                    class="absolute -inset-x-20 bottom-0 bg-gradient-to-t from-white pt-[7%]"
+                                    class="absolute -inset-x-20 bottom-0 bg-gradient-to-t from-white pt-[7%] dark:from-gray-900"
                                 ></div>
                             </div>
                         </div>
                     </div>
+
+                    <aside
+                        v-if="hasInfoSidebar"
+                        class="mt-10 min-w-0 lg:mt-0 lg:col-span-3"
+                    >
+                        <div
+                            class="flex min-w-0 flex-col gap-6 bg-white py-5 pl-0 pr-0 dark:bg-gray-900/80 lg:sticky lg:top-6"
+                        >
+                            <div
+                                v-if="studyIdentifier"
+                                class="min-w-0 shrink-0"
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Identifier
+                                </h3>
+                                <div class="mt-2">
+                                    <Tag :identifier="studyIdentifier" />
+                                </div>
+                            </div>
+                            <div
+                                v-if="hasPublicationDates"
+                                :class="[
+                                    'min-w-0 shrink-0',
+                                    studyIdentifier
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : '',
+                                ]"
+                            >
+                                <ShowProjectDates
+                                    variant="simple"
+                                    :release_date="study.data.release_date"
+                                    :created_at="study.data.created_at"
+                                />
+                            </div>
+                            <div
+                                v-if="hasKeywords"
+                                :class="[
+                                    'min-w-0 shrink-0',
+                                    studyIdentifier || hasPublicationDates
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : '',
+                                ]"
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Keywords
+                                </h3>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    <span
+                                        v-for="tag in study.data.tags"
+                                        :key="tag.id"
+                                        class="inline-flex items-center rounded-md bg-indigo-100 px-2.5 py-0.5 text-sm font-medium text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-200"
+                                    >
+                                        <svg
+                                            class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
+                                            fill="currentColor"
+                                            viewBox="0 0 8 8"
+                                        >
+                                            <circle cx="4" cy="4" r="3" />
+                                        </svg>
+                                        {{ tag.name["en"] }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div
+                                v-if="hasMolecularCompositionSidebar"
+                                :class="[
+                                    'min-w-0 shrink-0',
+                                    studyIdentifier ||
+                                    hasPublicationDates ||
+                                    hasKeywords
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : '',
+                                ]"
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Molecular info
+                                </h3>
+                                <MolecularInfoPanel
+                                    :molecules="compositionMolecules"
+                                />
+                            </div>
+                            <div
+                                v-if="hasLicense"
+                                class="w-full min-w-0 shrink-0"
+                                :class="
+                                    hasSidebarContentAboveCitation
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : ''
+                                "
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    License
+                                </h3>
+                                <p
+                                    class="mt-2 text-sm text-gray-600 dark:text-gray-400"
+                                >
+                                    <a
+                                        v-if="study.data.license.url"
+                                        :href="study.data.license.url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="font-medium text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400"
+                                    >
+                                        {{ study.data.license.title }}
+                                    </a>
+                                    <span
+                                        v-else
+                                        class="font-medium text-gray-900 dark:text-gray-100"
+                                    >
+                                        {{ study.data.license.title }}
+                                    </span>
+                                </p>
+                                <p
+                                    v-if="study.data.license.description"
+                                    class="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400"
+                                    v-html="
+                                        sanitizeHtml(
+                                            study.data.license.description
+                                        )
+                                    "
+                                ></p>
+                            </div>
+                            <div
+                                v-if="hasStudyCitations"
+                                class="w-full min-w-0 shrink-0"
+                                :class="
+                                    hasSidebarContentAboveStudyCitations
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : ''
+                                "
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    {{ citationsHeading }}
+                                </h3>
+                                <div class="mt-2 space-y-4">
+                                    <citation-card
+                                        :citations="study.data.citations"
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                v-if="showDoiCitation"
+                                class="w-full min-w-0 shrink-0"
+                                :class="
+                                    hasSidebarContentAboveDoiCitation
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : ''
+                                "
+                            >
+                                <Citation
+                                    :model="'sample'"
+                                    :doi="study.data.doi"
+                                />
+                            </div>
+                        </div>
+                    </aside>
                 </div>
+
             </div>
         </template>
     </sample-layout>
@@ -784,8 +656,9 @@ import SampleLayout from "@/Pages/Public/Sample/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
-import Depictor2D from "@/Shared/Depictor2D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
+import Tag from "@/Shared/Tag.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
@@ -801,8 +674,9 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
-        Depictor2D,
         DOIBadge,
+        MolecularInfoPanel,
+        Tag,
         Head,
         Citation,
         ShowProjectDates,
@@ -838,8 +712,69 @@ export default {
 
             return [];
         },
+        studyIdentifier() {
+            const identifier = this.study?.data?.identifier;
+
+            return identifier != null && String(identifier).length > 0
+                ? identifier
+                : null;
+        },
         hasMolecularCompositionSidebar() {
             return this.compositionMolecules.length > 0;
+        },
+        hasKeywords() {
+            return (this.study?.data?.tags?.length ?? 0) > 0;
+        },
+        hasPublicationDates() {
+            return (
+                Boolean(this.study?.data?.release_date) ||
+                Boolean(this.study?.data?.created_at)
+            );
+        },
+        hasLicense() {
+            return Boolean(this.study?.data?.license);
+        },
+        hasStudyCitations() {
+            return (this.study?.data?.citations?.length ?? 0) > 0;
+        },
+        citationsHeading() {
+            const count = this.study?.data?.citations?.length ?? 0;
+
+            return count === 1 ? "Citation" : "Citations";
+        },
+        showDoiCitation() {
+            return (
+                this.study?.data?.is_public &&
+                this.study?.data?.doi != null
+            );
+        },
+        hasSidebarContentAboveCitation() {
+            return (
+                Boolean(this.studyIdentifier) ||
+                this.hasPublicationDates ||
+                this.hasKeywords ||
+                this.hasMolecularCompositionSidebar
+            );
+        },
+        hasSidebarContentAboveStudyCitations() {
+            return this.hasSidebarContentAboveCitation || this.hasLicense;
+        },
+        hasSidebarContentAboveDoiCitation() {
+            return (
+                this.hasSidebarContentAboveStudyCitations ||
+                this.hasStudyCitations
+            );
+        },
+        hasInfoSidebar() {
+            return (
+                Boolean(this.studyIdentifier) ||
+                this.showDoiCitation ||
+                this.hasMolecularCompositionSidebar ||
+                this.hasKeywords ||
+                this.hasPublicationDates ||
+                this.hasStudyCitations ||
+                this.hasLicense
+            );
         },
     },
     mounted() {
@@ -849,6 +784,24 @@ export default {
                 this.schema = response.data;
             });
     },
-    methods: {},
+    methods: {
+        datasetHref(dataset) {
+            if (dataset?.public_url) {
+                try {
+                    return new URL(dataset.public_url).pathname;
+                } catch {
+                    return dataset.public_url;
+                }
+            }
+
+            if (dataset?.identifier) {
+                const id = String(dataset.identifier).replace(/^NMRXIV:/i, "");
+
+                return `/dataset/${id}`;
+            }
+
+            return "#";
+        },
+    },
 };
 </script>

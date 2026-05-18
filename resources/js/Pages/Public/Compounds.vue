@@ -177,41 +177,38 @@
                         </div>
                         <div v-if="results">
                             <div
-                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200 overflow-y-scroll"
-                                style="height: calc(100vh - 380px)"
+                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200"
                             >
+                                <compound-cards
+                                    v-if="results.data.length > 0"
+                                    class="block w-full min-w-0 max-w-none"
+                                    :molecules="results.data"
+                                    :loading="false"
+                                />
                                 <div
                                     v-if="results.data.length > 0"
-                                    class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
+                                    class="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between"
                                 >
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            Showing
-                                            <span class="font-medium">{{
-                                                results.from
-                                            }}</span>
-                                            to
-                                            <span class="font-medium">{{
-                                                results.to
-                                            }}</span>
-                                            of
-                                            <span class="font-medium">{{
-                                                results.total
-                                            }}</span>
-                                            results
-                                        </p>
-                                    </div>
+                                    <p class="text-sm text-gray-700">
+                                        Showing
+                                        <span class="font-medium">{{
+                                            results.from
+                                        }}</span>
+                                        to
+                                        <span class="font-medium">{{
+                                            results.to
+                                        }}</span>
+                                        of
+                                        <span class="font-medium">{{
+                                            results.total
+                                        }}</span>
+                                        results
+                                    </p>
                                     <Pagination
                                         v-if="results.last_page > 1"
                                         :links="results.links"
                                     />
                                 </div>
-                                <compound-cards
-                                    v-if="results.data.length > 0"
-                                    class="mt-6 block w-full min-w-0 max-w-none"
-                                    :molecules="results.data"
-                                    :loading="false"
-                                />
                                 <div v-else>
                                     <div v-if="error">
                                         <div class="bg-white">
@@ -464,36 +461,6 @@
                                             </p>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div
-                                v-if="results.data.length > 0"
-                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md sticky bottom-0 border-t border-gray-200 mt-auto"
-                            >
-                                <div
-                                    class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
-                                >
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            Showing
-                                            <span class="font-medium">{{
-                                                results.from
-                                            }}</span>
-                                            to
-                                            <span class="font-medium">{{
-                                                results.to
-                                            }}</span>
-                                            of
-                                            <span class="font-medium">{{
-                                                results.total
-                                            }}</span>
-                                            results
-                                        </p>
-                                    </div>
-                                    <Pagination
-                                        v-if="results.last_page > 1"
-                                        :links="results.links"
-                                    />
                                 </div>
                             </div>
                             <div

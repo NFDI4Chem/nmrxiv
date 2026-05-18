@@ -11,18 +11,35 @@
     <app-layout :title="project.name">
         <template #header>
             <!-- Project header section with background styling -->
-            <div class="bg-white index_beams">
+            <div :class="[
+                    'relative bg-white',
+                    hasHeaderPhoto ? 'index_beams' : '',
+                ]"
+            >
+                <SeededCoverBackground
+                    v-if="!hasHeaderPhoto && project?.data"
+                    :seed="project.data"
+                    container-class="h-36 sm:h-44 w-full"
+                />
                 <div
                     v-if="workspace && dashboardProject"
                     class="border-b border-gray-200 dark:border-gray-700"
                 >
                     <div
                         v-if="dashboardProject.is_deleted"
-                        class="px-3 py-2 text-center text-red-800 bg-red-50 border-b border-red-100 dark:bg-red-950/40 dark:text-red-100"
+                        class="border-b border-red-200/80 bg-red-50 px-4 py-3 text-center text-red-900 dark:border-red-800/50 dark:bg-red-950/55 dark:text-red-100"
                     >
-                        <b>Warning: </b> This project is deleted. At the end of
-                        the 30-day period, this project and all of its resources
-                        will be deleted permanently and cannot be recovered.
+                        <p
+                            class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                        >
+                            <span
+                                class="font-semibold text-red-950 dark:text-red-50"
+                                >Deleted.</span
+                            >
+                            At the end of the 30-day period, this project and
+                            all of its resources will be removed permanently and
+                            cannot be recovered.
+                        </p>
                     </div>
                     <div
                         v-else-if="
@@ -31,13 +48,16 @@
                             dashboardProject.doi &&
                             !workspace.preview
                         "
-                        class="border-b border-teal-200/80 bg-teal-50 px-3 py-3 text-center text-teal-900 dark:border-teal-800/50 dark:bg-teal-950/55 dark:text-teal-100"
+                        class="border-b border-teal-200/80 bg-teal-50 px-4 py-3 text-center text-teal-900 dark:border-teal-800/50 dark:bg-teal-950/55 dark:text-teal-100"
                     >
                         <p
                             class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
                         >
-                            <b>Info:</b>
-                            This project is in embargo and is scheduled for
+                            <span
+                                class="font-semibold text-teal-950 dark:text-teal-50"
+                                >Embargo.</span
+                            >
+                            This project is scheduled for
                             release on
                             <strong
                                 class="font-semibold text-teal-950 dark:text-teal-50"
@@ -60,18 +80,37 @@
                     <template v-else-if="dashboardProject.is_public">
                         <div
                             v-if="dashboardProject.is_archived"
-                            class="px-3 py-2 text-center text-yellow-800 bg-yellow-50 border-b border-yellow-100 dark:bg-yellow-950/40 dark:text-yellow-100"
+                            class="border-b border-amber-200/80 bg-amber-50 px-4 py-3 text-center text-amber-900 dark:border-amber-800/50 dark:bg-amber-950/55 dark:text-amber-100"
                         >
-                            <b>Warning: </b> This project is archived. It is now
-                            read-only.
+                            <p
+                                class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                            >
+                                <span
+                                    class="font-semibold text-amber-950 dark:text-amber-50"
+                                    >Archived.</span
+                                >
+                                This project is read-only.
+                            </p>
                         </div>
                         <div
                             v-else
-                            class="px-3 py-2 text-center text-green-800 bg-green-50 border-b border-green-100 dark:bg-green-950/40 dark:text-green-100"
+                            class="border-b border-emerald-200/80 bg-emerald-50 px-4 py-3 text-center text-emerald-900 dark:border-emerald-800/50 dark:bg-emerald-950/55 dark:text-emerald-100"
                         >
-                            <b>Info: </b> This project is published. You cannot
-                            edit a published project. Contact us at
-                            info.nmrxiv@uni-jena.de if you need to make changes.
+                            <p
+                                class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                            >
+                                <span
+                                    class="font-semibold text-emerald-950 dark:text-emerald-50"
+                                    >Published.</span
+                                >
+                                This project is read-only. To request changes,
+                                contact
+                                <a
+                                    href="mailto:info.nmrxiv@uni-jena.de"
+                                    class="font-medium text-emerald-800 underline decoration-emerald-600/45 underline-offset-2 hover:text-emerald-950 dark:text-emerald-200 dark:hover:text-white"
+                                    >info.nmrxiv@uni-jena.de</a
+                                >.
+                            </p>
                         </div>
                     </template>
                 </div>
@@ -297,54 +336,302 @@
         </template>
         <!-- Main content area with navigation tabs and content slot -->
         <main
-            class="flex-1 relative z-0 overflow-y-auto focus:outline-none xl:order-last"
+            class="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden focus:outline-none xl:order-last"
         >
             <!-- Same max-width + horizontal padding as project header -->
             <div
-                class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8"
+                class="mx-auto flex w-full max-w-7xl min-h-0 flex-1 flex-col px-4 sm:px-6 lg:px-8"
             >
-                <!-- Navigation tabs section -->
-                <div class="mt-6 sm:mt-2 2xl:mt-5">
-                    <div class="border-b border-gray-200">
+                <!-- Navigation tabs section (overflow visible so sample dropdown is not clipped) -->
+                <div
+                    class="relative z-20 mt-6 shrink-0 overflow-visible sm:mt-2 2xl:mt-5"
+                >
+                    <div class="overflow-visible border-b border-gray-200">
                         <!-- Tab navigation bar -->
                         <nav
-                            class="-mb-px flex space-x-8"
+                            class="-mb-px flex space-x-8 overflow-visible"
                             aria-label="Tabs"
                         >
-                            <!-- Individual tab links -->
-                            <Link
+                            <template
                                 v-for="tab in tabs"
                                 :key="tab.name"
-                                :href="
-                                    project.data.public_url +
-                                    '?tab=' +
-                                    tab.name
-                                "
-                                :class="[
-                                    selectedTab == tab.name
-                                        ? 'border-pink-500 text-gray-900'
-                                        : '',
-                                    'cursor-pointer text-gray-900 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-                                ]"
-                                aria-current="page"
                             >
-                                <span class="capitalize">{{ tab.name }}</span>
-                                <span
-                                    v-if="
-                                        tab.name === 'samples' &&
-                                        samplesTabCount !== null
-                                    "
-                                    class="ml-0.5 font-medium text-gray-500 normal-case dark:text-gray-400"
+                                <div
+                                    ref="samplesTabAnchor"
+                                    v-if="tab.name === 'samples'"
+                                    :class="[
+                                        isTabActive(tab.name)
+                                            ? 'border-pink-500 text-gray-900'
+                                            : 'border-transparent text-gray-500',
+                                        'inline-flex items-center gap-0.5 whitespace-nowrap border-b-2 text-sm font-medium dark:text-gray-300',
+                                    ]"
                                 >
-                                    ({{ samplesTabCount }})
-                                </span>
-                            </Link>
+                                    <Link
+                                        :href="
+                                            project.data.public_url +
+                                            '?tab=samples'
+                                        "
+                                        :class="[
+                                            isTabActive(tab.name)
+                                                ? 'text-gray-900 dark:text-gray-100'
+                                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-100',
+                                            'inline-flex cursor-pointer items-center gap-2 px-1 py-4',
+                                        ]"
+                                        :aria-current="
+                                            isTabActive(tab.name)
+                                                ? 'page'
+                                                : false
+                                        "
+                                    >
+                                        <span class="capitalize">{{
+                                            tab.name
+                                        }}</span>
+                                        <span
+                                            v-if="samplesTabCount !== null"
+                                            :class="samplesCountPillClass(tab.name)"
+                                        >
+                                            {{ samplesTabCount }}
+                                        </span>
+                                    </Link>
+                                    <Menu
+                                        v-if="
+                                            samplesTabCount !== null &&
+                                            samplesTabCount > 0
+                                        "
+                                        as="div"
+                                        class="relative z-30"
+                                    >
+                                        <MenuButton
+                                            type="button"
+                                            class="inline-flex items-center rounded-md p-1 py-4 text-gray-500 outline-none ring-0 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-0 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                            :aria-label="
+                                                'Select sample, ' +
+                                                samplesTabCount +
+                                                ' available'
+                                            "
+                                            @click="onSamplesMenuOpen"
+                                        >
+                                            <ChevronDownIcon
+                                                class="h-4 w-4"
+                                                aria-hidden="true"
+                                            />
+                                        </MenuButton>
+                                        <Teleport to="body">
+                                            <transition
+                                                enter-active-class="transition ease-out duration-100"
+                                                enter-from-class="transform opacity-0 scale-95"
+                                                enter-to-class="transform opacity-100 scale-100"
+                                                leave-active-class="transition ease-in duration-75"
+                                                leave-from-class="transform opacity-100 scale-100"
+                                                leave-to-class="transform opacity-0 scale-95"
+                                            >
+                                                <MenuItems
+                                                    class="fixed z-[200] origin-top-left overflow-visible bg-transparent py-0 shadow-none outline-none ring-0 focus:outline-none focus:ring-0"
+                                                    :style="samplesMenuStyle"
+                                                >
+                                                <div
+                                                    class="flex gap-2"
+                                                    @mouseleave="
+                                                        onSamplesMenuPanelLeave
+                                                    "
+                                                >
+                                                <div
+                                                    class="w-72 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
+                                                >
+                                                <p
+                                                    v-if="loadingProjectSamples"
+                                                    class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
+                                                >
+                                                    Loading samples…
+                                                </p>
+                                                <MenuItem
+                                                    v-for="sample in projectSamples"
+                                                    v-show="!loadingProjectSamples"
+                                                    :key="sample.id"
+                                                    v-slot="{ active }"
+                                                    as="div"
+                                                    class="relative p-0"
+                                                >
+                                                    <div
+                                                        class="relative"
+                                                        @mouseenter="
+                                                            onSampleRowEnter(
+                                                                sample
+                                                            )
+                                                        "
+                                                    >
+                                                        <div
+                                                            :class="[
+                                                                'flex items-stretch',
+                                                                isCurrentSample(
+                                                                    sample
+                                                                )
+                                                                    ? 'bg-teal-50/80 dark:bg-teal-950/30'
+                                                                    : active
+                                                                      ? 'bg-gray-50 dark:bg-gray-800/80'
+                                                                      : '',
+                                                            ]"
+                                                        >
+                                                            <Link
+                                                                :href="
+                                                                    sample.public_url
+                                                                "
+                                                                :class="[
+                                                                    'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
+                                                                    isCurrentSample(
+                                                                        sample
+                                                                    ) ||
+                                                                    active
+                                                                        ? 'text-teal-700 dark:text-teal-400'
+                                                                        : 'text-gray-900 dark:text-gray-100',
+                                                                ]"
+                                                            >
+                                                                <span
+                                                                    class="block truncate font-medium"
+                                                                    >{{
+                                                                        sample.name
+                                                                    }}</span>
+                                                                <span
+                                                                    v-if="
+                                                                        sample.identifier
+                                                                    "
+                                                                    class="mt-0.5 block truncate font-mono text-xs text-gray-500 dark:text-gray-400"
+                                                                >
+                                                                    {{
+                                                                        sample.identifier
+                                                                    }}
+                                                                </span>
+                                                            </Link>
+                                                            <div
+                                                                v-if="
+                                                                    sampleDatasets(
+                                                                        sample
+                                                                    ).length >
+                                                                    0
+                                                                "
+                                                                class="flex items-center px-2"
+                                                            >
+                                                                <ChevronRightIcon
+                                                                    :class="[
+                                                                        'h-4 w-4 shrink-0 text-gray-400 transition-opacity dark:text-gray-500',
+                                                                        hoveredSampleId ===
+                                                                            sample.id
+                                                                            ? 'opacity-100'
+                                                                            : 'opacity-0',
+                                                                    ]"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </MenuItem>
+                                                <p
+                                                    v-if="
+                                                        !loadingProjectSamples &&
+                                                        projectSamples.length ===
+                                                            0
+                                                    "
+                                                    class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
+                                                >
+                                                    No samples found
+                                                </p>
+                                                </div>
+                                                <div
+                                                    v-if="
+                                                        showSamplesSubnavColumn
+                                                    "
+                                                    class="w-72 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
+                                                    @mouseenter="
+                                                        onSubnavMouseEnter
+                                                    "
+                                                >
+                                                    <div
+                                                        v-for="dataset in sampleDatasets(
+                                                            hoveredSampleForNav
+                                                        )"
+                                                        :key="dataset.id"
+                                                        class="relative p-0"
+                                                    >
+                                                        <div
+                                                            :class="[
+                                                                'flex items-stretch',
+                                                                isCurrentDataset(
+                                                                    dataset
+                                                                )
+                                                                    ? 'bg-teal-50/80 dark:bg-teal-950/30'
+                                                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/80',
+                                                            ]"
+                                                        >
+                                                            <Link
+                                                                :href="
+                                                                    datasetNavUrl(
+                                                                        dataset
+                                                                    )
+                                                                "
+                                                                :class="[
+                                                                    'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
+                                                                    isCurrentDataset(
+                                                                        dataset
+                                                                    )
+                                                                        ? 'text-teal-700 dark:text-teal-400'
+                                                                        : 'text-gray-900 dark:text-gray-100',
+                                                                ]"
+                                                            >
+                                                                <span
+                                                                    class="block truncate font-medium"
+                                                                    >{{
+                                                                        dataset.name
+                                                                    }}</span>
+                                                                <span
+                                                                    v-if="
+                                                                        dataset.identifier
+                                                                    "
+                                                                    class="mt-0.5 block truncate font-mono text-xs text-gray-500 dark:text-gray-400"
+                                                                >
+                                                                    {{
+                                                                        dataset.identifier
+                                                                    }}
+                                                                </span>
+                                                            </Link>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                </MenuItems>
+                                            </transition>
+                                        </Teleport>
+                                    </Menu>
+                                </div>
+                                <Link
+                                    v-else
+                                    :href="
+                                        project.data.public_url +
+                                        '?tab=' +
+                                        tab.name
+                                    "
+                                    :class="[
+                                        isTabActive(tab.name)
+                                            ? 'border-pink-500 text-gray-900'
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                                        'inline-flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium dark:text-gray-300 dark:hover:text-gray-100',
+                                    ]"
+                                    :aria-current="
+                                        isTabActive(tab.name) ? 'page' : false
+                                    "
+                                >
+                                    <span class="capitalize">{{
+                                        tab.name
+                                    }}</span>
+                                </Link>
+                            </template>
                         </nav>
                     </div>
                 </div>
 
                 <!-- Content area for tab-specific content -->
-                <div class="bg-white">
+                <div
+                    class="min-h-0 flex-1 overflow-y-auto bg-white px-1"
+                >
                     <!-- Slot for project-specific content based on selected tab -->
                     <slot name="project-content" />
                 </div>
@@ -500,14 +787,20 @@
 
 // Layout and navigation imports
 import AppLayout from "@/Layouts/AppLayout.vue";
+import SeededCoverBackground from "@/Shared/SeededCoverBackground.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import { Link, router } from "@inertiajs/vue3";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/vue/24/solid";
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/vue/24/outline";
+import {
+    ChevronDownIcon,
+    ChevronRightIcon,
+} from "@heroicons/vue/24/outline";
 
 import "@vuepic/vue-datepicker/dist/main.css";
 
@@ -521,12 +814,19 @@ export default {
      */
     components: {
         AppLayout, // Main application layout wrapper
+        SeededCoverBackground,
         AccessDialogue,
         JetDialogModal,
         JetSecondaryButton,
         JetSuccessButton,
         Datepicker,
         Link, // Inertia.js Link component for navigation
+        Menu,
+        MenuButton,
+        MenuItem,
+        MenuItems,
+        ChevronDownIcon,
+        ChevronRightIcon,
         BookmarkIconSolid,
         BookmarkIconOutline,
     },
@@ -561,6 +861,12 @@ export default {
             type: String,
             default: "info",
         },
+
+        /** Current study when viewing a sample or dataset page */
+        currentStudy: {
+            type: Object,
+            default: null,
+        },
     },
 
     /**
@@ -579,6 +885,15 @@ export default {
              * Available navigation tabs for the project
              * Each tab represents a different section of project information
              */
+            projectSamples: [],
+            loadingProjectSamples: false,
+            projectSamplesLoaded: false,
+            hoveredSampleId: null,
+            hideSamplesSubnavTimer: null,
+            samplesMenuStyle: {
+                top: "0px",
+                left: "0px",
+            },
             tabs: [
                 {
                     name: "info",
@@ -603,6 +918,11 @@ export default {
      * Computed properties
      */
     computed: {
+        hasHeaderPhoto() {
+            const photoUrl = this.project?.data?.photo_url;
+
+            return Boolean(photoUrl && photoUrl !== "");
+        },
         /**
          * Get the current page URL from Inertia page props
          * @returns {String} Current application URL
@@ -622,6 +942,24 @@ export default {
             return typeof raw === "number" && Number.isFinite(raw)
                 ? raw
                 : null;
+        },
+        hoveredSampleForNav() {
+            if (this.hoveredSampleId == null) {
+                return null;
+            }
+
+            return (
+                this.projectSamples.find(
+                    (sample) => sample.id === this.hoveredSampleId,
+                ) ?? null
+            );
+        },
+        showSamplesSubnavColumn() {
+            const sample = this.hoveredSampleForNav;
+
+            return (
+                sample != null && this.sampleDatasets(sample).length > 0
+            );
         },
         showReleaseDateEditLink() {
             const p = this.dashboardProject;
@@ -653,10 +991,154 @@ export default {
         });
     },
 
+    beforeUnmount() {
+        this.clearHideSamplesSubnavTimer();
+    },
+
     /**
      * Component methods
      */
     methods: {
+        isTabActive(tabName) {
+            if (tabName === "samples") {
+                return ["samples", "study", "dataset"].includes(
+                    this.selectedTab
+                );
+            }
+
+            return this.selectedTab === tabName;
+        },
+        samplesCountPillClass(tabName) {
+            return [
+                this.isTabActive(tabName)
+                    ? "bg-pink-100 text-pink-800 ring-pink-200/80 dark:bg-pink-950/50 dark:text-pink-200 dark:ring-pink-800/50"
+                    : "bg-gray-100 text-gray-600 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700",
+                "inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ring-1 ring-inset",
+            ];
+        },
+        isCurrentSample(sample) {
+            const currentId =
+                this.currentStudy?.data?.id ?? this.currentStudy?.id ?? null;
+
+            return currentId != null && sample.id === currentId;
+        },
+        isCurrentDataset(dataset) {
+            if (!dataset) {
+                return false;
+            }
+
+            const pageUrl = this.url;
+            if (dataset.public_url && pageUrl.includes(dataset.public_url)) {
+                return true;
+            }
+
+            if (!dataset.identifier) {
+                return false;
+            }
+
+            const slug = String(dataset.identifier).replace(/^NMRXIV:/i, "");
+
+            return (
+                pageUrl.includes(`/${slug}`) ||
+                pageUrl.includes(String(dataset.identifier))
+            );
+        },
+        projectStudiesFetchUrl() {
+            const projectId = this.project?.data?.id;
+            if (!projectId) {
+                return null;
+            }
+
+            if (this.workspace?.dashboardProject?.id === projectId) {
+                return route("dashboard.project.studies", projectId);
+            }
+
+            return route("project.studies", projectId);
+        },
+        onSamplesMenuOpen() {
+            this.$nextTick(() => {
+                this.positionSamplesMenu();
+            });
+            this.loadProjectSamples();
+        },
+        positionSamplesMenu() {
+            const anchor = this.$refs.samplesTabAnchor;
+            const el = Array.isArray(anchor) ? anchor[0] : anchor;
+            if (!el?.getBoundingClientRect) {
+                return;
+            }
+
+            const rect = el.getBoundingClientRect();
+            this.samplesMenuStyle = {
+                top: `${rect.bottom + 4}px`,
+                left: `${rect.left}px`,
+            };
+        },
+        onSampleRowEnter(sample) {
+            this.clearHideSamplesSubnavTimer();
+            this.hoveredSampleId = sample.id;
+        },
+        onSamplesMenuPanelLeave() {
+            this.scheduleHideSamplesSubnav();
+        },
+        onSubnavMouseEnter() {
+            this.clearHideSamplesSubnavTimer();
+        },
+        scheduleHideSamplesSubnav() {
+            this.clearHideSamplesSubnavTimer();
+            this.hideSamplesSubnavTimer = window.setTimeout(() => {
+                this.hoveredSampleId = null;
+                this.hideSamplesSubnavTimer = null;
+            }, 200);
+        },
+        clearHideSamplesSubnavTimer() {
+            if (this.hideSamplesSubnavTimer != null) {
+                window.clearTimeout(this.hideSamplesSubnavTimer);
+                this.hideSamplesSubnavTimer = null;
+            }
+        },
+        sampleDatasets(sample) {
+            const datasets = sample?.datasets;
+
+            return Array.isArray(datasets) ? datasets : [];
+        },
+        datasetNavUrl(dataset) {
+            if (dataset?.public_url) {
+                return dataset.public_url;
+            }
+
+            if (!dataset?.identifier) {
+                return "#";
+            }
+
+            return `/${String(dataset.identifier).replace("NMRXIV:", "")}`;
+        },
+        loadProjectSamples() {
+            if (this.projectSamplesLoaded || this.loadingProjectSamples) {
+                return;
+            }
+
+            const url = this.projectStudiesFetchUrl();
+            if (!url) {
+                return;
+            }
+
+            this.loadingProjectSamples = true;
+            axios
+                .get(url, {
+                    params: {
+                        for_nav: 1,
+                        per_page: 100,
+                    },
+                })
+                .then((response) => {
+                    this.projectSamples = response.data?.data ?? [];
+                    this.projectSamplesLoaded = true;
+                })
+                .finally(() => {
+                    this.loadingProjectSamples = false;
+                });
+        },
         openReleaseDateModal() {
             const p = this.dashboardProject;
             if (!p?.id) {

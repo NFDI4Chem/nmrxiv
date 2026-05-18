@@ -26,10 +26,10 @@
                         {{ moleculeIdOverlayLabel }}
                     </span>
                 </div>
-                <div class="py-4 px-4">
+                <div class="px-4 pb-4 pt-3">
                     <div
                         v-if="showAnnotationStars"
-                        class="flex items-center"
+                        class="mb-2 flex items-center"
                     >
                         <div class="mb-1 flex items-center">
                             <svg
@@ -70,31 +70,64 @@
                             </svg>
                         </div>
                     </div>
-                    <div
-                        v-if="molecule.iupac_name && molecule.iupac_name != ''"
-                        class="text-gray-700 text-base break-all text-sm capitalize"
-                    >
-                        {{ molecule.iupac_name }}
-                    </div>
-                    <div
-                        v-else-if="
-                            molecule.canonical_smiles &&
-                            String(molecule.canonical_smiles).trim() !== ''
-                        "
-                        class="text-gray-700 text-sm leading-snug line-clamp-2 break-all dark:text-gray-200"
-                        :title="String(molecule.canonical_smiles)"
-                    >
-                        {{ molecule.canonical_smiles }}
-                    </div>
-                    <div
-                        v-else
-                        class="text-sm text-gray-500"
-                    >
-                        —
+                    <div class="space-y-2">
+                        <template v-if="displayTitle">
+                            <p
+                                v-if="displayTitleIsSmiles"
+                                class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                            >
+                                Structure
+                            </p>
+                            <h3
+                                :class="[
+                                    'leading-snug',
+                                    displayTitleIsSmiles
+                                        ? 'line-clamp-2 break-all font-mono text-xs font-normal text-gray-600 dark:text-gray-300'
+                                        : 'line-clamp-3 text-[0.9375rem] font-semibold tracking-tight text-gray-900 dark:text-gray-50',
+                                ]"
+                                :title="displayTitle"
+                            >
+                                {{ displayTitle }}
+                            </h3>
+                        </template>
+                        <p
+                            v-else
+                            class="text-sm text-gray-400 dark:text-gray-500"
+                        >
+                            —
+                        </p>
+
+                        <dl
+                            v-if="hasCompoundMeta"
+                            class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5"
+                        >
+                            <template v-if="molecularFormula">
+                                <dt class="sr-only">Molecular formula</dt>
+                                <dd
+                                    class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 font-mono text-[11px] font-medium text-gray-800 dark:bg-gray-800/80 dark:text-gray-200"
+                                >
+                                    {{ molecularFormula }}
+                                </dd>
+                            </template>
+                            <span
+                                v-if="molecularFormula && formattedMolecularWeight"
+                                class="text-gray-300 dark:text-gray-600"
+                                aria-hidden="true"
+                                >·</span
+                            >
+                            <template v-if="formattedMolecularWeight">
+                                <dt class="sr-only">Molecular weight</dt>
+                                <dd
+                                    class="text-[11px] font-medium tabular-nums text-gray-600 dark:text-gray-400"
+                                >
+                                    {{ formattedMolecularWeight }}
+                                </dd>
+                            </template>
+                        </dl>
                     </div>
                     <div
                         v-if="showWorkspaceGrouping"
-                        class="mt-2 overflow-hidden rounded-lg border border-gray-200/90 dark:border-gray-700"
+                        class="mt-3 overflow-hidden rounded-lg border border-gray-200/90 dark:border-gray-700"
                     >
                         <button
                             type="button"
@@ -322,6 +355,71 @@ export default {
         },
         inactiveStarCount() {
             return Math.max(0, 5 - this.starCount);
+        },
+        displayTitle() {
+            const iupac = this.molecule?.iupac_name;
+            if (iupac != null && String(iupac).trim() !== "") {
+                return String(iupac).trim();
+            }
+
+            const name = this.molecule?.name;
+            if (name != null && String(name).trim() !== "") {
+                return String(name).trim();
+            }
+
+            const smiles = this.molecule?.canonical_smiles;
+            if (smiles != null && String(smiles).trim() !== "") {
+                return String(smiles).trim();
+            }
+
+            return null;
+        },
+        displayTitleIsSmiles() {
+            const iupac = this.molecule?.iupac_name;
+            if (iupac != null && String(iupac).trim() !== "") {
+                return false;
+            }
+
+            const name = this.molecule?.name;
+            if (name != null && String(name).trim() !== "") {
+                return false;
+            }
+
+            return this.displayTitle != null;
+        },
+        molecularFormula() {
+            const raw = this.molecule?.molecular_formula;
+            if (raw == null) {
+                return null;
+            }
+            const trimmed = String(raw).trim();
+
+            return trimmed !== "" ? trimmed : null;
+        },
+        formattedMolecularWeight() {
+            const raw = this.molecule?.molecular_weight;
+            if (raw == null || raw === "") {
+                return null;
+            }
+            const n = Number(raw);
+            if (!Number.isFinite(n)) {
+                const trimmed = String(raw).trim();
+
+                return trimmed !== "" ? trimmed : null;
+            }
+
+            const formatted =
+                Math.abs(n - Math.round(n)) < 0.001
+                    ? String(Math.round(n))
+                    : n.toFixed(2).replace(/\.?0+$/, "");
+
+            return `${formatted} g/mol`;
+        },
+        hasCompoundMeta() {
+            return (
+                this.molecularFormula != null ||
+                this.formattedMolecularWeight != null
+            );
         },
     },
     mounted() {},
