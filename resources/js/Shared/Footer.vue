@@ -170,7 +170,7 @@ const currentYear = computed(() => new Date().getFullYear());
 const navigation = {
     quicklinks: [
         { name: "Projects", href: "/projects" },
-        { name: "Spectra", href: "/spectra" },
+        { name: "Compounds", href: "/compounds" },
     ],
     support: [
         { name: "Documentation", href: "https://docs.nmrxiv.org" },

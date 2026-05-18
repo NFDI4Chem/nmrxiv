@@ -237,7 +237,7 @@ export default {
                 return this.href;
             }
 
-            return "/spectra?compound=" + this.compoundNumericId;
+            return "/compound/M" + this.compoundNumericId;
         },
         compoundNumericId() {
             const raw = this.molecule?.identifier;

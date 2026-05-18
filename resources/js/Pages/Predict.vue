@@ -28,12 +28,6 @@
                                         Projects
                                     </Link>
                                     <Link
-                                        href="/spectra"
-                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                    >
-                                        Spectra
-                                    </Link>
-                                    <Link
                                         href="/compounds"
                                         class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
                                     >
@@ -141,12 +135,6 @@
                                                 class="text-sm font-medium text-gray-900 hover:text-gray-700"
                                             >
                                                 Projects
-                                            </Link>
-                                            <Link
-                                                href="/spectra"
-                                                class="text-sm font-medium text-gray-900 hover:text-gray-700"
-                                            >
-                                                Spectra
                                             </Link>
                                             <Link
                                                 href="/compounds"

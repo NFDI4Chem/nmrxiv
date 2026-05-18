@@ -201,43 +201,17 @@
                                             results
                                         </p>
                                     </div>
-                                    <div v-if="results.last_page > 1">
-                                        <nav
-                                            class="isolate inline-flex -space-x-px shadow-sm"
-                                            aria-label="Pagination"
-                                        >
-                                            <a
-                                                v-for="link in results.links"
-                                                :key="link.label"
-                                                :class="[
-                                                    link.active
-                                                        ? 'bg-gray-200'
-                                                        : '',
-                                                    'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
-                                                ]"
-                                                @click="navigateTo(link)"
-                                                v-html="
-                                                    sanitizeHtml(link.label)
-                                                "
-                                            >
-                                            </a>
-                                        </nav>
-                                    </div>
+                                    <Pagination
+                                        v-if="results.last_page > 1"
+                                        :links="results.links"
+                                    />
                                 </div>
-                                <div
+                                <compound-cards
                                     v-if="results.data.length > 0"
-                                    class="mx-auto grid mt-6 gap-5 lg:max-w-none md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6"
-                                >
-                                    <span
-                                        v-for="result in results.data"
-                                        :key="result.id"
-                                        class="rounded-lg hover:shadow-lg shadow border"
-                                    >
-                                        <MoleculeCard
-                                            :molecule="result"
-                                        ></MoleculeCard>
-                                    </span>
-                                </div>
+                                    class="mt-6 block w-full min-w-0 max-w-none"
+                                    :molecules="results.data"
+                                    :loading="false"
+                                />
                                 <div v-else>
                                     <div v-if="error">
                                         <div class="bg-white">
@@ -516,28 +490,10 @@
                                             results
                                         </p>
                                     </div>
-                                    <div v-if="results.last_page > 1">
-                                        <nav
-                                            class="isolate inline-flex -space-x-px shadow-sm"
-                                            aria-label="Pagination"
-                                        >
-                                            <a
-                                                v-for="link in results.links"
-                                                :key="link.label"
-                                                :class="[
-                                                    link.active
-                                                        ? 'bg-gray-200'
-                                                        : '',
-                                                    'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
-                                                ]"
-                                                @click="navigateTo(link)"
-                                                v-html="
-                                                    sanitizeHtml(link.label)
-                                                "
-                                            >
-                                            </a>
-                                        </nav>
-                                    </div>
+                                    <Pagination
+                                        v-if="results.last_page > 1"
+                                        :links="results.links"
+                                    />
                                 </div>
                             </div>
                             <div
@@ -634,15 +590,16 @@
 </template>
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import MoleculeCard from "@/App/MoleculeCard.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
-// Removed unused imports
+import CompoundCards from "@/Shared/CompoundCards.vue";
+import Pagination from "@/Shared/Pagination.vue";
 
 export default {
     components: {
         AppLayout,
-        MoleculeCard,
+        CompoundCards,
         StructureSearch,
+        Pagination,
     },
     props: ["page", "query", "limit", "tagType"],
     data() {
@@ -681,12 +638,12 @@ export default {
         }
     },
     methods: {
-        fetchCompounds(queryT) {
+        fetchCompounds(queryT, { resetPage = false } = {}) {
             this.error = null;
             this.results = null;
             this.loading = true;
             let queryTerm = null;
-            if (queryT) {
+            if (queryT !== undefined && queryT !== null) {
                 queryTerm = queryT;
             } else {
                 queryTerm = this.searchTerm ? this.searchTerm : "";
@@ -701,6 +658,9 @@ export default {
             }
 
             let sort = this.getParameterByName("sort");
+            if (!sort && queryTerm === "") {
+                sort = "recent";
+            }
 
             if (typeof window !== "undefined") {
                 let recentQueries = localStorage.getItem("recentQueries");
@@ -713,20 +673,18 @@ export default {
                 );
             }
 
-            let url = new URL(window.location);
-            url.searchParams.set("query", queryTerm);
-            url.searchParams.set("page", 1);
-            url = this.sanitiseURL(url);
-            window.history.pushState(
-                null,
-                "",
-                queryTerm == ""
-                    ? window.location.href.split("?")[0]
-                    : url.toString()
-            );
-            let page = this.page ? this.page : 1;
+            const page = resetPage
+                ? 1
+                : parseInt(
+                      this.getParameterByName("page") || this.page || "1",
+                      10
+                  ) || 1;
+            const limit = this.limit || 24;
+
+            this.syncBrowserUrl(queryTerm, page, sort);
+
             let urlEndpoint =
-                "/api/v1/search/?limit=" + this.limit + "&page=" + page;
+                "/api/v1/search/?limit=" + limit + "&page=" + page;
             if (sort) {
                 urlEndpoint = urlEndpoint + "&sort=" + sort;
             }
@@ -751,6 +709,44 @@ export default {
                     this.error = err.response;
                 });
         },
+        syncBrowserUrl(queryTerm, page, sort) {
+            const url = new URL(window.location);
+
+            if (queryTerm) {
+                url.searchParams.set("query", queryTerm);
+            } else {
+                url.searchParams.delete("query");
+            }
+
+            if (page > 1) {
+                url.searchParams.set("page", String(page));
+            } else {
+                url.searchParams.delete("page");
+            }
+
+            if (sort) {
+                url.searchParams.set("sort", sort);
+            } else {
+                url.searchParams.delete("sort");
+            }
+
+            if (this.tagType) {
+                url.searchParams.set("tagType", this.tagType);
+            }
+
+            const queryType = this.getParameterByName("type");
+            if (queryType) {
+                url.searchParams.set("type", queryType);
+            }
+
+            const cleaned = this.sanitiseURL(url);
+            const nextUrl =
+                [...cleaned.searchParams].length === 0
+                    ? cleaned.pathname
+                    : cleaned.toString();
+
+            window.history.replaceState(null, "", nextUrl);
+        },
         sanitiseURL(url) {
             for (const [key, value] of url.searchParams.entries()) {
                 if (
@@ -769,7 +765,7 @@ export default {
                 this.searchTerm = query;
                 this.type = "text";
             }
-            this.fetchCompounds(query);
+            this.fetchCompounds(query, { resetPage: true });
         },
         removeSearchQuery(query) {
             if (typeof window !== "undefined") {
@@ -785,17 +781,6 @@ export default {
                     JSON.stringify(recentQueries)
                 );
             }
-        },
-        navigateTo(link) {
-            let queryType = this.getParameterByName("type");
-            let searchTerm = this.searchTerm;
-            let tagType = this.tagType;
-            let location = "/compounds" + link.url;
-
-            let query = queryType ? "&type=" + queryType : "";
-            query += searchTerm ? "&query=" + searchTerm : "";
-            tagType = tagType ? "&tagType=" + tagType : "";
-            window.location = location + query + tagType;
         },
         getParameterByName(name, url = window.location.href) {
             name = name.replace(/[\[\]]/g, "\\$&");
