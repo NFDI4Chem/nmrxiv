@@ -3,6 +3,7 @@
 namespace Tests\Feature\Project;
 
 use App\Http\Controllers\ProjectController;
+use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
@@ -116,6 +117,33 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
 
         // Should only return the 3 public studies
         $this->assertCount(3, $response->json('data'));
+    }
+
+    public function test_public_studies_for_nav_includes_datasets(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'is_public' => true,
+            'owner_id' => $this->owner->id,
+            'name' => 'Nav Sample',
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->project->id,
+        ]);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->project->id,
+            'name' => 'First Dataset',
+        ]);
+
+        $response = $this->get("/projects/{$this->project->id}/studies?for_nav=1");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.name', 'Nav Sample');
+        $response->assertJsonPath('data.0.datasets.0.name', 'First Dataset');
     }
 
     public function test_public_studies_endpoint_filters_search_and_sort()

@@ -23,6 +23,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -103,7 +104,7 @@ class ProjectController extends Controller
 
     public function publicStudies(Request $request, Project $project)
     {
-        return StudyResource::collection(Study::where([['project_id', $project->id], ['is_public', true]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        return $this->projectStudiesResponse($request, $project, publicOnly: true);
     }
 
     public function toggleUpVote(Request $request, Project $project)
@@ -197,7 +198,39 @@ class ProjectController extends Controller
             throw new AuthorizationException;
         }
 
-        return StudyResource::collection(Study::where('project_id', $project->id)->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
+        return $this->projectStudiesResponse($request, $project, publicOnly: false);
+    }
+
+    /**
+     * @return AnonymousResourceCollection
+     */
+    protected function projectStudiesResponse(Request $request, Project $project, bool $publicOnly)
+    {
+        $query = Study::query()->where('project_id', $project->id);
+
+        if ($publicOnly) {
+            $query->where('is_public', true);
+        }
+
+        $query->filter($request->only('search', 'sort', 'mode'));
+
+        if ($request->boolean('for_nav')) {
+            $query->with(['datasets' => fn ($datasetQuery) => $datasetQuery->orderBy('name')]);
+        }
+
+        $perPage = $request->boolean('for_nav')
+            ? min($request->integer('per_page', 100), 100)
+            : ($publicOnly ? 12 : 9);
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        if ($request->boolean('for_nav')) {
+            $paginator->getCollection()->transform(
+                fn (Study $study) => (new StudyResource($study))->lite(false, ['datasets'])
+            );
+        }
+
+        return StudyResource::collection($paginator);
     }
 
     public function settings(Request $request, Project $project)
