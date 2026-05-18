@@ -108,26 +108,28 @@ class ApplicationControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_resolve_compound_redirects_to_spectra_for_valid_molecule(): void
+    public function test_resolve_compound_renders_studies_for_valid_molecule(): void
     {
-        $molecule = Molecule::factory()->create([
+        Molecule::factory()->create([
             'identifier' => 188,
         ]);
 
         $response = $this->get('/compound/M188');
 
-        $response->assertRedirect('/spectra?compound=188');
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page->component('Public/Studies'));
     }
 
     public function test_resolve_compound_with_lowercase_prefix(): void
     {
-        $molecule = Molecule::factory()->create([
+        Molecule::factory()->create([
             'identifier' => 189,
         ]);
 
         $response = $this->get('/compound/m189');
 
-        $response->assertRedirect('/spectra?compound=189');
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page->component('Public/Studies'));
     }
 
     public function test_resolve_compound_returns_404_for_non_existent_molecule(): void

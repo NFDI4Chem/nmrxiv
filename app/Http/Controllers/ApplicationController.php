@@ -26,7 +26,7 @@ class ApplicationController extends Controller
     {
         $query = $request->get('query');
         $limit = $request->get('limit') ? $request->get('limit') : 24;
-        $page = $request->query('page');
+        $page = max(1, (int) $request->query('page', 1));
         $tagType = $request->query('tagType') ? $request->query('tagType') : null;
 
         return Inertia::render('Public/Compounds', compact(['query', 'limit', 'page', 'tagType']));
@@ -44,12 +44,11 @@ class ApplicationController extends Controller
         $model = $resolvedModel['model'];
 
         if ($model && $namespace === 'Molecule') {
-            // Redirect to spectra page with compound parameter for now
-            // This maintains the current compound viewing functionality
-            // Use getRawOriginal to get the numeric identifier without NMRXIV:M prefix
             $compoundId = $model->getRawOriginal('identifier');
 
-            return redirect('/spectra?compound='.$compoundId);
+            return app(StudyController::class)->publicStudiesView(
+                $request->merge(['compound' => $compoundId])
+            );
         } else {
             abort(404, 'Compound not found');
         }
