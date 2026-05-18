@@ -87,7 +87,7 @@ class HandleInertiaRequests extends Middleware
                     ? $workspace
                     : 'default';
             },
-            'chemistryStandardizeUrl' => config('services.chemistry_standardize.url'),
+            'chemistryStandardizeUrl' => route('chemistry.standardize'),
             'orcidSearchApi' => config('orcid.search_api'),
             'orcidPersonApi' => config('orcid.person_api'),
             'michiStandardsUrl' => config('external-links.michi_standards_url'),

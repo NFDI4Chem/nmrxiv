@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CASController;
+use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
@@ -191,6 +192,11 @@ Route::middleware('auth', 'verified')->group(function () {
 
     // CAS Common Chemistry API Proxy
     Route::get('/cas/detail', [CASController::class, 'fetchCasData'])->name('cas.detail');
+
+    // Chemistry standardize API proxy (avoids browser CORS to external chem services)
+    Route::post('/chemistry/standardize', [ChemistryStandardizeController::class, 'standardize'])
+        ->middleware('throttle:60,1')
+        ->name('chemistry.standardize');
 
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
