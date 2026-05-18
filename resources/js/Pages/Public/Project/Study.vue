@@ -7,7 +7,7 @@
         <template #project-content>
             <!-- Main content container -->
             <div
-                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+                class="pb-10 mb-10 py-6"
             >
                 <!-- DOI Citation section (only for public studies with DOI) -->
                 <div
@@ -326,254 +326,132 @@
                         </dd>
                     </div>
                 </div>
+
                 <div
-                    v-if="
-                        study.data.sample.molecules.length > 0 ||
-                        study.data.sample.description == ''
-                    "
-                    class="mt-4"
+                    class="mt-4 md:grid md:grid-cols-12 md:gap-x-4 md:gap-y-6 lg:gap-x-5 xl:gap-x-6"
                 >
-                    <div class="relative">
                         <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
+                            :class="[
+                            'min-w-0 space-y-6',
+                            hasMolecularCompositionSidebar
+                                ? 'md:col-span-9'
+                                : 'md:col-span-12',
+                            ]"
                         >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Sample
-                            </span>
-                        </div>
-                    </div>
-                    <div
-                        v-if="study.data.sample.molecules.length > 0"
-                        class="mt-3"
-                    >
-                        <label>Molecular Composition</label>
-                        <div class="grid md:grid-cols-1 gap-2 mt-2">
-                            <div class="pr-2">
-                                <div
-                                    v-if="
-                                        study.data.sample.molecules.length > 0
-                                    "
-                                    class="flow-root"
-                                >
-                                    <ul role="list" class="-mb-8">
-                                        <li
-                                            v-for="molecule in study.data.sample
-                                                .molecules"
-                                            :key="molecule.standard_inchi"
-                                        >
-                                            <div class="relative pb-8">
-                                                <span
-                                                    class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
-                                                    aria-hidden="true"
-                                                ></span>
-                                                <div class="relative flex">
-                                                    <div
-                                                        v-if="
-                                                            molecule &&
-                                                            molecule.pivot
-                                                        "
-                                                        class="relative"
-                                                    >
-                                                        <div
-                                                            class="rounded-full border my-4 p-2 z-10 bg-gray-100 text-sm"
-                                                        >
-                                                            {{
-                                                                molecule.pivot
-                                                                    .percentage_composition
-                                                            }}%
-                                                        </div>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <div>
-                                                            <div
-                                                                class="text-sm"
-                                                            >
-                                                                <a
-                                                                    class="font-medium text-gray-900"
-                                                                    >{{
-                                                                        molecule.standard_inchi
-                                                                    }}</a
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            class="text-sm text-gray-700"
-                                                        >
-                                                            <div
-                                                                class="flex justify-left items-center mx-auto p-4 mt-4 ml-4"
-                                                            >
-                                                                <div
-                                                                    v-if="
-                                                                        molecule.canonical_smiles
-                                                                    "
-                                                                    class="bg-red flex items-center justify-center"
-                                                                >
-                                                                    <Depictor2D
-                                                                        class="p-4 h-64 w-64 mr-4"
-                                                                        :molecule="
-                                                                            molecule.canonical_smiles
-                                                                        "
-                                                                    ></Depictor2D>
-                                                                    <Depictor3D
-                                                                        :molecule="
-                                                                            molecule.canonical_smiles
-                                                                        "
-                                                                    ></Depictor3D>
-                                                                </div>
-                                                                <div
-                                                                    v-else
-                                                                    class="text-gray-500 text-sm"
-                                                                >
-                                                                    No structure
-                                                                    available
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <div
-                                        class="rounded-full border p-2 z-10 bg-gray-100 text-sm mt-14 text-center"
-                                    >
-                                        Sample chemical composition
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <div class="text-center my-10 py-10">
-                                        <h3
-                                            class="mt-2 text-sm font-medium text-gray-900"
-                                        >
-                                            No structures associated with the
-                                            sample yet!
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Get started by adding a new
-                                            molecule.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Spectra
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <SpectraViewer
-                            ref="spectraViewerREF"
-                            :project="project.data"
-                            :study="study.data"
-                        ></SpectraViewer>
-                    </div>
-
-                    <div class="my-6">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-semibold text-gray-900">
-                                    Spectra Datasets
-                                </h2>
-                                <span
-                                    class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
-                                >
-                                    {{ study.data.datasets.length }}
-                                    {{
-                                        study.data.datasets.length === 1
-                                            ? "dataset"
-                                            : "datasets"
-                                    }}
-                                </span>
-                            </div>
-
                             <div
-                                v-if="study.data.datasets.length === 0"
-                                class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300"
+                                v-if="
+                                    study.data.sample?.description &&
+                                    study.data.sample.description.length > 0
+                                "
+                                class="rounded-lg border border-gray-100 bg-gray-50/80 p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
                             >
-                                <svg
-                                    class="mx-auto h-12 w-12 text-gray-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                    />
-                                </svg>
-                                <h3
-                                    class="mt-2 text-sm font-medium text-gray-900"
-                                >
-                                    No datasets available
-                                </h3>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    There are no spectra datasets associated
-                                    with this study yet.
+                                <p class="whitespace-pre-wrap">
+                                    {{ study.data.sample.description }}
                                 </p>
                             </div>
 
-                            <div
-                                v-else
-                                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                            >
+                        <div class="mt-6">
+                            <SpectraViewer
+                                ref="spectraViewerREF"
+                                :project="project.data"
+                                :study="study.data"
+                            ></SpectraViewer>
+                        </div>
+
+                        <div class="my-6">
+                            <div>
                                 <div
-                                    v-for="dataset in study.data.datasets.sort(
-                                        (a, b) => (a.name > b.name ? 1 : -1)
-                                    )"
-                                    :key="dataset.slug"
-                                    class="group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-300"
+                                    class="mb-5 flex flex-wrap items-center justify-between gap-3"
                                 >
-                                    <a
-                                        :href="
-                                            '/' +
-                                            dataset.identifier.replace(
-                                                'NMRXIV:',
-                                                ''
-                                            )
-                                        "
-                                        target="_blank"
-                                        class="block p-4 h-full"
+                                    <h2
+                                        class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
                                     >
-                                        <div>
+                                        Spectra Datasets
+                                    </h2>
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium tabular-nums text-gray-700 ring-1 ring-inset ring-gray-900/5 dark:bg-gray-800/80 dark:text-gray-300 dark:ring-white/10"
+                                    >
+                                        {{ study.data.datasets.length }}
+                                        {{
+                                            study.data.datasets.length === 1
+                                                ? "dataset"
+                                                : "datasets"
+                                        }}
+                                    </span>
+                                </div>
+
+                                <div
+                                    v-if="study.data.datasets.length === 0"
+                                    class="rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50 to-white px-6 py-14 text-center dark:border-gray-700 dark:from-gray-900/40 dark:to-gray-950/20"
+                                >
+                                    <svg
+                                        class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.5"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                        />
+                                    </svg>
+                                    <h3
+                                        class="mt-3 text-sm font-semibold text-gray-900 dark:text-gray-100"
+                                    >
+                                        No datasets available
+                                    </h3>
+                                    <p
+                                        class="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+                                    >
+                                        There are no spectra datasets associated
+                                        with this study yet.
+                                    </p>
+                                </div>
+
+                                <div
+                                    v-else
+                                    class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                                >
+                                    <div
+                                        v-for="dataset in study.data.datasets.sort(
+                                            (a, b) => (a.name > b.name ? 1 : -1)
+                                        )"
+                                        :key="dataset.slug"
+                                        class="group relative"
+                                    >
+                                        <a
+                                            :href="
+                                                '/' +
+                                                dataset.identifier.replace(
+                                                    'NMRXIV:',
+                                                    ''
+                                                )
+                                            "
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-900/[0.06] transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:ring-gray-900/[0.1] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-gray-950 dark:ring-white/[0.08] dark:hover:ring-white/[0.14] dark:focus-visible:ring-offset-gray-950"
+                                        >
                                             <div
-                                                class="flex items-start justify-between mb-3"
+                                                class="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-teal-500/0 via-teal-500/70 to-teal-500/0 opacity-0 transition duration-300 group-hover:opacity-100"
+                                            ></div>
+
+                                            <div
+                                                class="flex flex-1 flex-col gap-3"
                                             >
                                                 <h3
-                                                    class="text-md font-bold text-teal-600 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 flex-1 pr-2"
+                                                    class="line-clamp-2 text-[0.9375rem] font-semibold leading-snug text-gray-900 transition-colors group-hover:text-teal-700 dark:text-gray-100 dark:group-hover:text-teal-400"
                                                 >
                                                     {{ dataset.name }}
                                                 </h3>
-                                            </div>
 
-                                            <div
-                                                class="flex flex-col gap-2 flex-1"
-                                            >
-                                                <div v-if="dataset.type">
+                                                <div
+                                                    v-if="dataset.type"
+                                                    class="flex flex-wrap gap-2"
+                                                >
                                                     <span
-                                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                                        class="inline-flex max-w-full items-center rounded-md bg-gray-50 px-2 py-1 text-[11px] font-medium leading-tight text-gray-700 ring-1 ring-inset ring-gray-500/10 dark:bg-gray-900 dark:text-gray-300 dark:ring-white/10"
                                                     >
                                                         {{
                                                             dataset.type.replace(
@@ -583,54 +461,81 @@
                                                         }}
                                                     </span>
                                                 </div>
-
-                                                <!-- <div class="overflow-hidden rounded-md border-0 text-gray-900">
-                                                    <div v-if="dataset.doi" class="cursor-pointer max-w-full">
-                                                        <span class="flex items-start rounded-l-md pr-2 py-1 text-xs font-medium flex-shrink-0 h-full">
-                                                            DOI:
-                                                        </span>
-                                                        <span class="flex items-start pr-2 py-1 text-xs font-bold break-all leading-tight min-w-0">
-                                                            {{ dataset.doi }}
-                                                        </span>
-                                                    </div>
-                                                </div> -->
                                             </div>
-                                        </div>
 
-                                        <div
-                                            class="mt-3 pt-3 border-t border-gray-100"
-                                        >
                                             <div
-                                                class="flex items-center text-xs text-gray-500"
+                                                class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-800"
                                             >
-                                                <span class="flex items-center">
-                                                    <svg
-                                                        class="w-3 h-3 mr-1"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                    View Dataset
-                                                </span>
                                                 <span
-                                                    class="ml-auto group-hover:text-blue-600 transition-colors duration-200"
+                                                    class="text-xs font-medium text-gray-500 dark:text-gray-400"
                                                 >
-                                                    →
+                                                    Open dataset
                                                 </span>
+                                                <svg
+                                                    class="h-4 w-4 shrink-0 text-gray-400 transition duration-300 group-hover:translate-x-0.5 group-hover:text-teal-600 dark:group-hover:text-teal-400"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="2"
+                                                    stroke="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                                                    />
+                                                </svg>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        </div>
+
+                        <aside
+                            v-if="hasMolecularCompositionSidebar"
+                            class="mt-8 min-w-0 md:mt-0 md:col-span-3"
+                        >
+                            <div
+                                class="space-y-6 bg-white p-6 dark:bg-gray-900/80 md:sticky md:top-6"
+                            >
+                                <ul role="list" class="space-y-8">
+                                    <li
+                                        v-for="molecule in compositionMolecules"
+                                        :key="
+                                            molecule.standard_inchi ||
+                                            molecule.id
+                                        "
+                                        class="min-w-0"
+                                    >
+                                        <p
+                                            class="text-sm font-medium break-all text-gray-900 dark:text-gray-100"
+                                        >
+                                            {{ molecule.standard_inchi }}
+                                        </p>
+                                        <div
+                                            v-if="molecule.canonical_smiles"
+                                            class="mt-3 flex justify-center"
+                                        >
+                                            <Depictor2D
+                                                class="max-h-52 max-w-full"
+                                                :molecule="
+                                                    molecule.canonical_smiles
+                                                "
+                                            ></Depictor2D>
+                                        </div>
+                                        <p
+                                            v-else
+                                            class="mt-2 text-sm text-gray-500"
+                                        >
+                                            No structure available
+                                        </p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </aside>
                     </div>
-                    <div>&emsp;</div>
-                </div>
             </div>
         </template>
     </project-layout>
@@ -653,7 +558,6 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
-import Depictor3D from "@/Shared/Depictor3D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
@@ -671,7 +575,6 @@ export default {
         MenuItems,
         SpectraViewer,
         Depictor2D,
-        Depictor3D,
         DOIBadge,
         Head,
         Citation,
@@ -725,6 +628,23 @@ export default {
          */
         url() {
             return String(this.$page.props.url);
+        },
+
+        compositionMolecules() {
+            const fromSample = this.study?.data?.sample?.molecules;
+            if (Array.isArray(fromSample) && fromSample.length > 0) {
+                return fromSample;
+            }
+            const top = this.study?.data?.molecules;
+            if (Array.isArray(top) && top.length > 0) {
+                return top;
+            }
+
+            return [];
+        },
+
+        hasMolecularCompositionSidebar() {
+            return this.compositionMolecules.length > 0;
         },
     },
 

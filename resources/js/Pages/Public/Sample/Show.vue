@@ -278,21 +278,29 @@
                 </div>
                 <div
                     v-if="
-                        study.data.sample.molecules.length > 0 ||
-                        study.data.sample.description == ''
+                        compositionMolecules.length > 0 ||
+                        study.data.sample?.description == ''
                     "
-                    class="mt-4"
+                    class="mt-4 md:grid md:grid-cols-12 md:gap-x-4 md:gap-y-8 lg:gap-x-5 xl:gap-x-6"
                 >
-                    <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
-                        <div class="pt-2 sm:col-span-6">
-                            <h2
-                                class="text-xl font-extrabold mb-3 text-blue-gray-900"
-                            >
-                                Submitter
-                            </h2>
+                    <div
+                        :class="[
+                            'min-w-0 space-y-4',
+                            hasMolecularCompositionSidebar
+                                ? 'md:col-span-9'
+                                : 'md:col-span-12',
+                        ]"
+                    >
+                        <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
+                            <div class="pt-2 sm:col-span-6">
+                                <h2
+                                    class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
+                                >
+                                    Submitter
+                                </h2>
+                            </div>
                         </div>
-                    </div>
-                    <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div
                             class="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
                         >
@@ -324,10 +332,10 @@
                                 </a>
                             </div>
                         </div>
-                    </div>
+                        </div>
 
-                    <!-- Submitted Through Information -->
-                    <div v-if="study.data.submitted_through" class="mt-4">
+                        <!-- Submitted Through Information -->
+                        <div v-if="study.data.submitted_through" class="mt-4">
                         <div
                             class="flex items-center space-x-3 text-sm text-gray-600"
                         >
@@ -379,15 +387,15 @@
                                 </span>
                             </a>
                         </div>
-                    </div>
+                        </div>
 
-                    <!-- Author Section -->
-                    <div
-                        v-if="
+                        <!-- Author Section -->
+                        <div
+                            v-if="
                             study.data.authors && study.data.authors.length > 0
                         "
-                        class="mt-6"
-                    >
+                            class="mt-6"
+                        >
                         <div class="relative">
                             <div
                                 class="absolute inset-0 flex items-center"
@@ -414,146 +422,70 @@
                                 <author-card :authors="study.data.authors" />
                             </div>
                         </div>
+                        </div>
                     </div>
 
-                    <div class="relative">&nbsp;</div>
-                    <div
-                        v-if="study.data.sample.molecules.length > 0"
-                        class="mt-3"
+                    <aside
+                        v-if="hasMolecularCompositionSidebar"
+                        class="mt-10 min-w-0 md:mt-0 md:col-span-3"
                     >
-                        <div class="relative flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-900">
-                                Molecular Composition
-                            </h2>
-                        </div>
-                        <div class="grid md:grid-cols-1 gap-2 mt-2">
-                            <div class="pr-2">
-                                <div
-                                    v-if="
-                                        study.data.sample.molecules.length > 0
-                                    "
-                                    class="flow-root"
-                                >
-                                    <ul role="list" class="-mb-8">
-                                        <li
-                                            v-for="molecule in study.data.sample
-                                                .molecules"
-                                            :key="molecule.standard_inchi"
-                                        >
-                                            <div class="relative pb-8">
-                                                <span
-                                                    class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-100"
-                                                    aria-hidden="true"
-                                                ></span>
-                                                <div
-                                                    class="relative flex items-start space-x-3"
-                                                >
-                                                    <div
-                                                        v-if="
-                                                            molecule &&
-                                                            molecule.pivot
-                                                        "
-                                                        class="relative"
-                                                    >
-                                                        <div
-                                                            class="rounded-full border p-2 z-10 bg-gray-100 text-sm"
-                                                        >
-                                                            {{
-                                                                molecule.pivot
-                                                                    .percentage_composition
-                                                            }}%
-                                                        </div>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <div>
-                                                            <div
-                                                                class="text-sm"
-                                                            >
-                                                                <a
-                                                                    class="font-medium text-gray-900"
-                                                                    >{{
-                                                                        molecule.standard_inchi
-                                                                    }}</a
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            class="mt-2 text-sm text-gray-700"
-                                                        >
-                                                            <div
-                                                                class="my-3 flex justify-left items-center"
-                                                            >
-                                                                <Depictor2D
-                                                                    class="py-4 px-4"
-                                                                    :molecule="
-                                                                        molecule.canonical_smiles
-                                                                    "
-                                                                ></Depictor2D>
-                                                                <Depictor3D
-                                                                    :molecule="
-                                                                        molecule.canonical_smiles
-                                                                    "
-                                                                ></Depictor3D>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <div
-                                        class="rounded-full border p-2 z-100 bg-gray-100 text-sm mt-4 text-center"
-                                    >
-                                        Sample chemical composition
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <div class="text-center my-10 py-10">
-                                        <h3
-                                            class="mt-2 text-sm font-medium text-gray-900"
-                                        >
-                                            No structures associated with the
-                                            sample yet!
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Get started by adding a new
-                                            molecule.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="relative">
                         <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
+                            class="space-y-6 bg-white p-6 dark:bg-gray-900/80 md:sticky md:top-6"
                         >
-                            <div class="w-full border-t border-gray-100"></div>
+                            <ul role="list" class="space-y-8">
+                                <li
+                                    v-for="molecule in compositionMolecules"
+                                    :key="
+                                        molecule.standard_inchi ||
+                                        molecule.id
+                                    "
+                                    class="min-w-0"
+                                >
+                                    <p
+                                        class="text-sm font-medium break-all text-gray-900 dark:text-gray-100"
+                                    >
+                                        {{ molecule.standard_inchi }}
+                                    </p>
+                                    <div
+                                        v-if="molecule.canonical_smiles"
+                                        class="mt-3 flex justify-center"
+                                    >
+                                        <Depictor2D
+                                            class="max-h-52 max-w-full"
+                                            :molecule="
+                                                molecule.canonical_smiles
+                                            "
+                                        ></Depictor2D>
+                                    </div>
+                                    <p
+                                        v-else
+                                        class="mt-2 text-sm text-gray-500"
+                                    >
+                                        No structure available
+                                    </p>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="relative flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-900">
-                                Spectra
-                            </h2>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <SpectraViewer
-                            ref="spectraViewerREF"
-                            :study="study.data"
-                        ></SpectraViewer>
-                    </div>
+                    </aside>
+                </div>
+                <div class="mt-6">
+                    <SpectraViewer
+                        ref="spectraViewerREF"
+                        :study="study.data"
+                    ></SpectraViewer>
 
                     <div class="my-6">
                         <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-semibold text-gray-900">
+                            <div
+                                class="mb-5 flex flex-wrap items-center justify-between gap-3"
+                            >
+                                <h2
+                                    class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                                >
                                     Datasets
                                 </h2>
                                 <span
-                                    class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+                                    class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium tabular-nums text-gray-700 ring-1 ring-inset ring-gray-900/5 dark:bg-gray-800/80 dark:text-gray-300 dark:ring-white/10"
                                 >
                                     {{ study.data.datasets.length }}
                                     {{
@@ -566,10 +498,10 @@
 
                             <div
                                 v-if="study.data.datasets.length === 0"
-                                class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300"
+                                class="rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50 to-white px-6 py-14 text-center dark:border-gray-700 dark:from-gray-900/40 dark:to-gray-950/20"
                             >
                                 <svg
-                                    class="mx-auto h-12 w-12 text-gray-400"
+                                    class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -577,16 +509,18 @@
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
+                                        stroke-width="1.5"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                                     />
                                 </svg>
                                 <h3
-                                    class="mt-2 text-sm font-medium text-gray-900"
+                                    class="mt-3 text-sm font-semibold text-gray-900 dark:text-gray-100"
                                 >
                                     No datasets available
                                 </h3>
-                                <p class="mt-1 text-sm text-gray-500">
+                                <p
+                                    class="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+                                >
                                     There are no spectra datasets associated
                                     with this study yet.
                                 </p>
@@ -594,61 +528,73 @@
 
                             <div
                                 v-else
-                                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                                class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                             >
                                 <div
                                     v-for="dataset in study.data.datasets.sort(
                                         (a, b) => (a.name > b.name ? 1 : -1)
                                     )"
                                     :key="dataset.slug"
-                                    class="group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-300"
+                                    class="group relative"
                                 >
                                     <a
                                         :href="dataset.external_url"
                                         target="_blank"
-                                        class="block p-4 h-full"
+                                        rel="noopener noreferrer"
+                                        class="relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-900/[0.06] transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:ring-gray-900/[0.1] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-gray-950 dark:ring-white/[0.08] dark:hover:ring-white/[0.14] dark:focus-visible:ring-offset-gray-950"
                                     >
-                                        <div>
-                                            <div
-                                                class="flex items-start justify-between mb-1"
+                                        <div
+                                            class="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-teal-500/0 via-teal-500/70 to-teal-500/0 opacity-0 transition duration-300 group-hover:opacity-100"
+                                        ></div>
+
+                                        <div
+                                            class="flex flex-1 flex-col gap-3"
+                                        >
+                                            <h3
+                                                class="line-clamp-2 text-[0.9375rem] font-semibold capitalize leading-snug text-gray-900 transition-colors group-hover:text-teal-700 dark:text-gray-100 dark:group-hover:text-teal-400"
                                             >
-                                                <h3
-                                                    class="text-md font-bold text-gray-600 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 flex-1 pr-2 capitalize"
-                                                >
-                                                    {{ dataset.name }}
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke-width="1.5"
-                                                        stroke="currentColor"
-                                                        class="w-4 h-4 ml-2 inline-block"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-                                                        />
-                                                    </svg>
-                                                </h3>
-                                            </div>
+                                                {{ dataset.name }}
+                                            </h3>
 
                                             <div
-                                                class="flex flex-col gap-2 flex-1"
+                                                v-if="dataset.type"
+                                                class="flex flex-wrap gap-2"
                                             >
-                                                <div v-if="dataset.type">
-                                                    <span
-                                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                                    >
-                                                        {{
-                                                            dataset.type.replace(
-                                                                /,\s*$/,
-                                                                ""
-                                                            )
-                                                        }}
-                                                    </span>
-                                                </div>
+                                                <span
+                                                    class="inline-flex max-w-full items-center rounded-md bg-gray-50 px-2 py-1 text-[11px] font-medium leading-tight text-gray-700 ring-1 ring-inset ring-gray-500/10 dark:bg-gray-900 dark:text-gray-300 dark:ring-white/10"
+                                                >
+                                                    {{
+                                                        dataset.type.replace(
+                                                            /,\s*$/,
+                                                            ""
+                                                        )
+                                                    }}
+                                                </span>
                                             </div>
+                                        </div>
+
+                                        <div
+                                            class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-800"
+                                        >
+                                            <span
+                                                class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                                            >
+                                                Open external
+                                            </span>
+                                            <svg
+                                                class="h-4 w-4 shrink-0 text-gray-400 transition duration-300 group-hover:translate-x-0.5 group-hover:text-teal-600 dark:group-hover:text-teal-400"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="2"
+                                                stroke="currentColor"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                                                />
+                                            </svg>
                                         </div>
                                     </a>
                                 </div>
@@ -822,7 +768,6 @@ import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
-import Depictor3D from "@/Shared/Depictor3D.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 export default {
     components: {
@@ -835,7 +780,6 @@ export default {
         MenuItems,
         SpectraViewer,
         Depictor2D,
-        Depictor3D,
         DOIBadge,
         Head,
         Citation,
@@ -854,6 +798,25 @@ export default {
         },
         url() {
             return String(this.$page.props.url);
+        },
+        /**
+         * Molecules for composition UI: prefer nested sample.molecules, fall back
+         * to study.data.molecules (StudyResource always exposes the latter).
+         */
+        compositionMolecules() {
+            const fromSample = this.study?.data?.sample?.molecules;
+            if (Array.isArray(fromSample) && fromSample.length > 0) {
+                return fromSample;
+            }
+            const top = this.study?.data?.molecules;
+            if (Array.isArray(top) && top.length > 0) {
+                return top;
+            }
+
+            return [];
+        },
+        hasMolecularCompositionSidebar() {
+            return this.compositionMolecules.length > 0;
         },
     },
     mounted() {

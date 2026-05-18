@@ -3,104 +3,141 @@
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
-                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+                class="pb-10 mb-10 py-6"
             >
-                <h1 class="mt-2 text-2xl font-bold break-words text-gray-900">
-                    <span>
-                        {{ study.data.name }} >
-                        <span class="text-blue-500"
-                            >{{ dataset.data.name }}
-                            <span v-if="dataset.data.type"
-                                >- ({{
-                                    dataset.data.type.replace(/,\s*$/, "")
-                                }})</span
-                            ></span
+                <header class="mt-2 space-y-4">
+                    <nav
+                        class="text-sm text-gray-500 dark:text-gray-400"
+                        aria-label="Breadcrumb"
+                    >
+                        <ol
+                            class="flex flex-wrap items-center gap-x-2 gap-y-1"
                         >
-                    </span>
-                    <div class="text-sm">
-                        <span class="text-gray-400 pt-2">
+                            <li class="min-w-0">
+                                <Link
+                                    v-if="studyPublicHref"
+                                    :href="studyPublicHref"
+                                    class="font-medium text-gray-600 transition-colors hover:text-teal-600 dark:text-gray-300 dark:hover:text-teal-400"
+                                >
+                                    {{ study.data.name }}
+                                </Link>
+                                <span
+                                    v-else
+                                    class="font-medium text-gray-600 dark:text-gray-300"
+                                >
+                                    {{ study.data.name }}
+                                </span>
+                            </li>
+                            <li
+                                aria-hidden="true"
+                                class="text-gray-300 dark:text-gray-600"
+                            >
+                                /
+                            </li>
+                            <li
+                                class="truncate font-medium text-gray-700 dark:text-gray-200"
+                                aria-current="page"
+                            >
+                                {{ dataset.data.name }}
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <div
+                        class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+                    >
+                        <div class="min-w-0 flex-1">
+                            <h1
+                                class="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-3xl"
+                            >
+                                <span class="break-words">{{
+                                    dataset.data.name
+                                }}</span>
+                            </h1>
+                            <p
+                                v-if="datasetTypeLabel"
+                                class="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+                            >
+                                {{ datasetTypeLabel }}
+                            </p>
+                        </div>
+                        <div
+                            class="flex flex-shrink-0 flex-wrap items-center gap-3"
+                        >
                             <DOIBadge
                                 :doi="dataset.data.doi"
                                 color="bg-green-100"
                             ></DOIBadge>
-                        </span>
-                    </div>
-                    <div class="float-right">
-                        <span class="flex-0.5 self-center">
                             <Menu
                                 v-if="dataset && study.data.is_public"
                                 as="div"
                                 class="relative text-left"
                             >
-                                <div>
-                                    <MenuButton
-                                        class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600"
-                                    >
-                                        <ShareIcon
-                                            class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
-                                            aria-hidden="true"
-                                        ></ShareIcon
-                                        >Share
-                                    </MenuButton>
-                                </div>
+                                <MenuButton
+                                    type="button"
+                                    class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                                >
+                                    <ShareIcon
+                                        class="mr-2 h-4 w-4 flex-shrink-0 text-gray-700 dark:text-gray-300"
+                                        aria-hidden="true"
+                                    />
+                                    Share
+                                </MenuButton>
                                 <transition
                                     enter-active-class="transition ease-out duration-100"
-                                    enter-from-class="transform opacity-0 scale-95"
-                                    enter-to-class="transform opacity-100 scale-100"
+                                    enter-from-class="transform scale-95 opacity-0"
+                                    enter-to-class="transform scale-100 opacity-100"
                                     leave-active-class="transition ease-in duration-75"
-                                    leave-from-class="transform opacity-100 scale-100"
-                                    leave-to-class="transform opacity-0 scale-95"
+                                    leave-from-class="transform scale-100 opacity-100"
+                                    leave-to-class="transform scale-95 opacity-0"
                                 >
                                     <MenuItems
-                                        class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                        class="absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 dark:ring-white/10"
                                     >
-                                        <div class="py-1">
-                                            <MenuItem v-slot="{ active }">
-                                                <div
-                                                    :class="[
-                                                        active
-                                                            ? 'bg-gray-100 text-gray-900'
-                                                            : 'text-gray-700',
-                                                        'block px-4 py-2 text-sm flex',
-                                                    ]"
-                                                >
-                                                    <div class="flex-grow">
-                                                        <input
-                                                            id="datasetPublicURLCopy"
-                                                            readonly
-                                                            type="text"
-                                                            :value="shareURL"
-                                                            class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                            @focus="
-                                                                $event.target.select()
-                                                            "
-                                                        />
-                                                    </div>
-                                                    <button
-                                                        type="button"
-                                                        class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                        @click="
-                                                            copyToClipboard(
-                                                                shareURL,
-                                                                'datasetPublicURLCopy'
-                                                            )
+                                        <MenuItem v-slot="{ active }">
+                                            <div
+                                                :class="[
+                                                    active
+                                                        ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                                                        : 'text-gray-700 dark:text-gray-200',
+                                                    'flex px-3 py-2 text-sm',
+                                                ]"
+                                            >
+                                                <div class="min-w-0 flex-1">
+                                                    <input
+                                                        id="datasetPublicURLCopy"
+                                                        readonly
+                                                        type="text"
+                                                        :value="shareURL"
+                                                        class="block w-full rounded-l-md border border-gray-300 bg-white text-sm focus:border-gray-500 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+                                                        @focus="
+                                                            $event.target.select()
                                                         "
-                                                    >
-                                                        <span
-                                                            ><ClipboardDocumentIcon
-                                                                class="h-5 w-5"
-                                                                aria-hidden="true"
-                                                        /></span>
-                                                    </button>
+                                                    />
                                                 </div>
-                                            </MenuItem>
-                                        </div>
+                                                <button
+                                                    type="button"
+                                                    class="-ml-px inline-flex shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-50 px-2.5 py-2 text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                                    @click="
+                                                        copyToClipboard(
+                                                            shareURL,
+                                                            'datasetPublicURLCopy'
+                                                        )
+                                                    "
+                                                >
+                                                    <ClipboardDocumentIcon
+                                                        class="h-5 w-5"
+                                                        aria-hidden="true"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </MenuItem>
                                     </MenuItems>
                                 </transition>
                             </Menu>
-                        </span>
+                        </div>
                     </div>
-                </h1>
+                </header>
                 <!-- <div class="mt-4">
                     <div class="relative">
                         <div
@@ -123,7 +160,10 @@
                         v-html="md(study.data.description)"
                     ></p>
                 </div> -->
-                <div class="mt-4">
+                <div
+                    v-if="study.data.tags && study.data.tags.length > 0"
+                    class="mt-4"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -133,34 +173,7 @@
                         </div>
                         <div class="relative flex items-center justify-between">
                             <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Spectra
-                            </span>
-                        </div>
-                    </div>
-                    <h1
-                        class="mt-2 text-2xl font-bold break-words text-gray-900"
-                    ></h1>
-                    <div class="my-7">
-                        <SpectraViewer
-                            :dataset="dataset.data"
-                            :project="project.data"
-                            :study="study.data"
-                        ></SpectraViewer>
-                    </div>
-                </div>
-                <div v-if="study.data.tags.length > 0" class="mt-4">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
+                                class="pr-3 text-md bg-white font-medium text-gray-400 dark:bg-gray-900"
                             >
                                 Keywords
                             </span>
@@ -175,7 +188,7 @@
                                     class="mr-2"
                                 >
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-200"
                                     >
                                         <svg
                                             class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
@@ -191,126 +204,141 @@
                         </dd>
                     </div>
                 </div>
+
                 <div
-                    v-if="
-                        study.data.sample.molecules.length > 0 ||
-                        study.data.sample.description == ''
-                    "
-                    class="mt-4"
+                    class="mt-4 md:grid md:grid-cols-12 md:gap-x-4 md:gap-y-6 lg:gap-x-5 xl:gap-x-6"
                 >
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Sample
-                            </span>
-                        </div>
-                    </div>
                     <div
-                        v-if="study.data.sample.molecules.length > 0"
-                        class="mt-3"
+                        :class="[
+                            'min-w-0 space-y-6',
+                            hasMolecularCompositionSidebar
+                                ? 'md:col-span-9'
+                                : 'md:col-span-12',
+                        ]"
                     >
-                        <label>Molecular Composition</label>
-                        <div class="grid md:grid-cols-2 gap-2 mt-2">
-                            <div class="pr-2">
-                                <div
-                                    v-if="
-                                        study.data.sample.molecules.length > 0
-                                    "
-                                    class="flow-root"
-                                >
-                                    <ul role="list" class="-mb-8">
-                                        <li
-                                            v-for="molecule in study.data.sample
-                                                .molecules"
-                                            :key="molecule.standard_inchi"
-                                        >
-                                            <div class="relative pb-8">
-                                                <span
-                                                    class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
-                                                    aria-hidden="true"
-                                                ></span>
-                                                <div
-                                                    class="relative flex items-start space-x-3"
-                                                >
-                                                    <div
-                                                        v-if="
-                                                            molecule &&
-                                                            molecule.pivot
-                                                        "
-                                                        class="relative"
-                                                    >
-                                                        <div
-                                                            class="rounded-full border p-2 z-10 bg-gray-100 text-sm"
-                                                        >
-                                                            {{
-                                                                molecule.pivot
-                                                                    .percentage_composition
-                                                            }}%
-                                                        </div>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <div>
-                                                            <div
-                                                                class="text-sm"
-                                                            >
-                                                                <a
-                                                                    class="font-medium text-gray-900"
-                                                                    >{{
-                                                                        molecule.standard_inchi
-                                                                    }}</a
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            class="mt-2 text-sm text-gray-700"
-                                                        >
-                                                            <div
-                                                                class="rounded-md border my-3 flex justify-center items-center"
-                                                            >
-                                                                <Depictor2D
-                                                                    class="py-4 -px-4"
-                                                                    :molecule="
-                                                                        molecule.canonical_smiles
-                                                                    "
-                                                                ></Depictor2D>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <div
-                                        class="rounded-full border p-2 z-10 bg-gray-100 text-sm mt-14 text-center"
-                                    >
-                                        Sample chemical composition
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <div class="text-center my-10 py-10">
-                                        <h3
-                                            class="mt-2 text-sm font-medium text-gray-900"
-                                        >
-                                            No structures associated with the
-                                            sample yet!
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Get started by adding a new
-                                            molecule.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                        <div
+                            v-if="
+                                study.data.sample?.description &&
+                                study.data.sample.description.length > 0
+                            "
+                            class="rounded-lg border border-gray-100 bg-gray-50/80 p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+                        >
+                            <p class="whitespace-pre-wrap">
+                                {{ study.data.sample.description }}
+                            </p>
                         </div>
+
+                        <div class="mt-6">
+                            <SpectraViewer
+                                ref="spectraViewerREF"
+                                :dataset="dataset.data"
+                                :project="project.data"
+                                :study="study.data"
+                            ></SpectraViewer>
+                        </div>
+
+                        <section
+                            v-if="firstSpectrumInfoRows.length > 0"
+                            class="mt-8 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900/80"
+                            aria-labelledby="spectrum-info-heading"
+                        >
+                            <div
+                                class="border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+                            >
+                                <h2
+                                    id="spectrum-info-heading"
+                                    class="text-sm font-semibold text-gray-900 dark:text-gray-100"
+                                >
+                                    Spectrum info
+                                </h2>
+                            </div>
+                            <div
+                                class="overflow-x-auto"
+                            >
+                                <table
+                                    class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+                                >
+                                    <thead class="bg-gray-50 dark:bg-gray-800/80">
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="py-3 pl-4 pr-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300 sm:pl-6"
+                                            >
+                                                Field
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="py-3 pl-3 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300 sm:pr-6"
+                                            >
+                                                Value
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900/40"
+                                    >
+                                        <tr
+                                            v-for="row in firstSpectrumInfoRows"
+                                            :key="row.key"
+                                        >
+                                            <th
+                                                scope="row"
+                                                class="whitespace-nowrap py-3 pl-4 pr-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6"
+                                            >
+                                                {{ row.key }}
+                                            </th>
+                                            <td
+                                                class="max-w-md break-words py-3 pl-3 pr-4 text-sm text-gray-600 dark:text-gray-300 sm:max-w-xl sm:pr-6"
+                                            >
+                                                {{ row.value }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
                     </div>
+
+                    <aside
+                        v-if="hasMolecularCompositionSidebar"
+                        class="mt-8 min-w-0 md:mt-0 md:col-span-3"
+                    >
+                        <div
+                            class="space-y-6 bg-white p-6 dark:bg-gray-900/80 md:sticky md:top-6"
+                        >
+                            <ul role="list" class="space-y-8">
+                                <li
+                                    v-for="molecule in compositionMolecules"
+                                    :key="
+                                        molecule.standard_inchi || molecule.id
+                                    "
+                                    class="min-w-0"
+                                >
+                                    <p
+                                        class="text-sm font-medium break-all text-gray-900 dark:text-gray-100"
+                                    >
+                                        {{ molecule.standard_inchi }}
+                                    </p>
+                                    <div
+                                        v-if="molecule.canonical_smiles"
+                                        class="mt-3 flex justify-center"
+                                    >
+                                        <Depictor2D
+                                            class="max-h-52 max-w-full"
+                                            :molecule="molecule.canonical_smiles"
+                                        ></Depictor2D>
+                                    </div>
+                                    <p
+                                        v-else
+                                        class="mt-2 text-sm text-gray-500"
+                                    >
+                                        No structure available
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                    </aside>
                 </div>
             </div>
         </template>
@@ -327,7 +355,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -342,6 +370,7 @@ export default {
         DOIBadge,
         Depictor2D,
         Head,
+        Link,
     },
     props: ["project", "tab", "study", "dataset"],
     data() {
@@ -354,8 +383,58 @@ export default {
         shareURL() {
             return this.dataset.data.public_url;
         },
+        studyPublicHref() {
+            return this.study?.data?.public_url ?? null;
+        },
+        datasetTypeLabel() {
+            const raw = this.dataset?.data?.type;
+            if (!raw || typeof raw !== "string") {
+                return "";
+            }
+
+            return raw.replace(/,\s*$/, "");
+        },
+        firstSpectrumInfo() {
+            const spectra =
+                this.dataset?.data?.nmrium_info?.data?.spectra;
+            if (!Array.isArray(spectra) || spectra.length === 0) {
+                return null;
+            }
+            const raw = spectra[0]?.info;
+            if (raw == null || typeof raw !== "object") {
+                return null;
+            }
+
+            return raw;
+        },
+        firstSpectrumInfoRows() {
+            const info = this.firstSpectrumInfo;
+            if (!info) {
+                return [];
+            }
+
+            return Object.keys(info).map((key) => ({
+                key,
+                value: this.formatSpectrumInfoCell(info[key]),
+            }));
+        },
         url() {
             return String(this.$page.props.url);
+        },
+        compositionMolecules() {
+            const fromSample = this.study?.data?.sample?.molecules;
+            if (Array.isArray(fromSample) && fromSample.length > 0) {
+                return fromSample;
+            }
+            const top = this.study?.data?.molecules;
+            if (Array.isArray(top) && top.length > 0) {
+                return top;
+            }
+
+            return [];
+        },
+        hasMolecularCompositionSidebar() {
+            return this.compositionMolecules.length > 0;
         },
     },
     mounted() {
@@ -364,6 +443,28 @@ export default {
             .then((response) => {
                 this.schema = response.data;
             });
+    },
+    methods: {
+        formatSpectrumInfoCell(val) {
+            if (val === null || val === undefined) {
+                return "—";
+            }
+            if (Array.isArray(val)) {
+                return val
+                    .map((v) =>
+                        v !== null &&
+                        typeof v === "object"
+                            ? JSON.stringify(v)
+                            : String(v),
+                    )
+                    .join(", ");
+            }
+            if (typeof val === "object") {
+                return JSON.stringify(val);
+            }
+
+            return String(val);
+        },
     },
 };
 </script>

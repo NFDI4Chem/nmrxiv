@@ -12,9 +12,74 @@
         <template #header>
             <!-- Project header section with background styling -->
             <div class="bg-white index_beams">
-                <!-- Top header bar with owner info and actions -->
-                <div class="border-b bg-white">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div
+                    v-if="workspace && dashboardProject"
+                    class="border-b border-gray-200 dark:border-gray-700"
+                >
+                    <div
+                        v-if="dashboardProject.is_deleted"
+                        class="px-3 py-2 text-center text-red-800 bg-red-50 border-b border-red-100 dark:bg-red-950/40 dark:text-red-100"
+                    >
+                        <b>Warning: </b> This project is deleted. At the end of
+                        the 30-day period, this project and all of its resources
+                        will be deleted permanently and cannot be recovered.
+                    </div>
+                    <div
+                        v-else-if="
+                            !dashboardProject.is_public &&
+                            !dashboardProject.is_published &&
+                            dashboardProject.doi &&
+                            !workspace.preview
+                        "
+                        class="border-b border-teal-200/80 bg-teal-50 px-3 py-3 text-center text-teal-900 dark:border-teal-800/50 dark:bg-teal-950/55 dark:text-teal-100"
+                    >
+                        <p
+                            class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                        >
+                            <b>Info:</b>
+                            This project is in embargo and is scheduled for
+                            release on
+                            <strong
+                                class="font-semibold text-teal-950 dark:text-teal-50"
+                                >{{
+                                    formatDate(
+                                        dashboardProject.release_date,
+                                    )
+                                }}</strong>. You cannot edit the project from this public page;
+                            create a new version to update its contents.
+                            <button
+                                v-if="showReleaseDateEditLink"
+                                type="button"
+                                class="whitespace-nowrap font-semibold text-teal-800 underline decoration-teal-600/45 underline-offset-2 hover:text-teal-950 dark:text-teal-200 dark:decoration-teal-300/50 dark:hover:text-white"
+                                @click="openReleaseDateModal"
+                            >
+                                Edit release date
+                            </button>
+                        </p>
+                    </div>
+                    <template v-else-if="dashboardProject.is_public">
+                        <div
+                            v-if="dashboardProject.is_archived"
+                            class="px-3 py-2 text-center text-yellow-800 bg-yellow-50 border-b border-yellow-100 dark:bg-yellow-950/40 dark:text-yellow-100"
+                        >
+                            <b>Warning: </b> This project is archived. It is now
+                            read-only.
+                        </div>
+                        <div
+                            v-else
+                            class="px-3 py-2 text-center text-green-800 bg-green-50 border-b border-green-100 dark:bg-green-950/40 dark:text-green-100"
+                        >
+                            <b>Info: </b> This project is published. You cannot
+                            edit a published project. Contact us at
+                            info.nmrxiv@uni-jena.de if you need to make changes.
+                        </div>
+                    </template>
+                </div>
+                <!-- Project header: single max-width column (matches tab strip + tab body) -->
+                <div
+                    class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8"
+                >
+                    <div class="border-b border-gray-200 bg-white py-3">
                         <!-- Responsive flex container for header content -->
                         <div
                             class="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
@@ -124,12 +189,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- Project details section -->
-                <div>
-                    <div class="pb-6 border-b border-gray-200">
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div class="relative z-10 pt-5">
+                    <div class="bg-white pb-6">
+                        <div class="relative z-10 pt-5">
                                 <!-- Project photo/banner (optional) -->
                                 <div
                                     v-if="
@@ -150,535 +211,85 @@
                                     <!-- Project title and identifier row -->
                                     <div
                                         v-if="project"
-                                        class="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:space-x-4"
+                                        class="flex flex-col sm:flex-row sm:items-start sm:space-x-4"
                                     >
                                         <!-- Project title -->
                                         <div class="min-w-0 flex-1">
-                                            <h1
-                                                class="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 break-words leading-tight"
-                                            >
-                                                {{
-                                                    toTitleCase(
-                                                        (project.data &&
-                                                            project.data
-                                                                .name) ||
-                                                            project.name ||
-                                                            "Project Name"
-                                                    )
-                                                }}
-                                            </h1>
-                                        </div>
-
-                                        <!-- Project identifier badge -->
-                                        <Tag
-                                            :identifier="
-                                                (project.data &&
-                                                    project.data.identifier) ||
-                                                project.identifier
-                                            "
-                                        />
-                                    </div>
-
-                                    <!-- DOI Badge - Primary identifier for citations -->
-                                    <div
-                                        v-if="
-                                            (project.data &&
-                                                project.data.doi) ||
-                                            project.doi
-                                        "
-                                        class="mt-3"
-                                    >
-                                        <DOIBadge
-                                            :doi="
-                                                (project.data &&
-                                                    project.data.doi) ||
-                                                project.doi
-                                            "
-                                        />
-                                    </div>
-
-                                    <!-- Metadata row with license, dates and other info -->
-                                    <div
-                                        v-if="
-                                            (project.data &&
-                                                project.data.license) ||
-                                            project.license ||
-                                            (project.data &&
-                                                (project.data.release_date ||
-                                                    project.data.created_at)) ||
-                                            project.release_date ||
-                                            project.created_at
-                                        "
-                                        class="mt-3"
-                                    >
-                                        <!-- Mobile-first responsive layout -->
-                                        <div class="space-y-3 sm:space-y-0">
-                                            <!-- Desktop: Single row layout -->
                                             <div
-                                                class="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 text-sm text-gray-600"
+                                                class="flex flex-wrap items-start gap-2"
                                             >
-                                                <!-- License Information -->
-                                                <div
-                                                    v-if="
-                                                        (project.data &&
-                                                            project.data
-                                                                .license) ||
-                                                        project.license
+                                                <button
+                                                    v-if="workspace"
+                                                    type="button"
+                                                    class="mt-1 shrink-0 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                                                    :aria-pressed="
+                                                        dashboardProject?.is_bookmarked
+                                                            ? 'true'
+                                                            : 'false'
                                                     "
-                                                    class="flex items-center space-x-1.5"
+                                                    aria-label="Toggle bookmark"
+                                                    @click="toggleStarred"
                                                 >
-                                                    <ScaleIcon
-                                                        class="h-4 w-4 text-gray-400 flex-shrink-0"
-                                                        aria-hidden="true"
-                                                    />
-                                                    <span class="font-medium"
-                                                        >License:</span
-                                                    >
-                                                    <a
+                                                    <BookmarkIconOutline
                                                         v-if="
-                                                            (project.data &&
-                                                                project.data
-                                                                    .license &&
-                                                                project.data
-                                                                    .license
-                                                                    .url) ||
-                                                            (project.license &&
-                                                                project.license
-                                                                    .url)
+                                                            !dashboardProject?.is_bookmarked
                                                         "
-                                                        :href="
-                                                            (project.data &&
-                                                                project.data
-                                                                    .license &&
-                                                                project.data
-                                                                    .license
-                                                                    .url) ||
-                                                            (project.license &&
-                                                                project.license
-                                                                    .url)
-                                                        "
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        class="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150"
-                                                        :title="
-                                                            'View ' +
-                                                            ((project.data &&
-                                                                project.data
-                                                                    .license &&
-                                                                project.data
-                                                                    .license
-                                                                    .title) ||
-                                                                (project.license &&
-                                                                    project
-                                                                        .license
-                                                                        .title)) +
-                                                            ' license details'
-                                                        "
-                                                    >
-                                                        {{
-                                                            (project.data &&
-                                                                project.data
-                                                                    .license &&
-                                                                project.data
-                                                                    .license
-                                                                    .title) ||
-                                                            (project.license &&
-                                                                project.license
-                                                                    .title)
-                                                        }}
-                                                    </a>
-                                                    <span
+                                                        class="h-6 w-6 text-gray-400 dark:text-gray-500"
+                                                    />
+                                                    <BookmarkIconSolid
                                                         v-else
-                                                        class="font-medium text-gray-900"
-                                                    >
-                                                        {{
+                                                        class="h-6 w-6 text-teal-600 dark:text-teal-400"
+                                                    />
+                                                </button>
+                                                <h1
+                                                    class="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 break-words leading-tight"
+                                                >
+                                                    {{
+                                                        toTitleCase(
                                                             (project.data &&
                                                                 project.data
-                                                                    .license &&
-                                                                project.data
-                                                                    .license
-                                                                    .title) ||
-                                                            (project.license &&
-                                                                project.license
-                                                                    .title)
-                                                        }}
-                                                    </span>
-                                                </div>
-
-                                                <!-- Project Dates -->
-                                                <div
-                                                    v-if="
-                                                        (project.data &&
-                                                            (project.data
-                                                                .release_date ||
-                                                                project.data
-                                                                    .created_at)) ||
-                                                        project.release_date ||
-                                                        project.created_at
-                                                    "
-                                                    class="flex items-center space-x-1.5"
-                                                >
-                                                    <CalendarDaysIcon
-                                                        class="h-4 w-4 text-gray-400 flex-shrink-0"
-                                                        aria-hidden="true"
-                                                    />
-                                                    <div
-                                                        class="flex items-center space-x-3"
-                                                    >
-                                                        <!-- Published date -->
-                                                        <div
-                                                            v-if="
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .release_date) ||
-                                                                project.release_date
-                                                            "
-                                                            class="flex items-center space-x-1"
-                                                        >
-                                                            <span
-                                                                class="font-medium"
-                                                                >Published:</span
-                                                            >
-                                                            <span
-                                                                class="font-medium text-gray-900"
-                                                            >
-                                                                {{
-                                                                    formatDate(
-                                                                        (project.data &&
-                                                                            project
-                                                                                .data
-                                                                                .release_date) ||
-                                                                            project.release_date
-                                                                    )
-                                                                }}
-                                                            </span>
-                                                        </div>
-
-                                                        <!-- Separator -->
-                                                        <div
-                                                            v-if="
-                                                                ((project.data &&
-                                                                    project.data
-                                                                        .release_date) ||
-                                                                    project.release_date) &&
-                                                                ((project.data &&
-                                                                    project.data
-                                                                        .created_at) ||
-                                                                    project.created_at)
-                                                            "
-                                                            class="text-gray-300"
-                                                        >
-                                                            •
-                                                        </div>
-
-                                                        <!-- Created date -->
-                                                        <div
-                                                            v-if="
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .created_at) ||
-                                                                project.created_at
-                                                            "
-                                                            class="flex items-center space-x-1"
-                                                        >
-                                                            <span
-                                                                class="font-medium"
-                                                                >Created:</span
-                                                            >
-                                                            <span
-                                                                class="font-medium text-gray-900"
-                                                            >
-                                                                {{
-                                                                    formatDate(
-                                                                        (project.data &&
-                                                                            project
-                                                                                .data
-                                                                                .created_at) ||
-                                                                            project.created_at
-                                                                    )
-                                                                }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                                    .name) ||
+                                                                project.name ||
+                                                                "Project Name"
+                                                        )
+                                                    }}
+                                                </h1>
                                             </div>
-
-                                            <!-- Mobile: Label-above-value layout -->
                                             <div
-                                                class="sm:hidden space-y-3 text-sm"
+                                                v-if="workspace"
+                                                class="mt-3 flex flex-wrap items-center gap-3"
                                             >
-                                                <!-- License Information -->
-                                                <div
-                                                    v-if="
-                                                        (project.data &&
-                                                            project.data
-                                                                .license) ||
-                                                        project.license
+                                                <access-dialogue
+                                                    :available-roles="
+                                                        workspace.availableRoles
                                                     "
-                                                    class="space-y-1"
-                                                >
-                                                    <div
-                                                        class="flex items-center space-x-1.5 text-gray-600"
-                                                    >
-                                                        <ScaleIcon
-                                                            class="h-4 w-4 text-gray-400 flex-shrink-0"
-                                                            aria-hidden="true"
-                                                        />
-                                                        <span
-                                                            class="font-medium"
-                                                            >License</span
-                                                        >
-                                                    </div>
-                                                    <div class="ml-5.5">
-                                                        <a
-                                                            v-if="
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .license &&
-                                                                    project.data
-                                                                        .license
-                                                                        .url) ||
-                                                                (project.license &&
-                                                                    project
-                                                                        .license
-                                                                        .url)
-                                                            "
-                                                            :href="
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .license &&
-                                                                    project.data
-                                                                        .license
-                                                                        .url) ||
-                                                                (project.license &&
-                                                                    project
-                                                                        .license
-                                                                        .url)
-                                                            "
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            class="font-medium text-blue-600 hover:text-blue-800 underline"
-                                                            :title="'View license details'"
-                                                        >
-                                                            {{
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .license &&
-                                                                    project.data
-                                                                        .license
-                                                                        .title) ||
-                                                                (project.license &&
-                                                                    project
-                                                                        .license
-                                                                        .title)
-                                                            }}
-                                                        </a>
-                                                        <span
-                                                            v-else
-                                                            class="font-medium text-gray-900"
-                                                        >
-                                                            {{
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .license &&
-                                                                    project.data
-                                                                        .license
-                                                                        .title) ||
-                                                                (project.license &&
-                                                                    project
-                                                                        .license
-                                                                        .title)
-                                                            }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Published date -->
-                                                <div
+                                                    :role="workspace.role"
+                                                    :team="workspace.team"
+                                                    :members="workspace.members"
+                                                    :project="dashboardProject"
+                                                    called-from="projectView"
+                                                    model="project"
+                                                />
+                                                <Link
                                                     v-if="
-                                                        (project.data &&
-                                                            project.data
-                                                                .release_date) ||
-                                                        project.release_date
+                                                        workspace
+                                                            .projectPermissions
+                                                            ?.canManageSettings
                                                     "
-                                                    class="space-y-1"
-                                                >
-                                                    <div
-                                                        class="flex items-center space-x-1.5 text-gray-600"
-                                                    >
-                                                        <CalendarDaysIcon
-                                                            class="h-4 w-4 text-gray-400 flex-shrink-0"
-                                                            aria-hidden="true"
-                                                        />
-                                                        <span
-                                                            class="font-medium"
-                                                            >Published</span
-                                                        >
-                                                    </div>
-                                                    <div class="ml-5.5">
-                                                        <span
-                                                            class="font-medium text-gray-900"
-                                                        >
-                                                            {{
-                                                                formatDate(
-                                                                    (project.data &&
-                                                                        project
-                                                                            .data
-                                                                            .release_date) ||
-                                                                        project.release_date
-                                                                )
-                                                            }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Created date -->
-                                                <div
-                                                    v-if="
-                                                        (project.data &&
-                                                            project.data
-                                                                .created_at) ||
-                                                        project.created_at
+                                                    :href="
+                                                        route(
+                                                            'dashboard.project.settings',
+                                                            project.data.id
+                                                        )
                                                     "
-                                                    class="space-y-1"
+                                                    class="text-sm font-semibold text-gray-800 hover:text-teal-700 dark:text-gray-200"
                                                 >
-                                                    <div
-                                                        class="flex items-center space-x-1.5 text-gray-600"
-                                                    >
-                                                        <CalendarDaysIcon
-                                                            class="h-4 w-4 text-gray-400 flex-shrink-0"
-                                                            aria-hidden="true"
-                                                        />
-                                                        <span
-                                                            class="font-medium"
-                                                            >Created</span
-                                                        >
-                                                    </div>
-                                                    <div class="ml-5.5">
-                                                        <span
-                                                            class="font-medium text-gray-900"
-                                                        >
-                                                            {{
-                                                                formatDate(
-                                                                    (project.data &&
-                                                                        project
-                                                                            .data
-                                                                            .created_at) ||
-                                                                        project.created_at
-                                                                )
-                                                            }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        v-if="
-                                            ((project.data &&
-                                                project.data.tags) ||
-                                                project.tags) &&
-                                            ((project.data &&
-                                                project.data.tags &&
-                                                project.data.tags.length > 0) ||
-                                                (project.tags &&
-                                                    project.tags.length > 0))
-                                        "
-                                        class="mt-4"
-                                    >
-                                        <!-- Desktop: Full tags display via Tag component -->
-                                        <Tag
-                                            :tags="
-                                                (project.data &&
-                                                    project.data.tags) ||
-                                                project.tags
-                                            "
-                                        />
-
-                                        <!-- Mobile: Compact tags display -->
-                                        <div class="sm:hidden">
-                                            <div class="space-y-2">
-                                                <!-- Tags label -->
-                                                <div
-                                                    class="flex items-center space-x-1.5 text-sm text-gray-600"
-                                                >
-                                                    <TagIcon
-                                                        class="h-4 w-4 text-gray-400 flex-shrink-0"
-                                                        aria-hidden="true"
-                                                    />
-                                                    <span class="font-medium"
-                                                        >Tags</span
-                                                    >
-                                                </div>
-
-                                                <!-- Limited tags with show more -->
-                                                <div class="ml-5.5">
-                                                    <div
-                                                        class="flex flex-wrap gap-1.5"
-                                                    >
-                                                        <a
-                                                            v-for="tag in (
-                                                                (project.data &&
-                                                                    project.data
-                                                                        .tags) ||
-                                                                project.tags
-                                                            ).slice(
-                                                                0,
-                                                                showAllTags
-                                                                    ? undefined
-                                                                    : 3
-                                                            )"
-                                                            :key="tag.id"
-                                                            class="inline-flex items-center rounded-md bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
-                                                            :href="
-                                                                '/projects?tag=' +
-                                                                tag.name.en
-                                                            "
-                                                        >
-                                                            {{ tag.name.en }}
-                                                        </a>
-
-                                                        <!-- Show more/less button -->
-                                                        <button
-                                                            v-if="
-                                                                (
-                                                                    (project.data &&
-                                                                        project
-                                                                            .data
-                                                                            .tags) ||
-                                                                    project.tags
-                                                                ).length > 3
-                                                            "
-                                                            class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 hover:bg-blue-100 transition-colors duration-150 cursor-pointer"
-                                                            @click="
-                                                                showAllTags =
-                                                                    !showAllTags
-                                                            "
-                                                        >
-                                                            {{
-                                                                showAllTags
-                                                                    ? "Show less"
-                                                                    : `+${
-                                                                          (
-                                                                              (project.data &&
-                                                                                  project
-                                                                                      .data
-                                                                                      .tags) ||
-                                                                              project.tags
-                                                                          )
-                                                                              .length -
-                                                                          3
-                                                                      } more`
-                                                            }}
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                    Project settings
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -688,37 +299,47 @@
         <main
             class="flex-1 relative z-0 overflow-y-auto focus:outline-none xl:order-last"
         >
-            <div>
+            <!-- Same max-width + horizontal padding as project header -->
+            <div
+                class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8"
+            >
                 <!-- Navigation tabs section -->
                 <div class="mt-6 sm:mt-2 2xl:mt-5">
                     <div class="border-b border-gray-200">
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <!-- Tab navigation bar -->
-                            <nav
-                                class="-mb-px flex space-x-8"
-                                aria-label="Tabs"
+                        <!-- Tab navigation bar -->
+                        <nav
+                            class="-mb-px flex space-x-8"
+                            aria-label="Tabs"
+                        >
+                            <!-- Individual tab links -->
+                            <Link
+                                v-for="tab in tabs"
+                                :key="tab.name"
+                                :href="
+                                    project.data.public_url +
+                                    '?tab=' +
+                                    tab.name
+                                "
+                                :class="[
+                                    selectedTab == tab.name
+                                        ? 'border-pink-500 text-gray-900'
+                                        : '',
+                                    'cursor-pointer text-gray-900 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                                ]"
+                                aria-current="page"
                             >
-                                <!-- Individual tab links -->
-                                <Link
-                                    v-for="tab in tabs"
-                                    :key="tab.name"
-                                    :href="
-                                        project.data.public_url +
-                                        '?tab=' +
-                                        tab.name
+                                <span class="capitalize">{{ tab.name }}</span>
+                                <span
+                                    v-if="
+                                        tab.name === 'samples' &&
+                                        samplesTabCount !== null
                                     "
-                                    :class="[
-                                        selectedTab == tab.name
-                                            ? 'border-pink-500 text-gray-900'
-                                            : '',
-                                        'cursor-pointer capitalize text-gray-900 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-                                    ]"
-                                    aria-current="page"
+                                    class="ml-0.5 font-medium text-gray-500 normal-case dark:text-gray-400"
                                 >
-                                    {{ tab.name }}
-                                </Link>
-                            </nav>
-                        </div>
+                                    ({{ samplesTabCount }})
+                                </span>
+                            </Link>
+                        </nav>
                     </div>
                 </div>
 
@@ -729,6 +350,134 @@
                 </div>
             </div>
         </main>
+
+        <jet-dialog-modal
+            :show="showReleaseDateModal"
+            max-width="2xl"
+            @close="closeReleaseDateModal"
+        >
+            <template #title>
+                Update release date
+            </template>
+
+            <template #content>
+                <div v-if="releaseDateModalError" class="mb-4">
+                    <div
+                        class="rounded-md bg-red-50 p-4 dark:bg-red-950/40"
+                        role="alert"
+                    >
+                        <p
+                            class="text-sm font-medium text-red-800 dark:text-red-200"
+                        >
+                            Could not update release date
+                        </p>
+                        <p class="mt-1 text-sm text-red-700 dark:text-red-300">
+                            {{ releaseDateModalError }}
+                        </p>
+                    </div>
+                </div>
+
+                <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                    Release date
+                </label>
+                <Datepicker
+                    v-model="releaseDateForm.release_date"
+                    :format="customDateFormat"
+                    :min-date="new Date()"
+                    :preview-format="customDateFormat"
+                />
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Choose when this project becomes public. Validation rules
+                    follow your selected date (for example, citation DOIs are
+                    required when the date is today or in the past).
+                </p>
+
+                <div class="mt-5">
+                    <h3
+                        class="text-lg font-bold text-gray-400 dark:text-gray-500"
+                    >
+                        Terms & Conditions
+                    </h3>
+                    <div class="mt-3">
+                        <div class="ml-2 flex items-start">
+                            <input
+                                id="public-release-conditions"
+                                v-model="releaseDateAck.conditions"
+                                type="checkbox"
+                                class="mt-1 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-800"
+                            />
+                            <label
+                                for="public-release-conditions"
+                                class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                            >
+                                I understand that publishing makes all
+                                underlying data publicly available on the nmrXiv
+                                platform after the set release date.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="ml-2 flex items-start">
+                            <input
+                                id="public-release-terms"
+                                v-model="releaseDateAck.terms"
+                                type="checkbox"
+                                class="mt-1 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-800"
+                            />
+                            <label
+                                for="public-release-terms"
+                                class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                            >
+                                I agree to the
+                                <a
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    :href="route('terms.show')"
+                                    class="underline text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                    >Terms of Service</a
+                                >
+                                and
+                                <a
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    :href="route('policy.show')"
+                                    class="underline text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                    >Privacy Policy</a
+                                >
+                                and hereby also grant nmrXiv permissions to
+                                distribute the datasets (and meta-data) under
+                                the specified license.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template #footer>
+                <jet-secondary-button type="button" @click="closeReleaseDateModal">
+                    Cancel
+                </jet-secondary-button>
+                <jet-success-button
+                    type="button"
+                    class="ml-2"
+                    :class="[
+                        !releaseDateAck.terms || !releaseDateAck.conditions
+                            ? 'bg-gray-200 cursor-not-allowed dark:bg-gray-700'
+                            : 'bg-primary-600 hover:bg-primary-700',
+                    ]"
+                    :disabled="
+                        releaseDateForm.processing ||
+                        !releaseDateAck.terms ||
+                        !releaseDateAck.conditions
+                    "
+                    @click="submitReleaseDateUpdate"
+                >
+                    Update release date
+                </jet-success-button>
+            </template>
+        </jet-dialog-modal>
     </app-layout>
 </template>
 
@@ -745,23 +494,24 @@
  * - Project header with owner information and profile photo
  * - Interactive upvote/like functionality with authentication checks
  * - Download button for project data access
- * - DOI badge for academic citations
- * - Responsive metadata display (license, dates, tags)
- * - Mobile-optimized tag display with show more/less functionality
  * - Tab navigation system for different project sections
  * - Proper title case formatting for project names
  */
 
 // Layout and navigation imports
 import AppLayout from "@/Layouts/AppLayout.vue";
+import AccessDialogue from "@/Shared/AccessDialogue.vue";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
+import Datepicker from "@vuepic/vue-datepicker";
 import { Link, router } from "@inertiajs/vue3";
+import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/vue/24/solid";
+import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/vue/24/outline";
+
+import "@vuepic/vue-datepicker/dist/main.css";
 
 // Icon imports from Heroicons
-import { ScaleIcon, CalendarDaysIcon, TagIcon } from "@heroicons/vue/24/solid";
-
-// Shared component imports
-import DOIBadge from "@/Shared/DOIBadge.vue";
-import Tag from "@/Shared/Tag.vue";
 
 export default {
     name: "PublicProjectLayout",
@@ -771,12 +521,14 @@ export default {
      */
     components: {
         AppLayout, // Main application layout wrapper
+        AccessDialogue,
+        JetDialogModal,
+        JetSecondaryButton,
+        JetSuccessButton,
+        Datepicker,
         Link, // Inertia.js Link component for navigation
-        ScaleIcon, // License/legal icon
-        CalendarDaysIcon, // Calendar icon for dates
-        TagIcon, // Tag icon for project tags
-        DOIBadge, // DOI badge component for citations
-        Tag, // Reusable identifier badge component (renamed)
+        BookmarkIconSolid,
+        BookmarkIconOutline,
     },
 
     /**
@@ -816,13 +568,13 @@ export default {
      */
     data() {
         return {
-            /**
-             * Controls tag display on mobile devices
-             * When false, shows only first 3 tags with "show more" button
-             * When true, shows all tags with "show less" button
-             */
-            showAllTags: false,
-
+            showReleaseDateModal: false,
+            releaseDateModalError: null,
+            releaseDateAck: {
+                conditions: false,
+                terms: false,
+            },
+            releaseDateForm: null,
             /**
              * Available navigation tabs for the project
              * Each tab represents a different section of project information
@@ -843,11 +595,6 @@ export default {
                     description: "Project files and data browser",
                     icon: "",
                 },
-                {
-                    name: "license",
-                    description: "License and usage information",
-                    icon: "",
-                },
             ],
         };
     },
@@ -863,12 +610,136 @@ export default {
         url() {
             return String(this.$page.props.url);
         },
+        workspace() {
+            return this.$page.props.workspace ?? null;
+        },
+        dashboardProject() {
+            return this.workspace?.dashboardProject ?? null;
+        },
+        samplesTabCount() {
+            const raw = this.project?.data?.samples_count;
+
+            return typeof raw === "number" && Number.isFinite(raw)
+                ? raw
+                : null;
+        },
+        showReleaseDateEditLink() {
+            const p = this.dashboardProject;
+            const w = this.workspace;
+            if (!p || !w || w.preview) {
+                return false;
+            }
+
+            return (
+                !p.is_public &&
+                !p.is_published &&
+                Boolean(p.doi)
+            );
+        },
+    },
+
+    created() {
+        this.releaseDateForm = this.$inertia.form({
+            _method: "PUT",
+            name: "",
+            enableProjectMode: false,
+            release_date: null,
+        });
+    },
+
+    mounted() {
+        this.$nextTick(() => {
+            this.handleReleaseDateEditQueryParam();
+        });
     },
 
     /**
      * Component methods
      */
     methods: {
+        openReleaseDateModal() {
+            const p = this.dashboardProject;
+            if (!p?.id) {
+                return;
+            }
+            this.releaseDateAck = { conditions: false, terms: false };
+            this.releaseDateModalError = null;
+            this.releaseDateForm.name = p.name;
+            this.releaseDateForm.enableProjectMode = Boolean(
+                p.enableProjectMode ?? p.enable_project_mode,
+            );
+            this.releaseDateForm.release_date = p.release_date;
+            this.releaseDateForm.clearErrors();
+            this.showReleaseDateModal = true;
+        },
+
+        closeReleaseDateModal() {
+            this.showReleaseDateModal = false;
+            this.releaseDateModalError = null;
+        },
+
+        stripReleaseDateEditQueryFromUrl() {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get("edit") !== "release_date") {
+                return;
+            }
+            url.searchParams.delete("edit");
+            const search = url.searchParams.toString();
+            const next =
+                url.pathname + (search ? `?${search}` : "") + url.hash;
+            window.history.replaceState({}, "", next);
+        },
+
+        handleReleaseDateEditQueryParam() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("edit") !== "release_date") {
+                return;
+            }
+            if (this.showReleaseDateEditLink) {
+                this.openReleaseDateModal();
+            }
+            this.stripReleaseDateEditQueryFromUrl();
+        },
+
+        submitReleaseDateUpdate() {
+            if (
+                !this.releaseDateAck.conditions ||
+                !this.releaseDateAck.terms ||
+                !this.dashboardProject?.id
+            ) {
+                return;
+            }
+            this.releaseDateModalError = null;
+            this.releaseDateForm.put(
+                this.route(
+                    "dashboard.project.updateReleaseDate",
+                    this.dashboardProject.id,
+                ),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.showReleaseDateModal = false;
+                        router.reload({ only: ["project", "workspace"] });
+                    },
+                    onError: (errors) => {
+                        const keys = Object.keys(errors);
+                        if (keys.length === 0) {
+                            this.releaseDateModalError =
+                                "Could not update release date.";
+                        } else {
+                            const k = keys[0];
+                            const v = errors[k];
+                            this.releaseDateModalError = Array.isArray(v)
+                                ? v[0]
+                                : String(
+                                      v ?? "Could not update release date.",
+                                  );
+                        }
+                    },
+                },
+            );
+        },
+
         /**
          * Toggle the upvote/like status for the current project
          *
@@ -881,6 +752,21 @@ export default {
          * The method includes error handling for API failures and
          * uses Inertia's selective reloading for better performance.
          */
+        toggleStarred() {
+            if (!this.project?.data?.id) {
+                return;
+            }
+            window.axios
+                .get(
+                    this.route("project.toggle-starred", [
+                        this.project.data.id,
+                    ])
+                )
+                .then(() => {
+                    router.reload({ only: ["project", "workspace"] });
+                })
+                .catch(() => {});
+        },
         toggleUpVote() {
             // Check if user is authenticated
             if (

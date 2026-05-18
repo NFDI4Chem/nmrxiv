@@ -548,9 +548,7 @@ export default {
             if (!project.is_public) {
                 if (project.draft_id) {
                     if (project.is_deleted) {
-                        return router.visit(
-                            this.route("dashboard.projects", [project.id])
-                        );
+                        return router.visit(this.projectHomeHref(project));
                     } else {
                         if (
                             project.draft.current_step &&
@@ -568,9 +566,7 @@ export default {
                     }
                 } else {
                     if (project.doi && project.release_date) {
-                        return router.visit(
-                            this.route("dashboard.projects", [project.id])
-                        );
+                        return router.visit(this.projectHomeHref(project));
                     } else {
                         alert(
                             "Draft missing. Please contact us at info.nmrxiv@uni-jena.de."
@@ -578,13 +574,18 @@ export default {
                     }
                 }
             } else {
-                return router.visit(
-                    this.route("dashboard.projects", [project.id])
-                );
+                return router.visit(this.projectHomeHref(project));
             }
         },
+        projectHomeHref(project) {
+            if (project?.identifier) {
+                return project.public_url;
+            }
+
+            return this.route("dashboard.projects", [project.id]);
+        },
         getProjectSummaryLink(project) {
-            return route("dashboard.projects", [project.id]);
+            return this.projectHomeHref(project);
         },
         getProjectSettingsLink(project) {
             return route("dashboard.project.settings", [project.id]);
@@ -660,8 +661,7 @@ export default {
         },
         openReleaseDateModalForProject(project) {
             const url =
-                this.route("dashboard.projects", [project.id]) +
-                "?edit=release_date";
+                this.projectHomeHref(project) + "?edit=release_date";
             window.open(url, "_blank");
         },
         reviewerPreviewUrl(project) {

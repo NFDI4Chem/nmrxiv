@@ -6,9 +6,17 @@
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <!-- Main content container -->
-            <div
-                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6"
-            >
+            <div class="pb-10 mb-10 pt-4 pb-6">
+                <study-index
+                    v-if="showWorkspaceStudyManager"
+                    :editable="true"
+                    :project="workspace.dashboardProject"
+                    :preview="false"
+                    :role="workspace.role"
+                    studies-endpoint="dashboard"
+                    :team-role="workspace.teamRole"
+                />
+                <template v-else>
                 <!-- Search controls section -->
                 <div class="flex items-baseline justify-between">
                     <div>
@@ -175,6 +183,7 @@
                     </svg>
                     Loading...
                 </div>
+                </template>
             </div>
         </template>
     </project-layout>
@@ -189,6 +198,7 @@
  */
 
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
+import StudyIndex from "@/Pages/Study/Index.vue";
 import StudyCard from "@/Shared/StudyCardPublic.vue";
 import { Head } from "@inertiajs/vue3";
 
@@ -197,6 +207,7 @@ export default {
 
     components: {
         ProjectLayout,
+        StudyIndex,
         StudyCard,
         Head,
     },
@@ -214,6 +225,18 @@ export default {
         },
     },
 
+    computed: {
+        workspace() {
+            return this.$page.props.workspace ?? null;
+        },
+        showWorkspaceStudyManager() {
+            return (
+                this.workspace &&
+                this.workspace.projectPermissions?.canUpdateProject
+            );
+        },
+    },
+
     data() {
         return {
             /** Loading state indicator */
@@ -226,7 +249,9 @@ export default {
     },
 
     mounted() {
-        // Initialize studies data on component mount
+        if (this.showWorkspaceStudyManager) {
+            return;
+        }
         if (this.project) {
             this.fetchStudies(route("project.studies", this.project.data.id));
         }

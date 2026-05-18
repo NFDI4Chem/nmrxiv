@@ -12,7 +12,27 @@
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <!-- Main content container with responsive padding -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+            <div class="pt-4 pb-6">
+                <div
+                    v-if="workspace && canUpdateProject"
+                    class="mb-4 rounded-md border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:border-teal-900/40 dark:bg-teal-950/30 dark:text-teal-100"
+                >
+                    <span>Need to add or replace files?</span>
+                    <Link
+                        :href="
+                            route(
+                                'dashboard.project.settings',
+                                project.data.id
+                            )
+                        "
+                        class="ml-1 font-semibold text-teal-800 underline hover:text-teal-950 dark:text-teal-200"
+                    >
+                        Open project settings
+                    </Link>
+                    <span class="hidden sm:inline">
+                        in the dashboard (upload and file tools).
+                    </span>
+                </div>
                 <!-- File browser section - only shown if project has files -->
                 <div v-if="project.data.files">
                     <!-- Breadcrumb navigation - hidden on mobile, shown on desktop -->
@@ -135,7 +155,7 @@ import FileSystemBrowser from "./../../../Shared/FileSystemBrowser.vue";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/vue/24/solid";
 
 // Inertia.js imports
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 export default {
     name: "ProjectFiles",
@@ -149,6 +169,7 @@ export default {
         HomeIcon, // Home icon for root breadcrumb
         FileSystemBrowser, // Main file browser component
         Head, // Inertia head component for page title
+        Link,
     },
 
     /**
@@ -172,6 +193,14 @@ export default {
      * Computed properties
      */
     computed: {
+        workspace() {
+            return this.$page.props.workspace ?? null;
+        },
+        canUpdateProject() {
+            return (
+                this.workspace?.projectPermissions?.canUpdateProject === true
+            );
+        },
         /**
          * Get the base URL from page props
          * @returns {String} Base application URL

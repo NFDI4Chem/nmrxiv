@@ -1,3 +1,8 @@
+<!--
+  Dashboard-only project home: used when the project has no public P-id yet, and for
+  obfuscated reviewer preview (ProjectController@review). Projects with a numeric
+  identifier redirect to the unified public shell at /project/P{n}.
+-->
 <template>
     <app-layout :title="project.name">
         <template #header>

@@ -451,7 +451,11 @@ export default {
                         setTimeout(() => this.trackProject(), 10000);
                     } else {
                         return this.$inertia.visit(
-                            this.route("dashboard.projects", [this.project.id])
+                            this.project?.identifier
+                                ? this.project.public_url
+                                : this.route("dashboard.projects", [
+                                      this.project.id,
+                                  ])
                         );
                     }
                 });

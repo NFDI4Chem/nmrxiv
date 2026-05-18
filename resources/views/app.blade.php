@@ -52,7 +52,7 @@
 
     </head>
     <body class="font-sans antialiased h-full">
-        @env (['development', 'local'])
+        <!-- @env (['development', 'local'])
         <div
             class="z-20 fixed bottom-0 bg-yellow-300 border-b w-screen border-black-800"
         >
@@ -60,7 +60,7 @@
               <small><b>DEMO SITE WARNING</b>: Please be aware that this is a demo/test server for nmrXiv and don't upload or save any sensitive data. For real data please visit <a href="https://nmrxiv.org" target="_blank" style=color:blue>nmrxiv.org.</a></small>
             </div>
         </div>
-        @endenv
+        @endenv -->
         
         @inertia
 

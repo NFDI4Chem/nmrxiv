@@ -16,10 +16,10 @@
         id="fs-dropzone"
         :class="[
             fullScreen
-                ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
+                ? 'fixed inset-0 flex h-screen w-screen flex-col -ml-4 -mt-6 overflow-hidden sm:ml-0 md:-ml-0 md:w-auto'
                 : height
                 ? `flex flex-col min-h-0 ${height} overflow-hidden`
-                : 'min-h-0 h-screen overflow-hidden',
+                : 'flex h-screen min-h-0 flex-col overflow-hidden',
             'bg-white rounded-lg',
         ]"
     >
