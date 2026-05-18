@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Dataset;
 use App\Models\Molecule;
+use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class ApplicationControllerTest extends TestCase
@@ -163,11 +165,14 @@ class ApplicationControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_resolve_project_renders_license_tab(): void
+    public function test_resolve_project_license_tab_renders_info(): void
     {
         $response = $this->get('/project/P1?tab=license');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Project/Show')
+            ->where('tab', 'info'));
     }
 
     public function test_resolve_project_returns_404_for_non_existent_project(): void
@@ -214,6 +219,9 @@ class ApplicationControllerTest extends TestCase
         $response = $this->get('/sample/S1');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Project/Study')
+        );
     }
 
     public function test_resolve_study_renders_study_without_project_when_no_project(): void
@@ -228,6 +236,9 @@ class ApplicationControllerTest extends TestCase
         $response = $this->get('/sample/S2');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Sample/Show')
+        );
     }
 
     public function test_resolve_dataset_renders_dataset_tab(): void
@@ -235,6 +246,31 @@ class ApplicationControllerTest extends TestCase
         $response = $this->get('/dataset/D1');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Project/Dataset')
+        );
+    }
+
+    public function test_resolve_dataset_includes_nmrium_info_when_nmrium_present(): void
+    {
+        NMRium::factory()->forDataset($this->dataset)->create([
+            'nmrium_info' => [
+                'version' => '4',
+                'data' => [
+                    'spectra' => [
+                        ['id' => 'test-spectrum'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->get('/dataset/D1');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Project/Dataset')
+            ->where('dataset.data.nmrium_info.version', '4')
+        );
     }
 
     public function test_resolve_dataset_returns_404_for_non_existent_dataset(): void

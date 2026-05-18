@@ -16,11 +16,12 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
-use Auth;
+use App\Support\ProjectWorkspace;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +34,7 @@ use Maize\Markable\Models\Like;
 
 class ProjectController extends Controller
 {
-    public function publicProjectView(Request $request, $owner, $slug)
+    public function publicProjectView(Request $request, $owner, $slug, GetLicense $getLicense)
     {
         $user = User::where('username', $owner)->firstOrFail();
 
@@ -45,42 +46,45 @@ class ProjectController extends Controller
             }
         }
 
+        $render = fn (string $component, array $props) => Inertia::render($component, array_merge(
+            $props,
+            ProjectWorkspace::inertiaPropsForPublicProject($request, $project, $getLicense)
+        ));
+
         $tab = $request->get('tab');
         if ($tab == 'info') {
-            return Inertia::render('Public/Project/Show', [
+            return $render('Public/Project/Show', [
                 'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
                 'tab' => $tab,
             ]);
-        } elseif ($tab == 'samples') {
-            return Inertia::render('Public/Project/Studies', [
-                'project' => (new ProjectResource($project))->lite(false, ['studies']),
+        }
+        if ($tab == 'samples') {
+            return $render('Public/Project/Samples', [
+                'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
             ]);
-        } elseif ($tab == 'files') {
-            return Inertia::render('Public/Project/Files', [
+        }
+        if ($tab == 'files') {
+            return $render('Public/Project/Files', [
                 'project' => (new ProjectResource($project))->lite(false, ['files']),
                 'tab' => $tab,
             ]);
-        } elseif ($tab == 'license') {
-            return Inertia::render('Public/Project/License', [
-                'project' => (new ProjectResource($project))->lite(false, ['license']),
-                'tab' => $tab,
-            ]);
-        } elseif ($tab == 'study') {
+        }
+        if ($tab == 'study') {
             $studyId = $request->get('id');
-            $study = Study::where([['slug', $studyId], ['owner_id', $user->id],  ['project_id', $project->id]])->firstOrFail();
+            $study = Study::where([['slug', $studyId], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
 
-            return Inertia::render('Public/Project/Study', [
+            return $render('Public/Project/Study', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
                 'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
             ]);
-        } else {
-            return Inertia::render('Public/Project/Show', [
-                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                'tab' => 'info',
-            ]);
         }
+
+        return $render('Public/Project/Show', [
+            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+            'tab' => 'info',
+        ]);
     }
 
     public function publicProjectsView(Request $request)
@@ -121,27 +125,26 @@ class ProjectController extends Controller
             throw new AuthorizationException;
         }
 
-        $team = $project->nonPersonalTeam;
-        $user = Auth::user();
-        $license = null;
-        if ($project->license_id) {
-            $license = $getLicense->getLicensebyId($project->license_id);
+        $rawIdentifier = $project->getRawOriginal('identifier');
+        if ($rawIdentifier !== null && $rawIdentifier !== '') {
+            $targetUrl = route('public.project.id', ['id' => 'P'.$rawIdentifier]);
+            $query = array_intersect_key(
+                $request->query(),
+                array_flip(['edit', 'tab'])
+            );
+            if ($query !== []) {
+                $targetUrl .= '?'.http_build_query($query);
+            }
+
+            return redirect()->to($targetUrl);
         }
 
-        return Inertia::render('Project/Show', [
-            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner'),
-            'team' => $team ? $team->load(['users', 'owner']) : null,
-            'members' => $project->allUsers(),
-            'availableRoles' => array_values(Jetstream::$roles),
-            'role' => $project->userProjectRole($user->email),
-            'teamRole' => $user->belongsToTeam($team) ? $user->teamRole($team) : null,
-            'license' => $license,
-            'projectPermissions' => [
-                'canDeleteProject' => Gate::check('deleteProject', $project),
-                'canUpdateProject' => Gate::check('updateProject', $project),
-                'canManageSettings' => Gate::check('manageSettings', $project),
+        return Inertia::render('Project/Show', array_merge(
+            [
+                'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner'),
             ],
-        ]);
+            ProjectWorkspace::dashboardShowCompanionProps($request, $project, $getLicense)
+        ));
     }
 
     public function review(Request $request, $obfuscationCode, GetLicense $getLicense)
@@ -374,8 +377,7 @@ class ProjectController extends Controller
                         ]);
                     }
 
-                    return redirect()
-                        ->route('dashboard.projects', $project)
+                    return $this->redirectToProjectCanonicalHome($project)
                         ->with('success', 'Your submission has been queued for processing.');
                 } else {
                     $project->refresh();
@@ -468,12 +470,24 @@ class ProjectController extends Controller
                     ]);
                 }
 
-                return redirect()
-                    ->route('dashboard.projects', $project)
+                return $this->redirectToProjectCanonicalHome($project)
                     ->with('success', 'Your submission has been queued for processing.');
             }
         }
 
+    }
+
+    /**
+     * Prefer the stable public URL when the project already has an assigned identifier.
+     */
+    protected function redirectToProjectCanonicalHome(Project $project): RedirectResponse
+    {
+        $rawIdentifier = $project->getRawOriginal('identifier');
+        if ($rawIdentifier !== null && $rawIdentifier !== '') {
+            return redirect()->route('public.project.id', ['id' => 'P'.$rawIdentifier]);
+        }
+
+        return redirect()->route('dashboard.projects', $project);
     }
 
     /**

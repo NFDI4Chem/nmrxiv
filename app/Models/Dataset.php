@@ -155,6 +155,42 @@ class Dataset extends Model implements Auditable
     }
 
     /**
+     * NMRium workspace payload for this dataset, normalized for API and UI.
+     * Molecule headers are merged from the study sample when present.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function normalizedNmriumInfo(): ?array
+    {
+        $nmrium = $this->nmrium;
+        if (! $nmrium) {
+            return null;
+        }
+
+        $nmriumInfo = $nmrium->nmrium_info;
+        if (is_string($nmriumInfo)) {
+            $nmriumInfo = json_decode($nmriumInfo, true);
+        }
+        if (! is_array($nmriumInfo)) {
+            $nmriumInfo = [];
+        }
+        if (! isset($nmriumInfo['data']) || ! is_array($nmriumInfo['data'])) {
+            $nmriumInfo['data'] = [];
+        }
+        if (! isset($nmriumInfo['data']['molecules']) || ! is_array($nmriumInfo['data']['molecules'])) {
+            $nmriumInfo['data']['molecules'] = [];
+        }
+
+        $sample = optional($this->study)->sample;
+        if ($sample) {
+            $nmriumInfo['data']['molecules'] = $sample
+                ->mergeNmriumMolecules($nmriumInfo['data']['molecules']);
+        }
+
+        return $nmriumInfo;
+    }
+
+    /**
      * The directory/file backing this dataset.
      *
      * The canonical link is `datasets.fs_id -> file_system_objects.id`,

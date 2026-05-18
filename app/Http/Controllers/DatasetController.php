@@ -35,34 +35,9 @@ class DatasetController extends Controller
 
     public function fetchNMRium(Request $request, Dataset $dataset)
     {
-        if ($dataset) {
-            $nmrium = $dataset->nmrium;
-            if ($nmrium) {
-                $nmriumInfo = $nmrium->nmrium_info;
-                if (is_string($nmriumInfo)) {
-                    $nmriumInfo = json_decode($nmriumInfo, true);
-                }
-                if (! is_array($nmriumInfo)) {
-                    $nmriumInfo = [];
-                }
-                if (! isset($nmriumInfo['data']) || ! is_array($nmriumInfo['data'])) {
-                    $nmriumInfo['data'] = [];
-                }
-                if (! isset($nmriumInfo['data']['molecules']) || ! is_array($nmriumInfo['data']['molecules'])) {
-                    $nmriumInfo['data']['molecules'] = [];
-                }
+        $dataset->loadMissing(['study.sample']);
 
-                $sample = optional($dataset->study)->sample;
-                if ($sample) {
-                    $nmriumInfo['data']['molecules'] = $sample
-                        ->mergeNmriumMolecules($nmriumInfo['data']['molecules']);
-                }
-
-                return $nmriumInfo;
-            } else {
-                return null;
-            }
-        }
+        return $dataset->normalizedNmriumInfo();
     }
 
     public function nmriumInfo(Request $request, Dataset $dataset)

@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\License\GetLicense;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use App\Models\Project;
+use App\Support\ProjectWorkspace;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class ApplicationController extends Controller
 {
@@ -56,9 +60,9 @@ class ApplicationController extends Controller
      *
      * @return Inertia\Inertia
      */
-    public function resolveSample(Request $request, $identifier)
+    public function resolveSample(Request $request, $identifier, GetLicense $getLicense)
     {
-        return $this->resolve($request, $identifier);
+        return $this->resolve($request, $identifier, $getLicense);
     }
 
     /**
@@ -66,9 +70,9 @@ class ApplicationController extends Controller
      *
      * @return Inertia\Inertia
      */
-    public function resolveProject(Request $request, $identifier)
+    public function resolveProject(Request $request, $identifier, GetLicense $getLicense)
     {
-        return $this->resolve($request, $identifier);
+        return $this->resolve($request, $identifier, $getLicense);
     }
 
     /**
@@ -76,9 +80,9 @@ class ApplicationController extends Controller
      *
      * @return Inertia\Inertia
      */
-    public function resolveDataset(Request $request, $identifier)
+    public function resolveDataset(Request $request, $identifier, GetLicense $getLicense)
     {
-        return $this->resolve($request, $identifier);
+        return $this->resolve($request, $identifier, $getLicense);
     }
 
     /**
@@ -87,13 +91,12 @@ class ApplicationController extends Controller
      *
      * @return Inertia\Inertia
      */
-    public function resolve(Request $request, $identifier)
+    public function resolve(Request $request, $identifier, GetLicense $getLicense)
     {
         $resolvedModel = resolveIdentifier($identifier);
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];
         if ($model) {
-            $studyId = $request->get('id');
             $tab = $request->get('tab');
 
             if ($namespace == 'Project') {
@@ -110,6 +113,7 @@ class ApplicationController extends Controller
                 $tab = 'study';
             } elseif ($namespace == 'Dataset') {
                 $dataset = $model;
+                $dataset->loadMissing(['nmrium', 'study.sample']);
                 $study = $dataset->study;
                 $project = $dataset->project;
                 $tab = 'dataset';
@@ -117,61 +121,96 @@ class ApplicationController extends Controller
 
             switch ($tab) {
                 case 'info':
-                    return Inertia::render('Public/Project/Show', [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                        'tab' => $tab,
-                    ]);
-                    break;
+                    return $this->renderPublicProject(
+                        'Public/Project/Show',
+                        [
+                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                            'tab' => $tab,
+                        ],
+                        $request,
+                        $project,
+                        $getLicense
+                    );
                 case 'samples':
-                    return Inertia::render('Public/Project/Samples', [
-                        'project' => (new ProjectResource($project))->lite(false, []),
-                        'tab' => $tab,
-                    ]);
-                    break;
-                case 'files':
-                    return Inertia::render('Public/Project/Files', [
-                        'project' => (new ProjectResource($project))->lite(false, ['files']),
-                        'tab' => $tab,
-                    ]);
-                    break;
-                case 'license':
-                    return Inertia::render('Public/Project/License', [
-                        'project' => (new ProjectResource($project))->lite(false, ['license']),
-                        'tab' => $tab,
-                    ]);
-                    break;
-                case 'study':
-                    if ($project) {
-                        return Inertia::render('Public/Project/Study', [
+                    return $this->renderPublicProject(
+                        'Public/Project/Samples',
+                        [
                             'project' => (new ProjectResource($project))->lite(false, []),
                             'tab' => $tab,
-                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
-                        ]);
-                        break;
-                    } else {
-                        return Inertia::render('Public/Sample/Show', [
+                        ],
+                        $request,
+                        $project,
+                        $getLicense
+                    );
+                case 'files':
+                    return $this->renderPublicProject(
+                        'Public/Project/Files',
+                        [
+                            'project' => (new ProjectResource($project))->lite(false, ['files']),
                             'tab' => $tab,
-                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors']),
-                        ]);
-                        break;
+                        ],
+                        $request,
+                        $project,
+                        $getLicense
+                    );
+                case 'study':
+                    if ($project) {
+                        return $this->renderPublicProject(
+                            'Public/Project/Study',
+                            [
+                                'project' => (new ProjectResource($project))->lite(false, []),
+                                'tab' => $tab,
+                                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
+                            ],
+                            $request,
+                            $project,
+                            $getLicense
+                        );
                     }
-                case 'dataset':
-                    return Inertia::render('Public/Project/Dataset', [
-                        'project' => (new ProjectResource($project))->lite(false, []),
+
+                    return Inertia::render('Public/Sample/Show', [
                         'tab' => $tab,
-                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
-                        'dataset' => (new DatasetResource($dataset)),
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors']),
                     ]);
-                    break;
+                case 'dataset':
+                    return $this->renderPublicProject(
+                        'Public/Project/Dataset',
+                        [
+                            'project' => (new ProjectResource($project))->lite(false, []),
+                            'tab' => $tab,
+                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
+                            'dataset' => (new DatasetResource($dataset))->lite(false, ['nmrium']),
+                        ],
+                        $request,
+                        $project,
+                        $getLicense
+                    );
                 default:
-                    return Inertia::render('Public/Project/Show', [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                        'tab' => 'info',
-                    ]);
+                    return $this->renderPublicProject(
+                        'Public/Project/Show',
+                        [
+                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                            'tab' => 'info',
+                        ],
+                        $request,
+                        $project,
+                        $getLicense
+                    );
             }
         } else {
             abort(404, 'Page not found');
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     */
+    private function renderPublicProject(string $component, array $props, Request $request, Project $project, GetLicense $getLicense): InertiaResponse
+    {
+        return Inertia::render($component, array_merge(
+            $props,
+            ProjectWorkspace::inertiaPropsForPublicProject($request, $project, $getLicense)
+        ));
     }
 
     /**

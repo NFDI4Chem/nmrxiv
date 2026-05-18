@@ -8,6 +8,7 @@ use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class ProjectPublicViewTest extends TestCase
@@ -90,7 +91,7 @@ class ProjectPublicViewTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_public_project_license_tab_view()
+    public function test_public_project_license_query_renders_info_tab()
     {
         $license = License::factory()->create();
         $this->publicProject->update(['license_id' => $license->id]);
@@ -102,6 +103,9 @@ class ProjectPublicViewTest extends TestCase
         ]));
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Public/Project/Show')
+            ->where('tab', 'info'));
     }
 
     public function test_public_project_study_tab_view()
