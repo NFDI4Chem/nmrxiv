@@ -412,15 +412,17 @@ class ProjectController extends Controller
                 // Sample collection mode: always immediate public release (no embargo).
                 $project->release_date = now()->startOfDay()->toDateString();
 
+                $project->load('draft');
+
                 $validation = $project->validation;
                 if ($validation) {
-                    $validation->process();
+                    $validation->process(forceSamplesMode: true);
                     $validation = $validation->fresh();
                 }
 
                 $status = true;
                 if ($validation) {
-                    $status = (bool) ($validation->report['project']['status'] ?? false);
+                    $status = Validation::samplesModePublishPasses($validation->report);
                 }
 
                 if (! $status) {

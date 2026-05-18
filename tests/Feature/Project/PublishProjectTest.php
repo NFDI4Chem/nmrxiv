@@ -214,6 +214,32 @@ class PublishProjectTest extends TestCase
     }
 
     #[Test]
+    public function incomplete_project_metadata_does_not_block_samples_mode_validation(): void
+    {
+        $this->project->studies()->each(fn ($study) => $study->delete());
+        $this->project->update([
+            'name' => '',
+            'description' => 'too short',
+        ]);
+
+        $draft = Draft::factory()->create([
+            'name' => 'Test Draft',
+            'owner_id' => $this->user->id,
+            'project_enabled' => false,
+        ]);
+        $this->project->update(['draft_id' => $draft->id]);
+
+        $validation = Validation::factory()->create();
+        $this->project->update(['validation_id' => $validation->id]);
+
+        $validation->process(forceSamplesMode: true);
+        $validation->refresh();
+
+        $this->assertEquals('true|skipped-samples-mode', $validation->report['project']['title']);
+        $this->assertEquals('true|skipped-samples-mode', $validation->report['project']['description']);
+    }
+
+    #[Test]
     public function citations_without_doi_pass_validation_in_samples_mode(): void
     {
         $draft = Draft::factory()->create([

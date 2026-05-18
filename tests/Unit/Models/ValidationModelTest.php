@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Dataset;
+use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Sample;
@@ -298,6 +299,81 @@ class ValidationModelTest extends TestCase
         // Verify the project's schema_version is set (it will use the system default)
         $project->refresh();
         $this->assertNotNull($project->schema_version);
+    }
+
+    public function test_samples_mode_skips_project_metadata_for_publish_status(): void
+    {
+        config(['validations.default' => 'test_samples_mode']);
+        config(['validations.test_samples_mode.project' => [
+            'title' => 'required',
+            'description' => 'required|min:20',
+        ]]);
+        config(['validations.test_samples_mode.study' => []]);
+        config(['validations.test_samples_mode.dataset' => []]);
+
+        $validation = new Validation;
+        $validation->save();
+
+        $draft = Draft::factory()->create([
+            'project_enabled' => false,
+        ]);
+
+        $project = Project::factory()->create([
+            'validation_id' => $validation->id,
+            'draft_id' => $draft->id,
+            'name' => '',
+            'description' => 'short',
+            'schema_version' => 'test_samples_mode',
+        ]);
+
+        $project->studies()->delete();
+
+        $validation->process();
+
+        $validation->refresh();
+
+        $this->assertEquals('true|skipped-samples-mode', $validation->report['project']['title']);
+        $this->assertEquals('true|skipped-samples-mode', $validation->report['project']['description']);
+        $this->assertTrue($validation->report['project']['status']);
+        $this->assertTrue(Validation::samplesModePublishPasses($validation->report));
+    }
+
+    public function test_samples_mode_publish_fails_when_study_validation_fails(): void
+    {
+        config(['validations.default' => 'test_samples_study']);
+        config(['validations.test_samples_study.project' => []]);
+        config(['validations.test_samples_study.study' => [
+            'title' => 'required',
+        ]]);
+        config(['validations.test_samples_study.dataset' => []]);
+
+        $validation = new Validation;
+        $validation->save();
+
+        $draft = Draft::factory()->create([
+            'project_enabled' => false,
+        ]);
+
+        $project = Project::factory()->create([
+            'validation_id' => $validation->id,
+            'draft_id' => $draft->id,
+            'schema_version' => 'test_samples_study',
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'name' => '',
+        ]);
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+        ]);
+
+        $validation->process();
+        $validation->refresh();
+
+        $this->assertFalse($validation->report['project']['status']);
+        $this->assertFalse(Validation::samplesModePublishPasses($validation->report));
     }
 
     public function test_process_method_validates_project_fields()

@@ -82,7 +82,7 @@ class Validation extends Model
         return $this->hasOne(Project::class);
     }
 
-    public function process()
+    public function process(bool $forceSamplesMode = false): void
     {
         $project = $this->project;
         $project->load('tags', 'authors', 'citations', 'draft');
@@ -93,7 +93,8 @@ class Validation extends Model
         $warnings = [];
         $errors = [];
 
-        $samplesMode = $project->draft && $project->draft->project_enabled === false;
+        $samplesMode = $forceSamplesMode
+            || ($project->draft && $project->draft->project_enabled === false);
 
         $schema_version = $project->schema_version ? $project->schema_version : config('validations.default');
 
@@ -120,8 +121,10 @@ class Validation extends Model
                 $errors = $validator->errors()->getMessages();
                 foreach ($project_rules as $key => $value) {
                     if (array_key_exists($key, $errors)) {
-                        $report['project'][$key] = 'false|'.$project_rules[$key];
-                        if (strpos($project_rules[$key], 'required') !== false) {
+                        $report['project'][$key] = $samplesMode
+                            ? 'true|skipped-samples-mode'
+                            : 'false|'.$project_rules[$key];
+                        if (! $samplesMode && strpos($project_rules[$key], 'required') !== false) {
                             $status = false;
                         }
                     } else {
@@ -305,6 +308,11 @@ class Validation extends Model
             $report['project']['citations_detail'] = $citationsValidation;
 
             $report['project']['studies'] = $studiesValidation;
+
+            if ($samplesMode) {
+                $status = self::samplesModePublishPasses($report);
+            }
+
             $report['project']['status'] = $status;
             $project->validation_status = $status;
             $project->save();
@@ -312,6 +320,28 @@ class Validation extends Model
             $this->report = $this->sanitizeUnicodeInReport($report);
             $this->save();
         }
+    }
+
+    /**
+     * Whether a validation report allows publishing individual samples (studies only).
+     *
+     * @param  array<string, mixed>  $report
+     */
+    public static function samplesModePublishPasses(array $report): bool
+    {
+        $studies = $report['project']['studies'] ?? [];
+
+        if ($studies === []) {
+            return false;
+        }
+
+        foreach ($studies as $study) {
+            if (! ($study['status'] ?? false)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
