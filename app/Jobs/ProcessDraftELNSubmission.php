@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Citation\SyncCitations;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
 use App\Http\Controllers\FileSystemController;
@@ -570,6 +571,11 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $study->update([
                 'citations' => $citations,
             ]);
+
+            $ownerUser = $study->owner;
+            if ($ownerUser) {
+                app(SyncCitations::class)->syncFromStudyElnPayload($study, $citations, $ownerUser);
+            }
 
             $logger->log($study->project->draft, 'info', 'Attached '.count($citations).' citations to study: '.$study->name);
 

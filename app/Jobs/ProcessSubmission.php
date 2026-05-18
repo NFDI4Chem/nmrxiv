@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Citation\SyncCitationPivot;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
@@ -181,6 +182,10 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $updater->update($_studies);
                 // Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
                 event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                $project->load('citations');
+                foreach ($_studies as $study) {
+                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
+                }
                 $project->delete();
                 $draft->delete();
 
