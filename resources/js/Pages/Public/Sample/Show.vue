@@ -9,26 +9,6 @@
                     :release_date="study.data.release_date"
                     :created_at="study.data.created_at"
                 />
-                <div
-                    v-if="
-                        study.data.citations &&
-                        study.data.citations.length > 0
-                    "
-                    class="mt-6"
-                >
-                    <h2
-                        class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
-                    >
-                        Citation(s)
-                    </h2>
-                    <div
-                        class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                    >
-                        <citation-card
-                            :citations="study.data.citations"
-                        />
-                    </div>
-                </div>
                 <div class="mt-2">
                     <!-- Study title -->
                     <h1 class="text-2xl font-bold break-words text-gray-900">
@@ -245,16 +225,6 @@
                     </div>
                 </div>
 
-                <div
-                    v-if="study.data.is_public && study.data.doi != null"
-                    class="-mx-4"
-                >
-                    <Citation
-                        :model="'sample'"
-                        :doi="study.data.doi"
-                    ></Citation>
-                </div>
-
                 <div v-if="study.data.tags.length > 0" class="relative mt-4">
                     <div class="relative">
                         <div
@@ -311,6 +281,15 @@
                                 : 'md:col-span-12',
                         ]"
                     >
+                        <div
+                            v-if="study.data.is_public && study.data.doi != null"
+                        >
+                            <Citation
+                                :model="'sample'"
+                                :doi="study.data.doi"
+                            ></Citation>
+                        </div>
+
                         <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
                             <div class="pt-2 sm:col-span-6">
                                 <h2
@@ -443,6 +422,27 @@
                             </div>
                         </div>
                         </div>
+
+                        <div
+                            v-if="
+                                study.data.citations &&
+                                study.data.citations.length > 0
+                            "
+                            class="mt-6"
+                        >
+                            <h2
+                                class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
+                            >
+                                Citation(s)
+                            </h2>
+                            <div
+                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                            >
+                                <citation-card
+                                    :citations="study.data.citations"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <aside
@@ -488,6 +488,7 @@
                         </div>
                     </aside>
                 </div>
+
                 <div class="mt-6">
                     <SpectraViewer
                         ref="spectraViewerREF"
