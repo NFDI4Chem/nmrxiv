@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'message' => $request->session()->get('message'),
                     'success' => $request->session()->get('success'),
                     'error' => $request->session()->get('error'),
+                    'publish_validation_hints' => $request->session()->get('publish_validation_hints'),
                 ];
             },
             'auth.user.permissions' => fn () => $user ?
@@ -65,6 +66,7 @@ class HandleInertiaRequests extends Middleware
             'config.announcements' => Schema::hasTable('announcements') ? Announcement::active() : null,
             'url' => config('app.url'),
             'nmriumURL' => config('external-links.nmrium_url'),
+            'spectraParserUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/spectra/parse/url',
             'team' => $user ? $user->currentTeam : null,
             'environment' => config('app.env'),
             'MEILISEARCH_HOST' => config('scout.meilisearch.host'),
@@ -74,7 +76,18 @@ class HandleInertiaRequests extends Middleware
             'dataciteURL' => config('doi.datacite.endpoint'),
             'coolOffPeriod' => config('nmrxiv.cool_off_period'),
             'mailFromAddress' => config('mail.from.address'),
-            'chemistryStandardizeUrl' => config('services.chemistry_standardize.url'),
+            'dashboardWorkspace' => function () use ($request) {
+                if (! $request->routeIs('dashboard')) {
+                    return null;
+                }
+
+                $workspace = $request->query('workspace');
+
+                return in_array($workspace, ['shared', 'recent', 'starred', 'trashed'], true)
+                    ? $workspace
+                    : 'default';
+            },
+            'chemistryStandardizeUrl' => route('chemistry.standardize'),
             'orcidSearchApi' => config('orcid.search_api'),
             'orcidPersonApi' => config('orcid.person_api'),
             'michiStandardsUrl' => config('external-links.michi_standards_url'),

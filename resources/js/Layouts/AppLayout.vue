@@ -93,89 +93,9 @@
                                     <span>Need help?</span>
                                 </a>
                             </div>
-                            <nav class="flex-1 px-3 pb-4 space-y-1">
-                                <div
-                                    v-for="(item, index) in filteredNavigation"
-                                    :key="item.name || item.prefix || index"
-                                    class="space-y-1"
-                                >
-                                    <!-- Section Header -->
-                                    <div
-                                        v-if="item.prefix && !item.name"
-                                        :class="[
-                                            index > 0 ? 'mt-6' : 'mt-0',
-                                            'px-3 mb-2',
-                                        ]"
-                                    >
-                                        <h3
-                                            class="text-xs font-medium text-gray-400 tracking-wide"
-                                        >
-                                            {{ item.prefix }}
-                                        </h3>
-                                    </div>
-
-                                    <!-- Main Item -->
-                                    <Link
-                                        v-if="item.href && item.name"
-                                        :href="item.href"
-                                        :class="[
-                                            $page.url === item.href
-                                                ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
-                                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
-                                            'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg transition-all duration-200 ease-in-out',
-                                        ]"
-                                    >
-                                        <component
-                                            :is="item.icon"
-                                            :class="[
-                                                $page.url === item.href
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-400 group-hover:text-gray-600',
-                                                'h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                                            ]"
-                                            aria-hidden="true"
-                                        />
-                                        <span class="truncate flex-1">{{
-                                            item.name
-                                        }}</span>
-                                    </Link>
-
-                                    <!-- Child Items -->
-                                    <div
-                                        v-if="
-                                            item.children &&
-                                            item.children.length > 0
-                                        "
-                                        class="ml-3 mt-1 space-y-0.5"
-                                    >
-                                        <Link
-                                            v-for="child in item.children"
-                                            :key="child.name"
-                                            :href="child.href"
-                                            :class="[
-                                                $page.url === child.href
-                                                    ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
-                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
-                                                'group flex items-center gap-3 px-3 py-2 text-sm rounded-r-lg transition-all duration-200',
-                                            ]"
-                                        >
-                                            <component
-                                                :is="child.icon"
-                                                :class="[
-                                                    $page.url === child.href
-                                                        ? 'text-gray-700'
-                                                        : 'text-gray-400 group-hover:text-gray-600',
-                                                    'h-4 w-4 flex-shrink-0 transition-colors duration-200',
-                                                ]"
-                                                aria-hidden="true"
-                                            />
-                                            <span class="truncate flex-1">{{
-                                                child.name
-                                            }}</span>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </nav>
+                            <DashboardSidebarNav
+                                :sections="filteredNavigationSections"
+                            />
                         </div>
                     </div>
                 </TransitionChild>
@@ -244,92 +164,10 @@
                             </div>
                         </div>
 
-                        <!-- Navigation -->
-                        <nav aria-label="Sidebar" class="flex flex-col py-2">
-                            <div
-                                v-for="(item, index) in filteredNavigation"
-                                :key="item.name || item.prefix || index"
-                            >
-                                <!-- Section Divider -->
-                                <div
-                                    v-if="index > 0"
-                                    class="h-px bg-gray-100 mx-2 my-2"
-                                ></div>
-
-                                <!-- Main Item -->
-                                <div
-                                    v-if="item.name && item.href"
-                                    class="relative group px-2 py-1"
-                                >
-                                    <Link
-                                        :href="item.href"
-                                        :class="[
-                                            $page.url === item.href
-                                                ? 'bg-gray-100 text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out',
-                                        ]"
-                                    >
-                                        <component
-                                            :is="item.icon"
-                                            :class="[
-                                                $page.url === item.href
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-500 group-hover:text-gray-700',
-                                                'h-6 w-6 transition-colors duration-200',
-                                            ]"
-                                            aria-hidden="true"
-                                        />
-                                    </Link>
-                                    <!-- Tooltip -->
-                                    <div
-                                        class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
-                                    >
-                                        {{ item.name }}
-                                        <div
-                                            class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"
-                                        ></div>
-                                    </div>
-                                </div>
-
-                                <!-- Child Items -->
-                                <div
-                                    v-for="child in item.children"
-                                    :key="child.name"
-                                    class="relative group px-2 py-1"
-                                >
-                                    <Link
-                                        :href="child.href"
-                                        :class="[
-                                            $page.url === child.href
-                                                ? 'text-gray-900 shadow-sm'
-                                                : 'text-gray-700 hover:text-gray-600',
-                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-colors',
-                                        ]"
-                                    >
-                                        <component
-                                            :is="child.icon"
-                                            :class="[
-                                                $page.url === child.href
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-500 group-hover:text-gray-600',
-                                                'h-5 w-5 transition-colors',
-                                            ]"
-                                            aria-hidden="true"
-                                        />
-                                    </Link>
-                                    <!-- Tooltip -->
-                                    <div
-                                        class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
-                                    >
-                                        {{ child.name }}
-                                        <div
-                                            class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"
-                                        ></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </nav>
+                        <DashboardSidebarNav
+                            :sections="filteredNavigationSections"
+                            icon-only
+                        />
                     </div>
                 </div>
             </div>
@@ -379,94 +217,16 @@
                         </a>
                     </div>
 
-                    <!-- Navigation -->
-                    <nav class="flex-1 px-3 py-4">
-                        <div
-                            v-for="(item, index) in filteredNavigation"
-                            :key="item.name || item.prefix || index"
-                            class="space-y-1"
-                        >
-                            <!-- Section Header -->
-                            <div
-                                v-if="item.prefix"
-                                :class="[
-                                    index > 0 ? 'mt-6' : 'mt-0',
-                                    'px-3 mb-2',
-                                ]"
-                            >
-                                <h3
-                                    class="text-xs font-medium text-gray-400 tracking-wide"
-                                >
-                                    {{ item.prefix }}
-                                </h3>
-                            </div>
-
-                            <!-- Main Item -->
-                            <Link
-                                v-if="item.name && item.href"
-                                :href="item.href"
-                                :class="[
-                                    $page.url === item.href
-                                        ? 'bg-gray-50 text-gray-900 font-medium border-l-2 border-gray-900'
-                                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
-                                    'group flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg transition-all duration-200 ease-in-out',
-                                ]"
-                            >
-                                <component
-                                    :is="item.icon"
-                                    :class="[
-                                        $page.url === item.href
-                                            ? 'text-gray-900'
-                                            : 'text-gray-400 group-hover:text-gray-600',
-                                        'h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                                    ]"
-                                    aria-hidden="true"
-                                />
-                                <span class="truncate flex-1">{{
-                                    item.name
-                                }}</span>
-                            </Link>
-
-                            <!-- Child Items -->
-                            <div
-                                v-if="item.children && item.children.length > 0"
-                                class="ml-3 mt-1 space-y-0.5"
-                            >
-                                <Link
-                                    v-for="child in item.children"
-                                    :key="child.name"
-                                    :href="child.href"
-                                    :class="[
-                                        $page.url === child.href
-                                            ? 'bg-gray-100 text-gray-900 font-medium border-l-2 border-gray-900'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent',
-                                        'group flex items-center gap-3 px-3 py-2 text-sm rounded-r-lg transition-all duration-200',
-                                    ]"
-                                >
-                                    <component
-                                        :is="child.icon"
-                                        :class="[
-                                            $page.url === child.href
-                                                ? 'text-gray-700'
-                                                : 'text-gray-400 group-hover:text-gray-600',
-                                            'h-4 w-4 flex-shrink-0 transition-colors duration-200',
-                                        ]"
-                                        aria-hidden="true"
-                                    />
-                                    <span class="truncate flex-1">{{
-                                        child.name
-                                    }}</span>
-                                </Link>
-                            </div>
-                        </div>
-                    </nav>
+                    <DashboardSidebarNav
+                        :sections="filteredNavigationSections"
+                    />
                 </div>
             </div>
         </div>
         <div
             :class="[
                 collapseSidebar ? 'md:pl-16' : 'md:pl-64',
-                'flex flex-col flex-1 z-0',
+                'flex min-h-0 flex-1 flex-col z-0',
             ]"
         >
             <div
@@ -474,7 +234,7 @@
             >
                 <button
                     type="button"
-                    class="hidden md:inline-flex p-4 rounded mx-1 mr-3 border-red-200 text-gray-500"
+                    class="hidden md:inline-flex items-center justify-center rounded-lg p-2.5 mx-1 mr-3 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                     @click="toggleCollapseSidebar()"
                 >
                     <Bars3Icon class="h-6 w-6" aria-hidden="true" />
@@ -915,7 +675,7 @@
                 </div>
             </div>
             <main
-                class="flex-1 relative overflow-y-hidden bg-white focus:outline-none"
+                class="relative flex min-h-0 flex-1 flex-col overflow-y-hidden bg-white focus:outline-none"
             >
                 <slot name="header"></slot>
                 <slot></slot>
@@ -927,30 +687,24 @@
 </template>
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
-import Search from "@/Shared/Search.vue";
-import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
 import Create from "@/Shared/CreateButton.vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
-import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
 import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
-import StudyCreate from "@/Pages/Study/Partials/Create.vue";
-import Submission from "@/Shared/Submission.vue";
 import Notification from "@/Shared/Notification.vue";
+import DashboardSidebarNav from "@/Layouts/Partials/DashboardSidebarNav.vue";
 import { ref } from "vue";
 import {
     DialogOverlay,
     Menu,
     MenuButton,
-    MenuItem,
     MenuItems,
     Dialog,
-    DialogPanel,
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
@@ -963,11 +717,9 @@ import {
     UsersIcon,
     StarIcon,
     FolderIcon,
-    Squares2X2Icon,
     SwatchIcon,
     TrashIcon,
 } from "@heroicons/vue/24/outline";
-import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
 const userNavigation = [];
 
@@ -976,77 +728,82 @@ const secondaryNavigation = [
     { name: "Shared with me", href: "#" },
 ];
 
-const navigation = [
+const navigationSections = [
     {
-        auth: true,
-        name: "Dashboard",
-        href: "/dashboard",
-        prefix: "Your Space",
-        id: "tour-step-dashboard",
-        icon: HomeIcon,
-        bg: "bg-gray-50",
-        children: [
+        title: "Workspace",
+        items: [
             {
                 auth: true,
-                name: "Shared with me",
-                href: "/dashboard/shared-with-me",
-                id: "tour-step-shared-with-me",
-                icon: UsersIcon,
-                bg: "bg-white",
-            },
-            {
-                auth: false,
-                name: "Recent",
-                href: "/dashboard/recent",
-                id: "tour-step-recent",
-                icon: ClockIcon,
-                bg: "bg-white",
-            },
-            {
-                auth: false,
-                name: "Starred",
-                href: "/dashboard/starred",
-                id: "tour-step-starred",
-                icon: StarIcon,
-                bg: "bg-white",
-            },
-            {
-                auth: false,
-                name: "Trash",
-                href: "/dashboard/trashed",
-                id: "tour-step-trash",
-                icon: TrashIcon,
-                bg: "bg-white",
+                name: "Dashboard",
+                href: "/dashboard",
+                id: "tour-step-dashboard",
+                icon: HomeIcon,
+                children: [
+                    {
+                        auth: true,
+                        name: "Shared with me",
+                        href: "/dashboard?workspace=shared",
+                        workspace: "shared",
+                        id: "tour-step-shared-with-me",
+                        icon: UsersIcon,
+                    },
+                    {
+                        auth: false,
+                        name: "Recent",
+                        href: "/dashboard?workspace=recent",
+                        workspace: "recent",
+                        id: "tour-step-recent",
+                        icon: ClockIcon,
+                    },
+                    {
+                        auth: false,
+                        name: "Starred",
+                        href: "/dashboard?workspace=starred",
+                        workspace: "starred",
+                        id: "tour-step-starred",
+                        icon: StarIcon,
+                    },
+                    {
+                        auth: false,
+                        name: "Trash",
+                        href: "/dashboard?workspace=trashed",
+                        workspace: "trashed",
+                        id: "tour-step-trash",
+                        icon: TrashIcon,
+                    },
+                ],
             },
         ],
     },
     {
-        prefix: "Public",
-        children: [
+        title: "Explore",
+        items: [
             {
                 auth: false,
                 name: "Projects",
                 href: "/projects",
                 icon: FolderIcon,
-                bg: "bg-white",
             },
             {
                 auth: false,
-                name: "Samples",
-                href: "/spectra",
-                icon: Squares2X2Icon,
-                bg: "bg-white",
-            },
-            {
-                auth: false,
-                name: "Compounds",
+                name: "Spectra Library",
                 href: "/compounds",
                 icon: SwatchIcon,
-                bg: "bg-white",
             },
         ],
     },
 ];
+
+function filterNavItems(items, isAuthenticated) {
+    return items
+        .filter((item) => !item.auth || isAuthenticated)
+        .map((item) => ({
+            ...item,
+            children: item.children
+                ? filterNavItems(item.children, isAuthenticated)
+                : undefined,
+        }));
+}
 
 export default {
     components: {
@@ -1056,38 +813,23 @@ export default {
         JetApplicationLogo,
         JetApplicationMark,
         JetDropdownLink,
-        JetDropdown,
         Link,
         Head,
         Dialog,
         DialogOverlay,
         Menu,
         MenuButton,
-        MenuItem,
         MenuItems,
         TransitionChild,
         TransitionRoot,
         BellIcon,
         Bars3Icon,
-        MagnifyingGlassIcon,
         XMarkIcon,
-        PlusIcon,
         FlashMessages,
-        DialogPanel,
         AnnouncementBanner,
-        Search,
-        UnifiedSearch,
         Create,
-        ClockIcon,
-        UsersIcon,
-        StarIcon,
-        TrashIcon,
-        FolderIcon,
-        Squares2X2Icon,
-        StudyCreate,
-        Submission,
         Notification,
-        SwatchIcon,
+        DashboardSidebarNav,
     },
     props: {
         title: String,
@@ -1109,7 +851,7 @@ export default {
             sidebarOpen,
             collapseSidebar,
             notificationElement,
-            navigation,
+            navigationSections,
         };
     },
     computed: {
@@ -1130,12 +872,17 @@ export default {
                 return true;
             }
         },
-        filteredNavigation() {
-            if (this.$page.props.auth.user?.first_name) {
-                return this.navigation;
-            } else {
-                return this.navigation.filter((i) => !i.auth);
-            }
+        filteredNavigationSections() {
+            const isAuthenticated = Boolean(
+                this.$page.props.auth.user?.first_name
+            );
+
+            return navigationSections
+                .map((section) => ({
+                    ...section,
+                    items: filterNavItems(section.items, isAuthenticated),
+                }))
+                .filter((section) => section.items.length > 0);
         },
         personalTeam() {
             return this.$page.props.auth.user?.all_teams.filter(

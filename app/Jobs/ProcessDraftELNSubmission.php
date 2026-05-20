@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Citation\SyncCitations;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
 use App\Http\Controllers\FileSystemController;
@@ -17,6 +18,7 @@ use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
 use App\Services\PathGeneratorService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -295,6 +297,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 }
 
                 $logger->log($draft, 'info', 'Dispatching Archiving Jobs, Auto-Processing ELN Spectra, Validation And Submission Of ELN Draft');
+
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_draft_eln_submission_dispatch_chain',
+                    'project_id' => $project->id,
+                    'draft_id' => $draft->id,
+                    'chained_jobs' => ['ArchiveStudy', 'ProcessELNSpectra', 'ValidateAndSubmitELNDraft'],
+                ]);
+
                 ArchiveStudy::dispatch($project)
                     ->chain([
                         new ProcessELNSpectra($project->id),
@@ -412,7 +422,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                 // Get the draft to access processing logs
                 $draft = $project->draft;
-                $processingLogs = $draft ? $draft->process_logs : [];
+                $processingLogs = $draft ? $draft->processing_logs : [];
 
                 $study->update([
                     'name' => $studyMetadata['name'].' ('.$study->name.')',
@@ -570,6 +580,11 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $study->update([
                 'citations' => $citations,
             ]);
+
+            $ownerUser = $study->owner;
+            if ($ownerUser) {
+                app(SyncCitations::class)->syncFromStudyElnPayload($study, $citations, $ownerUser);
+            }
 
             $logger->log($study->project->draft, 'info', 'Attached '.count($citations).' citations to study: '.$study->name);
 
@@ -764,24 +779,56 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             if (! $molecule) {
-                $molecule = Molecule::create([
-                    'molecular_formula' => $moleculeInfo['molecular_formula'] ?? null,
-                    'molecular_weight' => $moleculeInfo['molecular_weight'] ?? null,
-                    'smiles' => $moleculeInfo['smiles'] ?? null,
-                    'absolute_smiles' => $moleculeInfo['absolute_smiles'] ?? null,
-                    'canonical_smiles' => $moleculeInfo['canonical_smiles'] ?? $moleculeInfo['smiles'] ?? null,
-                    'inchi' => $moleculeInfo['inchi'] ?? null,
-                    'standard_inchi' => $moleculeInfo['standard_inchi'] ?? $moleculeInfo['inchi'] ?? null,
-                    'inchi_key' => $moleculeInfo['inchi_key'] ?? null,
-                    'standard_inchi_key' => $moleculeInfo['standard_inchi_key'] ?? $moleculeInfo['inchi_key'] ?? null,
-                ]);
+                try {
+                    $molecule = DB::transaction(function () use ($moleculeInfo) {
+                        return Molecule::create([
+                            'molecular_formula' => $moleculeInfo['molecular_formula'] ?? null,
+                            'molecular_weight' => $moleculeInfo['molecular_weight'] ?? null,
+                            'smiles' => $moleculeInfo['smiles'] ?? null,
+                            'absolute_smiles' => $moleculeInfo['absolute_smiles'] ?? null,
+                            'canonical_smiles' => $moleculeInfo['canonical_smiles'] ?? $moleculeInfo['smiles'] ?? null,
+                            'inchi' => $moleculeInfo['inchi'] ?? null,
+                            'standard_inchi' => $moleculeInfo['standard_inchi'] ?? $moleculeInfo['inchi'] ?? null,
+                            'inchi_key' => $moleculeInfo['inchi_key'] ?? null,
+                            'standard_inchi_key' => $moleculeInfo['standard_inchi_key'] ?? $moleculeInfo['inchi_key'] ?? null,
+                        ]);
+                    });
 
-                Log::info('Created new molecule', [
-                    'molecule_id' => $molecule->id,
-                    'molecular_formula' => $molecule->molecular_formula,
-                    'inchi_key' => $molecule->inchi_key,
-                ]);
+                    Log::info('Created new molecule', [
+                        'molecule_id' => $molecule->id,
+                        'molecular_formula' => $molecule->molecular_formula,
+                        'inchi_key' => $molecule->inchi_key,
+                    ]);
+                } catch (QueryException $e) {
+                    $standardInchi = $moleculeInfo['standard_inchi'] ?? $moleculeInfo['inchi'] ?? null;
 
+                    if (! empty($moleculeInfo['inchi'])) {
+                        $molecule = Molecule::where('inchi', $moleculeInfo['inchi'])->first();
+                    }
+
+                    if (! $molecule && ! empty($moleculeInfo['smiles'])) {
+                        $molecule = Molecule::where('smiles', $moleculeInfo['smiles'])->first();
+                    }
+
+                    if (! $molecule && $standardInchi) {
+                        $molecule = Molecule::where('standard_inchi', $standardInchi)->first();
+                    }
+
+                    if (! $molecule) {
+                        Log::error('Failed to create or find molecule', [
+                            'molecule_info' => $moleculeInfo,
+                            'error' => $e->getMessage(),
+                        ]);
+
+                        return null;
+                    }
+
+                    Log::info('Found existing molecule', [
+                        'molecule_id' => $molecule->id,
+                        'molecular_formula' => $molecule->molecular_formula,
+                        'inchi_key' => $molecule->inchi_key,
+                    ]);
+                }
             } else {
                 Log::info('Found existing molecule', [
                     'molecule_id' => $molecule->id,

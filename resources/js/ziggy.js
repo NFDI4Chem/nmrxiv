@@ -17,6 +17,7 @@ const Ziggy = {
             uri: "api/oauth2-callback",
             methods: ["GET", "HEAD"],
         },
+        "boost.browser-logs": { uri: "_boost/browser-logs", methods: ["POST"] },
         login: { uri: "login", methods: ["GET", "HEAD"] },
         "login.store": { uri: "login", methods: ["POST"] },
         logout: { uri: "logout", methods: ["POST"] },
@@ -307,6 +308,7 @@ const Ziggy = {
         },
         landing: { uri: "/", methods: ["GET", "HEAD"] },
         about: { uri: "about-us", methods: ["GET", "HEAD"] },
+        predict: { uri: "predict", methods: ["GET", "HEAD"] },
         "supportBubble.submit": { uri: "support-bubble", methods: ["POST"] },
         impersonate: {
             uri: "impersonate/take/{id}/{guardName?}",
@@ -687,9 +689,39 @@ const Ziggy = {
             parameters: ["dataset"],
             bindings: { dataset: "id" },
         },
+        "dashboard.datasets.assignments.update": {
+            uri: "dashboard/datasets/{dataset}/assignments",
+            methods: ["PUT"],
+            parameters: ["dataset"],
+            bindings: { dataset: "id" },
+        },
+        "dashboard.draft.show": {
+            uri: "dashboard/drafts/{draft}/show",
+            methods: ["GET", "HEAD"],
+            parameters: ["draft"],
+            bindings: { draft: "id" },
+        },
         "dashboard.draft.info": {
             uri: "dashboard/drafts/{draft}/info",
             methods: ["GET", "HEAD"],
+            parameters: ["draft"],
+            bindings: { draft: "id" },
+        },
+        "dashboard.draft.status": {
+            uri: "dashboard/drafts/{draft}/status",
+            methods: ["GET", "HEAD"],
+            parameters: ["draft"],
+            bindings: { draft: "id" },
+        },
+        "dashboard.draft.provisional-doi.store": {
+            uri: "dashboard/drafts/{draft}/provisional-doi",
+            methods: ["POST"],
+            parameters: ["draft"],
+            bindings: { draft: "id" },
+        },
+        "dashboard.draft.provisional-doi.destroy": {
+            uri: "dashboard/drafts/{draft}/provisional-doi",
+            methods: ["DELETE"],
             parameters: ["draft"],
             bindings: { draft: "id" },
         },
@@ -714,6 +746,12 @@ const Ziggy = {
         "dashboard.draft.files.delete": {
             uri: "dashboard/drafts/{draft}/files/{filesystemobject}",
             methods: ["DELETE"],
+            parameters: ["draft", "filesystemobject"],
+            bindings: { draft: "id", filesystemobject: "id" },
+        },
+        "dashboard.draft.sample-folder.reset": {
+            uri: "dashboard/drafts/{draft}/sample-folders/{filesystemobject}/reset",
+            methods: ["POST"],
             parameters: ["draft", "filesystemobject"],
             bindings: { draft: "id", filesystemobject: "id" },
         },
@@ -892,6 +930,12 @@ const Ziggy = {
         "storage.local": {
             uri: "storage/{path}",
             methods: ["GET", "HEAD"],
+            wheres: { path: ".*" },
+            parameters: ["path"],
+        },
+        "storage.local.upload": {
+            uri: "storage/{path}",
+            methods: ["PUT"],
             wheres: { path: ".*" },
             parameters: ["path"],
         },

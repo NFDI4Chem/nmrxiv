@@ -15,7 +15,10 @@ class UserDrafts
     {
         [$user_id, $team_id] = $user->getUserTeamData();
 
-        return Draft::with('Tags')
+        return Draft::with([
+            'Tags',
+            'project:id,slug,status,draft_id',
+        ])
             ->where('owner_id', $user_id)
             ->where('team_id', $team_id)
             ->where('is_deleted', false)

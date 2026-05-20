@@ -304,7 +304,7 @@ export default {
         form: {
             deep: true,
             handler: throttle(function () {
-                this.$inertia.get("/spectra", pickBy(this.form), {
+                this.$inertia.get("/projects", pickBy(this.form), {
                     preserveState: true,
                 });
             }, 150),

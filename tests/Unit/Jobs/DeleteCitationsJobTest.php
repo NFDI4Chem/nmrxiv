@@ -4,6 +4,12 @@ namespace Tests\Unit\Jobs;
 
 use App\Jobs\DeleteCitations;
 use App\Models\Citation;
+use App\Models\License;
+use App\Models\Project;
+use App\Models\Study;
+use App\Models\Team;
+use App\Models\User;
+use App\Models\Validation;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -101,6 +107,42 @@ class DeleteCitationsJobTest extends TestCase
 
         $this->assertDatabaseMissing('citations', ['id' => $citation1->id]);
         $this->assertDatabaseMissing('citations', ['id' => $citation2->id]);
+    }
+
+    public function test_handle_keeps_citation_attached_only_to_study(): void
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create(['user_id' => $user->id]);
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+        $project = Project::factory()->create([
+            'team_id' => $team->id,
+            'owner_id' => $user->id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'owner_id' => $user->id,
+            'team_id' => $team->id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $citation = Citation::factory()->create();
+
+        DB::table('citation_study')->insert([
+            'citation_id' => $citation->id,
+            'study_id' => $study->id,
+            'user' => (string) $user->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $job = new DeleteCitations(collect([$citation]));
+        $job->handle();
+
+        $this->assertDatabaseHas('citations', ['id' => $citation->id]);
     }
 
     public function test_handle_with_empty_citations_array(): void

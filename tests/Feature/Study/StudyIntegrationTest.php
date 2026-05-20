@@ -78,87 +78,16 @@ class StudyIntegrationTest extends TestCase
         }
     }
 
-    public function test_public_studies_view_page(): void
+    public function test_legacy_spectra_url_redirects_to_projects(): void
     {
-        Study::factory(2)->create([
-            'project_id' => $this->project->id,
-            'owner_id' => $this->user->id,
-            'team_id' => $this->team->id,
-            'is_public' => true,
-            'is_archived' => false,
-        ]);
-
-        $response = $this->get(route('public.spectra'));
-
-        // Just check if it returns 200 first
-        $response->assertStatus(200);
-
-        // For now, skip the Inertia assertion until we fix the core issue
-        $this->markTestIncomplete('Inertia response assertion needs investigation');
+        $this->get('/spectra')
+            ->assertRedirect(route('public.projects'));
     }
 
-    public function test_public_studies_search_functionality(): void
+    public function test_legacy_spectra_url_with_compound_redirects_to_compound_page(): void
     {
-        $searchableStudy = Study::factory()->create([
-            'project_id' => $this->project->id,
-            'owner_id' => $this->user->id,
-            'team_id' => $this->team->id,
-            'name' => 'Searchable NMR Study',
-            'description' => 'This study contains searchable content',
-            'is_public' => true,
-            'is_archived' => false,
-        ]);
-
-        $otherStudy = Study::factory()->create([
-            'project_id' => $this->project->id,
-            'owner_id' => $this->user->id,
-            'team_id' => $this->team->id,
-            'name' => 'Different Study',
-            'description' => 'No matching content here',
-            'is_public' => true,
-            'is_archived' => false,
-        ]);
-
-        $this->get(route('public.spectra', ['search' => 'Searchable']))
-            ->assertStatus(200);
-
-        // TODO: Fix Inertia response testing
-        // ->assertInertia(fn ($page) => $page
-        //     ->component('Public/Studies')
-        //     ->has('studies')
-        //     ->where('filters.search', 'Searchable')
-        // );
-    }
-
-    public function test_public_studies_sorting(): void
-    {
-        $oldStudy = Study::factory()->create([
-            'project_id' => $this->project->id,
-            'owner_id' => $this->user->id,
-            'team_id' => $this->team->id,
-            'is_public' => true,
-            'is_archived' => false,
-            'created_at' => now()->subDays(5),
-        ]);
-
-        $newStudy = Study::factory()->create([
-            'project_id' => $this->project->id,
-            'owner_id' => $this->user->id,
-            'team_id' => $this->team->id,
-            'is_public' => true,
-            'is_archived' => false,
-            'created_at' => now(),
-        ]);
-
-        $this->get(route('public.spectra', ['sort' => 'creation']))
-            ->assertStatus(200);
-
-        // TODO: Fix Inertia response testing
-        // ->assertInertia(fn ($page) => $page
-        //     ->component('Public/Studies')
-        //     ->has('studies')
-        //     ->where('filters.sort', 'creation')
-        // );
+        $this->get('/spectra?compound=123')
+            ->assertRedirect(route('public.compound', ['id' => 'M123']));
     }
 
     public function test_studies_filtered_by_molecule(): void
@@ -173,7 +102,7 @@ class StudyIntegrationTest extends TestCase
             'is_archived' => false,
         ]);
 
-        $studyWithoutMolecule = Study::factory()->create([
+        Study::factory()->create([
             'project_id' => $this->project->id,
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
@@ -181,20 +110,13 @@ class StudyIntegrationTest extends TestCase
             'is_archived' => false,
         ]);
 
-        // Associate molecule with first study through sample
         $sample = Sample::factory()->create(['study_id' => $studyWithMolecule->id]);
         $sample->molecules()->attach($molecule);
 
-        $this->get(route('public.spectra', ['compound' => '123']))
-            ->assertStatus(200);
+        $response = $this->get(route('public.compound', ['id' => 'M123']));
+        $page = $this->assertInertiaPageComponent($response, 'Public/Studies');
 
-        // TODO: Fix Inertia response testing
-        // ->assertInertia(fn ($page) => $page
-        //     ->component('Public/Studies')
-        //     ->has('studies')
-        //     ->has('molecule')
-        //     ->where('molecule.identifier', 123)
-        // );
+        $this->assertArrayHasKey('molecule', $page['props']);
     }
 
     public function test_study_resource_transformation(): void

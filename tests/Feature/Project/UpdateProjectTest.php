@@ -8,9 +8,8 @@ use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class UpdateProjectTest extends TestCase
+class UpdateProjectTest extends ProjectFeatureTestCase
 {
     use RefreshDatabase;
 
@@ -73,6 +72,24 @@ class UpdateProjectTest extends TestCase
         $this->assertEquals('Updated Project Name', $this->project->name);
         $this->assertEquals('Updated project description', $this->project->description);
         $this->assertEquals('#FF5733', $this->project->color);
+    }
+
+    public function test_project_update_can_suppress_success_flash_message()
+    {
+        $updateData = [
+            'name' => 'Updated Without Toast',
+            'description' => 'No flash please',
+            'suppress_project_updated_flash' => true,
+        ];
+
+        $response = $this->actingAs($this->owner)
+            ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
+
+        $response->assertStatus(302);
+        $response->assertSessionMissing('success');
+
+        $this->project->refresh();
+        $this->assertEquals('Updated Without Toast', $this->project->name);
     }
 
     public function test_project_collaborator_can_update_project_via_http()
@@ -538,5 +555,100 @@ class UpdateProjectTest extends TestCase
         $this->project->refresh();
         $this->assertEquals($releaseDate, $this->project->release_date ?
             Carbon::parse($this->project->release_date)->format('Y-m-d H:i:s') : null);
+    }
+
+    public function test_project_tags_can_be_cleared_when_project_tags_updated_flag_is_set(): void
+    {
+        $this->project->syncTagsWithType(['alpha', 'beta'], 'Project');
+        $this->project->load('tags');
+        $this->assertCount(2, $this->project->tags);
+
+        $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", [
+                'name' => $this->project->name,
+                'description' => $this->project->description,
+                'project_tags_updated' => true,
+                'tags_array' => [],
+            ])
+            ->assertSuccessful();
+
+        $this->project->refresh();
+        $this->project->load('tags');
+        $this->assertCount(0, $this->project->tags);
+    }
+
+    public function test_project_tags_cleared_when_project_tags_updated_without_tags_array_key(): void
+    {
+        $this->project->syncTagsWithType(['keep-me'], 'Project');
+        $this->project->load('tags');
+        $this->assertCount(1, $this->project->tags);
+
+        $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", [
+                'name' => $this->project->name,
+                'description' => $this->project->description,
+                'project_tags_updated' => true,
+            ])
+            ->assertSuccessful();
+
+        $this->project->refresh();
+        $this->project->load('tags');
+        $this->assertCount(0, $this->project->tags);
+    }
+
+    public function test_project_species_can_be_cleared_when_project_species_updated_flag_is_set(): void
+    {
+        $this->project->update([
+            'species' => json_encode([['id' => 'NCBITaxon_9606', 'label' => 'Homo sapiens']]),
+        ]);
+
+        $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", [
+                'name' => $this->project->name,
+                'description' => $this->project->description,
+                'project_species_updated' => true,
+                'species' => [],
+            ])
+            ->assertSuccessful();
+
+        $this->project->refresh();
+        $this->assertSame('[]', $this->project->species);
+    }
+
+    public function test_project_species_cleared_when_project_species_updated_without_species_key(): void
+    {
+        $this->project->update([
+            'species' => json_encode([['id' => 'NCBITaxon_9606', 'label' => 'Homo sapiens']]),
+        ]);
+
+        $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", [
+                'name' => $this->project->name,
+                'description' => $this->project->description,
+                'project_species_updated' => true,
+            ])
+            ->assertSuccessful();
+
+        $this->project->refresh();
+        $this->assertSame('[]', $this->project->species);
+    }
+
+    public function test_embargo_project_show_loads_with_edit_release_date_query(): void
+    {
+        $embargoProject = Project::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'is_public' => false,
+            'doi' => '10.5281/nmrxiv.test-embargo',
+            'release_date' => now()->addDays(20),
+            'license_id' => $this->license->id,
+            'status' => 'embargo',
+        ]);
+        $embargoProject->users()->attach($this->owner, ['role' => 'creator']);
+
+        $response = $this->actingAs($this->owner)
+            ->get("/dashboard/projects/{$embargoProject->id}?edit=release_date");
+
+        $this->assertInertiaPageComponent($response, 'Project/Show');
     }
 }

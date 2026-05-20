@@ -61,7 +61,22 @@ class Project extends Model implements Auditable
         'release_date',
         'deleted_on',
         'species',
+        'provisional_doi',
+        'provisional_doi_registered_at',
+        'validation_id',
+        'validation_status',
+        'schema_version',
     ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'provisional_doi_registered_at' => 'datetime',
+        ];
+    }
 
     protected static $marks = [
         Like::class,
@@ -73,7 +88,7 @@ class Project extends Model implements Auditable
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published', 'provisional_doi_url'];
 
     /**
      * Get the URL to the project's profile photo.
@@ -115,6 +130,28 @@ class Project extends Model implements Auditable
         } else {
             return Bookmark::has($this, $user);
         }
+    }
+
+    /**
+     * Resolver URL for the provisional DOI, when set.
+     */
+    protected function provisionalDoiUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $doi = $this->attributes['provisional_doi'] ?? null;
+                if ($doi === null || $doi === '') {
+                    return null;
+                }
+
+                $host = rtrim((string) config('doi.host'), '/');
+                if ($host === '' || ! str_contains($host, '://')) {
+                    $host = 'https://doi.org';
+                }
+
+                return $host.'/'.$doi;
+            },
+        );
     }
 
     /**

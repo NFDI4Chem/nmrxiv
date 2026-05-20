@@ -477,6 +477,23 @@ export default {
         };
     },
     computed: {
+        compoundNumericId() {
+            const raw = this.molecule?.identifier;
+            if (raw === null || raw === undefined) {
+                return "";
+            }
+            const s = String(raw).replace(/^NMRXIV:M/i, "");
+            const lead = s.match(/^(\d+)/);
+
+            return lead ? lead[1] : "";
+        },
+        listUrl() {
+            if (this.compoundNumericId) {
+                return `/compound/M${this.compoundNumericId}`;
+            }
+
+            return "/projects";
+        },
         pageTitle() {
             if (this.molecule && this.molecule.identifier) {
                 let title = `${this.molecule.identifier}`;
@@ -505,7 +522,11 @@ export default {
         form: {
             deep: true,
             handler: throttle(function () {
-                this.$inertia.get("/spectra", pickBy(this.form), {
+                const params = pickBy(this.form);
+                if (this.compoundNumericId) {
+                    params.compound = this.compoundNumericId;
+                }
+                this.$inertia.get(this.listUrl, params, {
                     preserveState: true,
                 });
             }, 150),

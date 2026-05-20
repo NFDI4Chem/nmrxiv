@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CASController;
+use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
@@ -160,6 +161,12 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
         ->name('citation.delete');
 
+    Route::post('citations/study/{study}', [CitationController::class, 'saveStudy'])
+        ->name('citation.study.save');
+
+    Route::delete('citations/study/{study}/delete', [CitationController::class, 'destroyStudy'])
+        ->name('citation.study.delete');
+
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
         ->name('onboarding.complete');
 
@@ -186,17 +193,26 @@ Route::middleware('auth', 'verified')->group(function () {
     // CAS Common Chemistry API Proxy
     Route::get('/cas/detail', [CASController::class, 'fetchCasData'])->name('cas.detail');
 
+    // Chemistry standardize API proxy (avoids browser CORS to external chem services)
+    Route::post('/chemistry/standardize', [ChemistryStandardizeController::class, 'standardize'])
+        ->middleware('throttle:60,1')
+        ->name('chemistry.standardize');
+
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
             ->name('submission');
-        Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
-            ->name('shared-with-me');
-        Route::get('starred', [DashboardController::class, 'starred'])
-            ->name('starred');
-        Route::get('trashed', [DashboardController::class, 'trashed'])
-            ->name('trashed');
-        Route::get('recent', [DashboardController::class, 'recent'])
-            ->name('recent');
+        Route::get('shared-with-me', function () {
+            return redirect()->route('dashboard', ['workspace' => 'shared']);
+        })->name('shared-with-me');
+        Route::get('starred', function () {
+            return redirect()->route('dashboard', ['workspace' => 'starred']);
+        })->name('starred');
+        Route::get('trashed', function () {
+            return redirect()->route('dashboard', ['workspace' => 'trashed']);
+        })->name('trashed');
+        Route::get('recent', function () {
+            return redirect()->route('dashboard', ['workspace' => 'recent']);
+        })->name('recent');
 
         Route::post('/storage/signed-draft-storage-url', [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url', [FileSystemController::class, 'signedStorageURL']);
@@ -296,11 +312,19 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.datasets.nmriumInfo');
         Route::post('datasets/{dataset}/snapshot', [DatasetController::class, 'snapshot'])
             ->name('dashboard.dataset.snapshot');
+        Route::put('datasets/{dataset}/assignments', [DatasetController::class, 'updateAssignments'])
+            ->name('dashboard.datasets.assignments.update');
 
         Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
             ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');
+        Route::get('drafts/{draft}/status', [DraftController::class, 'status'])
+            ->name('dashboard.draft.status');
+        Route::post('drafts/{draft}/provisional-doi', [DraftController::class, 'storeProvisionalDoi'])
+            ->name('dashboard.draft.provisional-doi.store');
+        Route::delete('drafts/{draft}/provisional-doi', [DraftController::class, 'destroyProvisionalDoi'])
+            ->name('dashboard.draft.provisional-doi.destroy');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
         Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
@@ -309,6 +333,8 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.update');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [FileSystemController::class, 'deleteFSO'])
             ->name('dashboard.draft.files.delete');
+        Route::post('drafts/{draft}/sample-folders/{filesystemobject}/reset', [DraftController::class, 'resetSampleFolder'])
+            ->name('dashboard.draft.sample-folder.reset');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
@@ -383,16 +409,15 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-// Redirect old compound URLs to new structure
+// Legacy /spectra URLs
 Route::get('/spectra', function (Request $request) {
     $compound = $request->query('compound');
     if ($compound) {
         return redirect()->route('public.compound', ['id' => 'M'.$compound], 301);
     }
 
-    // If no compound parameter, show the spectra page as before
-    return app(StudyController::class)->publicStudiesView($request);
-})->name('public.spectra');
+    return redirect()->route('public.projects', [], 301);
+});
 
 // Keep the old generic resolver for backward compatibility but redirect to new URLs
 Route::get('{id}', function ($id) {
@@ -458,9 +483,6 @@ Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMR
 
 Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
-
-Route::get('spectra', [StudyController::class, 'publicStudiesView'])
-    ->name('public.spectra');
 
 // oEmbed service endpoint - returns oEmbed JSON response for external embedding
 // Supports oEmbed 1.0 specification for rich content embedding

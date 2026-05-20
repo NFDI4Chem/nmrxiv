@@ -6,6 +6,30 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Jobs\RabbitMQJob;
 return [
 
     'connections' => [
+
+        /*
+        |----------------------------------------------------------------------
+        | Redis Queue Connection
+        |----------------------------------------------------------------------
+        |
+        | Override the framework default `retry_after` (90s) so long-running
+        | archive jobs (ZipStream over many large NMR datasets) are not
+        | re-reserved by another worker mid-flight, which would otherwise cause
+        | a `MaxAttemptsExceededException` once the original attempt finishes.
+        |
+        | `retry_after` MUST exceed both the Horizon supervisor `timeout`
+        | (currently 9000s) and the realistic worst-case runtime of any single
+        | archive job. The framework default is far too low for this app.
+        */
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 14400),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
         'rabbitmq' => [
 
             'driver' => 'rabbitmq',

@@ -7,6 +7,7 @@ use App\Jobs\ArchiveStudy;
 use App\Models\Project;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ArchiveData extends Command
 {
@@ -38,6 +39,13 @@ class ArchiveData extends Command
             foreach ($projects as $project) {
                 echo $project->identifier;
                 echo "\r\n";
+
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'archive_data_command_dispatch',
+                    'project_id' => $project->id,
+                    'identifier' => $project->identifier,
+                ]);
+
                 ArchiveProject::dispatch($project);
                 ArchiveStudy::dispatch($project);
             }

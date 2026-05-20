@@ -50,12 +50,6 @@
                                         Projects
                                     </Link>
                                     <Link
-                                        href="/spectra"
-                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                    >
-                                        Spectra
-                                    </Link>
-                                    <Link
                                         href="/compounds"
                                         class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
                                     >
@@ -579,7 +573,7 @@
 
                         <!-- Spectra Card -->
                         <a
-                            href="/spectra"
+                            href="/projects"
                             class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
                         >
                             <div>

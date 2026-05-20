@@ -3,314 +3,487 @@
     <Head :title="study.data.name" />
 
     <!-- Main layout wrapper -->
-    <project-layout :project="project" :selected-tab="tab">
+    <project-layout
+        :project="project"
+        :selected-tab="tab"
+        :current-study="study"
+    >
         <template #project-content>
             <!-- Main content container -->
-            <div
-                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
-            >
-                <!-- DOI Citation section (only for public studies with DOI) -->
-                <div
-                    v-if="study.data.is_public && study.data.doi != null"
-                    class="-mx-4"
-                >
-                    <Citation
-                        :model="'sample'"
-                        :doi="study.data.doi"
-                    ></Citation>
-                </div>
+            <div class="pb-10 mb-10 py-6">
+                <div class="lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6">
+                    <div
+                        :class="[
+                            'min-w-0 overflow-visible',
+                            hasInfoSidebar ? 'lg:col-span-9' : 'lg:col-span-12',
+                        ]"
+                    >
+                        <!-- Study header section -->
+                        <div class="mt-2">
+                            <!-- Study title -->
+                            <h1
+                                class="text-2xl font-bold break-words text-gray-900"
+                            >
+                                <div class="text-blue-500 break-all">
+                                    {{ study.data.name }}
+                                </div>
+                            </h1>
 
-                <!-- Study header section -->
-                <div class="mt-2">
-                    <!-- Study title -->
-                    <h1 class="text-2xl font-bold break-words text-gray-900">
-                        <div class="text-blue-500 break-all">
-                            {{ study.data.name }}
-                        </div>
-                    </h1>
+                            <!-- Header controls section -->
+                            <div class="mt-3">
+                                <!-- DOI Badge (left aligned) -->
+                                <div class="float-left">
+                                    <DOIBadge
+                                        :doi="study.data.doi"
+                                        color="bg-yellow-300"
+                                    ></DOIBadge>
+                                </div>
 
-                    <!-- Header controls section -->
-                    <div class="mt-3">
-                        <!-- DOI Badge (left aligned) -->
-                        <div class="float-left">
-                            <DOIBadge
-                                :doi="study.data.doi"
-                                color="bg-yellow-300"
-                            ></DOIBadge>
-                        </div>
-
-                        <!-- Desktop layout controls (right aligned) -->
-                        <div class="hidden sm:block float-right">
-                            <!-- Share button (desktop) -->
-                            <div class="float-right">
-                                <!-- Share dropdown menu -->
-                                <Menu
-                                    v-if="
-                                        selectedDataset && study.data.is_public
-                                    "
-                                    as="div"
-                                    class="relative text-left"
-                                >
-                                    <!-- Share button trigger -->
-                                    <div>
-                                        <MenuButton
-                                            class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
-                                        >
-                                            <ShareIcon
-                                                class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
-                                                aria-hidden="true"
-                                            ></ShareIcon
-                                            >Share
-                                        </MenuButton>
-                                    </div>
-                                    <!-- Share dropdown transition -->
-                                    <transition
-                                        enter-active-class="transition ease-out duration-100"
-                                        enter-from-class="transform opacity-0 scale-95"
-                                        enter-to-class="transform opacity-100 scale-100"
-                                        leave-active-class="transition ease-in duration-75"
-                                        leave-from-class="transform opacity-100 scale-100"
-                                        leave-to-class="transform opacity-0 scale-95"
+                                <!-- Desktop layout controls (right aligned) -->
+                                <div class="hidden sm:block float-right">
+                                    <Menu
+                                        v-if="
+                                            selectedDataset &&
+                                            study.data.is_public
+                                        "
+                                        as="div"
+                                        class="relative text-left"
                                     >
-                                        <!-- Share dropdown menu items -->
-                                        <MenuItems
-                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                        <!-- Share button trigger -->
+                                        <div>
+                                            <MenuButton
+                                                class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
+                                            >
+                                                <ShareIcon
+                                                    class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
+                                                    aria-hidden="true"
+                                                ></ShareIcon
+                                                >Share
+                                            </MenuButton>
+                                        </div>
+                                        <!-- Share dropdown transition -->
+                                        <transition
+                                            enter-active-class="transition ease-out duration-100"
+                                            enter-from-class="transform opacity-0 scale-95"
+                                            enter-to-class="transform opacity-100 scale-100"
+                                            leave-active-class="transition ease-in duration-75"
+                                            leave-from-class="transform opacity-100 scale-100"
+                                            leave-to-class="transform opacity-0 scale-95"
                                         >
-                                            <div class="py-1">
-                                                <!-- Share URL input and copy button -->
-                                                <MenuItem v-slot="{ active }">
-                                                    <div
-                                                        :class="[
-                                                            active
-                                                                ? 'bg-gray-100 text-gray-900'
-                                                                : 'text-gray-700',
-                                                            'block px-4 py-2 text-sm flex',
-                                                        ]"
+                                            <!-- Share dropdown menu items -->
+                                            <MenuItems
+                                                class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                            >
+                                                <div class="py-1">
+                                                    <!-- Share URL input and copy button -->
+                                                    <MenuItem
+                                                        v-slot="{ active }"
                                                     >
-                                                        <!-- URL input field -->
-                                                        <div class="flex-grow">
-                                                            <input
-                                                                id="datasetPublicURLCopyDesktop"
-                                                                readonly
-                                                                type="text"
-                                                                :value="
-                                                                    shareURL
-                                                                "
-                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
-                                                            />
-                                                        </div>
-
-                                                        <!-- Copy to clipboard button -->
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                            @click="
-                                                                copyToClipboard(
-                                                                    shareURL,
-                                                                    'datasetPublicURLCopyDesktop'
-                                                                )
-                                                            "
+                                                        <div
+                                                            :class="[
+                                                                active
+                                                                    ? 'bg-gray-100 text-gray-900'
+                                                                    : 'text-gray-700',
+                                                                'block px-4 py-2 text-sm flex',
+                                                            ]"
                                                         >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
-                                                    </div>
-                                                </MenuItem>
-                                            </div>
-                                        </MenuItems>
-                                    </transition>
-                                </Menu>
-                            </div>
+                                                            <!-- URL input field -->
+                                                            <div
+                                                                class="flex-grow"
+                                                            >
+                                                                <input
+                                                                    id="datasetPublicURLCopyDesktop"
+                                                                    readonly
+                                                                    type="text"
+                                                                    :value="
+                                                                        shareURL
+                                                                    "
+                                                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                    @focus="
+                                                                        $event.target.select()
+                                                                    "
+                                                                />
+                                                            </div>
 
-                            <!-- Study identifier (desktop) -->
-                            <div class="text-sm float-right">
-                                <div
-                                    class="hover:text-blue-600 hover:cursor-pointer text-gray-500 mx-2 my-1"
-                                >
-                                    <p class="inline m-0 p-0">
-                                        #{{ study.data.identifier }}
-                                    </p>
+                                                            <!-- Copy to clipboard button -->
+                                                            <button
+                                                                type="button"
+                                                                class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                                @click="
+                                                                    copyToClipboard(
+                                                                        shareURL,
+                                                                        'datasetPublicURLCopyDesktop'
+                                                                    )
+                                                                "
+                                                            >
+                                                                <span
+                                                                    ><ClipboardDocumentIcon
+                                                                        class="h-5 w-5"
+                                                                        aria-hidden="true"
+                                                                /></span>
+                                                            </button>
+                                                        </div>
+                                                    </MenuItem>
+                                                </div>
+                                            </MenuItems>
+                                        </transition>
+                                    </Menu>
                                 </div>
                             </div>
-
-                            <!-- Clear floats -->
                             <div class="clear-both"></div>
-                        </div>
-                    </div>
-                    <div class="clear-both"></div>
 
-                    <!-- Mobile layout section -->
-                    <div class="mt-4">
-                        <!-- Mobile controls (stacked vertically) -->
-                        <div class="flex flex-col gap-3 sm:hidden">
-                            <!-- Share button (mobile) -->
-                            <div>
-                                <!-- Share dropdown menu (mobile) -->
-                                <Menu
-                                    v-if="
-                                        selectedDataset && study.data.is_public
-                                    "
-                                    as="div"
-                                    class="relative text-left"
-                                >
-                                    <!-- Share button trigger (mobile) -->
-                                    <div>
-                                        <MenuButton
-                                            class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
-                                        >
-                                            <ShareIcon
-                                                class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
-                                                aria-hidden="true"
-                                            ></ShareIcon
-                                            >Share
-                                        </MenuButton>
-                                    </div>
-                                    <transition
-                                        enter-active-class="transition ease-out duration-100"
-                                        enter-from-class="transform opacity-0 scale-95"
-                                        enter-to-class="transform opacity-100 scale-100"
-                                        leave-active-class="transition ease-in duration-75"
-                                        leave-from-class="transform opacity-100 scale-100"
-                                        leave-to-class="transform opacity-0 scale-95"
+                            <!-- Mobile layout section -->
+                            <div class="mt-4">
+                                <!-- Mobile controls (stacked vertically) -->
+                                <div class="sm:hidden">
+                                    <Menu
+                                        v-if="
+                                            selectedDataset &&
+                                            study.data.is_public
+                                        "
+                                        as="div"
+                                        class="relative text-left"
                                     >
-                                        <MenuItems
-                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                        <!-- Share button trigger (mobile) -->
+                                        <div>
+                                            <MenuButton
+                                                class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
+                                            >
+                                                <ShareIcon
+                                                    class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
+                                                    aria-hidden="true"
+                                                ></ShareIcon
+                                                >Share
+                                            </MenuButton>
+                                        </div>
+                                        <transition
+                                            enter-active-class="transition ease-out duration-100"
+                                            enter-from-class="transform opacity-0 scale-95"
+                                            enter-to-class="transform opacity-100 scale-100"
+                                            leave-active-class="transition ease-in duration-75"
+                                            leave-from-class="transform opacity-100 scale-100"
+                                            leave-to-class="transform opacity-0 scale-95"
                                         >
-                                            <div class="py-1">
-                                                <MenuItem v-slot="{ active }">
-                                                    <div
-                                                        :class="[
-                                                            active
-                                                                ? 'bg-gray-100 text-gray-900'
-                                                                : 'text-gray-700',
-                                                            'block px-4 py-2 text-sm flex',
-                                                        ]"
+                                            <MenuItems
+                                                class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                            >
+                                                <div class="py-1">
+                                                    <MenuItem
+                                                        v-slot="{ active }"
                                                     >
-                                                        <div class="flex-grow">
-                                                            <input
-                                                                id="datasetPublicURLCopy"
-                                                                readonly
-                                                                type="text"
-                                                                :value="
-                                                                    shareURL
-                                                                "
-                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                            @click="
-                                                                copyToClipboard(
-                                                                    shareURL,
-                                                                    'datasetPublicURLCopy'
-                                                                )
-                                                            "
+                                                        <div
+                                                            :class="[
+                                                                active
+                                                                    ? 'bg-gray-100 text-gray-900'
+                                                                    : 'text-gray-700',
+                                                                'block px-4 py-2 text-sm flex',
+                                                            ]"
                                                         >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
-                                                    </div>
-                                                </MenuItem>
-                                            </div>
-                                        </MenuItems>
-                                    </transition>
-                                </Menu>
-                            </div>
-                            <!-- Study identifier (mobile) -->
-                            <div class="text-sm">
-                                <div
-                                    class="inline hover:text-blue-600 hover:cursor-pointer text-gray-500"
-                                >
-                                    #{{ study.data.identifier }}
+                                                            <div
+                                                                class="flex-grow"
+                                                            >
+                                                                <input
+                                                                    id="datasetPublicURLCopy"
+                                                                    readonly
+                                                                    type="text"
+                                                                    :value="
+                                                                        shareURL
+                                                                    "
+                                                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                    @focus="
+                                                                        $event.target.select()
+                                                                    "
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                                @click="
+                                                                    copyToClipboard(
+                                                                        shareURL,
+                                                                        'datasetPublicURLCopy'
+                                                                    )
+                                                                "
+                                                            >
+                                                                <span
+                                                                    ><ClipboardDocumentIcon
+                                                                        class="h-5 w-5"
+                                                                        aria-hidden="true"
+                                                                /></span>
+                                                            </button>
+                                                        </div>
+                                                    </MenuItem>
+                                                </div>
+                                            </MenuItems>
+                                        </transition>
+                                    </Menu>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div
-                    v-if="
-                        study.data.description &&
-                        study.data.description.length > 0
-                    "
-                    class="mt-4"
-                >
-                    <div class="relative">
                         <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
+                            v-if="
+                                study.data.description &&
+                                study.data.description.length > 0
+                            "
+                            class="mt-4"
                         >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Description
-                            </span>
-                        </div>
-                    </div>
-                    <div>
-                        <div
-                            :class="[
-                                'mt-1 px-0 text-sm text-blue-gray-500 prose prose-sm max-w-none transition-all duration-300',
-                                isDescriptionExpanded
-                                    ? 'max-h-none'
-                                    : 'max-h-32 overflow-hidden',
-                            ]"
-                            v-html="md(study.data.description)"
-                        ></div>
-                        <button
-                            v-if="isDescriptionLong"
-                            class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium focus:outline-none"
-                            @click="toggleDescription"
-                        >
-                            {{
-                                isDescriptionExpanded
-                                    ? "Show less"
-                                    : "Show more"
-                            }}
-                        </button>
-                    </div>
-                </div>
-                <div v-if="study.data.tags.length > 0" class="mt-4">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Keywords
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <dd class="mt-1 text-md text-gray-900 space-y-5">
-                            <p>
-                                <span
-                                    v-for="tag in study.data.tags"
-                                    :key="tag.id"
-                                    class="mr-2"
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-0 flex items-center"
+                                    aria-hidden="true"
+                                >
+                                    <div
+                                        class="w-full border-t border-gray-100"
+                                    ></div>
+                                </div>
+                                <div
+                                    class="relative flex items-center justify-between"
                                 >
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
+                                        class="pr-3 text-md bg-white font-medium text-gray-400"
+                                    >
+                                        Description
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div
+                                    :class="[
+                                        'mt-1 px-0 text-sm text-blue-gray-500 prose prose-sm max-w-none transition-all duration-300',
+                                        isDescriptionExpanded
+                                            ? 'max-h-none'
+                                            : 'max-h-32 overflow-hidden',
+                                    ]"
+                                    v-html="md(study.data.description)"
+                                ></div>
+                                <button
+                                    v-if="isDescriptionLong"
+                                    class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium focus:outline-none"
+                                    @click="toggleDescription"
+                                >
+                                    {{
+                                        isDescriptionExpanded
+                                            ? "Show less"
+                                            : "Show more"
+                                    }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 space-y-6">
+                            <div
+                                v-if="
+                                    study.data.sample?.description &&
+                                    study.data.sample.description.length > 0
+                                "
+                                class="rounded-lg border border-gray-100 bg-gray-50/80 p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+                            >
+                                <p class="whitespace-pre-wrap">
+                                    {{ study.data.sample.description }}
+                                </p>
+                            </div>
+
+                            <div
+                                class="mt-6 min-w-0 max-w-full overflow-x-auto"
+                            >
+                                <SpectraViewer
+                                    ref="spectraViewerREF"
+                                    :project="project.data"
+                                    :study="study.data"
+                                ></SpectraViewer>
+                            </div>
+
+                            <div class="my-6 overflow-visible">
+                                <div>
+                                    <div
+                                        class="mb-5 flex flex-wrap items-center justify-between gap-3"
+                                    >
+                                        <h2
+                                            class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                                        >
+                                            Spectra Datasets
+                                        </h2>
+                                        <span
+                                            class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium tabular-nums text-gray-700 ring-1 ring-inset ring-gray-900/5 dark:bg-gray-800/80 dark:text-gray-300 dark:ring-white/10"
+                                        >
+                                            {{ study.data.datasets.length }}
+                                            {{
+                                                study.data.datasets.length === 1
+                                                    ? "dataset"
+                                                    : "datasets"
+                                            }}
+                                        </span>
+                                    </div>
+
+                                    <div
+                                        v-if="study.data.datasets.length === 0"
+                                        class="rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50 to-white px-6 py-14 text-center dark:border-gray-700 dark:from-gray-900/40 dark:to-gray-950/20"
+                                    >
+                                        <svg
+                                            class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="1.5"
+                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                            />
+                                        </svg>
+                                        <h3
+                                            class="mt-3 text-sm font-semibold text-gray-900 dark:text-gray-100"
+                                        >
+                                            No datasets available
+                                        </h3>
+                                        <p
+                                            class="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+                                        >
+                                            There are no spectra datasets
+                                            associated with this study yet.
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-else
+                                        class="grid grid-cols-1 gap-5 p-0.5 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                                    >
+                                        <div
+                                            v-for="dataset in study.data.datasets.sort(
+                                                (a, b) =>
+                                                    a.name > b.name ? 1 : -1
+                                            )"
+                                            :key="dataset.slug"
+                                            class="group relative"
+                                        >
+                                            <a
+                                                :href="
+                                                    '/' +
+                                                    dataset.identifier.replace(
+                                                        'NMRXIV:',
+                                                        ''
+                                                    )
+                                                "
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-inset ring-gray-900/[0.08] transition duration-300 ease-out hover:shadow-md hover:ring-gray-900/[0.12] focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-gray-950 dark:ring-white/[0.1] dark:hover:ring-white/[0.16] dark:focus-visible:ring-offset-gray-950"
+                                            >
+                                                <div
+                                                    class="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-teal-500/0 via-teal-500/70 to-teal-500/0 opacity-0 transition duration-300 group-hover:opacity-100"
+                                                ></div>
+
+                                                <div
+                                                    class="flex flex-1 flex-col gap-3"
+                                                >
+                                                    <h3
+                                                        class="line-clamp-2 text-[0.9375rem] font-semibold leading-snug text-gray-900 transition-colors group-hover:text-teal-700 dark:text-gray-100 dark:group-hover:text-teal-400"
+                                                    >
+                                                        {{ dataset.name }}
+                                                    </h3>
+
+                                                    <div
+                                                        v-if="dataset.type"
+                                                        class="flex flex-wrap gap-2"
+                                                    >
+                                                        <span
+                                                            class="inline-flex max-w-full items-center rounded-md bg-gray-50 px-2 py-1 text-[11px] font-medium leading-tight text-gray-700 ring-1 ring-inset ring-gray-500/10 dark:bg-gray-900 dark:text-gray-300 dark:ring-white/10"
+                                                        >
+                                                            {{
+                                                                dataset.type.replace(
+                                                                    /,\s*$/,
+                                                                    ""
+                                                                )
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-800"
+                                                >
+                                                    <span
+                                                        class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                                                    >
+                                                        Open dataset
+                                                    </span>
+                                                    <svg
+                                                        class="h-4 w-4 shrink-0 text-gray-400 transition duration-300 group-hover:translate-x-0.5 group-hover:text-teal-600 dark:group-hover:text-teal-400"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="2"
+                                                        stroke="currentColor"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside
+                        v-if="hasInfoSidebar"
+                        class="mt-10 min-w-0 lg:mt-0 lg:col-span-3"
+                    >
+                        <div
+                            class="flex min-w-0 flex-col gap-6 bg-white py-5 pl-0 pr-0 dark:bg-gray-900/80 lg:sticky lg:top-6"
+                        >
+                            <div
+                                v-if="studyIdentifier"
+                                class="min-w-0 shrink-0"
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Identifier
+                                </h3>
+                                <div class="mt-2">
+                                    <Tag :identifier="studyIdentifier" />
+                                </div>
+                            </div>
+                            <div
+                                v-if="hasPublicationDates"
+                                :class="[
+                                    'min-w-0 shrink-0',
+                                    studyIdentifier
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : '',
+                                ]"
+                            >
+                                <ShowProjectDates
+                                    variant="simple"
+                                    :release_date="study.data.release_date"
+                                    :created_at="study.data.created_at"
+                                />
+                            </div>
+                            <div
+                                v-if="hasKeywords"
+                                :class="[
+                                    'min-w-0 shrink-0',
+                                    studyIdentifier || hasPublicationDates
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : '',
+                                ]"
+                            >
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Keywords
+                                </h3>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    <span
+                                        v-for="tag in study.data.tags"
+                                        :key="tag.id"
+                                        class="inline-flex items-center rounded-md bg-indigo-100 px-2.5 py-0.5 text-sm font-medium text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-200"
                                     >
                                         <svg
                                             class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
@@ -321,315 +494,64 @@
                                         </svg>
                                         {{ tag.name["en"] }}
                                     </span>
-                                </span>
-                            </p>
-                        </dd>
-                    </div>
-                </div>
-                <div
-                    v-if="
-                        study.data.sample.molecules.length > 0 ||
-                        study.data.sample.description == ''
-                    "
-                    class="mt-4"
-                >
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Sample
-                            </span>
-                        </div>
-                    </div>
-                    <div
-                        v-if="study.data.sample.molecules.length > 0"
-                        class="mt-3"
-                    >
-                        <label>Molecular Composition</label>
-                        <div class="grid md:grid-cols-1 gap-2 mt-2">
-                            <div class="pr-2">
-                                <div
-                                    v-if="
-                                        study.data.sample.molecules.length > 0
-                                    "
-                                    class="flow-root"
-                                >
-                                    <ul role="list" class="-mb-8">
-                                        <li
-                                            v-for="molecule in study.data.sample
-                                                .molecules"
-                                            :key="molecule.standard_inchi"
-                                        >
-                                            <div class="relative pb-8">
-                                                <span
-                                                    class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
-                                                    aria-hidden="true"
-                                                ></span>
-                                                <div class="relative flex">
-                                                    <div
-                                                        v-if="
-                                                            molecule &&
-                                                            molecule.pivot
-                                                        "
-                                                        class="relative"
-                                                    >
-                                                        <div
-                                                            class="rounded-full border my-4 p-2 z-10 bg-gray-100 text-sm"
-                                                        >
-                                                            {{
-                                                                molecule.pivot
-                                                                    .percentage_composition
-                                                            }}%
-                                                        </div>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <div>
-                                                            <div
-                                                                class="text-sm"
-                                                            >
-                                                                <a
-                                                                    class="font-medium text-gray-900"
-                                                                    >{{
-                                                                        molecule.standard_inchi
-                                                                    }}</a
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            class="text-sm text-gray-700"
-                                                        >
-                                                            <div
-                                                                class="flex justify-left items-center mx-auto p-4 mt-4 ml-4"
-                                                            >
-                                                                <div
-                                                                    v-if="
-                                                                        molecule.canonical_smiles
-                                                                    "
-                                                                    class="bg-red flex items-center justify-center"
-                                                                >
-                                                                    <Depictor2D
-                                                                        class="p-4 h-64 w-64 mr-4"
-                                                                        :molecule="
-                                                                            molecule.canonical_smiles
-                                                                        "
-                                                                    ></Depictor2D>
-                                                                    <Depictor3D
-                                                                        :molecule="
-                                                                            molecule.canonical_smiles
-                                                                        "
-                                                                    ></Depictor3D>
-                                                                </div>
-                                                                <div
-                                                                    v-else
-                                                                    class="text-gray-500 text-sm"
-                                                                >
-                                                                    No structure
-                                                                    available
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <div
-                                        class="rounded-full border p-2 z-10 bg-gray-100 text-sm mt-14 text-center"
-                                    >
-                                        Sample chemical composition
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <div class="text-center my-10 py-10">
-                                        <h3
-                                            class="mt-2 text-sm font-medium text-gray-900"
-                                        >
-                                            No structures associated with the
-                                            sample yet!
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Get started by adding a new
-                                            molecule.
-                                        </p>
-                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Spectra
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <SpectraViewer
-                            ref="spectraViewerREF"
-                            :project="project.data"
-                            :study="study.data"
-                        ></SpectraViewer>
-                    </div>
-
-                    <div class="my-6">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-semibold text-gray-900">
-                                    Spectra Datasets
-                                </h2>
-                                <span
-                                    class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
-                                >
-                                    {{ study.data.datasets.length }}
-                                    {{
-                                        study.data.datasets.length === 1
-                                            ? "dataset"
-                                            : "datasets"
-                                    }}
-                                </span>
-                            </div>
-
                             <div
-                                v-if="study.data.datasets.length === 0"
-                                class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300"
+                                v-if="hasMolecularCompositionSidebar"
+                                :class="[
+                                    'min-w-0 shrink-0',
+                                    studyIdentifier ||
+                                    hasPublicationDates ||
+                                    hasKeywords
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : '',
+                                ]"
                             >
-                                <svg
-                                    class="mx-auto h-12 w-12 text-gray-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                    />
-                                </svg>
                                 <h3
-                                    class="mt-2 text-sm font-medium text-gray-900"
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                 >
-                                    No datasets available
+                                    Molecular info
                                 </h3>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    There are no spectra datasets associated
-                                    with this study yet.
-                                </p>
+                                <MolecularInfoPanel
+                                    :molecules="compositionMolecules"
+                                />
                             </div>
-
                             <div
-                                v-else
-                                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                                v-if="hasStudyCitations"
+                                class="w-full min-w-0 shrink-0"
+                                :class="
+                                    hasSidebarContentAboveCitation
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : ''
+                                "
                             >
-                                <div
-                                    v-for="dataset in study.data.datasets.sort(
-                                        (a, b) => (a.name > b.name ? 1 : -1)
-                                    )"
-                                    :key="dataset.slug"
-                                    class="group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-300"
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                 >
-                                    <a
-                                        :href="
-                                            '/' +
-                                            dataset.identifier.replace(
-                                                'NMRXIV:',
-                                                ''
-                                            )
-                                        "
-                                        target="_blank"
-                                        class="block p-4 h-full"
-                                    >
-                                        <div>
-                                            <div
-                                                class="flex items-start justify-between mb-3"
-                                            >
-                                                <h3
-                                                    class="text-md font-bold text-teal-600 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 flex-1 pr-2"
-                                                >
-                                                    {{ dataset.name }}
-                                                </h3>
-                                            </div>
-
-                                            <div
-                                                class="flex flex-col gap-2 flex-1"
-                                            >
-                                                <div v-if="dataset.type">
-                                                    <span
-                                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                                    >
-                                                        {{
-                                                            dataset.type.replace(
-                                                                /,\s*$/,
-                                                                ""
-                                                            )
-                                                        }}
-                                                    </span>
-                                                </div>
-
-                                                <!-- <div class="overflow-hidden rounded-md border-0 text-gray-900">
-                                                    <div v-if="dataset.doi" class="cursor-pointer max-w-full">
-                                                        <span class="flex items-start rounded-l-md pr-2 py-1 text-xs font-medium flex-shrink-0 h-full">
-                                                            DOI:
-                                                        </span>
-                                                        <span class="flex items-start pr-2 py-1 text-xs font-bold break-all leading-tight min-w-0">
-                                                            {{ dataset.doi }}
-                                                        </span>
-                                                    </div>
-                                                </div> -->
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            class="mt-3 pt-3 border-t border-gray-100"
-                                        >
-                                            <div
-                                                class="flex items-center text-xs text-gray-500"
-                                            >
-                                                <span class="flex items-center">
-                                                    <svg
-                                                        class="w-3 h-3 mr-1"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                    View Dataset
-                                                </span>
-                                                <span
-                                                    class="ml-auto group-hover:text-blue-600 transition-colors duration-200"
-                                                >
-                                                    →
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </a>
+                                    {{ citationsHeading }}
+                                </h3>
+                                <div class="mt-2 space-y-4">
+                                    <citation-card
+                                        :citations="study.data.citations"
+                                    />
                                 </div>
                             </div>
+                            <div
+                                v-if="showDoiCitation"
+                                class="w-full min-w-0 shrink-0"
+                                :class="
+                                    hasSidebarContentAboveDoiCitation
+                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
+                                        : ''
+                                "
+                            >
+                                <Citation
+                                    :model="'sample'"
+                                    :doi="study.data.doi"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div>&emsp;</div>
+                    </aside>
                 </div>
             </div>
         </template>
@@ -652,11 +574,13 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
-import Depictor2D from "@/Shared/Depictor2D.vue";
-import Depictor3D from "@/Shared/Depictor3D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
+import Tag from "@/Shared/Tag.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
+import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 
 export default {
     name: "StudyDetail",
@@ -670,11 +594,13 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
-        Depictor2D,
-        Depictor3D,
         DOIBadge,
+        MolecularInfoPanel,
+        Tag,
         Head,
         Citation,
+        CitationCard,
+        ShowProjectDates,
     },
 
     props: {
@@ -725,6 +651,73 @@ export default {
          */
         url() {
             return String(this.$page.props.url);
+        },
+
+        compositionMolecules() {
+            const fromSample = this.study?.data?.sample?.molecules;
+            if (Array.isArray(fromSample) && fromSample.length > 0) {
+                return fromSample;
+            }
+            const top = this.study?.data?.molecules;
+            if (Array.isArray(top) && top.length > 0) {
+                return top;
+            }
+
+            return [];
+        },
+
+        studyIdentifier() {
+            const identifier = this.study?.data?.identifier;
+
+            return identifier != null && String(identifier).length > 0
+                ? identifier
+                : null;
+        },
+        hasMolecularCompositionSidebar() {
+            return this.compositionMolecules.length > 0;
+        },
+        hasKeywords() {
+            return (this.study?.data?.tags?.length ?? 0) > 0;
+        },
+        hasPublicationDates() {
+            return (
+                Boolean(this.study?.data?.release_date) ||
+                Boolean(this.study?.data?.created_at)
+            );
+        },
+        hasStudyCitations() {
+            return (this.study?.data?.citations?.length ?? 0) > 0;
+        },
+        citationsHeading() {
+            const count = this.study?.data?.citations?.length ?? 0;
+
+            return count === 1 ? "Citation" : "Citations";
+        },
+        showDoiCitation() {
+            return this.study?.data?.is_public && this.study?.data?.doi != null;
+        },
+        hasSidebarContentAboveCitation() {
+            return (
+                Boolean(this.studyIdentifier) ||
+                this.hasPublicationDates ||
+                this.hasKeywords ||
+                this.hasMolecularCompositionSidebar
+            );
+        },
+        hasSidebarContentAboveDoiCitation() {
+            return (
+                this.hasSidebarContentAboveCitation || this.hasStudyCitations
+            );
+        },
+        hasInfoSidebar() {
+            return (
+                Boolean(this.studyIdentifier) ||
+                this.showDoiCitation ||
+                this.hasMolecularCompositionSidebar ||
+                this.hasKeywords ||
+                this.hasPublicationDates ||
+                this.hasStudyCitations
+            );
         },
     },
 

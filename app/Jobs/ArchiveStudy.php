@@ -6,7 +6,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use Aws\S3\S3Client;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,11 +15,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
-class ArchiveStudy implements ShouldBeUnique, ShouldQueue
+class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 0;
+
+    /**
+     * Only ever run an archive job once. Failures must surface to Horizon
+     * rather than be retried, otherwise large zips re-run from scratch and
+     * compound the load on Ceph.
+     */
+    public $tries = 1;
 
     /**
      * The project instance.
@@ -45,21 +52,51 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
     }
 
     /**
+     * Bound the unique lock so a crashed worker cannot strand it in Redis.
+     * The lock is also released as soon as `handle()` starts (per
+     * ShouldBeUniqueUntilProcessing), so the only role of this TTL is the
+     * crash/kill safety net.
+     */
+    public function uniqueFor(): int
+    {
+        return 600;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
     {
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_study_job_started',
+            'project_id' => $this->project->id,
+        ]);
+
         // Debug logging - immediate write to log file
         Log::info('=== ArchiveStudy job STARTED for project: '.$this->project->id.' ===');
         Log::info('Project ID: '.$this->project->id);
         Log::info('Current timestamp: '.now()->toString());
 
         Log::info('Archiving study for projects '.$this->project->id);
-        $project = $this->project;
+        // Re-fetch the project so we see studies / files added between
+        // dispatch and handle. Without this, a job dispatched while a prior
+        // ArchiveStudy run was still working would observe stale state.
+        $project = Project::with('studies')->find($this->project->id);
         if ($project) {
             Log::info("Project {$project->id} studies count: ".$project->studies->count());
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'archive_study_project_loaded',
+                'project_id' => $project->id,
+                'studies_count' => $project->studies->count(),
+            ]);
+
             foreach ($project->studies as $study) {
                 Log::info("Processing study {$study->id}");
+                // Refresh study state. The earlier reference held by `$project`
+                // could be stale if another job (or the FileSystemObject
+                // observer) updated `download_url` after we were enqueued.
+                $study->refresh();
                 $study->internal_status = 'processing';
                 $study->save();
                 $archiveDownloadURL = $study->download_url;
@@ -225,6 +262,12 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                                 $s3Url = $this->generateS3Url($zipFilePath, $filesystemDriver, $bucket);
                                 $study->download_url = $s3Url;
                                 Log::info("Study {$study->id}: Archive created successfully at: {$s3Url}");
+
+                                Log::info('embargo_publish_trace', [
+                                    'stage' => 'archive_study_zip_built',
+                                    'project_id' => $project->id,
+                                    'study_id' => $study->id,
+                                ]);
                             } catch (\Exception $e) {
                                 // Clean up the partial file if it exists
                                 if (Storage::disk($filesystemDriver)->exists($zipFilePath)) {
@@ -242,20 +285,44 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         $study->save();
                     } else {
                         Log::info("Study {$study->id}: No fsObject found, marking complete");
+
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'archive_study_skip_no_fs_object',
+                            'project_id' => $project->id,
+                            'study_id' => $study->id,
+                        ]);
+
                         $study->internal_status = 'complete';
                         $study->save();
                     }
                 } else {
                     Log::info("Study {$study->id}: Already has download URL, marking complete");
+
+                    Log::info('embargo_publish_trace', [
+                        'stage' => 'archive_study_skip_existing_download_url',
+                        'project_id' => $project->id,
+                        'study_id' => $study->id,
+                    ]);
+
                     $study->internal_status = 'complete';
                     $study->save();
                 }
             }
         } else {
             Log::info('No project found');
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'archive_study_project_not_found',
+                'project_id' => $this->project->id,
+            ]);
         }
 
         Log::info('=== ArchiveStudy job COMPLETED for project: '.$this->project->id.' ===');
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_study_job_finished',
+            'project_id' => $this->project->id,
+        ]);
     }
 
     /**

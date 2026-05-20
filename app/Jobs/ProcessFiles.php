@@ -132,6 +132,12 @@ class ProcessFiles implements ShouldBeUnique, ShouldQueue
             $study->update(['download_url' => null]);
         }
 
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_files_dispatch_archive_study',
+            'project_id' => $project->id,
+            'draft_id' => $this->draft->id,
+        ]);
+
         // Dispatch archive job to regenerate archives
         ArchiveStudy::dispatch($project);
     }

@@ -75,7 +75,7 @@
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import Depictor3D from "@/Shared/Depictor3D.vue";
-import OCL from "openchemlib/full";
+import { createStructureEditor } from "@/Utils/structureEditor";
 
 export default {
     components: {
@@ -120,7 +120,7 @@ export default {
         loadStructureEditor(id) {
             this.edit = true;
             this.$nextTick(() => {
-                this.editor = OCL.StructureEditor.createSVGEditor(id, 1);
+                this.editor = createStructureEditor(id);
                 if (this.modelValue) {
                     this.editor.setSmiles(this.modelValue);
                 }

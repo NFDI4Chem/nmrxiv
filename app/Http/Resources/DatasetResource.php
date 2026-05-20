@@ -54,6 +54,11 @@ class DatasetResource extends JsonResource
             'external_url' => $this->external_url,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            $this->mergeWhen(in_array('nmrium', $this->properties), function () {
+                return [
+                    'nmrium_info' => $this->resource->normalizedNmriumInfo(),
+                ];
+            }),
         ];
     }
 }

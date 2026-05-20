@@ -1,12 +1,12 @@
 <!--
-  Study Card Public Component
+  Compound card (public)
   
-  A modern card component for displaying study information in public project views.
+  A card for displaying a compound / study in public project views.
   Features responsive design, image carousel, molecular structure fallback, and
   comprehensive study metadata display with experiment types and status indicators.
 -->
 <template>
-    <!-- Main study card container with hover effects and transitions -->
+    <!-- Compound card: preview, structure, and metadata -->
     <div
         v-if="study"
         class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 ease-in-out overflow-hidden"

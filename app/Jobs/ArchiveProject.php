@@ -22,6 +22,13 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
     public $timeout = 0;
 
     /**
+     * Only ever run an archive job once. Failures must surface to Horizon
+     * rather than be retried, otherwise large zips re-run from scratch and
+     * compound the load on Ceph.
+     */
+    public $tries = 1;
+
+    /**
      * The project instance.
      *
      * @var Project
@@ -45,10 +52,25 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
     }
 
     /**
+     * How long (seconds) the unique lock should be held. Without this,
+     * a crashed/killed worker can leave the lock orphaned in redis and
+     * silently swallow every subsequent dispatch for this project.
+     */
+    public function uniqueFor(): int
+    {
+        return 14400;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
     {
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_project_job_started',
+            'project_id' => $this->project->id,
+        ]);
+
         $project = $this->project;
         if ($project) {
             $archiveDownloadURL = $project->download_url;
@@ -168,14 +190,36 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $project->download_url = $url;
                         $project->internal_status = 'complete';
                         $project->save();
+
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'archive_project_zip_built',
+                            'project_id' => $project->id,
+                            'download_url_set' => true,
+                        ]);
+                    } else {
+                        Log::info('embargo_publish_trace', [
+                            'stage' => 'archive_project_skip_zip',
+                            'project_id' => $project->id,
+                            'reason' => ! $fsObject ? 'no_fs_object' : 'fs_status_missing',
+                        ]);
                     }
                 } else {
+                    Log::info('embargo_publish_trace', [
+                        'stage' => 'archive_project_skip_existing_download_url',
+                        'project_id' => $project->id,
+                    ]);
+
                     $project->internal_status = 'complete';
                     $project->save();
                 }
             }
 
         }
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'archive_project_job_finished',
+            'project_id' => $this->project->id,
+        ]);
     }
 
     /**

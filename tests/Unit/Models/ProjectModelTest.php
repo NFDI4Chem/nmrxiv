@@ -141,6 +141,8 @@ class ProjectModelTest extends TestCase
             'is_deleted', 'is_archived', 'status', 'obfuscationcode', 'description', 'type', 'uuid', 'access',
             'access_type', 'team_id', 'owner_id', 'draft_id', 'fs_id',
             'project_photo_path', 'license_id', 'release_date', 'deleted_on', 'species',
+            'provisional_doi', 'provisional_doi_registered_at',
+            'validation_id', 'validation_status', 'schema_version',
         ];
 
         $project = new Project;
@@ -297,7 +299,7 @@ class ProjectModelTest extends TestCase
     public function test_it_has_correct_appended_attributes(): void
     {
         $project = Project::factory()->create();
-        $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
+        $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published', 'provisional_doi_url'];
 
         $this->assertEquals($appends, $project->getAppends());
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Molecule;
+use App\Support\Public\PublicMoleculeAggregates;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -262,6 +263,10 @@ class SearchController extends Controller
 
             $query = $this->sanitizeQuery($request->get('query'));
 
+            if (($query === null || $query === '') && $sort === null) {
+                $sort = 'recent';
+            }
+
             $type = $request->query('type')
                 ? $request->query('type')
                 : $request->get('type');
@@ -334,12 +339,17 @@ class SearchController extends Controller
 
             $queryType = strtolower($queryType);
 
+            $publicSpectraFilter = ' AND '.PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+
             $statement = null;
 
             if ($queryType == 'smiles' || $queryType == 'substructure') {
                 try {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM mols WHERE m@>? LIMIT ? OFFSET ?',
+                        "SELECT mols.id, COUNT(*) OVER () as count FROM mols
+                        INNER JOIN molecules ON molecules.id = mols.id
+                        WHERE m@>? AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
+                        LIMIT ? OFFSET ?",
                         [$query, $limit, $offset]
                     );
                 } catch (\Exception $e) {
@@ -349,18 +359,21 @@ class SearchController extends Controller
                 }
             } elseif ($queryType == 'inchi') {
                 $hits = DB::select(
-                    'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi LIKE ? LIMIT ? OFFSET ?',
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi LIKE ?{$publicSpectraFilter} LIMIT ? OFFSET ?",
                     ['%'.$query.'%', $limit, $offset]
                 );
             } elseif ($queryType == 'inchikey') {
                 $hits = DB::select(
-                    'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi_key LIKE ? LIMIT ? OFFSET ?',
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi_key LIKE ?{$publicSpectraFilter} LIMIT ? OFFSET ?",
                     ['%'.$query.'%', $limit, $offset]
                 );
             } elseif ($queryType == 'exact') {
                 try {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM mols WHERE m@=? LIMIT ? OFFSET ?',
+                        "SELECT mols.id, COUNT(*) OVER () as count FROM mols
+                        INNER JOIN molecules ON molecules.id = mols.id
+                        WHERE m@=? AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
+                        LIMIT ? OFFSET ?",
                         [$query, $limit, $offset]
                     );
                 } catch (\Exception $e) {
@@ -370,7 +383,10 @@ class SearchController extends Controller
             } elseif ($queryType == 'similarity') {
                 try {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM fps WHERE mfp2%morganbv_fp(?) LIMIT ? OFFSET ?',
+                        "SELECT fps.id, COUNT(*) OVER () as count FROM fps
+                        INNER JOIN molecules ON molecules.id = fps.id
+                        WHERE mfp2%morganbv_fp(?) AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
+                        LIMIT ? OFFSET ?",
                         [$query, $limit, $offset]
                     );
                 } catch (\Exception $e) {
@@ -378,8 +394,18 @@ class SearchController extends Controller
                     $hits = [];
                 }
             } elseif ($queryType == 'tags') {
-                $results = Molecule::withAnyTags([$query], $tagType)->paginate($limit)->items();
-                $count = Molecule::withAnyTags([$query], $tagType)->count();
+                $tagQuery = PublicMoleculeAggregates::scopePublicCatalog(
+                    Molecule::withAnyTags([$query], $tagType)
+                );
+                if ($sort === 'recent') {
+                    $tagQuery->orderByDesc('created_at');
+                }
+                $results = PublicMoleculeAggregates::enrich(
+                    $tagQuery->paginate($limit)->items()
+                );
+                $count = PublicMoleculeAggregates::scopePublicCatalog(
+                    Molecule::withAnyTags([$query], $tagType)
+                )->count();
             } elseif ($queryType == 'filters') {
                 $result = $this->buildSecureFilterQuery($query, $filterMap, $limit, $offset);
                 $hits = $result['hits'];
@@ -387,12 +413,13 @@ class SearchController extends Controller
             } else {
                 if ($query) {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?) LIMIT ? OFFSET ?',
-                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
+                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
                     );
                 } else {
+                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL LIMIT ? OFFSET ?',
+                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL{$publicSpectraFilter} {$orderBy} LIMIT ? OFFSET ?",
                         [$limit, $offset]
                     );
                 }
@@ -432,14 +459,27 @@ class SearchController extends Controller
                     $results = [];
                 }
             }
+
+            if ($results !== []) {
+                $results = PublicMoleculeAggregates::enrich($results);
+            }
+
             $pagination = new LengthAwarePaginator(
                 $results,
                 $count,
                 $limit,
-                $page
+                $page,
+                ['path' => url('/compounds')]
             );
 
-            // dd($pagination);
+            $pagination->appends(array_filter([
+                'query' => $query !== null && $query !== '' ? $query : null,
+                'sort' => $sort,
+                'limit' => $limit !== 24 ? $limit : null,
+                'tagType' => $tagType,
+                'type' => $queryType !== 'text' ? $queryType : null,
+            ], fn ($value) => $value !== null && $value !== ''));
+
             return $pagination;
         } catch (QueryException $exception) {
             return response()->json(
@@ -572,7 +612,14 @@ class SearchController extends Controller
             }
 
             $whereClause = implode(' OR ', $whereConditions);
-            $sql = "SELECT molecule_id as id, COUNT(*) OVER () as count FROM properties WHERE {$whereClause} LIMIT ? OFFSET ?";
+            $publicSpectraFilter = PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+            $sql = "SELECT properties.molecule_id as id, COUNT(*) OVER () as count
+                FROM properties
+                INNER JOIN molecules ON molecules.id = properties.molecule_id
+                WHERE ({$whereClause})
+                  AND molecules.identifier IS NOT NULL
+                  AND {$publicSpectraFilter}
+                LIMIT ? OFFSET ?";
 
             $parameters[] = $limit;
             $parameters[] = $offset;

@@ -67,6 +67,8 @@ class Study extends Model implements Auditable
         'validation_id',
         'metadata_bagit_generation_status',
         'metadata_bagit_generation_logs',
+        'has_nmrium',
+        'has_nmredata',
     ];
 
     /**
@@ -350,6 +352,14 @@ class Study extends Model implements Auditable
     {
         return $this->belongsToMany(Author::class)
             ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Normalized citations (pivot `citation_study`). Named `linkedCitations` to avoid clashing with the JSON `citations` attribute.
+     */
+    public function linkedCitations(): BelongsToMany
+    {
+        return $this->belongsToMany(Citation::class)->withTimestamps();
     }
 
     /**

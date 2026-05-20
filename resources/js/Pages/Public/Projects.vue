@@ -158,13 +158,14 @@
                 </div>
                 <div v-if="filters.mode == 'grid'">
                     <div
-                        class="mt-4 mx-auto grid gap-8 lg:grid-cols-4 2xl:grid-cols-6 w-full"
+                        class="mx-auto mt-4 grid w-full gap-6 sm:gap-8 lg:grid-cols-4 2xl:grid-cols-6"
                     >
                         <span
                             v-for="project in projects.data.filter(
                                 (p) => p.owner
                             )"
                             :key="project.id"
+                            class="block min-w-0 overflow-visible"
                         >
                             <project-card
                                 :mode="filters.mode"
@@ -179,7 +180,7 @@
                     >
                         <ul
                             role="list"
-                            class="divide-y border rounded-md divide-gray-200"
+                            class="divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
                         >
                             <span
                                 v-for="project in projects.data.filter(

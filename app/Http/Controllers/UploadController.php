@@ -14,8 +14,22 @@ class UploadController extends Controller
 {
     public function upload(Request $request)
     {
+        $draftId = $request->get('draft_id');
+
+        if (is_numeric($draftId)) {
+            $draft = Draft::find((int) $draftId);
+
+            if ($draft) {
+                $project = Project::where('draft_id', $draft->id)->first();
+
+                if ($project && $project->status !== 'draft') {
+                    return redirect()->route('publish', ['draft' => $draft->id]);
+                }
+            }
+        }
+
         return Inertia::render('Upload', [
-            'draft_id' => $request->get('draft_id'),
+            'draft_id' => $draftId,
             'step' => $request->get('step'),
         ]);
     }

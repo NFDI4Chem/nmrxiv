@@ -38,7 +38,7 @@ class StudyPublish extends Mailable
         }
 
         return $this->markdown('vendor.mail.study-published', [
-            'url' => url(config('app.url').'/spectra'),
+            'url' => url(config('app.url').'/projects'),
             'samples' => $this->studies,
             'releaseToday' => $releaseToday,
             'releaseDate' => $releaseDate,

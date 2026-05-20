@@ -126,6 +126,20 @@ class StudyResource extends JsonResource
                     ),
                 ];
             }),
+            $this->mergeWhen(! $this->lite, function () {
+                return [
+                    $this->mergeWhen(
+                        in_array('citations', $this->properties),
+                        function () {
+                            return [
+                                'citations' => CitationResource::collection(
+                                    $this->relationLoaded('linkedCitations') ? $this->linkedCitations : collect()
+                                ),
+                            ];
+                        }
+                    ),
+                ];
+            }),
         ];
     }
 }

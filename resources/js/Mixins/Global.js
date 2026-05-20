@@ -2,7 +2,7 @@ import * as marked from "marked";
 import DOMPurify from "dompurify";
 import { copyText } from "vue3-clipboard";
 import pluralize from "pluralize";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 
 export default {
     methods: {
@@ -159,6 +159,19 @@ export default {
             const date = new Date(timestamp);
             return new Intl.DateTimeFormat("en", {
                 dateStyle: "full",
+                timeStyle: "short",
+            }).format(date);
+        },
+        /**
+         * Unified date+time display for record metadata (Published / Created / Updated rows).
+         */
+        formatRecordTimestamp(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+            const date = new Date(timestamp);
+            return new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
                 timeStyle: "short",
             }).format(date);
         },

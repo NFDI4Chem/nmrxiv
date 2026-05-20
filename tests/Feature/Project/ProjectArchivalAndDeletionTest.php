@@ -9,12 +9,12 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Tests\TestCase;
 
-class ProjectArchivalAndDeletionTest extends TestCase
+class ProjectArchivalAndDeletionTest extends ProjectFeatureTestCase
 {
     use RefreshDatabase;
 
@@ -29,6 +29,8 @@ class ProjectArchivalAndDeletionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Notification::fake();
 
         $this->owner = User::factory()->withPersonalTeam()->create();
         $this->collaborator = User::factory()->create();

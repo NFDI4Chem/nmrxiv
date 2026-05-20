@@ -90,7 +90,7 @@ class ProjectPublicViewTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_public_project_license_tab_view()
+    public function test_public_project_license_query_renders_info_tab()
     {
         $license = License::factory()->create();
         $this->publicProject->update(['license_id' => $license->id]);
@@ -101,7 +101,8 @@ class ProjectPublicViewTest extends TestCase
             'tab' => 'license',
         ]));
 
-        $response->assertStatus(200);
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Show');
+        $this->assertSame('info', $page['props']['tab']);
     }
 
     public function test_public_project_study_tab_view()

@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Actions\Draft\DraftFiles;
 use App\Actions\Draft\ProcessDraft;
+use App\Actions\Draft\ResetSampleFolder;
 use App\Actions\Draft\UserDrafts;
 use App\Jobs\ProcessFiles;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
+use App\Support\ProvisionalDoi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 /**
  * Handle draft management operations including file processing, validation, and project conversion.
@@ -31,7 +35,8 @@ class DraftController extends Controller
         private FileSystemController $fileSystemController,
         private UserDrafts $userDrafts,
         private ProcessDraft $processDraft,
-        private DraftFiles $draftFiles
+        private DraftFiles $draftFiles,
+        private ResetSampleFolder $resetSampleFolder
     ) {}
 
     /**
@@ -85,6 +90,32 @@ class DraftController extends Controller
     }
 
     /**
+     * Reset cached state for a single sample folder so the next "Proceed to
+     * Step 2" run reprocesses it from scratch.
+     */
+    public function resetSampleFolder(Request $request, Draft $draft, FileSystemObject $filesystemobject): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
+
+        if ($filesystemobject->draft_id !== $draft->id) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Filesystem object does not belong to this draft.',
+            ], 403);
+        }
+
+        $result = $this->resetSampleFolder->execute($draft, $filesystemobject);
+
+        return response()->json($result, $result['ok'] ? 200 : 422);
+    }
+
+    /**
      * Get a single draft by ID with ownership verification.
      */
     public function show(Request $request, Draft $draft): JsonResponse
@@ -98,7 +129,7 @@ class DraftController extends Controller
         }
 
         return response()->json([
-            'draft' => $draft->load('Tags'),
+            'draft' => $draft->load(['Tags', 'project:id,slug,status,draft_id']),
         ]);
     }
 
@@ -145,12 +176,135 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+        if (! $project) {
+            return response()->json([
+                'project' => null,
+                'studies' => [],
+            ]);
+        }
+
+        $project->load(['owner']);
+        $studies = $project->studies()
+            ->with(['datasets', 'sample.molecules', 'tags'])
+            ->get();
 
         return response()->json([
-            'project' => $project->load(['owner']),
+            'project' => $project,
             'studies' => $studies,
         ]);
+    }
+
+    /**
+     * Lightweight study processing status for upload polling (read-only).
+     */
+    public function status(Request $request, Draft $draft): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
+
+        $project = Project::where('draft_id', $draft->id)->first();
+
+        if (! $project) {
+            return response()->json([
+                'project_id' => null,
+                'inprogress_count' => 0,
+                'studies' => [],
+            ]);
+        }
+
+        $studies = $project->studies()
+            ->select(['id', 'name', 'slug', 'internal_status', 'has_nmrium', 'project_id'])
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'project_id' => $project->id,
+            'inprogress_count' => $studies->where('internal_status', '!=', 'complete')->count(),
+            'studies' => $studies,
+        ]);
+    }
+
+    /**
+     * Create or return the draft project's provisional DOI (not registered with DataCite).
+     */
+    public function storeProvisionalDoi(Request $request, Draft $draft): JsonResponse
+    {
+        $this->authorizeDraftOwner($draft);
+
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id, $team_id, $team] = $user->getUserTeamData();
+
+        try {
+            $payload = DB::transaction(function () use ($draft, $user, $user_id, $team_id, $team): array {
+                Draft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
+
+                $project = Project::query()->where('draft_id', $draft->id)->first();
+
+                if (! $project) {
+                    $project = $this->processDraft->createNewProject($draft, $user_id, $team_id, $user, $team);
+                }
+
+                $locked = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
+
+                if ($locked->provisional_doi === null || $locked->provisional_doi === '') {
+                    $locked->provisional_doi = ProvisionalDoi::forDraft($draft);
+                    $locked->save();
+                }
+
+                $locked->refresh();
+
+                return [
+                    'provisional_doi' => $locked->provisional_doi,
+                    'url' => $locked->provisional_doi_url,
+                ];
+            });
+        } catch (RuntimeException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 503);
+        }
+
+        return response()->json($payload);
+    }
+
+    /**
+     * Clear the provisional DOI for the draft's project.
+     */
+    public function destroyProvisionalDoi(Request $request, Draft $draft): Response
+    {
+        $this->authorizeDraftOwner($draft);
+
+        $project = Project::query()->where('draft_id', $draft->id)->first();
+
+        if (! $project) {
+            return response()->noContent();
+        }
+
+        if ($project->draft_id === null) {
+            abort(403);
+        }
+
+        $project->provisional_doi = null;
+        $project->save();
+
+        return response()->noContent();
+    }
+
+    private function authorizeDraftOwner(Draft $draft): void
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        [$user_id] = $user->getUserTeamData();
+
+        if ($draft->owner_id !== $user_id) {
+            abort(403);
+        }
     }
 
     /**

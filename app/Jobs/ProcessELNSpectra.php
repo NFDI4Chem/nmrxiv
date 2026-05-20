@@ -29,18 +29,42 @@ class ProcessELNSpectra implements ShouldQueue
         if (! $project) {
             Log::error("Project not found: {$this->projectId}");
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_eln_spectra_aborted',
+                'reason' => 'project_not_found',
+                'project_id' => $this->projectId,
+            ]);
+
             return;
         }
 
         try {
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_eln_spectra_start',
+                'project_id' => $project->id,
+                'identifier' => $project->identifier,
+            ]);
+
             Log::info("Starting spectra processing for project: {$project->identifier}");
 
             $this->processProjectStudies($project);
 
             Log::info("Successfully completed spectra processing for project: {$project->identifier}");
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_eln_spectra_complete',
+                'project_id' => $project->id,
+            ]);
+
         } catch (Exception $e) {
             Log::error("Failed to process spectra for project {$project->identifier}: ".$e->getMessage());
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_eln_spectra_failed',
+                'project_id' => $project->id,
+                'error' => $e->getMessage(),
+            ]);
+
             throw $e;
         }
     }

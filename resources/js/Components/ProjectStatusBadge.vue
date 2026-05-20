@@ -1,11 +1,16 @@
 <template>
-    <div v-if="visibleStatuses.length > 0" class="flex flex-wrap gap-2 ml-4">
+    <div
+        v-if="visibleStatuses.length > 0"
+        class="flex shrink-0 flex-wrap items-center gap-2"
+    >
         <span
             v-for="status in visibleStatuses"
             :key="status.type"
+            :title="status.label"
             :class="[
-                'inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium capitalize',
+                'inline-flex w-36 shrink-0 items-center justify-center truncate px-2.5 py-0.5 text-center text-xs font-semibold',
                 getStatusClasses(status.type),
+                'rounded-full',
             ]"
         >
             {{ status.label }}
@@ -14,6 +19,16 @@
 </template>
 
 <script>
+const STATUS_LABELS = {
+    deleted: "Deleted",
+    embargo: "Embargo",
+    draft: "Draft",
+    archived: "Archived",
+    published: "Published",
+    complete: "Complete",
+    processing: "Processing",
+};
+
 export default {
     name: "ProjectStatusBadge",
 
@@ -39,10 +54,17 @@ export default {
                 return [];
             }
 
+            const key = String(this.project.status).toLowerCase();
+            const label =
+                STATUS_LABELS[key] ??
+                String(this.project.status)
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase());
+
             return [
                 {
                     type: this.project.status,
-                    label: this.project.status,
+                    label,
                 },
             ];
         },
@@ -54,6 +76,7 @@ export default {
          * Following consistent color patterns based on status values
          */
         getStatusClasses(statusType) {
+            const key = String(statusType).toLowerCase();
             const colorMap = {
                 // Critical states - Red theme
                 deleted:
@@ -81,7 +104,7 @@ export default {
             };
 
             return (
-                colorMap[statusType] ||
+                colorMap[key] ||
                 "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
             );
         },

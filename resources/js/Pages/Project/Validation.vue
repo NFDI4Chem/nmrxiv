@@ -10,7 +10,12 @@
                             >
                                 <Link
                                     :href="
-                                        route('dashboard.projects', project.id)
+                                        project.identifier
+                                            ? project.public_url
+                                            : route(
+                                                  'dashboard.projects',
+                                                  project.id
+                                              )
                                     "
                                     >{{ project.name }}</Link
                                 >&nbsp;/&nbsp;Validation
