@@ -1,7 +1,7 @@
 import "./bootstrap";
 import "../css/app.css";
 
-import { installBlockingDiagnostics } from "./utils/blockingDiagnostics";
+import { installBlockingDiagnostics } from "./Utils/blockingDiagnostics";
 
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";

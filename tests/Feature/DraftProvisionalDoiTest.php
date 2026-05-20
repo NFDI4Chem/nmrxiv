@@ -34,7 +34,7 @@ class DraftProvisionalDoiTest extends TestCase
         $this->draft = Draft::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $team->id,
-            'key' => 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+            'key' => 'a1b2c3d4',
         ]);
 
         $validation = Validation::factory()->create();

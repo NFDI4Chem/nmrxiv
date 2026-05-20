@@ -129,7 +129,7 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_compound_library_deduplicates_same_primary_molecule(): void
     {
-        $dupKey = 'DEDUPEKEYABCDEFGHIJKLMNOPQRSTUVWSYZ012345678900';
+        $dupKey = 'DEDUPECOMPOUNDTESTKEY-UHFFFAOYSA-N';
 
         $molecule = Molecule::factory()->create([
             'standard_inchi_key' => $dupKey,
