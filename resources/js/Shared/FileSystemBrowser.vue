@@ -1973,10 +1973,7 @@ export default {
             this.closeStudyContextMenu,
             true
         );
-        document.removeEventListener(
-            "keydown",
-            this.handleStudyContextMenuKey
-        );
+        document.removeEventListener("keydown", this.handleStudyContextMenuKey);
     },
     /**
      * Component methods
@@ -2833,14 +2830,8 @@ export default {
             // Clamp to viewport so the menu doesn't overflow the right edge.
             const menuWidth = 220;
             const menuHeight = 110;
-            const x = Math.min(
-                payload.x,
-                window.innerWidth - menuWidth - 8
-            );
-            const y = Math.min(
-                payload.y,
-                window.innerHeight - menuHeight - 8
-            );
+            const x = Math.min(payload.x, window.innerWidth - menuWidth - 8);
+            const y = Math.min(payload.y, window.innerHeight - menuHeight - 8);
 
             this.studyContextMenu = {
                 visible: true,

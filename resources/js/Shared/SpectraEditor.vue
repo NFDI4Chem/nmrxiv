@@ -84,7 +84,9 @@
                             <span>There were errors loading spectra</span>
                             <ChevronDownIcon
                                 class="h-4 w-4 text-red-500 transition-transform duration-150"
-                                :class="{ 'rotate-180': !spectraErrorsCollapsed }"
+                                :class="{
+                                    'rotate-180': !spectraErrorsCollapsed,
+                                }"
                                 aria-hidden="true"
                             />
                         </button>
@@ -95,7 +97,9 @@
                         >
                             <ul role="list" class="list-disc space-y-1 pl-5">
                                 <li
-                                    v-for="(group, index) in groupedSpectraErrors"
+                                    v-for="(
+                                        group, index
+                                    ) in groupedSpectraErrors"
                                     :key="index"
                                     class="break-words"
                                 >
@@ -349,8 +353,7 @@ export default {
         },
         buildNmriumAllowedOrigins() {
             const raw =
-                this.$page.props.nmriumURL ||
-                "https://nmriumdev.nmrxiv.org";
+                this.$page.props.nmriumURL || "https://nmriumdev.nmrxiv.org";
             try {
                 const href = raw.startsWith("//") ? `https:${raw}` : raw;
                 const u = new URL(href);
@@ -398,7 +401,9 @@ export default {
                 const syncMs = performance.now() - syncStart;
                 if (DEBUG_SPECTRA_TIMING && syncMs >= 16) {
                     dbg(
-                        `onNmriumWindowMessage (sync) took ${syncMs.toFixed(1)}ms`,
+                        `onNmriumWindowMessage (sync) took ${syncMs.toFixed(
+                            1
+                        )}ms`,
                         {
                             rawType: e.data?.type,
                             origin: e.origin?.slice(0, 80),
@@ -633,7 +638,10 @@ export default {
             };
             this.nmriumPostLoadAt = performance.now();
             dbg("iframe.postMessage(nmr-wrapper:load) -> sent");
-            iframe.postMessage({ type: `nmr-wrapper:load`, data: payload }, "*");
+            iframe.postMessage(
+                { type: `nmr-wrapper:load`, data: payload },
+                "*"
+            );
             this.scheduleNmriumHandoff();
 
             return true;

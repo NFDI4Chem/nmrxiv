@@ -20,10 +20,7 @@
                     <span>Need to add or replace files?</span>
                     <Link
                         :href="
-                            route(
-                                'dashboard.project.settings',
-                                project.data.id
-                            )
+                            route('dashboard.project.settings', project.data.id)
                         "
                         class="ml-1 font-semibold text-teal-800 underline hover:text-teal-950 dark:text-teal-200"
                     >

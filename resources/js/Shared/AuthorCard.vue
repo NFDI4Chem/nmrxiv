@@ -6,9 +6,7 @@
     >
         <div class="flex gap-3 sm:gap-4">
             <div class="min-w-0 flex-1">
-                <div
-                    class="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1"
-                >
+                <div class="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                     <h3 class="text-md font-bold leading-5 text-gray-900">
                         {{ author.title }}
                         {{ author.given_name }}

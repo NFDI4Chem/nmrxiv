@@ -11,7 +11,8 @@
     <app-layout :title="project.name">
         <template #header>
             <!-- Project header section with background styling -->
-            <div :class="[
+            <div
+                :class="[
                     'relative bg-white',
                     hasHeaderPhoto ? 'index_beams' : '',
                 ]"
@@ -57,16 +58,14 @@
                                 class="font-semibold text-teal-950 dark:text-teal-50"
                                 >Embargo.</span
                             >
-                            This project is scheduled for
-                            release on
+                            This project is scheduled for release on
                             <strong
                                 class="font-semibold text-teal-950 dark:text-teal-50"
                                 >{{
-                                    formatDate(
-                                        dashboardProject.release_date,
-                                    )
-                                }}</strong>. You cannot edit the project from this public page;
-                            create a new version to update its contents.
+                                    formatDate(dashboardProject.release_date)
+                                }}</strong
+                            >. You cannot edit the project from this public
+                            page; create a new version to update its contents.
                             <button
                                 v-if="showReleaseDateEditLink"
                                 type="button"
@@ -115,9 +114,7 @@
                     </template>
                 </div>
                 <!-- Project header: single max-width column (matches tab strip + tab body) -->
-                <div
-                    class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8"
-                >
+                <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
                     <div class="border-b border-gray-200 bg-white py-3">
                         <!-- Responsive flex container for header content -->
                         <div
@@ -230,105 +227,104 @@
                     </div>
                     <div class="bg-white pb-6">
                         <div class="relative z-10 pt-5">
-                                <!-- Project photo/banner (optional) -->
-                                <div
-                                    v-if="
-                                        project.data.photo_url &&
-                                        project.data.photo_url != ''
-                                    "
-                                    class="flex justify-center sm:justify-start h-24 w-72 md:mb-12"
-                                >
-                                    <img
-                                        class="h-24 w-72 object-cover border rounded ring-4 ring-white sm:h-32 sm:w-96"
-                                        :src="project.data.photo_url"
-                                        :alt="project.data.name"
-                                    />
-                                </div>
+                            <!-- Project photo/banner (optional) -->
+                            <div
+                                v-if="
+                                    project.data.photo_url &&
+                                    project.data.photo_url != ''
+                                "
+                                class="flex justify-center sm:justify-start h-24 w-72 md:mb-12"
+                            >
+                                <img
+                                    class="h-24 w-72 object-cover border rounded ring-4 ring-white sm:h-32 sm:w-96"
+                                    :src="project.data.photo_url"
+                                    :alt="project.data.name"
+                                />
+                            </div>
 
-                                <!-- Project title and identifier section -->
-                                <div class="text-left rounded-lg pt-2 sm:pt-2">
-                                    <!-- Project title and identifier row -->
-                                    <div
-                                        v-if="project"
-                                        class="flex flex-col sm:flex-row sm:items-start sm:space-x-4"
-                                    >
-                                        <!-- Project title -->
-                                        <div class="min-w-0 flex-1">
-                                            <div
-                                                class="flex flex-wrap items-start gap-2"
-                                            >
-                                                <button
-                                                    v-if="workspace"
-                                                    type="button"
-                                                    class="mt-1 shrink-0 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                                                    :aria-pressed="
-                                                        dashboardProject?.is_bookmarked
-                                                            ? 'true'
-                                                            : 'false'
-                                                    "
-                                                    aria-label="Toggle bookmark"
-                                                    @click="toggleStarred"
-                                                >
-                                                    <BookmarkIconOutline
-                                                        v-if="
-                                                            !dashboardProject?.is_bookmarked
-                                                        "
-                                                        class="h-6 w-6 text-gray-400 dark:text-gray-500"
-                                                    />
-                                                    <BookmarkIconSolid
-                                                        v-else
-                                                        class="h-6 w-6 text-teal-600 dark:text-teal-400"
-                                                    />
-                                                </button>
-                                                <h1
-                                                    class="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 break-words leading-tight"
-                                                >
-                                                    {{
-                                                        toTitleCase(
-                                                            (project.data &&
-                                                                project.data
-                                                                    .name) ||
-                                                                project.name ||
-                                                                "Project Name"
-                                                        )
-                                                    }}
-                                                </h1>
-                                            </div>
-                                            <div
+                            <!-- Project title and identifier section -->
+                            <div class="text-left rounded-lg pt-2 sm:pt-2">
+                                <!-- Project title and identifier row -->
+                                <div
+                                    v-if="project"
+                                    class="flex flex-col sm:flex-row sm:items-start sm:space-x-4"
+                                >
+                                    <!-- Project title -->
+                                    <div class="min-w-0 flex-1">
+                                        <div
+                                            class="flex flex-wrap items-start gap-2"
+                                        >
+                                            <button
                                                 v-if="workspace"
-                                                class="mt-3 flex flex-wrap items-center gap-3"
+                                                type="button"
+                                                class="mt-1 shrink-0 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                                                :aria-pressed="
+                                                    dashboardProject?.is_bookmarked
+                                                        ? 'true'
+                                                        : 'false'
+                                                "
+                                                aria-label="Toggle bookmark"
+                                                @click="toggleStarred"
                                             >
-                                                <access-dialogue
-                                                    :available-roles="
-                                                        workspace.availableRoles
-                                                    "
-                                                    :role="workspace.role"
-                                                    :team="workspace.team"
-                                                    :members="workspace.members"
-                                                    :project="dashboardProject"
-                                                    called-from="projectView"
-                                                    model="project"
-                                                />
-                                                <Link
+                                                <BookmarkIconOutline
                                                     v-if="
-                                                        workspace
-                                                            .projectPermissions
-                                                            ?.canManageSettings
+                                                        !dashboardProject?.is_bookmarked
                                                     "
-                                                    :href="
-                                                        route(
-                                                            'dashboard.project.settings',
-                                                            project.data.id
-                                                        )
-                                                    "
-                                                    class="text-sm font-semibold text-gray-800 hover:text-teal-700 dark:text-gray-200"
-                                                >
-                                                    Project settings
-                                                </Link>
-                                            </div>
+                                                    class="h-6 w-6 text-gray-400 dark:text-gray-500"
+                                                />
+                                                <BookmarkIconSolid
+                                                    v-else
+                                                    class="h-6 w-6 text-teal-600 dark:text-teal-400"
+                                                />
+                                            </button>
+                                            <h1
+                                                class="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 break-words leading-tight"
+                                            >
+                                                {{
+                                                    toTitleCase(
+                                                        (project.data &&
+                                                            project.data
+                                                                .name) ||
+                                                            project.name ||
+                                                            "Project Name"
+                                                    )
+                                                }}
+                                            </h1>
+                                        </div>
+                                        <div
+                                            v-if="workspace"
+                                            class="mt-3 flex flex-wrap items-center gap-3"
+                                        >
+                                            <access-dialogue
+                                                :available-roles="
+                                                    workspace.availableRoles
+                                                "
+                                                :role="workspace.role"
+                                                :team="workspace.team"
+                                                :members="workspace.members"
+                                                :project="dashboardProject"
+                                                called-from="projectView"
+                                                model="project"
+                                            />
+                                            <Link
+                                                v-if="
+                                                    workspace.projectPermissions
+                                                        ?.canManageSettings
+                                                "
+                                                :href="
+                                                    route(
+                                                        'dashboard.project.settings',
+                                                        project.data.id
+                                                    )
+                                                "
+                                                class="text-sm font-semibold text-gray-800 hover:text-teal-700 dark:text-gray-200"
+                                            >
+                                                Project settings
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -352,10 +348,7 @@
                             class="-mb-px flex space-x-8 overflow-visible"
                             aria-label="Tabs"
                         >
-                            <template
-                                v-for="tab in tabs"
-                                :key="tab.name"
-                            >
+                            <template v-for="tab in tabs" :key="tab.name">
                                 <div
                                     ref="samplesTabAnchor"
                                     v-if="tab.name === 'samples'"
@@ -388,7 +381,9 @@
                                         }}</span>
                                         <span
                                             v-if="samplesTabCount !== null"
-                                            :class="samplesCountPillClass(tab.name)"
+                                            :class="
+                                                samplesCountPillClass(tab.name)
+                                            "
                                         >
                                             {{ samplesTabCount }}
                                         </span>
@@ -429,174 +424,185 @@
                                                     class="fixed z-[200] origin-top-left overflow-visible bg-transparent py-0 shadow-none outline-none ring-0 focus:outline-none focus:ring-0"
                                                     :style="samplesMenuStyle"
                                                 >
-                                                <div
-                                                    class="flex gap-2"
-                                                    @mouseleave="
-                                                        onSamplesMenuPanelLeave
-                                                    "
-                                                >
-                                                <div
-                                                    class="w-72 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
-                                                >
-                                                <p
-                                                    v-if="loadingProjectSamples"
-                                                    class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
-                                                >
-                                                    Loading samples…
-                                                </p>
-                                                <MenuItem
-                                                    v-for="sample in projectSamples"
-                                                    v-show="!loadingProjectSamples"
-                                                    :key="sample.id"
-                                                    v-slot="{ active }"
-                                                    as="div"
-                                                    class="relative p-0"
-                                                >
                                                     <div
-                                                        class="relative"
-                                                        @mouseenter="
-                                                            onSampleRowEnter(
-                                                                sample
-                                                            )
+                                                        class="flex gap-2"
+                                                        @mouseleave="
+                                                            onSamplesMenuPanelLeave
                                                         "
                                                     >
                                                         <div
-                                                            :class="[
-                                                                'flex items-stretch',
-                                                                isCurrentSample(
-                                                                    sample
-                                                                )
-                                                                    ? 'bg-teal-50/80 dark:bg-teal-950/30'
-                                                                    : active
-                                                                      ? 'bg-gray-50 dark:bg-gray-800/80'
-                                                                      : '',
-                                                            ]"
+                                                            class="w-72 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
                                                         >
-                                                            <Link
-                                                                :href="
-                                                                    sample.public_url
-                                                                "
-                                                                :class="[
-                                                                    'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
-                                                                    isCurrentSample(
-                                                                        sample
-                                                                    ) ||
-                                                                    active
-                                                                        ? 'text-teal-700 dark:text-teal-400'
-                                                                        : 'text-gray-900 dark:text-gray-100',
-                                                                ]"
-                                                            >
-                                                                <span
-                                                                    class="block truncate font-medium"
-                                                                    >{{
-                                                                        sample.name
-                                                                    }}</span>
-                                                                <span
-                                                                    v-if="
-                                                                        sample.identifier
-                                                                    "
-                                                                    class="mt-0.5 block truncate font-mono text-xs text-gray-500 dark:text-gray-400"
-                                                                >
-                                                                    {{
-                                                                        sample.identifier
-                                                                    }}
-                                                                </span>
-                                                            </Link>
-                                                            <div
+                                                            <p
                                                                 v-if="
-                                                                    sampleDatasets(
-                                                                        sample
-                                                                    ).length >
-                                                                    0
+                                                                    loadingProjectSamples
                                                                 "
-                                                                class="flex items-center px-2"
+                                                                class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
                                                             >
-                                                                <ChevronRightIcon
+                                                                Loading samples…
+                                                            </p>
+                                                            <MenuItem
+                                                                v-for="sample in projectSamples"
+                                                                v-show="
+                                                                    !loadingProjectSamples
+                                                                "
+                                                                :key="sample.id"
+                                                                v-slot="{
+                                                                    active,
+                                                                }"
+                                                                as="div"
+                                                                class="relative p-0"
+                                                            >
+                                                                <div
+                                                                    class="relative"
+                                                                    @mouseenter="
+                                                                        onSampleRowEnter(
+                                                                            sample
+                                                                        )
+                                                                    "
+                                                                >
+                                                                    <div
+                                                                        :class="[
+                                                                            'flex items-stretch',
+                                                                            isCurrentSample(
+                                                                                sample
+                                                                            )
+                                                                                ? 'bg-teal-50/80 dark:bg-teal-950/30'
+                                                                                : active
+                                                                                ? 'bg-gray-50 dark:bg-gray-800/80'
+                                                                                : '',
+                                                                        ]"
+                                                                    >
+                                                                        <Link
+                                                                            :href="
+                                                                                sample.public_url
+                                                                            "
+                                                                            :class="[
+                                                                                'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
+                                                                                isCurrentSample(
+                                                                                    sample
+                                                                                ) ||
+                                                                                active
+                                                                                    ? 'text-teal-700 dark:text-teal-400'
+                                                                                    : 'text-gray-900 dark:text-gray-100',
+                                                                            ]"
+                                                                        >
+                                                                            <span
+                                                                                class="block truncate font-medium"
+                                                                                >{{
+                                                                                    sample.name
+                                                                                }}</span
+                                                                            >
+                                                                            <span
+                                                                                v-if="
+                                                                                    sample.identifier
+                                                                                "
+                                                                                class="mt-0.5 block truncate font-mono text-xs text-gray-500 dark:text-gray-400"
+                                                                            >
+                                                                                {{
+                                                                                    sample.identifier
+                                                                                }}
+                                                                            </span>
+                                                                        </Link>
+                                                                        <div
+                                                                            v-if="
+                                                                                sampleDatasets(
+                                                                                    sample
+                                                                                )
+                                                                                    .length >
+                                                                                0
+                                                                            "
+                                                                            class="flex items-center px-2"
+                                                                        >
+                                                                            <ChevronRightIcon
+                                                                                :class="[
+                                                                                    'h-4 w-4 shrink-0 text-gray-400 transition-opacity dark:text-gray-500',
+                                                                                    hoveredSampleId ===
+                                                                                    sample.id
+                                                                                        ? 'opacity-100'
+                                                                                        : 'opacity-0',
+                                                                                ]"
+                                                                                aria-hidden="true"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </MenuItem>
+                                                            <p
+                                                                v-if="
+                                                                    !loadingProjectSamples &&
+                                                                    projectSamples.length ===
+                                                                        0
+                                                                "
+                                                                class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
+                                                            >
+                                                                No samples found
+                                                            </p>
+                                                        </div>
+                                                        <div
+                                                            v-if="
+                                                                showSamplesSubnavColumn
+                                                            "
+                                                            class="w-72 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
+                                                            @mouseenter="
+                                                                onSubnavMouseEnter
+                                                            "
+                                                        >
+                                                            <div
+                                                                v-for="dataset in sampleDatasets(
+                                                                    hoveredSampleForNav
+                                                                )"
+                                                                :key="
+                                                                    dataset.id
+                                                                "
+                                                                class="relative p-0"
+                                                            >
+                                                                <div
                                                                     :class="[
-                                                                        'h-4 w-4 shrink-0 text-gray-400 transition-opacity dark:text-gray-500',
-                                                                        hoveredSampleId ===
-                                                                            sample.id
-                                                                            ? 'opacity-100'
-                                                                            : 'opacity-0',
+                                                                        'flex items-stretch',
+                                                                        isCurrentDataset(
+                                                                            dataset
+                                                                        )
+                                                                            ? 'bg-teal-50/80 dark:bg-teal-950/30'
+                                                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/80',
                                                                     ]"
-                                                                    aria-hidden="true"
-                                                                />
+                                                                >
+                                                                    <Link
+                                                                        :href="
+                                                                            datasetNavUrl(
+                                                                                dataset
+                                                                            )
+                                                                        "
+                                                                        :class="[
+                                                                            'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
+                                                                            isCurrentDataset(
+                                                                                dataset
+                                                                            )
+                                                                                ? 'text-teal-700 dark:text-teal-400'
+                                                                                : 'text-gray-900 dark:text-gray-100',
+                                                                        ]"
+                                                                    >
+                                                                        <span
+                                                                            class="block truncate font-medium"
+                                                                            >{{
+                                                                                dataset.name
+                                                                            }}</span
+                                                                        >
+                                                                        <span
+                                                                            v-if="
+                                                                                dataset.identifier
+                                                                            "
+                                                                            class="mt-0.5 block truncate font-mono text-xs text-gray-500 dark:text-gray-400"
+                                                                        >
+                                                                            {{
+                                                                                dataset.identifier
+                                                                            }}
+                                                                        </span>
+                                                                    </Link>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </MenuItem>
-                                                <p
-                                                    v-if="
-                                                        !loadingProjectSamples &&
-                                                        projectSamples.length ===
-                                                            0
-                                                    "
-                                                    class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
-                                                >
-                                                    No samples found
-                                                </p>
-                                                </div>
-                                                <div
-                                                    v-if="
-                                                        showSamplesSubnavColumn
-                                                    "
-                                                    class="w-72 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
-                                                    @mouseenter="
-                                                        onSubnavMouseEnter
-                                                    "
-                                                >
-                                                    <div
-                                                        v-for="dataset in sampleDatasets(
-                                                            hoveredSampleForNav
-                                                        )"
-                                                        :key="dataset.id"
-                                                        class="relative p-0"
-                                                    >
-                                                        <div
-                                                            :class="[
-                                                                'flex items-stretch',
-                                                                isCurrentDataset(
-                                                                    dataset
-                                                                )
-                                                                    ? 'bg-teal-50/80 dark:bg-teal-950/30'
-                                                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/80',
-                                                            ]"
-                                                        >
-                                                            <Link
-                                                                :href="
-                                                                    datasetNavUrl(
-                                                                        dataset
-                                                                    )
-                                                                "
-                                                                :class="[
-                                                                    'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
-                                                                    isCurrentDataset(
-                                                                        dataset
-                                                                    )
-                                                                        ? 'text-teal-700 dark:text-teal-400'
-                                                                        : 'text-gray-900 dark:text-gray-100',
-                                                                ]"
-                                                            >
-                                                                <span
-                                                                    class="block truncate font-medium"
-                                                                    >{{
-                                                                        dataset.name
-                                                                    }}</span>
-                                                                <span
-                                                                    v-if="
-                                                                        dataset.identifier
-                                                                    "
-                                                                    class="mt-0.5 block truncate font-mono text-xs text-gray-500 dark:text-gray-400"
-                                                                >
-                                                                    {{
-                                                                        dataset.identifier
-                                                                    }}
-                                                                </span>
-                                                            </Link>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                </div>
                                                 </MenuItems>
                                             </transition>
                                         </Teleport>
@@ -629,9 +635,7 @@
                 </div>
 
                 <!-- Content area for tab-specific content -->
-                <div
-                    class="min-h-0 flex-1 overflow-y-auto bg-white px-1"
-                >
+                <div class="min-h-0 flex-1 overflow-y-auto bg-white px-1">
                     <!-- Slot for project-specific content based on selected tab -->
                     <slot name="project-content" />
                 </div>
@@ -643,9 +647,7 @@
             max-width="2xl"
             @close="closeReleaseDateModal"
         >
-            <template #title>
-                Update release date
-            </template>
+            <template #title> Update release date </template>
 
             <template #content>
                 <div v-if="releaseDateModalError" class="mb-4">
@@ -743,7 +745,10 @@
             </template>
 
             <template #footer>
-                <jet-secondary-button type="button" @click="closeReleaseDateModal">
+                <jet-secondary-button
+                    type="button"
+                    @click="closeReleaseDateModal"
+                >
                     Cancel
                 </jet-secondary-button>
                 <jet-success-button
@@ -797,10 +802,7 @@ import { Link, router } from "@inertiajs/vue3";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/vue/24/solid";
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/vue/24/outline";
-import {
-    ChevronDownIcon,
-    ChevronRightIcon,
-} from "@heroicons/vue/24/outline";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/vue/24/outline";
 
 import "@vuepic/vue-datepicker/dist/main.css";
 
@@ -939,9 +941,7 @@ export default {
         samplesTabCount() {
             const raw = this.project?.data?.samples_count;
 
-            return typeof raw === "number" && Number.isFinite(raw)
-                ? raw
-                : null;
+            return typeof raw === "number" && Number.isFinite(raw) ? raw : null;
         },
         hoveredSampleForNav() {
             if (this.hoveredSampleId == null) {
@@ -950,16 +950,14 @@ export default {
 
             return (
                 this.projectSamples.find(
-                    (sample) => sample.id === this.hoveredSampleId,
+                    (sample) => sample.id === this.hoveredSampleId
                 ) ?? null
             );
         },
         showSamplesSubnavColumn() {
             const sample = this.hoveredSampleForNav;
 
-            return (
-                sample != null && this.sampleDatasets(sample).length > 0
-            );
+            return sample != null && this.sampleDatasets(sample).length > 0;
         },
         showReleaseDateEditLink() {
             const p = this.dashboardProject;
@@ -968,11 +966,7 @@ export default {
                 return false;
             }
 
-            return (
-                !p.is_public &&
-                !p.is_published &&
-                Boolean(p.doi)
-            );
+            return !p.is_public && !p.is_published && Boolean(p.doi);
         },
     },
 
@@ -1148,7 +1142,7 @@ export default {
             this.releaseDateModalError = null;
             this.releaseDateForm.name = p.name;
             this.releaseDateForm.enableProjectMode = Boolean(
-                p.enableProjectMode ?? p.enable_project_mode,
+                p.enableProjectMode ?? p.enable_project_mode
             );
             this.releaseDateForm.release_date = p.release_date;
             this.releaseDateForm.clearErrors();
@@ -1167,8 +1161,7 @@ export default {
             }
             url.searchParams.delete("edit");
             const search = url.searchParams.toString();
-            const next =
-                url.pathname + (search ? `?${search}` : "") + url.hash;
+            const next = url.pathname + (search ? `?${search}` : "") + url.hash;
             window.history.replaceState({}, "", next);
         },
 
@@ -1195,7 +1188,7 @@ export default {
             this.releaseDateForm.put(
                 this.route(
                     "dashboard.project.updateReleaseDate",
-                    this.dashboardProject.id,
+                    this.dashboardProject.id
                 ),
                 {
                     preserveScroll: true,
@@ -1213,12 +1206,10 @@ export default {
                             const v = errors[k];
                             this.releaseDateModalError = Array.isArray(v)
                                 ? v[0]
-                                : String(
-                                      v ?? "Could not update release date.",
-                                  );
+                                : String(v ?? "Could not update release date.");
                         }
                     },
-                },
+                }
             );
         },
 
@@ -1240,9 +1231,7 @@ export default {
             }
             window.axios
                 .get(
-                    this.route("project.toggle-starred", [
-                        this.project.data.id,
-                    ])
+                    this.route("project.toggle-starred", [this.project.data.id])
                 )
                 .then(() => {
                     router.reload({ only: ["project", "workspace"] });

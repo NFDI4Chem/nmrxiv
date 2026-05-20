@@ -778,14 +778,15 @@
                                         >
                                             <p class="font-semibold">
                                                 Sample folder structure needs
-                                                attention before you can
-                                                proceed
+                                                attention before you can proceed
                                             </p>
                                             <ul
                                                 class="mt-1 list-disc space-y-1 pl-5"
                                             >
                                                 <li
-                                                    v-for="(warning, idx) in processingWarnings"
+                                                    v-for="(
+                                                        warning, idx
+                                                    ) in processingWarnings"
                                                     :key="idx"
                                                 >
                                                     {{ warning }}
@@ -1748,101 +1749,100 @@
                                                                         <section
                                                                             class="mx-auto max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                         >
-                                                                                <button
-                                                                                    type="button"
-                                                                                    class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
-                                                                                    :aria-expanded="
-                                                                                        chemicalCompositionExpanded
-                                                                                    "
-                                                                                    aria-controls="chemical-composition-panel"
-                                                                                    @click="
-                                                                                        chemicalCompositionExpanded =
-                                                                                            !chemicalCompositionExpanded
-                                                                                    "
+                                                                            <button
+                                                                                type="button"
+                                                                                class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
+                                                                                :aria-expanded="
+                                                                                    chemicalCompositionExpanded
+                                                                                "
+                                                                                aria-controls="chemical-composition-panel"
+                                                                                @click="
+                                                                                    chemicalCompositionExpanded =
+                                                                                        !chemicalCompositionExpanded
+                                                                                "
+                                                                            >
+                                                                                <div
+                                                                                    class="flex min-w-0 flex-1 items-center gap-3"
                                                                                 >
-                                                                                    <div
-                                                                                        class="flex min-w-0 flex-1 items-center gap-3"
+                                                                                    <h3
+                                                                                        id="chemical-composition"
+                                                                                        class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
                                                                                     >
-                                                                                        <h3
-                                                                                            id="chemical-composition"
-                                                                                            class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
-                                                                                        >
-                                                                                            Chemical
-                                                                                            composition
-                                                                                            <span
-                                                                                                class="text-red-500"
-                                                                                                aria-hidden="true"
-                                                                                                >*</span
-                                                                                            >
-                                                                                        </h3>
+                                                                                        Chemical
+                                                                                        composition
                                                                                         <span
-                                                                                            v-if="
-                                                                                                !chemicalCompositionExpanded &&
-                                                                                                selectedStudy
-                                                                                            "
-                                                                                            class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold tabular-nums text-gray-700 ring-1 ring-inset ring-gray-200/80 dark:bg-slate-700/80 dark:text-slate-200 dark:ring-gray-600"
+                                                                                            class="text-red-500"
+                                                                                            aria-hidden="true"
+                                                                                            >*</span
                                                                                         >
-                                                                                            <img
-                                                                                                src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
-                                                                                                alt=""
-                                                                                                class="h-5 w-5 shrink-0 object-contain opacity-80 dark:opacity-90"
-                                                                                                width="20"
-                                                                                                height="20"
-                                                                                                loading="lazy"
-                                                                                                decoding="async"
-                                                                                            />
-                                                                                            {{
+                                                                                    </h3>
+                                                                                    <span
+                                                                                        v-if="
+                                                                                            !chemicalCompositionExpanded &&
+                                                                                            selectedStudy
+                                                                                        "
+                                                                                        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold tabular-nums text-gray-700 ring-1 ring-inset ring-gray-200/80 dark:bg-slate-700/80 dark:text-slate-200 dark:ring-gray-600"
+                                                                                    >
+                                                                                        <img
+                                                                                            src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
+                                                                                            alt=""
+                                                                                            class="h-5 w-5 shrink-0 object-contain opacity-80 dark:opacity-90"
+                                                                                            width="20"
+                                                                                            height="20"
+                                                                                            loading="lazy"
+                                                                                            decoding="async"
+                                                                                        />
+                                                                                        {{
+                                                                                            selectedStudyMoleculeCount
+                                                                                        }}
+                                                                                        <span
+                                                                                            class="sr-only"
+                                                                                            >{{
                                                                                                 selectedStudyMoleculeCount
                                                                                             }}
-                                                                                            <span
-                                                                                                class="sr-only"
-                                                                                                >{{
-                                                                                                    selectedStudyMoleculeCount
-                                                                                                }}
-                                                                                                molecule(s)
-                                                                                                in
-                                                                                                this
-                                                                                                sample</span
-                                                                                            >
-                                                                                        </span>
-                                                                                    </div>
-                                                                                    <ChevronRightIcon
-                                                                                        class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
-                                                                                        :class="{
-                                                                                            'rotate-90':
-                                                                                                chemicalCompositionExpanded,
-                                                                                        }"
-                                                                                        aria-hidden="true"
-                                                                                    />
-                                                                                </button>
+                                                                                            molecule(s)
+                                                                                            in
+                                                                                            this
+                                                                                            sample</span
+                                                                                        >
+                                                                                    </span>
+                                                                                </div>
+                                                                                <ChevronRightIcon
+                                                                                    class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
+                                                                                    :class="{
+                                                                                        'rotate-90':
+                                                                                            chemicalCompositionExpanded,
+                                                                                    }"
+                                                                                    aria-hidden="true"
+                                                                                />
+                                                                            </button>
 
+                                                                            <div
+                                                                                v-show="
+                                                                                    chemicalCompositionExpanded
+                                                                                "
+                                                                                id="chemical-composition-panel"
+                                                                                class="grid min-h-0 gap-4 p-3 sm:p-4 lg:grid-cols-2 lg:items-stretch lg:gap-6 lg:p-4"
+                                                                                role="region"
+                                                                                aria-labelledby="chemical-composition"
+                                                                            >
                                                                                 <div
-                                                                                    v-show="
-                                                                                        chemicalCompositionExpanded
-                                                                                    "
-                                                                                    id="chemical-composition-panel"
-                                                                                    class="grid min-h-0 gap-4 p-3 sm:p-4 lg:grid-cols-2 lg:items-stretch lg:gap-6 lg:p-4"
-                                                                                    role="region"
-                                                                                    aria-labelledby="chemical-composition"
+                                                                                    class="flex h-full min-h-0 min-w-0 flex-col gap-3 lg:border-r lg:border-gray-100 lg:pr-4 dark:lg:border-gray-700"
                                                                                 >
                                                                                     <div
-                                                                                        class="flex h-full min-h-0 min-w-0 flex-col gap-3 lg:border-r lg:border-gray-100 lg:pr-4 dark:lg:border-gray-700"
+                                                                                        v-if="
+                                                                                            selectedStudy
+                                                                                                .sample
+                                                                                                .molecules
+                                                                                                .length >
+                                                                                            0
+                                                                                        "
+                                                                                        class="min-h-0"
                                                                                     >
-
-                                                                                        <div
-                                                                                            v-if="
-                                                                                                selectedStudy
-                                                                                                    .sample
-                                                                                                    .molecules
-                                                                                                    .length >
-                                                                                                0
-                                                                                            "
-                                                                                            class="min-h-0"
+                                                                                        <ul
+                                                                                            role="list"
+                                                                                            class="flex flex-col gap-3"
                                                                                         >
-                                                                                            <ul
-                                                                                                role="list"
-                                                                                                class="flex flex-col gap-3"
-                                                                                            >
                                                                                             <li
                                                                                                 v-for="molecule in selectedStudy
                                                                                                     .sample
@@ -1955,7 +1955,7 @@
                                                                                                 </div>
                                                                                             </li>
                                                                                         </ul>
-                                                                                        </div>
+                                                                                    </div>
                                                                                     <div
                                                                                         v-else
                                                                                         class="flex min-h-0 flex-1 flex-col justify-center"
@@ -1995,101 +1995,101 @@
                                                                                 <div
                                                                                     class="flex min-w-0 flex-col gap-3"
                                                                                 >
-                                                                                        <div
-                                                                                            class="flex items-center justify-between gap-2"
+                                                                                    <div
+                                                                                        class="flex items-center justify-between gap-2"
+                                                                                    >
+                                                                                        <h4
+                                                                                            class="text-sm font-semibold text-gray-900 dark:text-slate-200"
                                                                                         >
-                                                                                            <h4
-                                                                                                class="text-sm font-semibold text-gray-900 dark:text-slate-200"
-                                                                                            >
-                                                                                                Add
-                                                                                                structure
-                                                                                            </h4>
-                                                                                            <a
-                                                                                                href="https://docs.nmrxiv.org/submission-guides/editor.html"
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                class="text-xs font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300"
-                                                                                            >
-                                                                                                Help
-                                                                                            </a>
-                                                                                        </div>
+                                                                                            Add
+                                                                                            structure
+                                                                                        </h4>
+                                                                                        <a
+                                                                                            href="https://docs.nmrxiv.org/submission-guides/editor.html"
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            class="text-xs font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300"
+                                                                                        >
+                                                                                            Help
+                                                                                        </a>
+                                                                                    </div>
 
+                                                                                    <div
+                                                                                        class="rounded-md bg-gray-100 p-0.5 dark:bg-slate-900/80"
+                                                                                        role="tablist"
+                                                                                    >
                                                                                         <div
-                                                                                            class="rounded-md bg-gray-100 p-0.5 dark:bg-slate-900/80"
-                                                                                            role="tablist"
+                                                                                            class="flex flex-wrap gap-0.5"
                                                                                         >
-                                                                                            <div
-                                                                                                class="flex flex-wrap gap-0.5"
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                role="tab"
+                                                                                                aria-label="Draw structure in editor"
+                                                                                                :aria-selected="
+                                                                                                    activeInputTab ===
+                                                                                                    'editor'
+                                                                                                "
+                                                                                                :class="[
+                                                                                                    activeInputTab ===
+                                                                                                    'editor'
+                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
+                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
+                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
+                                                                                                ]"
+                                                                                                @click="
+                                                                                                    switchToEditorTab()
+                                                                                                "
                                                                                             >
-                                                                                                <button
-                                                                                                    type="button"
-                                                                                                    role="tab"
-                                                                                                    aria-label="Draw structure in editor"
-                                                                                                    :aria-selected="
-                                                                                                        activeInputTab ===
-                                                                                                        'editor'
-                                                                                                    "
-                                                                                                    :class="[
-                                                                                                        activeInputTab ===
-                                                                                                        'editor'
-                                                                                                            ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                            : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                        'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                    ]"
-                                                                                                    @click="
-                                                                                                        switchToEditorTab()
-                                                                                                    "
-                                                                                                >
-                                                                                                    Draw
-                                                                                                </button>
-                                                                                                <button
-                                                                                                    type="button"
-                                                                                                    role="tab"
-                                                                                                    aria-label="Paste SMILES, MOL, or SDF"
-                                                                                                    :aria-selected="
-                                                                                                        activeInputTab ===
-                                                                                                        'structure'
-                                                                                                    "
-                                                                                                    :class="[
-                                                                                                        activeInputTab ===
-                                                                                                        'structure'
-                                                                                                            ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                            : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                        'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                    ]"
-                                                                                                    @click="
-                                                                                                        switchToStructureTab()
-                                                                                                    "
-                                                                                                >
-                                                                                                    Paste
-                                                                                                </button>
-                                                                                                <button
-                                                                                                    type="button"
-                                                                                                    role="tab"
-                                                                                                    aria-label="Look up CAS registry number"
-                                                                                                    :aria-selected="
-                                                                                                        activeInputTab ===
-                                                                                                        'cas'
-                                                                                                    "
-                                                                                                    :class="[
-                                                                                                        activeInputTab ===
-                                                                                                        'cas'
-                                                                                                            ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                            : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                        'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                    ]"
-                                                                                                    @click="
-                                                                                                        switchToCasTab()
-                                                                                                    "
-                                                                                                >
-                                                                                                    CAS
-                                                                                                </button>
-                                                                                            </div>
+                                                                                                Draw
+                                                                                            </button>
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                role="tab"
+                                                                                                aria-label="Paste SMILES, MOL, or SDF"
+                                                                                                :aria-selected="
+                                                                                                    activeInputTab ===
+                                                                                                    'structure'
+                                                                                                "
+                                                                                                :class="[
+                                                                                                    activeInputTab ===
+                                                                                                    'structure'
+                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
+                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
+                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
+                                                                                                ]"
+                                                                                                @click="
+                                                                                                    switchToStructureTab()
+                                                                                                "
+                                                                                            >
+                                                                                                Paste
+                                                                                            </button>
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                role="tab"
+                                                                                                aria-label="Look up CAS registry number"
+                                                                                                :aria-selected="
+                                                                                                    activeInputTab ===
+                                                                                                    'cas'
+                                                                                                "
+                                                                                                :class="[
+                                                                                                    activeInputTab ===
+                                                                                                    'cas'
+                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
+                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
+                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
+                                                                                                ]"
+                                                                                                @click="
+                                                                                                    switchToCasTab()
+                                                                                                "
+                                                                                            >
+                                                                                                CAS
+                                                                                            </button>
                                                                                         </div>
+                                                                                    </div>
 
-                                                                                        <div
-                                                                                            class="flex h-[min(380px,52vh)] min-h-[280px] w-full flex-shrink-0 flex-col"
-                                                                                        >
+                                                                                    <div
+                                                                                        class="flex h-[min(380px,52vh)] min-h-[280px] w-full flex-shrink-0 flex-col"
+                                                                                    >
                                                                                         <!-- Structure/SMILES Input Tab -->
                                                                                         <div
                                                                                             v-show="
@@ -2098,89 +2098,89 @@
                                                                                             "
                                                                                             class="flex min-h-0 flex-1 flex-col gap-2 pt-1"
                                                                                         >
-                                                                                                <div
-                                                                                                    class="flex min-h-0 flex-1 flex-col border-2 border-dashed border-gray-300 rounded-lg p-2 transition-colors hover:border-teal-400 dark:border-gray-600 dark:hover:border-teal-500"
-                                                                                                    :class="{
-                                                                                                        'border-teal-400 bg-teal-50 dark:bg-teal-950/30':
-                                                                                                            isDragging,
-                                                                                                    }"
-                                                                                                    @dragover.prevent="
-                                                                                                        handleDragOver
+                                                                                            <div
+                                                                                                class="flex min-h-0 flex-1 flex-col border-2 border-dashed border-gray-300 rounded-lg p-2 transition-colors hover:border-teal-400 dark:border-gray-600 dark:hover:border-teal-500"
+                                                                                                :class="{
+                                                                                                    'border-teal-400 bg-teal-50 dark:bg-teal-950/30':
+                                                                                                        isDragging,
+                                                                                                }"
+                                                                                                @dragover.prevent="
+                                                                                                    handleDragOver
+                                                                                                "
+                                                                                                @dragleave.prevent="
+                                                                                                    handleDragLeave
+                                                                                                "
+                                                                                                @drop.prevent="
+                                                                                                    handleDrop
+                                                                                                "
+                                                                                            >
+                                                                                                <p
+                                                                                                    v-if="
+                                                                                                        !chemicalInput
                                                                                                     "
-                                                                                                    @dragleave.prevent="
-                                                                                                        handleDragLeave
-                                                                                                    "
-                                                                                                    @drop.prevent="
-                                                                                                        handleDrop
-                                                                                                    "
+                                                                                                    class="mb-2 text-left text-xs text-gray-500 dark:text-slate-400"
                                                                                                 >
-                                                                                                    <p
+                                                                                                    SMILES,
+                                                                                                    MOL,
+                                                                                                    or
+                                                                                                    SDF
+                                                                                                    —
+                                                                                                    paste
+                                                                                                    or
+                                                                                                    drop
+                                                                                                    .mol
+                                                                                                    /
+                                                                                                    .sdf
+                                                                                                </p>
+                                                                                                <textarea
+                                                                                                    v-model="
+                                                                                                        chemicalInput
+                                                                                                    "
+                                                                                                    placeholder="SMILES (one line) or MOL/SDF block…"
+                                                                                                    class="min-h-0 w-full flex-1 resize-y rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
+                                                                                                    @blur="
+                                                                                                        loadStructure
+                                                                                                    "
+                                                                                                    @paste="
+                                                                                                        handlePaste
+                                                                                                    "
+                                                                                                    @input="
+                                                                                                        handleInput
+                                                                                                    "
+                                                                                                ></textarea>
+                                                                                            </div>
+
+                                                                                            <div
+                                                                                                class="flex shrink-0 items-center justify-between"
+                                                                                            >
+                                                                                                <div
+                                                                                                    class="flex space-x-2"
+                                                                                                >
+                                                                                                    <button
                                                                                                         v-if="
-                                                                                                            !chemicalInput
-                                                                                                        "
-                                                                                                        class="mb-2 text-left text-xs text-gray-500 dark:text-slate-400"
-                                                                                                    >
-                                                                                                        SMILES,
-                                                                                                        MOL,
-                                                                                                        or
-                                                                                                        SDF
-                                                                                                        —
-                                                                                                        paste
-                                                                                                        or
-                                                                                                        drop
-                                                                                                        .mol
-                                                                                                        /
-                                                                                                        .sdf
-                                                                                                    </p>
-                                                                                                    <textarea
-                                                                                                        v-model="
                                                                                                             chemicalInput
                                                                                                         "
-                                                                                                        placeholder="SMILES (one line) or MOL/SDF block…"
-                                                                                                        class="min-h-0 w-full flex-1 resize-y rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
-                                                                                                        @blur="
-                                                                                                            loadStructure
+                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                                                                                        @click="
+                                                                                                            clearInput
                                                                                                         "
-                                                                                                        @paste="
-                                                                                                            handlePaste
-                                                                                                        "
-                                                                                                        @input="
-                                                                                                            handleInput
-                                                                                                        "
-                                                                                                    ></textarea>
+                                                                                                    >
+                                                                                                        Clear
+                                                                                                    </button>
                                                                                                 </div>
 
                                                                                                 <div
-                                                                                                    class="flex shrink-0 items-center justify-between"
+                                                                                                    v-if="
+                                                                                                        detectedFormat
+                                                                                                    "
+                                                                                                    class="text-xs text-gray-500"
                                                                                                 >
-                                                                                                    <div
-                                                                                                        class="flex space-x-2"
-                                                                                                    >
-                                                                                                        <button
-                                                                                                            v-if="
-                                                                                                                chemicalInput
-                                                                                                            "
-                                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                                                                                            @click="
-                                                                                                                clearInput
-                                                                                                            "
-                                                                                                        >
-                                                                                                            Clear
-                                                                                                        </button>
-                                                                                                    </div>
-
-                                                                                                    <div
-                                                                                                        v-if="
-                                                                                                            detectedFormat
-                                                                                                        "
-                                                                                                        class="text-xs text-gray-500"
-                                                                                                    >
-                                                                                                        Detected:
-                                                                                                        {{
-                                                                                                            detectedFormat
-                                                                                                        }}
-                                                                                                    </div>
+                                                                                                    Detected:
+                                                                                                    {{
+                                                                                                        detectedFormat
+                                                                                                    }}
                                                                                                 </div>
+                                                                                            </div>
                                                                                         </div>
 
                                                                                         <!-- CAS Registry Number Input Tab -->
@@ -2191,87 +2191,87 @@
                                                                                             "
                                                                                             class="flex min-h-0 flex-1 flex-col pt-1"
                                                                                         >
+                                                                                            <div
+                                                                                                class="rounded-lg border border-gray-300 p-2 dark:border-gray-600"
+                                                                                            >
                                                                                                 <div
-                                                                                                    class="rounded-lg border border-gray-300 p-2 dark:border-gray-600"
+                                                                                                    class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
                                                                                                 >
                                                                                                     <div
-                                                                                                        class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
+                                                                                                        class="min-w-0 flex-1"
                                                                                                     >
-                                                                                                        <div
-                                                                                                            class="min-w-0 flex-1"
-                                                                                                        >
-                                                                                                            <input
-                                                                                                                v-model="
-                                                                                                                    casInput
-                                                                                                                "
-                                                                                                                type="text"
-                                                                                                                placeholder="CAS e.g. 58-08-2"
-                                                                                                                class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
-                                                                                                                :disabled="
-                                                                                                                    casLoading
-                                                                                                                "
-                                                                                                                @keyup.enter="
-                                                                                                                    importFromCAS
-                                                                                                                "
-                                                                                                            />
-                                                                                                        </div>
-                                                                                                        <button
+                                                                                                        <input
+                                                                                                            v-model="
+                                                                                                                casInput
+                                                                                                            "
+                                                                                                            type="text"
+                                                                                                            placeholder="CAS e.g. 58-08-2"
+                                                                                                            class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
                                                                                                             :disabled="
-                                                                                                                !casInput.trim() ||
                                                                                                                 casLoading
                                                                                                             "
-                                                                                                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                                                            @click="
+                                                                                                            @keyup.enter="
                                                                                                                 importFromCAS
                                                                                                             "
-                                                                                                        >
-                                                                                                            <svg
-                                                                                                                v-if="
-                                                                                                                    casLoading
-                                                                                                                "
-                                                                                                                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                                                fill="none"
-                                                                                                                viewBox="0 0 24 24"
-                                                                                                            >
-                                                                                                                <circle
-                                                                                                                    class="opacity-25"
-                                                                                                                    cx="12"
-                                                                                                                    cy="12"
-                                                                                                                    r="10"
-                                                                                                                    stroke="currentColor"
-                                                                                                                    stroke-width="4"
-                                                                                                                ></circle>
-                                                                                                                <path
-                                                                                                                    class="opacity-75"
-                                                                                                                    fill="currentColor"
-                                                                                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                                                                                ></path>
-                                                                                                            </svg>
-                                                                                                            {{
-                                                                                                                casLoading
-                                                                                                                    ? "Loading..."
-                                                                                                                    : "Import"
-                                                                                                            }}
-                                                                                                        </button>
+                                                                                                        />
                                                                                                     </div>
-
-                                                                                                    <div
-                                                                                                        v-if="
-                                                                                                            casInput
+                                                                                                    <button
+                                                                                                        :disabled="
+                                                                                                            !casInput.trim() ||
+                                                                                                            casLoading
                                                                                                         "
-                                                                                                        class="mt-2 flex justify-between"
+                                                                                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                                                        @click="
+                                                                                                            importFromCAS
+                                                                                                        "
                                                                                                     >
-                                                                                                        <button
-                                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                                                                                            @click="
-                                                                                                                clearCasInput
+                                                                                                        <svg
+                                                                                                            v-if="
+                                                                                                                casLoading
                                                                                                             "
+                                                                                                            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                                            fill="none"
+                                                                                                            viewBox="0 0 24 24"
                                                                                                         >
-                                                                                                            Clear
-                                                                                                        </button>
-                                                                                                    </div>
+                                                                                                            <circle
+                                                                                                                class="opacity-25"
+                                                                                                                cx="12"
+                                                                                                                cy="12"
+                                                                                                                r="10"
+                                                                                                                stroke="currentColor"
+                                                                                                                stroke-width="4"
+                                                                                                            ></circle>
+                                                                                                            <path
+                                                                                                                class="opacity-75"
+                                                                                                                fill="currentColor"
+                                                                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                                                                            ></path>
+                                                                                                        </svg>
+                                                                                                        {{
+                                                                                                            casLoading
+                                                                                                                ? "Loading..."
+                                                                                                                : "Import"
+                                                                                                        }}
+                                                                                                    </button>
                                                                                                 </div>
+
+                                                                                                <div
+                                                                                                    v-if="
+                                                                                                        casInput
+                                                                                                    "
+                                                                                                    class="mt-2 flex justify-between"
+                                                                                                >
+                                                                                                    <button
+                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                                                                                        @click="
+                                                                                                            clearCasInput
+                                                                                                        "
+                                                                                                    >
+                                                                                                        Clear
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
                                                                                         </div>
 
                                                                                         <!-- Structure editor tab -->
@@ -2283,15 +2283,15 @@
                                                                                             id="structureSearchEditor"
                                                                                             class="min-h-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 shadow-inner dark:border-gray-600 dark:bg-slate-900/50"
                                                                                         ></div>
-                                                                                        </div>
+                                                                                    </div>
 
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                errorMessage ||
-                                                                                                casError
-                                                                                            "
-                                                                                            class="mt-1.5"
-                                                                                        />
+                                                                                    <jet-input-error
+                                                                                        :message="
+                                                                                            errorMessage ||
+                                                                                            casError
+                                                                                        "
+                                                                                        class="mt-1.5"
+                                                                                    />
                                                                                     <div
                                                                                         class="mb-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm ring-1 ring-gray-900/5 dark:border-gray-600 dark:bg-slate-900/50 dark:ring-white/5"
                                                                                     >
@@ -2325,9 +2325,9 @@
                                                                                                     compositionPureSampleDisabled
                                                                                                         ? 'cursor-not-allowed opacity-60 text-gray-400 dark:text-slate-500'
                                                                                                         : compositionSampleType ===
-                                                                                                            'pure'
-                                                                                                          ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-600'
-                                                                                                          : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
+                                                                                                          'pure'
+                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-600'
+                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
                                                                                                     'min-w-0 flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:pointer-events-none dark:focus-visible:ring-offset-slate-900',
                                                                                                 ]"
                                                                                                 @click="
@@ -2396,7 +2396,8 @@
                                                                                                     formatCompositionPercent(
                                                                                                         percentage
                                                                                                     )
-                                                                                                }}%</span>
+                                                                                                }}%</span
+                                                                                            >
                                                                                         </div>
 
                                                                                         <div
@@ -2417,7 +2418,8 @@
                                                                                                         formatCompositionPercent(
                                                                                                             percentage
                                                                                                         )
-                                                                                                    }}%</span>
+                                                                                                    }}%</span
+                                                                                                >
                                                                                             </div>
                                                                                             <slider
                                                                                                 v-if="
@@ -2459,8 +2461,8 @@
                                                                                         compound
                                                                                     </button>
                                                                                 </div>
-                                                                        </div>
-                                                                    </section>
+                                                                            </div>
+                                                                        </section>
                                                                         <section
                                                                             class="mx-auto mt-3 max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                         >
@@ -2507,34 +2509,109 @@
                                                                                 <div
                                                                                     class="rounded-md border border-teal-100 bg-teal-50/70 p-3 text-xs leading-relaxed text-teal-900 dark:border-teal-900/40 dark:bg-teal-950/40 dark:text-teal-100"
                                                                                 >
-                                                                                    <p class="font-medium">
-                                                                                        Two ways to record assignments
+                                                                                    <p
+                                                                                        class="font-medium"
+                                                                                    >
+                                                                                        Two
+                                                                                        ways
+                                                                                        to
+                                                                                        record
+                                                                                        assignments
                                                                                     </p>
                                                                                     <ol
                                                                                         class="mt-1 list-decimal space-y-1 pl-5"
                                                                                     >
                                                                                         <li>
-                                                                                            Paste an
-                                                                                            <span class="font-semibold">ACS-style assignment string</span>
-                                                                                            (or a list of atom-number / peak pairs) into the textarea for each spectrum below and hit
-                                                                                            <span class="font-semibold">Save</span>.
+                                                                                            Paste
+                                                                                            an
+                                                                                            <span
+                                                                                                class="font-semibold"
+                                                                                                >ACS-style
+                                                                                                assignment
+                                                                                                string</span
+                                                                                            >
+                                                                                            (or
+                                                                                            a
+                                                                                            list
+                                                                                            of
+                                                                                            atom-number
+                                                                                            /
+                                                                                            peak
+                                                                                            pairs)
+                                                                                            into
+                                                                                            the
+                                                                                            textarea
+                                                                                            for
+                                                                                            each
+                                                                                            spectrum
+                                                                                            below
+                                                                                            and
+                                                                                            hit
+                                                                                            <span
+                                                                                                class="font-semibold"
+                                                                                                >Save</span
+                                                                                            >.
                                                                                         </li>
                                                                                         <li>
-                                                                                            Use the
-                                                                                            <span class="font-semibold">NMRium viewer above</span>
-                                                                                            to assign atoms graphically: press
-                                                                                            <kbd class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800">r</kbd>
-                                                                                            for ranges, click
-                                                                                            <span class="italic">Auto Ranges Picking</span>,
-                                                                                            then drag a range link onto an atom in the structure. Diastereotopic atoms expand with
-                                                                                            <kbd class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800">Shift</kbd>
-                                                                                            + click. Assigned atoms turn yellow.
+                                                                                            Use
+                                                                                            the
+                                                                                            <span
+                                                                                                class="font-semibold"
+                                                                                                >NMRium
+                                                                                                viewer
+                                                                                                above</span
+                                                                                            >
+                                                                                            to
+                                                                                            assign
+                                                                                            atoms
+                                                                                            graphically:
+                                                                                            press
+                                                                                            <kbd
+                                                                                                class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800"
+                                                                                                >r</kbd
+                                                                                            >
+                                                                                            for
+                                                                                            ranges,
+                                                                                            click
+                                                                                            <span
+                                                                                                class="italic"
+                                                                                                >Auto
+                                                                                                Ranges
+                                                                                                Picking</span
+                                                                                            >,
+                                                                                            then
+                                                                                            drag
+                                                                                            a
+                                                                                            range
+                                                                                            link
+                                                                                            onto
+                                                                                            an
+                                                                                            atom
+                                                                                            in
+                                                                                            the
+                                                                                            structure.
+                                                                                            Diastereotopic
+                                                                                            atoms
+                                                                                            expand
+                                                                                            with
+                                                                                            <kbd
+                                                                                                class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800"
+                                                                                                >Shift</kbd
+                                                                                            >
+                                                                                            +
+                                                                                            click.
+                                                                                            Assigned
+                                                                                            atoms
+                                                                                            turn
+                                                                                            yellow.
                                                                                             <a
                                                                                                 href="https://docs.nmrium.org/help/assignment/"
                                                                                                 target="_blank"
                                                                                                 rel="noopener"
                                                                                                 class="ml-1 underline decoration-dotted underline-offset-2 hover:no-underline"
-                                                                                                >Full guide ↗</a
+                                                                                                >Full
+                                                                                                guide
+                                                                                                ↗</a
                                                                                             >
                                                                                         </li>
                                                                                     </ol>
@@ -2545,12 +2622,27 @@
                                                                                         !selectedStudy ||
                                                                                         !(
                                                                                             selectedStudy.datasets &&
-                                                                                            selectedStudy.datasets.length
+                                                                                            selectedStudy
+                                                                                                .datasets
+                                                                                                .length
                                                                                         )
                                                                                     "
                                                                                     class="rounded-md border border-dashed border-gray-300 bg-gray-50/70 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-slate-800/60 dark:text-slate-300"
                                                                                 >
-                                                                                    No spectra are attached to this sample yet, so there is nothing to assign.
+                                                                                    No
+                                                                                    spectra
+                                                                                    are
+                                                                                    attached
+                                                                                    to
+                                                                                    this
+                                                                                    sample
+                                                                                    yet,
+                                                                                    so
+                                                                                    there
+                                                                                    is
+                                                                                    nothing
+                                                                                    to
+                                                                                    assign.
                                                                                 </div>
 
                                                                                 <div
@@ -2657,7 +2749,10 @@
                                                                                                         applies
                                                                                                         to
                                                                                                         <template
-                                                                                                            v-for="(ds, idx) in group.datasets"
+                                                                                                            v-for="(
+                                                                                                                ds,
+                                                                                                                idx
+                                                                                                            ) in group.datasets"
                                                                                                             :key="
                                                                                                                 'expno-' +
                                                                                                                 ds.id
@@ -2667,8 +2762,8 @@
                                                                                                                     idx >
                                                                                                                     0
                                                                                                                 "
-                                                                                                                >,
-                                                                                                            </span>{{
+                                                                                                                >, </span
+                                                                                                            >{{
                                                                                                                 ds.type &&
                                                                                                                 ds.type.split(
                                                                                                                     " - "
@@ -2812,39 +2907,77 @@
                                                                                         >
                                                                                             Sample
                                                                                             Description
-                                                                                        <span
-                                                                                            class="float-right rounded-full px-2"
-                                                                                            @click="
-                                                                                                autoGenerateDescription()
-                                                                                            "
+                                                                                            <span
+                                                                                                class="float-right rounded-full px-2"
+                                                                                                @click="
+                                                                                                    autoGenerateDescription()
+                                                                                                "
+                                                                                            >
+                                                                                                Auto
+                                                                                                generate
+                                                                                            </span>
+                                                                                        </label>
+                                                                                        <div
+                                                                                            class="mt-1"
                                                                                         >
-                                                                                            Auto
-                                                                                            generate
-                                                                                        </span>
-                                                                                    </label>
+                                                                                            <textarea
+                                                                                                id="study-description"
+                                                                                                v-model="
+                                                                                                    studyForm.description
+                                                                                                "
+                                                                                                name="study-description"
+                                                                                                rows="3"
+                                                                                                class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                                                                                @blur="
+                                                                                                    saveStudyDetails
+                                                                                                "
+                                                                                            ></textarea>
+                                                                                            <jet-input-error
+                                                                                                :message="
+                                                                                                    studyForm
+                                                                                                        .errors
+                                                                                                        .description
+                                                                                                "
+                                                                                                class="mt-2"
+                                                                                            />
+                                                                                        </div>
+                                                                                    </div>
                                                                                     <div
-                                                                                        class="mt-1"
+                                                                                        class="mb-3"
                                                                                     >
-                                                                                        <textarea
-                                                                                            id="study-description"
-                                                                                            v-model="
-                                                                                                studyForm.description
-                                                                                            "
-                                                                                            name="study-description"
-                                                                                            rows="3"
-                                                                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
-                                                                                            @blur="
-                                                                                                saveStudyDetails
-                                                                                            "
-                                                                                        ></textarea>
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                studyForm
-                                                                                                    .errors
-                                                                                                    .description
-                                                                                            "
-                                                                                            class="mt-2"
-                                                                                        />
+                                                                                        <label
+                                                                                            for="description"
+                                                                                            class="block text-sm font-medium text-gray-700"
+                                                                                        >
+                                                                                            Keywords
+                                                                                        </label>
+                                                                                        <div>
+                                                                                            <vue-tags-input
+                                                                                                v-model="
+                                                                                                    studyForm.tag
+                                                                                                "
+                                                                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                                                                :separators="[
+                                                                                                    ';',
+                                                                                                    ',',
+                                                                                                ]"
+                                                                                                max-width="100%"
+                                                                                                :tags="
+                                                                                                    studyForm.tags
+                                                                                                "
+                                                                                                @tags-changed="
+                                                                                                    updateTags
+                                                                                                "
+                                                                                            />
+                                                                                            <jet-input-error
+                                                                                                :message="
+                                                                                                    studyForm
+                                                                                                        .errors
+                                                                                                        .tags
+                                                                                                "
+                                                                                                class="mt-2"
+                                                                                            />
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div
@@ -2854,143 +2987,105 @@
                                                                                         for="description"
                                                                                         class="block text-sm font-medium text-gray-700"
                                                                                     >
-                                                                                        Keywords
+                                                                                        Organism
+                                                                                        (Optional)
                                                                                     </label>
-                                                                                    <div>
-                                                                                        <vue-tags-input
-                                                                                            v-model="
-                                                                                                studyForm.tag
-                                                                                            "
-                                                                                            placeholder="Type a keyword or keywords separated by comma (,) and press enter"
-                                                                                            :separators="[
-                                                                                                ';',
-                                                                                                ',',
-                                                                                            ]"
-                                                                                            max-width="100%"
-                                                                                            :tags="
-                                                                                                studyForm.tags
-                                                                                            "
-                                                                                            @tags-changed="
-                                                                                                updateTags
-                                                                                            "
-                                                                                        />
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                studyForm
-                                                                                                    .errors
-                                                                                                    .tags
-                                                                                            "
-                                                                                            class="mt-2"
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div
-                                                                                class="mb-3"
-                                                                            >
-                                                                                <label
-                                                                                    for="description"
-                                                                                    class="block text-sm font-medium text-gray-700"
-                                                                                >
-                                                                                    Organism
-                                                                                    (Optional)
-                                                                                </label>
 
-                                                                                <div
-                                                                                    class="mt-2 sm:flex sm:items-start sm:justify-between"
-                                                                                >
                                                                                     <div
-                                                                                        class="text-sm text-gray-500 w-full"
+                                                                                        class="mt-2 sm:flex sm:items-start sm:justify-between"
                                                                                     >
-                                                                                        <ontology-autocomplete
-                                                                                            class="rounded-md"
-                                                                                            format="text"
-                                                                                            :value="
-                                                                                                studySpecies
-                                                                                            "
-                                                                                            placeholder="Search species"
-                                                                                            @change="
-                                                                                                studySpecies =
-                                                                                                    $event
-                                                                                                        .detail[0]
-                                                                                            "
-                                                                                            @blur="
-                                                                                                updateSpecies(
+                                                                                        <div
+                                                                                            class="text-sm text-gray-500 w-full"
+                                                                                        >
+                                                                                            <ontology-autocomplete
+                                                                                                class="rounded-md"
+                                                                                                format="text"
+                                                                                                :value="
                                                                                                     studySpecies
-                                                                                                )
-                                                                                            "
-                                                                                        ></ontology-autocomplete>
+                                                                                                "
+                                                                                                placeholder="Search species"
+                                                                                                @change="
+                                                                                                    studySpecies =
+                                                                                                        $event
+                                                                                                            .detail[0]
+                                                                                                "
+                                                                                                @blur="
+                                                                                                    updateSpecies(
+                                                                                                        studySpecies
+                                                                                                    )
+                                                                                                "
+                                                                                            ></ontology-autocomplete>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
+                                                                                        >
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                                                                @click="
+                                                                                                    updateSpecies(
+                                                                                                        studySpecies
+                                                                                                    )
+                                                                                                "
+                                                                                            >
+                                                                                                <svg
+                                                                                                    class="-ml-0.5 h-5 w-5 text-gray-400"
+                                                                                                    viewBox="0 0 20 20"
+                                                                                                    fill="currentColor"
+                                                                                                    aria-hidden="true"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+                                                                                                    ></path>
+                                                                                                </svg>
+                                                                                                Add
+                                                                                            </button>
+                                                                                        </div>
                                                                                     </div>
                                                                                     <div
-                                                                                        class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
+                                                                                        class="mt-2"
                                                                                     >
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                                                                            @click="
-                                                                                                updateSpecies(
-                                                                                                    studySpecies
-                                                                                                )
+                                                                                        <div
+                                                                                            v-for="(
+                                                                                                species,
+                                                                                                $index
+                                                                                            ) in studyForm.species"
+                                                                                            :key="
+                                                                                                $index
                                                                                             "
+                                                                                            class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
                                                                                         >
-                                                                                            <svg
-                                                                                                class="-ml-0.5 h-5 w-5 text-gray-400"
-                                                                                                viewBox="0 0 20 20"
-                                                                                                fill="currentColor"
-                                                                                                aria-hidden="true"
+                                                                                            <ontology-term-annotation
+                                                                                                :annotation="
+                                                                                                    species
+                                                                                                "
+                                                                                            ></ontology-term-annotation>
+                                                                                            <span
+                                                                                                class="cursor-pointer"
+                                                                                                @click="
+                                                                                                    removeSpecies(
+                                                                                                        $index
+                                                                                                    )
+                                                                                                "
                                                                                             >
-                                                                                                <path
-                                                                                                    d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-                                                                                                ></path>
-                                                                                            </svg>
-                                                                                            Add
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    class="mt-2"
-                                                                                >
-                                                                                    <div
-                                                                                        v-for="(
-                                                                                            species,
-                                                                                            $index
-                                                                                        ) in studyForm.species"
-                                                                                        :key="
-                                                                                            $index
-                                                                                        "
-                                                                                        class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
-                                                                                    >
-                                                                                        <ontology-term-annotation
-                                                                                            :annotation="
-                                                                                                species
-                                                                                            "
-                                                                                        ></ontology-term-annotation>
-                                                                                        <span
-                                                                                            class="cursor-pointer"
-                                                                                            @click="
-                                                                                                removeSpecies(
-                                                                                                    $index
-                                                                                                )
-                                                                                            "
-                                                                                        >
-                                                                                            <svg
-                                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                                viewBox="0 0 24 24"
-                                                                                                fill="currentColor"
-                                                                                                class="w-5 h-5 ml-2"
-                                                                                            >
-                                                                                                <path
-                                                                                                    fill-rule="evenodd"
-                                                                                                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
-                                                                                                    clip-rule="evenodd"
-                                                                                                />
-                                                                                            </svg>
-                                                                                        </span>
+                                                                                                <svg
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    viewBox="0 0 24 24"
+                                                                                                    fill="currentColor"
+                                                                                                    class="w-5 h-5 ml-2"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill-rule="evenodd"
+                                                                                                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
+                                                                                                        clip-rule="evenodd"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </span>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            </div>
-                                                                    </section>
+                                                                        </section>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -3010,8 +3105,8 @@
                                             loader.importMeta
                                                 ? 'spectra-loading-title'
                                                 : loader.bannerMessage
-                                                  ? 'spectra-loading-banner'
-                                                  : undefined
+                                                ? 'spectra-loading-banner'
+                                                : undefined
                                         "
                                     >
                                         <div
@@ -3046,7 +3141,9 @@
                                                     </svg>
                                                 </div>
 
-                                                <template v-if="loader.importMeta">
+                                                <template
+                                                    v-if="loader.importMeta"
+                                                >
                                                     <h2
                                                         id="spectra-loading-title"
                                                         class="text-base font-semibold tracking-tight text-gray-900 dark:text-white"
@@ -3399,9 +3496,7 @@
                             <span class="font-medium text-gray-700">
                                 Processed
                             </span>
-                            <span
-                                class="font-mono tabular-nums text-gray-900"
-                            >
+                            <span class="font-mono tabular-nums text-gray-900">
                                 {{ processedStudiesCount }} /
                                 {{ totalStudiesCount }} samples
                             </span>
@@ -3735,9 +3830,7 @@ export default {
             if (!total) {
                 return 0;
             }
-            return Math.round(
-                (this.processedStudiesCount / total) * 100
-            );
+            return Math.round((this.processedStudiesCount / total) * 100);
         },
         contactSupportHref() {
             const draftRef = this.currentDraft
@@ -3965,10 +4058,7 @@ export default {
             },
         },
         processedStudiesCount(newCount, oldCount) {
-            if (
-                this.showProcessingOverlay &&
-                newCount > (oldCount || 0)
-            ) {
+            if (this.showProcessingOverlay && newCount > (oldCount || 0)) {
                 this.startProcessingStuckTimer();
             }
         },
@@ -4015,10 +4105,7 @@ export default {
         },
         compositionSampleType(mode) {
             if (mode === "pure") {
-                this.percentage = Math.min(
-                    99.99,
-                    this.compositionSliderMax
-                );
+                this.percentage = Math.min(99.99, this.compositionSliderMax);
             } else if (mode === "mixture") {
                 const max = this.compositionSliderMax;
                 if (this.percentage > max) {
@@ -4085,8 +4172,7 @@ export default {
                     if (selectedDraft) {
                         if (
                             this.step === "2" &&
-                            String(this.draft_id) ===
-                                String(selectedDraft.id)
+                            String(this.draft_id) === String(selectedDraft.id)
                         ) {
                             Promise.all([
                                 axios
@@ -4110,8 +4196,7 @@ export default {
                                         draftToUse = showRes.data.draft;
                                     }
                                     const p = infoRes?.data?.project;
-                                    const studiesList =
-                                        infoRes?.data?.studies;
+                                    const studiesList = infoRes?.data?.studies;
                                     if (
                                         p &&
                                         studiesList &&
@@ -4769,11 +4854,7 @@ export default {
                     : [];
                 this.processingWarnings = nextWarnings;
                 this.syncNeedsReservedFromProject();
-                if (
-                    this.project &&
-                    this.studies &&
-                    this.studies.length > 0
-                ) {
+                if (this.project && this.studies && this.studies.length > 0) {
                     this.loadingStep = false;
                     if (nextWarnings.length > 0) {
                         // Keep the user on step 1 until the nested sample
@@ -4889,11 +4970,7 @@ export default {
                     const p = infoRes.data.project;
                     const studiesList = infoRes.data.studies;
 
-                    if (
-                        !p ||
-                        !studiesList ||
-                        studiesList.length === 0
-                    ) {
+                    if (!p || !studiesList || studiesList.length === 0) {
                         return this.fetchProjectDetails().then(handleSuccess);
                     }
 
@@ -5149,8 +5226,7 @@ export default {
             const next = {};
             const datasets = (study && study.datasets) || [];
             datasets.forEach((ds) => {
-                next[ds.id] =
-                    (ds.assignments && ds.assignments.acs) || "";
+                next[ds.id] = (ds.assignments && ds.assignments.acs) || "";
             });
             this.assignmentsDraft = next;
             this.assignmentsErrors = {};
@@ -5225,7 +5301,11 @@ export default {
          * when nothing changed from what every dataset already has saved.
          */
         autosaveAssignmentsForGroup(group) {
-            if (!group || !Array.isArray(group.datasets) || !group.datasets.length) {
+            if (
+                !group ||
+                !Array.isArray(group.datasets) ||
+                !group.datasets.length
+            ) {
                 return;
             }
             const key = group.key;
@@ -5249,7 +5329,11 @@ export default {
          * group as fully assigned.
          */
         saveAssignmentsForGroup(group) {
-            if (!group || !Array.isArray(group.datasets) || !group.datasets.length) {
+            if (
+                !group ||
+                !Array.isArray(group.datasets) ||
+                !group.datasets.length
+            ) {
                 return;
             }
             const key = group.key;
@@ -5873,7 +5957,9 @@ export default {
                             });
                         }
                         const version =
-                            nmriumState.version ?? parsedSpectra.version ?? null;
+                            nmriumState.version ??
+                            parsedSpectra.version ??
+                            null;
                         delete parsedSpectra["version"];
                         const molecules = Array.isArray(parsedSpectra.molecules)
                             ? parsedSpectra.molecules
@@ -6320,9 +6406,7 @@ export default {
                 return String(Math.round(n));
             }
 
-            return n
-                .toFixed(3)
-                .replace(/\.?0+$/, "");
+            return n.toFixed(3).replace(/\.?0+$/, "");
         },
     },
 };

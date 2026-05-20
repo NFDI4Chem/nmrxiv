@@ -26,7 +26,9 @@
                 v-if="hasToolbar(citation)"
                 class="flex shrink-0 flex-col items-center gap-1 pl-2 sm:flex-row sm:items-start sm:gap-1.5 sm:pl-0"
                 role="toolbar"
-                :aria-label="'Actions for citation: ' + (citation.title || 'citation')"
+                :aria-label="
+                    'Actions for citation: ' + (citation.title || 'citation')
+                "
             >
                 <a
                     v-if="showOpenLinkButton && citation.doi"

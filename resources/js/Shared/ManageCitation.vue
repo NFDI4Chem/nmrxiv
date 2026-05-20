@@ -1,349 +1,360 @@
 <template>
     <div>
         <jet-dialog-modal
-        :show="showDialog"
-        :max-width="'6xl'"
-        @close="onClose"
-    >
-        <template #title>
-            <span class="text-base font-medium text-gray-900">
-                {{ project.name }} - Manage Citations
-            </span>
-        </template>
-        <template #content>
-            <div>
-                <div class="mb-4 rounded-md bg-gray-50 p-4 ring-1 ring-primary-200">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg
-                                class="h-5 w-5 text-primary-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-primary-900">
-                                Note: Citation details can be updated during the
-                                embargo period. A DOI is not required for
-                                embargoed publication, but we recommend
-                                reviewing this section and adding any missing
-                                DOIs before making the project public.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            :show="showDialog"
+            :max-width="'6xl'"
+            @close="onClose"
+        >
+            <template #title>
+                <span class="text-base font-medium text-gray-900">
+                    {{ project.name }} - Manage Citations
+                </span>
+            </template>
+            <template #content>
                 <div>
                     <div
-                        class="mx-auto flex max-w-3xl flex-col gap-10 px-4 sm:px-6"
+                        class="mb-4 rounded-md bg-gray-50 p-4 ring-1 ring-primary-200"
                     >
-                        <!-- Import from DOI (add flow only; hidden while editing) -->
-                        <section
-                            v-if="!isEdit"
-                            aria-labelledby="citation-import-heading"
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg
+                                    class="h-5 w-5 text-primary-500"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-primary-900">
+                                    Note: Citation details can be updated during
+                                    the embargo period. A DOI is not required
+                                    for embargoed publication, but we recommend
+                                    reviewing this section and adding any
+                                    missing DOIs before making the project
+                                    public.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            class="mx-auto flex max-w-3xl flex-col gap-10 px-4 sm:px-6"
                         >
-                            <h3
-                                id="citation-import-heading"
-                                class="text-sm font-bold leading-6 text-gray-900"
+                            <!-- Import from DOI (add flow only; hidden while editing) -->
+                            <section
+                                v-if="!isEdit"
+                                aria-labelledby="citation-import-heading"
                             >
-                                Import from DOI
-                            </h3>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Fetch publication metadata automatically, then
-                                add it to your project.
-                            </p>
-                            <div
-                                class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
-                            >
-                                <div class="sm:col-span-2">
-                                    <label
-                                        for="query"
-                                        class="block text-sm font-medium text-gray-700"
-                                    >
-                                        DOI
-                                    </label>
-                                    <div class="mt-1 flex rounded-md shadow-sm">
-                                        <input
-                                            id="query"
-                                            v-model="query"
-                                            type="text"
-                                            name="query"
-                                            placeholder="Enter DOI to import citation automatically"
-                                            autocomplete="off"
-                                            class="min-w-0 flex-1 rounded border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2">
-                                <jet-secondary-button
-                                    :disabled="!isQueryValid || loading"
-                                    @click="fetchCitations"
+                                <h3
+                                    id="citation-import-heading"
+                                    class="text-sm font-bold leading-6 text-gray-900"
                                 >
-                                    Import
-                                </jet-secondary-button>
-                                <jet-secondary-button
-                                    :disabled="
-                                        isEmpty(fetchedCitations) && !query
-                                    "
-                                    @click="clearImportData"
-                                >
-                                    Reset
-                                </jet-secondary-button>
-                            </div>
-                            <jet-input-error :message="error" class="mt-2" />
-                            <div
-                                v-if="loading"
-                                class="mt-4 sm:col-span-9 align-centre"
-                            >
-                                <loading-button :loading="loading" />
-                            </div>
-                            <div
-                                v-if="
-                                    !(
-                                        isEmpty(fetchedCitations) ||
-                                        fetchCitations == null
-                                    ) && !loading
-                                "
-                                class="mt-4"
-                            >
-                                <CitationCard
-                                    :citations="[fetchedCitations]"
-                                />
-                                <div class="mt-3 flex justify-end">
-                                    <jet-secondary-button
-                                        class="text-md font-bold text-primary-900"
-                                        @click="save('addFetched')"
-                                    >
-                                        Add
-                                    </jet-secondary-button>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Manual citation (below import when adding) -->
-                        <section
-                            :class="
-                                isEdit
-                                    ? ''
-                                    : 'border-t border-gray-200 pt-10'
-                            "
-                            aria-labelledby="citation-manual-heading"
-                        >
-                            <h3
-                                id="citation-manual-heading"
-                                class="text-sm font-bold leading-6 text-gray-900"
-                            >
-                                <template v-if="!isEdit"
-                                    >Add citation manually</template
-                                >
-                                <template v-else>Update citation</template>
-                            </h3>
-                            <p v-if="!isEdit" class="mt-1 text-sm text-gray-500">
-                                Or enter title, authors, and optional DOI and
-                                citation text yourself.
-                            </p>
-                            <p v-else class="mt-1 text-sm text-gray-500">
-                                Update title, authors, DOI, or citation text as
-                                needed.
-                            </p>
-                            <div
-                                class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
-                            >
-                                <div class="sm:col-span-1">
-                                    <label
-                                        for="doi"
-                                        class="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-red-500"
-                                    >
-                                        DOI
-                                    </label>
-                                    <div class="mt-1">
-                                        <input
-                                            id="doi"
-                                            v-model="form.doi"
-                                            type="text"
-                                            name="doi"
-                                            placeholder="Enter DOI (e.g., 10.1000/journal.2023.0001)"
-                                            :class="[
-                                                isEdit
-                                                    ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                    : '',
-                                                'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                            ]"
-                                        />
-                                    </div>
-                                    <jet-input-error
-                                        :message="form.errors.doi"
-                                        class="mt-2"
-                                    />
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label
-                                        for="title"
-                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                    >
-                                        Title
-                                    </label>
-                                    <div class="mt-1">
-                                        <input
-                                            id="title"
-                                            v-model="form.title"
-                                            type="text"
-                                            name="title"
-                                            placeholder="Enter publication title"
-                                            autocomplete="title"
-                                            :class="[
-                                                isEdit
-                                                    ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                    : '',
-                                                'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                            ]"
-                                        />
-                                    </div>
-                                    <jet-input-error
-                                        :message="form.errors.title"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <div class="sm:col-span-2">
-                                    <label
-                                        for="authors"
-                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                    >
-                                        Authors
-                                    </label>
-                                    <div class="mt-1">
-                                        <textarea
-                                            id="authors"
-                                            v-model="form.authors"
-                                            type="text"
-                                            name="authors"
-                                            placeholder="Enter author names (e.g., Smith J, Johnson A, Brown M)"
-                                            :class="[
-                                                isEdit
-                                                    ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                    : '',
-                                                'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                            ]"
-                                        />
-                                    </div>
-                                    <jet-input-error
-                                        :message="form.errors.authors"
-                                        class="mt-2"
-                                    />
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label
-                                        for="citation_text"
-                                        class="block text-sm font-medium text-gray-700"
-                                    >
-                                        Citation Text
-                                    </label>
-                                    <div class="mt-1">
-                                        <textarea
-                                            id="citation_text"
-                                            v-model="form.citation_text"
-                                            name="citation_text"
-                                            autocomplete="citation_text"
-                                            placeholder="Enter complete citation (journal, year, volume, issue, pages) or provide any relevant publication information"
-                                            type="text"
-                                            :class="[
-                                                isEdit
-                                                    ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                    : '',
-                                                'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                            ]"
-                                        />
-                                    </div>
-                                </div>
+                                    Import from DOI
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Fetch publication metadata automatically,
+                                    then add it to your project.
+                                </p>
                                 <div
-                                    v-if="!isEdit"
-                                    class="sm:col-span-2 flex flex-wrap justify-end gap-2"
+                                    class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
                                 >
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="query"
+                                            class="block text-sm font-medium text-gray-700"
+                                        >
+                                            DOI
+                                        </label>
+                                        <div
+                                            class="mt-1 flex rounded-md shadow-sm"
+                                        >
+                                            <input
+                                                id="query"
+                                                v-model="query"
+                                                type="text"
+                                                name="query"
+                                                placeholder="Enter DOI to import citation automatically"
+                                                autocomplete="off"
+                                                class="min-w-0 flex-1 rounded border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-2">
                                     <jet-secondary-button
-                                        :disabled="form.processing"
-                                        @click="
-                                            form.reset(),
-                                                citationsForm.reset(),
-                                                clearFormErrors()
+                                        :disabled="!isQueryValid || loading"
+                                        @click="fetchCitations"
+                                    >
+                                        Import
+                                    </jet-secondary-button>
+                                    <jet-secondary-button
+                                        :disabled="
+                                            isEmpty(fetchedCitations) && !query
                                         "
+                                        @click="clearImportData"
                                     >
-                                        Clear
+                                        Reset
                                     </jet-secondary-button>
-                                    <jet-secondary-button
-                                        @click="save('addManually')"
-                                    >
-                                        Add
-                                    </jet-secondary-button>
+                                </div>
+                                <jet-input-error
+                                    :message="error"
+                                    class="mt-2"
+                                />
+                                <div
+                                    v-if="loading"
+                                    class="mt-4 sm:col-span-9 align-centre"
+                                >
+                                    <loading-button :loading="loading" />
                                 </div>
                                 <div
-                                    v-else
-                                    class="sm:col-span-2 flex flex-wrap justify-end gap-2"
+                                    v-if="
+                                        !(
+                                            isEmpty(fetchedCitations) ||
+                                            fetchCitations == null
+                                        ) && !loading
+                                    "
+                                    class="mt-4"
                                 >
-                                    <jet-secondary-button
-                                        :disabled="form.processing"
-                                        @click="onCancelEdit()"
-                                    >
-                                        Cancel
-                                    </jet-secondary-button>
-                                    <jet-secondary-button
-                                        :disabled="form.processing"
-                                        @click="save('addManually')"
-                                    >
-                                        Update
-                                    </jet-secondary-button>
+                                    <CitationCard
+                                        :citations="[fetchedCitations]"
+                                    />
+                                    <div class="mt-3 flex justify-end">
+                                        <jet-secondary-button
+                                            class="text-md font-bold text-primary-900"
+                                            @click="save('addFetched')"
+                                        >
+                                            Add
+                                        </jet-secondary-button>
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
+                            </section>
+
+                            <!-- Manual citation (below import when adding) -->
+                            <section
+                                :class="
+                                    isEdit
+                                        ? ''
+                                        : 'border-t border-gray-200 pt-10'
+                                "
+                                aria-labelledby="citation-manual-heading"
+                            >
+                                <h3
+                                    id="citation-manual-heading"
+                                    class="text-sm font-bold leading-6 text-gray-900"
+                                >
+                                    <template v-if="!isEdit"
+                                        >Add citation manually</template
+                                    >
+                                    <template v-else>Update citation</template>
+                                </h3>
+                                <p
+                                    v-if="!isEdit"
+                                    class="mt-1 text-sm text-gray-500"
+                                >
+                                    Or enter title, authors, and optional DOI
+                                    and citation text yourself.
+                                </p>
+                                <p v-else class="mt-1 text-sm text-gray-500">
+                                    Update title, authors, DOI, or citation text
+                                    as needed.
+                                </p>
+                                <div
+                                    class="mt-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+                                >
+                                    <div class="sm:col-span-1">
+                                        <label
+                                            for="doi"
+                                            class="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-red-500"
+                                        >
+                                            DOI
+                                        </label>
+                                        <div class="mt-1">
+                                            <input
+                                                id="doi"
+                                                v-model="form.doi"
+                                                type="text"
+                                                name="doi"
+                                                placeholder="Enter DOI (e.g., 10.1000/journal.2023.0001)"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                        <jet-input-error
+                                            :message="form.errors.doi"
+                                            class="mt-2"
+                                        />
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="title"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        >
+                                            Title
+                                        </label>
+                                        <div class="mt-1">
+                                            <input
+                                                id="title"
+                                                v-model="form.title"
+                                                type="text"
+                                                name="title"
+                                                placeholder="Enter publication title"
+                                                autocomplete="title"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                        <jet-input-error
+                                            :message="form.errors.title"
+                                            class="mt-2"
+                                        />
+                                    </div>
+
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="authors"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        >
+                                            Authors
+                                        </label>
+                                        <div class="mt-1">
+                                            <textarea
+                                                id="authors"
+                                                v-model="form.authors"
+                                                type="text"
+                                                name="authors"
+                                                placeholder="Enter author names (e.g., Smith J, Johnson A, Brown M)"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                        <jet-input-error
+                                            :message="form.errors.authors"
+                                            class="mt-2"
+                                        />
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="citation_text"
+                                            class="block text-sm font-medium text-gray-700"
+                                        >
+                                            Citation Text
+                                        </label>
+                                        <div class="mt-1">
+                                            <textarea
+                                                id="citation_text"
+                                                v-model="form.citation_text"
+                                                name="citation_text"
+                                                autocomplete="citation_text"
+                                                placeholder="Enter complete citation (journal, year, volume, issue, pages) or provide any relevant publication information"
+                                                type="text"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-if="!isEdit"
+                                        class="sm:col-span-2 flex flex-wrap justify-end gap-2"
+                                    >
+                                        <jet-secondary-button
+                                            :disabled="form.processing"
+                                            @click="
+                                                form.reset(),
+                                                    citationsForm.reset(),
+                                                    clearFormErrors()
+                                            "
+                                        >
+                                            Clear
+                                        </jet-secondary-button>
+                                        <jet-secondary-button
+                                            @click="save('addManually')"
+                                        >
+                                            Add
+                                        </jet-secondary-button>
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="sm:col-span-2 flex flex-wrap justify-end gap-2"
+                                    >
+                                        <jet-secondary-button
+                                            :disabled="form.processing"
+                                            @click="onCancelEdit()"
+                                        >
+                                            Cancel
+                                        </jet-secondary-button>
+                                        <jet-secondary-button
+                                            :disabled="form.processing"
+                                            @click="save('addManually')"
+                                        >
+                                            Update
+                                        </jet-secondary-button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </template>
-        <template #footer>
-            <div class="flex">
-                <jet-secondary-button class="float-left" @click="onClose">
-                    Close
+            </template>
+            <template #footer>
+                <div class="flex">
+                    <jet-secondary-button class="float-left" @click="onClose">
+                        Close
+                    </jet-secondary-button>
+                </div>
+            </template>
+        </jet-dialog-modal>
+
+        <jet-dialog-modal
+            :show="confirmDelete"
+            max-width="md"
+            @close="closeDeleteConfirm"
+        >
+            <template #title> Delete citation </template>
+
+            <template #content>
+                <p class="text-sm text-gray-600">
+                    Are you sure you want to delete this citation? This cannot
+                    be undone.
+                </p>
+            </template>
+
+            <template #footer>
+                <jet-secondary-button @click="closeDeleteConfirm">
+                    Cancel
                 </jet-secondary-button>
-            </div>
-        </template>
-    </jet-dialog-modal>
 
-    <jet-dialog-modal
-        :show="confirmDelete"
-        max-width="md"
-        @close="closeDeleteConfirm"
-    >
-        <template #title> Delete citation </template>
-
-        <template #content>
-            <p class="text-sm text-gray-600">
-                Are you sure you want to delete this citation? This cannot be
-                undone.
-            </p>
-        </template>
-
-        <template #footer>
-            <jet-secondary-button @click="closeDeleteConfirm">
-                Cancel
-            </jet-secondary-button>
-
-            <jet-danger-button
-                class="ml-2"
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
-                @click="deleteCitation()"
-            >
-                Delete citation
-            </jet-danger-button>
-        </template>
-    </jet-dialog-modal>
+                <jet-danger-button
+                    class="ml-2"
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                    @click="deleteCitation()"
+                >
+                    Delete citation
+                </jet-danger-button>
+            </template>
+        </jet-dialog-modal>
     </div>
 </template>
 <script>

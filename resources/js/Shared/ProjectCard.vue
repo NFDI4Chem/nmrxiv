@@ -15,9 +15,7 @@
                         class="relative h-36 overflow-hidden rounded-t-xl lg:h-36 xl:h-36"
                     >
                         <img
-                            v-if="
-                                project.photo_url && project.photo_url != ''
-                            "
+                            v-if="project.photo_url && project.photo_url != ''"
                             :src="project.photo_url"
                             :alt="project.name"
                             class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
@@ -37,10 +35,7 @@
                     </div>
                 </Link>
 
-                <div
-                    v-if="project.stats"
-                    class="absolute right-2 top-2 z-20"
-                >
+                <div v-if="project.stats" class="absolute right-2 top-2 z-20">
                     <span
                         class="inline-flex overflow-hidden rounded-full bg-white/90 shadow-sm ring-1 ring-black/5 backdrop-blur-sm"
                     >
@@ -89,10 +84,7 @@
                         >
                             {{ project.description }}
                         </p>
-                        <p
-                            v-else
-                            class="mt-2 text-sm italic text-gray-400"
-                        >
+                        <p v-else class="mt-2 text-sm italic text-gray-400">
                             No description provided
                         </p>
 
@@ -221,9 +213,7 @@
                 </Link>
 
                 <div class="flex min-w-0 flex-1 flex-col justify-between">
-                    <div
-                        class="flex items-start justify-between gap-3"
-                    >
+                    <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0 flex-1">
                             <p
                                 v-if="project.identifier"
@@ -231,7 +221,9 @@
                             >
                                 #{{ project.identifier }}
                             </p>
-                            <h3 class="mt-0.5 line-clamp-2 text-base font-semibold text-gray-900">
+                            <h3
+                                class="mt-0.5 line-clamp-2 text-base font-semibold text-gray-900"
+                            >
                                 <Link
                                     :href="project.public_url"
                                     class="hover:text-teal-800"
@@ -253,10 +245,7 @@
                             </p>
                         </div>
 
-                        <div
-                            v-if="project.stats"
-                            class="shrink-0"
-                        >
+                        <div v-if="project.stats" class="shrink-0">
                             <span
                                 class="inline-flex overflow-hidden rounded-full border border-gray-200 bg-white shadow-sm"
                             >
@@ -299,9 +288,7 @@
                             v-if="licenseTitle"
                             class="mt-1 flex min-w-0 items-center gap-1.5"
                         >
-                            <ScaleIcon
-                                class="h-4 w-4 shrink-0 text-gray-400"
-                            />
+                            <ScaleIcon class="h-4 w-4 shrink-0 text-gray-400" />
                             <span
                                 class="line-clamp-2 text-xs font-medium text-gray-600"
                                 :title="licenseTitle"
@@ -312,39 +299,39 @@
                         <div
                             class="flex flex-wrap items-center gap-x-4 gap-y-1"
                         >
-                        <p
-                            v-if="project.download_url"
-                            class="flex items-center"
-                        >
-                            <a
-                                :href="project.download_url"
-                                class="inline-flex items-center gap-1 text-teal-700 hover:text-teal-900"
+                            <p
+                                v-if="project.download_url"
+                                class="flex items-center"
                             >
-                                <ArrowDownTrayIcon
-                                    class="h-4 w-4"
+                                <a
+                                    :href="project.download_url"
+                                    class="inline-flex items-center gap-1 text-teal-700 hover:text-teal-900"
+                                >
+                                    <ArrowDownTrayIcon
+                                        class="h-4 w-4"
+                                        aria-hidden="true"
+                                    />
+                                    Download
+                                </a>
+                            </p>
+                            <p class="flex items-center gap-1.5">
+                                <svg
+                                    class="h-4 w-4 shrink-0 text-gray-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
                                     aria-hidden="true"
-                                />
-                                Download
-                            </a>
-                        </p>
-                        <p class="flex items-center gap-1.5">
-                            <svg
-                                class="h-4 w-4 shrink-0 text-gray-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
-                            <time :datetime="project.created_at">
-                                {{ formatDate(project.created_at) }}
-                            </time>
-                        </p>
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                                <time :datetime="project.created_at">
+                                    {{ formatDate(project.created_at) }}
+                                </time>
+                            </p>
                         </div>
                     </div>
                 </div>

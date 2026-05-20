@@ -85,10 +85,7 @@
                 <slot name="emptyText"></slot>
             </div>
         </div>
-        <div
-            v-else
-            class="flex w-full min-w-0 flex-col items-stretch gap-5"
-        >
+        <div v-else class="flex w-full min-w-0 flex-col items-stretch gap-5">
             <article
                 v-for="project in projects"
                 :key="project.uuid"
@@ -99,7 +96,9 @@
                     v-if="project.status"
                     class="flex w-11 shrink-0 flex-col items-center justify-center gap-1 border-r border-black/[0.06] px-0.5 py-3 text-center sm:w-12 sm:py-4"
                     :class="statusRibbonSurface(project)"
-                    :aria-label="`Project status: ${statusRibbonLabel(project)}`"
+                    :aria-label="`Project status: ${statusRibbonLabel(
+                        project
+                    )}`"
                 >
                     <component
                         :is="statusRibbonIcon(project)"
@@ -150,7 +149,10 @@
                                     "
                                     @click.stop="toggleProjectStarred(project)"
                                 >
-                                    <StarIcon class="h-5 w-5" aria-hidden="true" />
+                                    <StarIcon
+                                        class="h-5 w-5"
+                                        aria-hidden="true"
+                                    />
                                 </button>
                                 <div class="tooltip">
                                     <a
@@ -169,10 +171,7 @@
                                         >Summary view</span
                                     >
                                 </div>
-                                <div
-                                    v-if="!project.is_public"
-                                    class="tooltip"
-                                >
+                                <div v-if="!project.is_public" class="tooltip">
                                     <a
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -194,8 +193,7 @@
                         <div
                             v-if="
                                 (team && team.id != project.team_id) ||
-                                project.owner_id !=
-                                    $page.props.auth.user.id
+                                project.owner_id != $page.props.auth.user.id
                             "
                             class="mt-3"
                         >
@@ -254,7 +252,9 @@
                             >
                                 <button
                                     v-if="
-                                        showFooterProvisionalDoiShare(project) &&
+                                        showFooterProvisionalDoiShare(
+                                            project
+                                        ) &&
                                         statusRibbonKey(project) !== 'embargo'
                                     "
                                     type="button"
@@ -270,9 +270,7 @@
                                     :aria-controls="
                                         'footer-share-doi-' + project.uuid
                                     "
-                                    @click="
-                                        toggleDashboardFooterShare(project)
-                                    "
+                                    @click="toggleDashboardFooterShare(project)"
                                 >
                                     <ShareIcon
                                         class="h-3.5 w-3.5 shrink-0"
@@ -340,7 +338,9 @@
                                 <div
                                     class="min-w-0 flex flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 font-medium"
                                 >
-                                    <span class="font-semibold">Scheduled release</span>
+                                    <span class="font-semibold"
+                                        >Scheduled release</span
+                                    >
                                     <span
                                         class="tabular-nums text-amber-900 dark:text-amber-50"
                                     >
@@ -365,9 +365,7 @@
                                         type="button"
                                         class="inline-flex items-center gap-1 rounded-lg border border-amber-200/80 bg-white/90 px-2 py-1.5 text-[11px] font-medium text-amber-950 shadow-sm ring-1 ring-amber-100/80 hover:bg-amber-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1 dark:border-amber-800 dark:bg-amber-900/50 dark:text-amber-100 dark:ring-amber-800/60 dark:hover:bg-amber-900/80"
                                         :aria-expanded="
-                                            isScheduledReleaseShareOpen(
-                                                project
-                                            )
+                                            isScheduledReleaseShareOpen(project)
                                         "
                                         :aria-controls="
                                             'scheduled-release-details-' +
@@ -406,9 +404,7 @@
                                 </div>
                             </div>
                             <div
-                                v-show="
-                                    isScheduledReleaseShareOpen(project)
-                                "
+                                v-show="isScheduledReleaseShareOpen(project)"
                                 class="mt-2 border-t border-amber-200/70 pt-2 dark:border-amber-800/80"
                             >
                                 <dl
@@ -418,75 +414,108 @@
                                     "
                                     class="grid gap-2.5 text-left dark:border-amber-800/80"
                                 >
-                                <div
-                                    v-if="hasDashboardDoiToShare(project)"
-                                >
-                                    <dt class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90">
-                                        {{ dashboardDoiHeadingLabel(project) }}
-                                    </dt>
-                                    <dd class="mt-0.5 min-w-0">
-                                        <a
-                                            :href="dashboardDoiLinkHref(project)"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="inline-flex items-center gap-1 break-all font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
-                                            @click.stop
+                                    <div v-if="hasDashboardDoiToShare(project)">
+                                        <dt
+                                            class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90"
                                         >
-                                            {{ dashboardDoiLinkText(project) }}
-                                            <ArrowTopRightOnSquareIcon
-                                                class="h-3.5 w-3.5 shrink-0 opacity-80"
-                                                aria-hidden="true"
-                                            />
-                                        </a>
-                                    </dd>
-                                </div>
-                                <div v-if="project.obfuscationcode">
-                                    <dt class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90">
-                                        Reviewer access (no login)
-                                    </dt>
-                                    <dd class="mt-1">
-                                        <div
-                                            class="flex min-w-0 rounded-md border border-amber-200/80 bg-white/90 shadow-sm dark:border-amber-800 dark:bg-gray-950/50"
-                                        >
-                                            <input
-                                                type="text"
-                                                readonly
-                                                class="min-w-0 flex-1 truncate border-0 bg-transparent px-2 py-1.5 text-[11px] text-gray-800 focus:ring-0 dark:text-gray-200 rounded-l-md"
-                                                :value="reviewerPreviewUrl(project)"
-                                                :aria-label="'Reviewer preview URL for ' + project.name"
-                                                @focus="$event.target.select()"
-                                                @click.stop
-                                            />
-                                            <button
-                                                type="button"
-                                                class="inline-flex shrink-0 items-center justify-center border-l border-amber-200/80 bg-amber-100/50 px-2 py-1.5 text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-100 dark:hover:bg-amber-900/70"
-                                                :aria-label="'Open reviewer preview for ' + project.name + ' in a new tab'"
-                                                @click.stop="openReviewerPreviewInNewTab(project)"
-                                            >
-                                                <ArrowTopRightOnSquareIcon
-                                                    class="h-3.5 w-3.5"
-                                                    aria-hidden="true"
-                                                />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="inline-flex shrink-0 items-center gap-1 border-l border-amber-200/80 bg-amber-100/50 px-2 py-1.5 text-[11px] font-medium text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-100 dark:hover:bg-amber-900/70 rounded-r-md"
-                                                @click.stop="
-                                                    copyText(
-                                                        reviewerPreviewUrl(project)
+                                            {{
+                                                dashboardDoiHeadingLabel(
+                                                    project
+                                                )
+                                            }}
+                                        </dt>
+                                        <dd class="mt-0.5 min-w-0">
+                                            <a
+                                                :href="
+                                                    dashboardDoiLinkHref(
+                                                        project
                                                     )
                                                 "
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="inline-flex items-center gap-1 break-all font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
+                                                @click.stop
                                             >
-                                                <ClipboardDocumentIcon
-                                                    class="h-3.5 w-3.5"
+                                                {{
+                                                    dashboardDoiLinkText(
+                                                        project
+                                                    )
+                                                }}
+                                                <ArrowTopRightOnSquareIcon
+                                                    class="h-3.5 w-3.5 shrink-0 opacity-80"
                                                     aria-hidden="true"
                                                 />
-                                                Copy
-                                            </button>
-                                        </div>
-                                    </dd>
-                                </div>
-                            </dl>
+                                            </a>
+                                        </dd>
+                                    </div>
+                                    <div v-if="project.obfuscationcode">
+                                        <dt
+                                            class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90"
+                                        >
+                                            Reviewer access (no login)
+                                        </dt>
+                                        <dd class="mt-1">
+                                            <div
+                                                class="flex min-w-0 rounded-md border border-amber-200/80 bg-white/90 shadow-sm dark:border-amber-800 dark:bg-gray-950/50"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    readonly
+                                                    class="min-w-0 flex-1 truncate border-0 bg-transparent px-2 py-1.5 text-[11px] text-gray-800 focus:ring-0 dark:text-gray-200 rounded-l-md"
+                                                    :value="
+                                                        reviewerPreviewUrl(
+                                                            project
+                                                        )
+                                                    "
+                                                    :aria-label="
+                                                        'Reviewer preview URL for ' +
+                                                        project.name
+                                                    "
+                                                    @focus="
+                                                        $event.target.select()
+                                                    "
+                                                    @click.stop
+                                                />
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex shrink-0 items-center justify-center border-l border-amber-200/80 bg-amber-100/50 px-2 py-1.5 text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-100 dark:hover:bg-amber-900/70"
+                                                    :aria-label="
+                                                        'Open reviewer preview for ' +
+                                                        project.name +
+                                                        ' in a new tab'
+                                                    "
+                                                    @click.stop="
+                                                        openReviewerPreviewInNewTab(
+                                                            project
+                                                        )
+                                                    "
+                                                >
+                                                    <ArrowTopRightOnSquareIcon
+                                                        class="h-3.5 w-3.5"
+                                                        aria-hidden="true"
+                                                    />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex shrink-0 items-center gap-1 border-l border-amber-200/80 bg-amber-100/50 px-2 py-1.5 text-[11px] font-medium text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-100 dark:hover:bg-amber-900/70 rounded-r-md"
+                                                    @click.stop="
+                                                        copyText(
+                                                            reviewerPreviewUrl(
+                                                                project
+                                                            )
+                                                        )
+                                                    "
+                                                >
+                                                    <ClipboardDocumentIcon
+                                                        class="h-3.5 w-3.5"
+                                                        aria-hidden="true"
+                                                    />
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </dd>
+                                    </div>
+                                </dl>
                             </div>
                         </div>
                     </div>
@@ -667,8 +696,7 @@ export default {
             };
         },
         openReleaseDateModalForProject(project) {
-            const url =
-                this.projectHomeHref(project) + "?edit=release_date";
+            const url = this.projectHomeHref(project) + "?edit=release_date";
             window.open(url, "_blank");
         },
         reviewerPreviewUrl(project) {
@@ -786,9 +814,7 @@ export default {
                 complete: "text-emerald-700 dark:text-emerald-300",
                 processing: "text-sky-700 dark:text-sky-300",
             };
-            return (
-                tones[key] ?? "text-gray-800 dark:text-gray-200"
-            );
+            return tones[key] ?? "text-gray-800 dark:text-gray-200";
         },
         statusRibbonTextTone(project) {
             const key = this.statusRibbonKey(project);
@@ -801,9 +827,7 @@ export default {
                 complete: "text-emerald-950 dark:text-emerald-100",
                 processing: "text-sky-950 dark:text-sky-100",
             };
-            return (
-                tones[key] ?? "text-gray-900 dark:text-gray-100"
-            );
+            return tones[key] ?? "text-gray-900 dark:text-gray-100";
         },
     },
 };

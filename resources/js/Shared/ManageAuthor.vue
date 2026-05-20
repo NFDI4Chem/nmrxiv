@@ -1,601 +1,612 @@
 <template>
     <div>
         <jet-dialog-modal
-        :show="showDialog"
-        :max-width="'6xl'"
-        @close="onClose"
-    >
-        <template #title>
-            <span class="text-base font-medium text-gray-900">
-                {{ project.name }} - Manage Authors
-            </span>
-        </template>
-        <template #content>
-            <div>
-                <div
-                    v-if="authorOrderSaveNotice"
-                    class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
-                    role="status"
-                    aria-live="polite"
-                >
-                    {{ authorOrderSaveNotice }}
-                </div>
-                <div v-if="displayAddAuthorForms">
+            :show="showDialog"
+            :max-width="'6xl'"
+            @close="onClose"
+        >
+            <template #title>
+                <span class="text-base font-medium text-gray-900">
+                    {{ project.name }} - Manage Authors
+                </span>
+            </template>
+            <template #content>
+                <div>
                     <div
-                        class="relative mx-auto grid grid-cols-1 gap-x-5"
-                        :class="
-                            isEdit ? 'max-w-3xl' : 'max-w-7xl lg:grid-cols-2'
-                        "
+                        v-if="authorOrderSaveNotice"
+                        class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                        role="status"
+                        aria-live="polite"
                     >
-                        <!--Add Manual Section-->
+                        {{ authorOrderSaveNotice }}
+                    </div>
+                    <div v-if="displayAddAuthorForms">
                         <div
-                            class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-1"
+                            class="relative mx-auto grid grid-cols-1 gap-x-5"
+                            :class="
+                                isEdit
+                                    ? 'max-w-3xl'
+                                    : 'max-w-7xl lg:grid-cols-2'
+                            "
                         >
-                            <div>
-                                <p
-                                    class="text-sm font-semibold leading-6 text-gray-900"
-                                >
-                                    <span v-if="!isEdit">Add</span
-                                    ><span v-else>Edit</span> author
-                                </p>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Title is optional (e.g. Dr., Prof.). Given
-                                    and family name are required.
-                                </p>
-                                <div
-                                    class="mt-4 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-12"
-                                >
-                                    <div class="sm:col-span-3">
-                                        <label
-                                            for="title"
-                                            class="block text-sm font-medium text-gray-700"
-                                        >
-                                            Title
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="title"
-                                                v-model="form.title"
-                                                type="text"
-                                                name="title"
-                                                autocomplete="honorific-prefix"
-                                                placeholder="Dr., Prof., …"
-                                                maxlength="32"
-                                                :class="inputClasses"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-4">
-                                        <label
-                                            for="given-name"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            First name
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="given-name"
-                                                v-model="form.given_name"
-                                                type="text"
-                                                name="given-name"
-                                                autocomplete="given-name"
-                                                :class="inputClasses"
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="
-                                                authorsForm.errors.given_name
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
-                                    <div class="sm:col-span-5">
-                                        <label
-                                            for="family-name"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            Family name
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="family-name"
-                                                v-model="form.family_name"
-                                                type="text"
-                                                name="family-name"
-                                                autocomplete="family-name"
-                                                :class="inputClasses"
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="
-                                                authorsForm.errors.family_name
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
-
-                                    <div class="sm:col-span-7">
-                                        <label
-                                            for="email"
-                                            class="block text-sm font-medium text-gray-700"
-                                        >
-                                            Email address
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="email"
-                                                v-model="form.email_id"
-                                                name="email"
-                                                type="email"
-                                                autocomplete="email"
-                                                :class="inputClasses"
-                                            />
-                                            <jet-input-error
-                                                :message="form.errors.email_id"
-                                                class="mt-2"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="sm:col-span-5">
-                                        <label
-                                            for="orcid"
-                                            class="block text-sm font-medium text-gray-700"
-                                        >
-                                            ORCID iD
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="orcid"
-                                                v-model="form.orcid_id"
-                                                name="orcid"
-                                                autocomplete="off"
-                                                type="text"
-                                                placeholder="0000-0000-0000-0000"
-                                                :class="inputClasses"
-                                            />
-                                            <jet-input-error
-                                                :message="form.errors.orcid_id"
-                                                class="mt-2"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="sm:col-span-12">
-                                        <select-rich
-                                            v-model:selected="
-                                                form.contributor_type
-                                            "
-                                            label="Role"
-                                            :items="contributorType"
-                                        />
-                                        <jet-input-error
-                                            :message="
-                                                form.errors.contributor_type
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
-                                    <div class="sm:col-span-12">
-                                        <label
-                                            for="about"
-                                            class="block text-sm font-medium text-gray-700"
-                                        >
-                                            Affiliation
-                                        </label>
-                                        <div class="mt-1">
-                                            <ror-affiliation-typeahead
-                                                v-model="form.affiliation"
-                                                v-model:ror-id="form.ror_id"
-                                                input-id="affiliation"
-                                                input-class="mt-1 block w-full"
-                                                placeholder="Start typing organization name..."
-                                            />
-                                        </div>
-                                        <p class="mt-1 text-xs text-gray-500">
-                                            Start typing to search for your
-                                            organization. Select from the
-                                            dropdown or enter a custom name.
-                                        </p>
-                                        <jet-input-error
-                                            :message="
-                                                authorsForm.errors.affiliation
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
-                                    <div
-                                        v-if="!isEdit"
-                                        class="sm:col-span-12 flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 pt-5"
-                                    >
-                                        <jet-secondary-button
-                                            type="button"
-                                            :disabled="
-                                                !(
-                                                    form &&
-                                                    form.given_name &&
-                                                    form.family_name
-                                                )
-                                            "
-                                            @click="
-                                                form.reset(),
-                                                    authorsForm.reset()
-                                            "
-                                        >
-                                            Clear
-                                        </jet-secondary-button>
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                            :disabled="!isFormValid"
-                                            @click="save('addManually')"
-                                        >
-                                            Add author
-                                        </button>
-                                    </div>
-                                    <div
-                                        v-else
-                                        class="sm:col-span-12 flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 pt-5"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                            :disabled="!isFormValid"
-                                            @click="save('addManually')"
-                                        >
-                                            Update author
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Import Section (hidden while editing an author) -->
-                        <div
-                            v-if="!isEdit"
-                            class="border-l pb-36 lg:col-start-2 lg:row-start-1 lg:px-1"
-                        >
-                            <div class="pl-2">
-                                <p
-                                    class="text-sm leading-6 font-bold text-gray-900"
-                                >
-                                    Import From
-                                </p>
-                                <div
-                                    class="mt-1 grid grid-cols-1 gap-y-5 gap-x-4 sm:grid-cols-2"
-                                >
-                                    <div class="sm:col-span-2">
-                                        <label
-                                            for="name"
-                                            class="block text-sm font-medium text-gray-700"
-                                        >
-                                            DOI or ORCID iD
-                                        </label>
-                                        <div
-                                            class="mt-1 flex rounded-md shadow-sm"
-                                        >
-                                            <input
-                                                id="name"
-                                                v-model="query"
-                                                type="text"
-                                                name="name"
-                                                autocomplete="off"
-                                                placeholder="DOI or ORCID iD e.g. 10.1186/s19991-022-00987-0 or 0000-0001-6033-8976"
-                                                class="flex-1 focus:ring-primary-500 focus:border-primary-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
-                                            />
-                                        </div>
-                                        <!-- <jet-input-error :message="importAuthorsForm.errors.input" class="mt-2" /> -->
-                                    </div>
-                                </div>
-                                <div class="sm:col-span-2 mt-4">
-                                    <jet-secondary-button
-                                        :disabled="
-                                            query == '' || !query || loading
-                                        "
-                                        @click="fetchAuthors"
-                                    >
-                                        <span
-                                            v-if="loading"
-                                            class="flex items-center"
-                                        >
-                                            <svg
-                                                class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <circle
-                                                    class="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    stroke-width="4"
-                                                ></circle>
-                                                <path
-                                                    class="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                ></path>
-                                            </svg>
-                                            Importing...
-                                        </span>
-                                        <span v-else>Import</span>
-                                    </jet-secondary-button>
-                                    <jet-secondary-button
-                                        class="ml-2"
-                                        :disabled="!hasFetchedAuthors"
-                                        @click="
-                                            (fetchedAuthors = []),
-                                                (query = null)
-                                        "
-                                    >
-                                        Reset
-                                    </jet-secondary-button>
-                                    <jet-secondary-button
-                                        class="ml-2 float-right"
-                                        :disabled="
-                                            !$page.props.auth.user?.orcid_id
-                                        "
-                                        @click="addCurrentUser"
-                                    >
-                                        Add me
-                                    </jet-secondary-button>
-                                </div>
-                                <jet-input-error
-                                    :message="error"
-                                    class="mt-2"
-                                />
-                                <div
-                                    v-if="loading"
-                                    class="sm:col-span-9 mt-4 align-centre"
-                                >
-                                    <loading-button :loading="loading" />
-                                </div>
+                            <!--Add Manual Section-->
+                            <div
+                                class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-1"
+                            >
                                 <div>
-                                    <div
-                                        style="max-height: 40vh"
-                                        class="overflow-auto p-2 mt-4 space-y-2"
+                                    <p
+                                        class="text-sm font-semibold leading-6 text-gray-900"
                                     >
-                                        <div
-                                            v-for="author in fetchedAuthors"
-                                            :key="
-                                                author.authorId ||
-                                                author.orcidId ||
-                                                author.fullName
-                                            "
-                                            :class="
-                                                author.selected
-                                                    ? 'ring-2 ring-primary-500 rounded-md'
-                                                    : ''
-                                            "
-                                            @click="
-                                                addAuthorToSelectedList(author)
-                                            "
-                                        >
-                                            <AuthorCard
-                                                :authors="[
-                                                    {
-                                                        id: author.authorId
-                                                            ? author.authorId
-                                                                  .value
-                                                            : undefined,
-                                                        title:
-                                                            author.title || '',
-                                                        given_name:
-                                                            author.firstName,
-                                                        family_name:
-                                                            author.lastName,
-                                                        affiliation:
-                                                            author.affiliation,
-                                                        orcid_id:
-                                                            author.orcidId,
-                                                        email_id:
-                                                            author.email_id,
-                                                    },
-                                                ]"
+                                        <span v-if="!isEdit">Add</span
+                                        ><span v-else>Edit</span> author
+                                    </p>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        Title is optional (e.g. Dr., Prof.).
+                                        Given and family name are required.
+                                    </p>
+                                    <div
+                                        class="mt-4 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-12"
+                                    >
+                                        <div class="sm:col-span-3">
+                                            <label
+                                                for="title"
+                                                class="block text-sm font-medium text-gray-700"
+                                            >
+                                                Title
+                                            </label>
+                                            <div class="mt-1">
+                                                <input
+                                                    id="title"
+                                                    v-model="form.title"
+                                                    type="text"
+                                                    name="title"
+                                                    autocomplete="honorific-prefix"
+                                                    placeholder="Dr., Prof., …"
+                                                    maxlength="32"
+                                                    :class="inputClasses"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div class="sm:col-span-4">
+                                            <label
+                                                for="given-name"
+                                                class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            >
+                                                First name
+                                            </label>
+                                            <div class="mt-1">
+                                                <input
+                                                    id="given-name"
+                                                    v-model="form.given_name"
+                                                    type="text"
+                                                    name="given-name"
+                                                    autocomplete="given-name"
+                                                    :class="inputClasses"
+                                                />
+                                            </div>
+                                            <jet-input-error
+                                                :message="
+                                                    authorsForm.errors
+                                                        .given_name
+                                                "
+                                                class="mt-2"
                                             />
                                         </div>
+                                        <div class="sm:col-span-5">
+                                            <label
+                                                for="family-name"
+                                                class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            >
+                                                Family name
+                                            </label>
+                                            <div class="mt-1">
+                                                <input
+                                                    id="family-name"
+                                                    v-model="form.family_name"
+                                                    type="text"
+                                                    name="family-name"
+                                                    autocomplete="family-name"
+                                                    :class="inputClasses"
+                                                />
+                                            </div>
+                                            <jet-input-error
+                                                :message="
+                                                    authorsForm.errors
+                                                        .family_name
+                                                "
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <div class="sm:col-span-7">
+                                            <label
+                                                for="email"
+                                                class="block text-sm font-medium text-gray-700"
+                                            >
+                                                Email address
+                                            </label>
+                                            <div class="mt-1">
+                                                <input
+                                                    id="email"
+                                                    v-model="form.email_id"
+                                                    name="email"
+                                                    type="email"
+                                                    autocomplete="email"
+                                                    :class="inputClasses"
+                                                />
+                                                <jet-input-error
+                                                    :message="
+                                                        form.errors.email_id
+                                                    "
+                                                    class="mt-2"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="sm:col-span-5">
+                                            <label
+                                                for="orcid"
+                                                class="block text-sm font-medium text-gray-700"
+                                            >
+                                                ORCID iD
+                                            </label>
+                                            <div class="mt-1">
+                                                <input
+                                                    id="orcid"
+                                                    v-model="form.orcid_id"
+                                                    name="orcid"
+                                                    autocomplete="off"
+                                                    type="text"
+                                                    placeholder="0000-0000-0000-0000"
+                                                    :class="inputClasses"
+                                                />
+                                                <jet-input-error
+                                                    :message="
+                                                        form.errors.orcid_id
+                                                    "
+                                                    class="mt-2"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="sm:col-span-12">
+                                            <select-rich
+                                                v-model:selected="
+                                                    form.contributor_type
+                                                "
+                                                label="Role"
+                                                :items="contributorType"
+                                            />
+                                            <jet-input-error
+                                                :message="
+                                                    form.errors.contributor_type
+                                                "
+                                                class="mt-2"
+                                            />
+                                        </div>
+                                        <div class="sm:col-span-12">
+                                            <label
+                                                for="about"
+                                                class="block text-sm font-medium text-gray-700"
+                                            >
+                                                Affiliation
+                                            </label>
+                                            <div class="mt-1">
+                                                <ror-affiliation-typeahead
+                                                    v-model="form.affiliation"
+                                                    v-model:ror-id="form.ror_id"
+                                                    input-id="affiliation"
+                                                    input-class="mt-1 block w-full"
+                                                    placeholder="Start typing organization name..."
+                                                />
+                                            </div>
+                                            <p
+                                                class="mt-1 text-xs text-gray-500"
+                                            >
+                                                Start typing to search for your
+                                                organization. Select from the
+                                                dropdown or enter a custom name.
+                                            </p>
+                                            <jet-input-error
+                                                :message="
+                                                    authorsForm.errors
+                                                        .affiliation
+                                                "
+                                                class="mt-2"
+                                            />
+                                        </div>
+                                        <div
+                                            v-if="!isEdit"
+                                            class="sm:col-span-12 flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 pt-5"
+                                        >
+                                            <jet-secondary-button
+                                                type="button"
+                                                :disabled="
+                                                    !(
+                                                        form &&
+                                                        form.given_name &&
+                                                        form.family_name
+                                                    )
+                                                "
+                                                @click="
+                                                    form.reset(),
+                                                        authorsForm.reset()
+                                                "
+                                            >
+                                                Clear
+                                            </jet-secondary-button>
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                :disabled="!isFormValid"
+                                                @click="save('addManually')"
+                                            >
+                                                Add author
+                                            </button>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="sm:col-span-12 flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 pt-5"
+                                        >
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                :disabled="!isFormValid"
+                                                @click="save('addManually')"
+                                            >
+                                                Update author
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div
-                                        v-if="hasFetchedAuthors"
-                                        class="sm:col-span-6 mt-4"
+                                </div>
+                            </div>
+                            <!-- Import Section (hidden while editing an author) -->
+                            <div
+                                v-if="!isEdit"
+                                class="border-l pb-36 lg:col-start-2 lg:row-start-1 lg:px-1"
+                            >
+                                <div class="pl-2">
+                                    <p
+                                        class="text-sm leading-6 font-bold text-gray-900"
                                     >
+                                        Import From
+                                    </p>
+                                    <div
+                                        class="mt-1 grid grid-cols-1 gap-y-5 gap-x-4 sm:grid-cols-2"
+                                    >
+                                        <div class="sm:col-span-2">
+                                            <label
+                                                for="name"
+                                                class="block text-sm font-medium text-gray-700"
+                                            >
+                                                DOI or ORCID iD
+                                            </label>
+                                            <div
+                                                class="mt-1 flex rounded-md shadow-sm"
+                                            >
+                                                <input
+                                                    id="name"
+                                                    v-model="query"
+                                                    type="text"
+                                                    name="name"
+                                                    autocomplete="off"
+                                                    placeholder="DOI or ORCID iD e.g. 10.1186/s19991-022-00987-0 or 0000-0001-6033-8976"
+                                                    class="flex-1 focus:ring-primary-500 focus:border-primary-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
+                                                />
+                                            </div>
+                                            <!-- <jet-input-error :message="importAuthorsForm.errors.input" class="mt-2" /> -->
+                                        </div>
+                                    </div>
+                                    <div class="sm:col-span-2 mt-4">
                                         <jet-secondary-button
-                                            :disabled="!hasSelectedAuthors"
-                                            class="float-right ml-2"
-                                            @click="save('addSelected')"
+                                            :disabled="
+                                                query == '' || !query || loading
+                                            "
+                                            @click="fetchAuthors"
                                         >
-                                            Add Selected ({{
-                                                selectedAuthorsCount
-                                            }})
+                                            <span
+                                                v-if="loading"
+                                                class="flex items-center"
+                                            >
+                                                <svg
+                                                    class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        class="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        stroke-width="4"
+                                                    ></circle>
+                                                    <path
+                                                        class="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                                Importing...
+                                            </span>
+                                            <span v-else>Import</span>
                                         </jet-secondary-button>
                                         <jet-secondary-button
-                                            class="float-right"
-                                            @click="save('addAll')"
+                                            class="ml-2"
+                                            :disabled="!hasFetchedAuthors"
+                                            @click="
+                                                (fetchedAuthors = []),
+                                                    (query = null)
+                                            "
                                         >
-                                            Add All
+                                            Reset
                                         </jet-secondary-button>
+                                        <jet-secondary-button
+                                            class="ml-2 float-right"
+                                            :disabled="
+                                                !$page.props.auth.user?.orcid_id
+                                            "
+                                            @click="addCurrentUser"
+                                        >
+                                            Add me
+                                        </jet-secondary-button>
+                                    </div>
+                                    <jet-input-error
+                                        :message="error"
+                                        class="mt-2"
+                                    />
+                                    <div
+                                        v-if="loading"
+                                        class="sm:col-span-9 mt-4 align-centre"
+                                    >
+                                        <loading-button :loading="loading" />
+                                    </div>
+                                    <div>
+                                        <div
+                                            style="max-height: 40vh"
+                                            class="overflow-auto p-2 mt-4 space-y-2"
+                                        >
+                                            <div
+                                                v-for="author in fetchedAuthors"
+                                                :key="
+                                                    author.authorId ||
+                                                    author.orcidId ||
+                                                    author.fullName
+                                                "
+                                                :class="
+                                                    author.selected
+                                                        ? 'ring-2 ring-primary-500 rounded-md'
+                                                        : ''
+                                                "
+                                                @click="
+                                                    addAuthorToSelectedList(
+                                                        author
+                                                    )
+                                                "
+                                            >
+                                                <AuthorCard
+                                                    :authors="[
+                                                        {
+                                                            id: author.authorId
+                                                                ? author
+                                                                      .authorId
+                                                                      .value
+                                                                : undefined,
+                                                            title:
+                                                                author.title ||
+                                                                '',
+                                                            given_name:
+                                                                author.firstName,
+                                                            family_name:
+                                                                author.lastName,
+                                                            affiliation:
+                                                                author.affiliation,
+                                                            orcid_id:
+                                                                author.orcidId,
+                                                            email_id:
+                                                                author.email_id,
+                                                        },
+                                                    ]"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div
+                                            v-if="hasFetchedAuthors"
+                                            class="sm:col-span-6 mt-4"
+                                        >
+                                            <jet-secondary-button
+                                                :disabled="!hasSelectedAuthors"
+                                                class="float-right ml-2"
+                                                @click="save('addSelected')"
+                                            >
+                                                Add Selected ({{
+                                                    selectedAuthorsCount
+                                                }})
+                                            </jet-secondary-button>
+                                            <jet-secondary-button
+                                                class="float-right"
+                                                @click="save('addAll')"
+                                            >
+                                                Add All
+                                            </jet-secondary-button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div
+                            v-if="!isEdit && authors.length > 0"
+                            class="mt-8 flex justify-start px-4 sm:px-6"
+                        >
+                            <jet-secondary-button
+                                type="button"
+                                @click="goToReorderAuthors"
+                            >
+                                Reorder authors
+                            </jet-secondary-button>
+                        </div>
                     </div>
                     <div
-                        v-if="!isEdit && authors.length > 0"
-                        class="mt-8 flex justify-start px-4 sm:px-6"
+                        v-if="authors.length > 0 && !displayAddAuthorForms"
+                        style="height: 60vh"
+                        class="overflow-y-scroll sm:rounded-md"
                     >
-                        <jet-secondary-button
-                            type="button"
-                            @click="goToReorderAuthors"
-                        >
-                            Reorder authors
-                        </jet-secondary-button>
-                    </div>
-                </div>
-                <div
-                    v-if="authors.length > 0 && !displayAddAuthorForms"
-                    style="height: 60vh"
-                    class="overflow-y-scroll sm:rounded-md"
-                >
-                    <div class="mb-4 flex justify-end px-2">
-                        <button
-                            type="button"
-                            class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                            @click="openAddAuthorForm"
-                        >
-                            <PlusIcon
-                                class="-ml-0.5 mr-2 h-5 w-5 text-white"
-                                aria-hidden="true"
-                            />
-                            Add author
-                        </button>
-                    </div>
-                    <p class="mb-1 text-xs font-medium text-red-800">
-                        *Click and drag authors to sort order.
-                    </p>
-                    <draggable
-                        v-model="authors"
-                        item-key="author.id"
-                        group="author"
-                        @start="drag = true"
-                        @end="drag = false"
-                        @change="onSort()"
-                    >
-                        <template #item="{ element }">
-                            <div class="relative cursor-move mb-2">
-                                <AuthorCard
-                                    :authors="[element]"
-                                    :enable-role-click="true"
-                                    @role-click="
-                                        (a) => {
-                                            showManageRoleDialog = true;
-                                            updateRoleForm.author_id = a.id;
-                                        }
-                                    "
+                        <div class="mb-4 flex justify-end px-2">
+                            <button
+                                type="button"
+                                class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                @click="openAddAuthorForm"
+                            >
+                                <PlusIcon
+                                    class="-ml-0.5 mr-2 h-5 w-5 text-white"
+                                    aria-hidden="true"
                                 />
-                                <div
-                                    class="absolute bottom-2 right-2 flex space-x-1"
-                                >
-                                    <!-- <button
+                                Add author
+                            </button>
+                        </div>
+                        <p class="mb-1 text-xs font-medium text-red-800">
+                            *Click and drag authors to sort order.
+                        </p>
+                        <draggable
+                            v-model="authors"
+                            item-key="author.id"
+                            group="author"
+                            @start="drag = true"
+                            @end="drag = false"
+                            @change="onSort()"
+                        >
+                            <template #item="{ element }">
+                                <div class="relative cursor-move mb-2">
+                                    <AuthorCard
+                                        :authors="[element]"
+                                        :enable-role-click="true"
+                                        @role-click="
+                                            (a) => {
+                                                showManageRoleDialog = true;
+                                                updateRoleForm.author_id = a.id;
+                                            }
+                                        "
+                                    />
+                                    <div
+                                        class="absolute bottom-2 right-2 flex space-x-1"
+                                    >
+                                        <!-- <button
                                         class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
                                         @click="(showManageRoleDialog = true), (updateRoleForm.author_id = element.id)"
                                     >
                                         <span class="sr-only">Manage Role</span>
                                         <PencilIcon class="w-3.5 h-3.5 text-gray-600" />
                                     </button> -->
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center p-1 border border-transparent"
-                                        @click="edit(element)"
-                                    >
-                                        <span class="sr-only">Edit</span>
-                                        <PencilIcon
-                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                        />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center p-1 border border-transparent"
-                                        @click="confirmDeletion(element)"
-                                    >
-                                        <span class="sr-only">Delete</span>
-                                        <TrashIcon
-                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                        />
-                                    </button>
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center p-1 border border-transparent"
+                                            @click="edit(element)"
+                                        >
+                                            <span class="sr-only">Edit</span>
+                                            <PencilIcon
+                                                class="w-3.5 h-3.5 mr-1 text-gray-600"
+                                            />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center p-1 border border-transparent"
+                                            @click="confirmDeletion(element)"
+                                        >
+                                            <span class="sr-only">Delete</span>
+                                            <TrashIcon
+                                                class="w-3.5 h-3.5 mr-1 text-gray-600"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </template>
-                    </draggable>
+                            </template>
+                        </draggable>
+                    </div>
                 </div>
-            </div>
-        </template>
-        <template #footer>
-            <div class="flex justify-end">
-                <jet-secondary-button type="button" @click="onClose">
-                    Close
+            </template>
+            <template #footer>
+                <div class="flex justify-end">
+                    <jet-secondary-button type="button" @click="onClose">
+                        Close
+                    </jet-secondary-button>
+                </div>
+            </template>
+        </jet-dialog-modal>
+
+        <jet-dialog-modal
+            :show="confirmDelete"
+            max-width="md"
+            @close="closeDeleteConfirm"
+        >
+            <template #title> Delete Author </template>
+
+            <template #content>
+                Are you sure you want to delete this author?
+                <div class="mt-4"></div>
+            </template>
+
+            <template #footer>
+                <jet-secondary-button @click="closeDeleteConfirm">
+                    Cancel
                 </jet-secondary-button>
-            </div>
-        </template>
-    </jet-dialog-modal>
 
-    <jet-dialog-modal
-        :show="confirmDelete"
-        max-width="md"
-        @close="closeDeleteConfirm"
-    >
-        <template #title> Delete Author </template>
-
-        <template #content>
-            Are you sure you want to delete this author?
-            <div class="mt-4"></div>
-        </template>
-
-        <template #footer>
-            <jet-secondary-button @click="closeDeleteConfirm">
-                Cancel
-            </jet-secondary-button>
-
-            <jet-danger-button
-                class="ml-2"
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
-                @click="deleteAuthor()"
-            >
-                Delete Author
-            </jet-danger-button>
-        </template>
-    </jet-dialog-modal>
-
-    <!-- Manage Role Dialog Modal-->
-    <jet-dialog-modal
-        :show="showManageRoleDialog"
-        @close="showManageRoleDialog = false"
-    >
-        <template #title> Manage Role </template>
-
-        <template #content>
-            <div style="height: 30vh" class="overflow-auto p-1">
-                <div
-                    v-for="item in contributorType"
-                    :key="item.title"
-                    class="relative flex items-start mt-2"
+                <jet-danger-button
+                    class="ml-2"
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                    @click="deleteAuthor()"
                 >
+                    Delete Author
+                </jet-danger-button>
+            </template>
+        </jet-dialog-modal>
+
+        <!-- Manage Role Dialog Modal-->
+        <jet-dialog-modal
+            :show="showManageRoleDialog"
+            @close="showManageRoleDialog = false"
+        >
+            <template #title> Manage Role </template>
+
+            <template #content>
+                <div style="height: 30vh" class="overflow-auto p-1">
                     <div
-                        class="cursor-pointer flex-1 border rounded-md p-2 bg-white-200 hover:bg-gray-200"
-                        @click="updateRole(item)"
+                        v-for="item in contributorType"
+                        :key="item.title"
+                        class="relative flex items-start mt-2"
                     >
-                        <div class="text-gray-900">
-                            <b>{{ item.title }}</b> <br />
-                            <p
-                                class="text-xs align-top"
-                                v-text="
-                                    item.description.replace(
-                                        /<br\s*\/?>/gi,
-                                        ' '
-                                    )
-                                "
-                            ></p>
+                        <div
+                            class="cursor-pointer flex-1 border rounded-md p-2 bg-white-200 hover:bg-gray-200"
+                            @click="updateRole(item)"
+                        >
+                            <div class="text-gray-900">
+                                <b>{{ item.title }}</b> <br />
+                                <p
+                                    class="text-xs align-top"
+                                    v-text="
+                                        item.description.replace(
+                                            /<br\s*\/?>/gi,
+                                            ' '
+                                        )
+                                    "
+                                ></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </template>
-        <template #footer>
-            <jet-secondary-button @click="showManageRoleDialog = false">
-                Cancel
-            </jet-secondary-button>
-        </template>
-    </jet-dialog-modal>
+            </template>
+            <template #footer>
+                <jet-secondary-button @click="showManageRoleDialog = false">
+                    Cancel
+                </jet-secondary-button>
+            </template>
+        </jet-dialog-modal>
     </div>
 </template>
 
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import {
-    TrashIcon,
-    PencilIcon,
-    PlusIcon,
-} from "@heroicons/vue/24/solid";
+import { TrashIcon, PencilIcon, PlusIcon } from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
@@ -1377,8 +1388,7 @@ export default {
                             clearTimeout(this.authorOrderSaveNoticeTimer);
                             this.authorOrderSaveNoticeTimer = null;
                         }
-                        this.authorOrderSaveNotice =
-                            "Author order updated.";
+                        this.authorOrderSaveNotice = "Author order updated.";
                         this.authorOrderSaveNoticeTimer = setTimeout(() => {
                             this.authorOrderSaveNotice = null;
                             this.authorOrderSaveNoticeTimer = null;

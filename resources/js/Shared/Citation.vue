@@ -117,7 +117,9 @@
                     class="space-y-2"
                     aria-hidden="true"
                 >
-                    <div class="h-2.5 w-full animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"></div>
+                    <div
+                        class="h-2.5 w-full animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
+                    ></div>
                     <div
                         class="h-2.5 w-5/6 animate-pulse rounded bg-blue-200/80 dark:bg-blue-900/60"
                     ></div>
@@ -130,7 +132,9 @@
                     v-else-if="loadError"
                     class="rounded border border-amber-200 bg-amber-50 p-2 text-xs leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100"
                 >
-                    <p class="text-sm font-semibold">Could not load citation.</p>
+                    <p class="text-sm font-semibold">
+                        Could not load citation.
+                    </p>
                     <p class="mt-0.5 font-normal opacity-90">
                         Try another format or open
                         <a
@@ -244,7 +248,10 @@ export default {
                         const matchIndex =
                             this.processedResponse.search(pattern);
                         this.processedResponse =
-                            this.processedResponse.substring(0, matchIndex - 2) +
+                            this.processedResponse.substring(
+                                0,
+                                matchIndex - 2
+                            ) +
                             ". nmrXiv. " +
                             this.processedResponse.substring(matchIndex);
                     } else if (this.selectedFormat === "RSC") {
@@ -260,10 +267,7 @@ export default {
                     } else if (this.selectedFormat === "Wiley") {
                         this.processedResponse =
                             "[dataset] " +
-                            this.processedResponse.replace(
-                                " [Data set]",
-                                ""
-                            );
+                            this.processedResponse.replace(" [Data set]", "");
                     } else if (this.selectedFormat === "Springer") {
                         const springerPattern = /\(20(\d{2})\)/;
                         const match =

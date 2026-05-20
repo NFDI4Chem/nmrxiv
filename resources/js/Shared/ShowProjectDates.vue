@@ -10,9 +10,7 @@
                 class="h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-gray-500"
                 aria-hidden="true"
             />
-            <div
-                class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1"
-            >
+            <div class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
                 <template v-for="(seg, idx) in segments" :key="seg.label">
                     <span
                         v-if="idx > 0"

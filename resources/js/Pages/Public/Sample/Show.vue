@@ -26,85 +26,83 @@
                         <!-- Desktop layout controls (right aligned) -->
                         <div class="hidden sm:block float-right">
                             <Menu
-                                    v-if="study.data.is_public"
-                                    as="div"
-                                    class="relative text-left"
-                                >
-                                    <!-- Share button trigger -->
-                                    <div>
-                                        <MenuButton
-                                            class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
-                                        >
-                                            <ShareIcon
-                                                class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
-                                                aria-hidden="true"
-                                            ></ShareIcon
-                                            >Share
-                                        </MenuButton>
-                                    </div>
-                                    <!-- Share dropdown transition -->
-                                    <transition
-                                        enter-active-class="transition ease-out duration-100"
-                                        enter-from-class="transform opacity-0 scale-95"
-                                        enter-to-class="transform opacity-100 scale-100"
-                                        leave-active-class="transition ease-in duration-75"
-                                        leave-from-class="transform opacity-100 scale-100"
-                                        leave-to-class="transform opacity-0 scale-95"
+                                v-if="study.data.is_public"
+                                as="div"
+                                class="relative text-left"
+                            >
+                                <!-- Share button trigger -->
+                                <div>
+                                    <MenuButton
+                                        class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
                                     >
-                                        <!-- Share dropdown menu items -->
-                                        <MenuItems
-                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-                                        >
-                                            <div class="py-1">
-                                                <!-- Share URL input and copy button -->
-                                                <MenuItem v-slot="{ active }">
-                                                    <div
-                                                        :class="[
-                                                            active
-                                                                ? 'bg-gray-100 text-gray-900'
-                                                                : 'text-gray-700',
-                                                            'block px-4 py-2 text-sm flex',
-                                                        ]"
-                                                    >
-                                                        <!-- URL input field -->
-                                                        <div class="flex-grow">
-                                                            <input
-                                                                id="datasetPublicURLCopyDesktop"
-                                                                readonly
-                                                                type="text"
-                                                                :value="
-                                                                    shareURL
-                                                                "
-                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
-                                                            />
-                                                        </div>
-
-                                                        <!-- Copy to clipboard button -->
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                            @click="
-                                                                copyToClipboard(
-                                                                    shareURL,
-                                                                    'datasetPublicURLCopyDesktop'
-                                                                )
+                                        <ShareIcon
+                                            class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
+                                            aria-hidden="true"
+                                        ></ShareIcon
+                                        >Share
+                                    </MenuButton>
+                                </div>
+                                <!-- Share dropdown transition -->
+                                <transition
+                                    enter-active-class="transition ease-out duration-100"
+                                    enter-from-class="transform opacity-0 scale-95"
+                                    enter-to-class="transform opacity-100 scale-100"
+                                    leave-active-class="transition ease-in duration-75"
+                                    leave-from-class="transform opacity-100 scale-100"
+                                    leave-to-class="transform opacity-0 scale-95"
+                                >
+                                    <!-- Share dropdown menu items -->
+                                    <MenuItems
+                                        class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                    >
+                                        <div class="py-1">
+                                            <!-- Share URL input and copy button -->
+                                            <MenuItem v-slot="{ active }">
+                                                <div
+                                                    :class="[
+                                                        active
+                                                            ? 'bg-gray-100 text-gray-900'
+                                                            : 'text-gray-700',
+                                                        'block px-4 py-2 text-sm flex',
+                                                    ]"
+                                                >
+                                                    <!-- URL input field -->
+                                                    <div class="flex-grow">
+                                                        <input
+                                                            id="datasetPublicURLCopyDesktop"
+                                                            readonly
+                                                            type="text"
+                                                            :value="shareURL"
+                                                            class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                            @focus="
+                                                                $event.target.select()
                                                             "
-                                                        >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
+                                                        />
                                                     </div>
-                                                </MenuItem>
-                                            </div>
-                                        </MenuItems>
-                                    </transition>
-                                </Menu>
+
+                                                    <!-- Copy to clipboard button -->
+                                                    <button
+                                                        type="button"
+                                                        class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                        @click="
+                                                            copyToClipboard(
+                                                                shareURL,
+                                                                'datasetPublicURLCopyDesktop'
+                                                            )
+                                                        "
+                                                    >
+                                                        <span
+                                                            ><ClipboardDocumentIcon
+                                                                class="h-5 w-5"
+                                                                aria-hidden="true"
+                                                        /></span>
+                                                    </button>
+                                                </div>
+                                            </MenuItem>
+                                        </div>
+                                    </MenuItems>
+                                </transition>
+                            </Menu>
                         </div>
                     </div>
                     <div class="clear-both"></div>
@@ -114,185 +112,180 @@
                         <!-- Mobile controls (stacked vertically) -->
                         <div class="sm:hidden">
                             <Menu
-                                    v-if="study.data.is_public"
-                                    as="div"
-                                    class="relative text-left"
-                                >
-                                    <!-- Share button trigger (mobile) -->
-                                    <div>
-                                        <MenuButton
-                                            class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
-                                        >
-                                            <ShareIcon
-                                                class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
-                                                aria-hidden="true"
-                                            ></ShareIcon
-                                            >Share
-                                        </MenuButton>
-                                    </div>
-                                    <transition
-                                        enter-active-class="transition ease-out duration-100"
-                                        enter-from-class="transform opacity-0 scale-95"
-                                        enter-to-class="transform opacity-100 scale-100"
-                                        leave-active-class="transition ease-in duration-75"
-                                        leave-from-class="transform opacity-100 scale-100"
-                                        leave-to-class="transform opacity-0 scale-95"
+                                v-if="study.data.is_public"
+                                as="div"
+                                class="relative text-left"
+                            >
+                                <!-- Share button trigger (mobile) -->
+                                <div>
+                                    <MenuButton
+                                        class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1"
                                     >
-                                        <MenuItems
-                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-                                        >
-                                            <div class="py-1">
-                                                <MenuItem v-slot="{ active }">
-                                                    <div
-                                                        :class="[
-                                                            active
-                                                                ? 'bg-gray-100 text-gray-900'
-                                                                : 'text-gray-700',
-                                                            'block px-4 py-2 text-sm flex',
-                                                        ]"
-                                                    >
-                                                        <div class="flex-grow">
-                                                            <input
-                                                                id="datasetPublicURLCopy"
-                                                                readonly
-                                                                type="text"
-                                                                :value="
-                                                                    shareURL
-                                                                "
-                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                            @click="
-                                                                copyToClipboard(
-                                                                    shareURL,
-                                                                    'datasetPublicURLCopy'
-                                                                )
+                                        <ShareIcon
+                                            class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
+                                            aria-hidden="true"
+                                        ></ShareIcon
+                                        >Share
+                                    </MenuButton>
+                                </div>
+                                <transition
+                                    enter-active-class="transition ease-out duration-100"
+                                    enter-from-class="transform opacity-0 scale-95"
+                                    enter-to-class="transform opacity-100 scale-100"
+                                    leave-active-class="transition ease-in duration-75"
+                                    leave-from-class="transform opacity-100 scale-100"
+                                    leave-to-class="transform opacity-0 scale-95"
+                                >
+                                    <MenuItems
+                                        class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                    >
+                                        <div class="py-1">
+                                            <MenuItem v-slot="{ active }">
+                                                <div
+                                                    :class="[
+                                                        active
+                                                            ? 'bg-gray-100 text-gray-900'
+                                                            : 'text-gray-700',
+                                                        'block px-4 py-2 text-sm flex',
+                                                    ]"
+                                                >
+                                                    <div class="flex-grow">
+                                                        <input
+                                                            id="datasetPublicURLCopy"
+                                                            readonly
+                                                            type="text"
+                                                            :value="shareURL"
+                                                            class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                            @focus="
+                                                                $event.target.select()
                                                             "
-                                                        >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
+                                                        />
                                                     </div>
-                                                </MenuItem>
-                                            </div>
-                                        </MenuItems>
-                                    </transition>
-                                </Menu>
+                                                    <button
+                                                        type="button"
+                                                        class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                        @click="
+                                                            copyToClipboard(
+                                                                shareURL,
+                                                                'datasetPublicURLCopy'
+                                                            )
+                                                        "
+                                                    >
+                                                        <span
+                                                            ><ClipboardDocumentIcon
+                                                                class="h-5 w-5"
+                                                                aria-hidden="true"
+                                                        /></span>
+                                                    </button>
+                                                </div>
+                                            </MenuItem>
+                                        </div>
+                                    </MenuItems>
+                                </transition>
+                            </Menu>
                         </div>
                     </div>
                 </div>
 
-                <div
-                    class="mt-4 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6"
-                >
+                <div class="mt-4 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6">
                     <div
                         :class="[
                             'min-w-0 space-y-6 overflow-visible',
-                            hasInfoSidebar
-                                ? 'lg:col-span-9'
-                                : 'lg:col-span-12',
+                            hasInfoSidebar ? 'lg:col-span-9' : 'lg:col-span-12',
                         ]"
                     >
-
                         <!-- Submitted Through Information -->
                         <div v-if="study.data.submitted_through">
-                        <div
-                            class="flex items-center space-x-3 text-sm text-gray-600"
-                        >
-                            <svg
-                                class="h-4 w-4 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                            <div
+                                class="flex items-center space-x-3 text-sm text-gray-600"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-                                />
-                            </svg>
-                            <span>Submitted via:</span>
-                            <span
-                                class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-gray-800 uppercase"
-                            >
-                                <img
-                                    :src="`/img/eln/${study.data.submitted_through}.png`"
-                                    class="h-12"
-                                />
-                            </span>
-                            <a
-                                :href="study.data.external_url"
-                                target="_blank"
-                                class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600"
-                            >
-                                <span
-                                    class="inline-flex items-center py-1 rounded text-md font-bold uppercase"
+                                <svg
+                                    class="h-4 w-4 text-gray-400"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
                                 >
-                                    {{ study.data.external_id }}
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        class="w-4 h-4 ml-3"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-                                        />
-                                    </svg>
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                                    />
+                                </svg>
+                                <span>Submitted via:</span>
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-gray-800 uppercase"
+                                >
+                                    <img
+                                        :src="`/img/eln/${study.data.submitted_through}.png`"
+                                        class="h-12"
+                                    />
                                 </span>
-                            </a>
-                        </div>
+                                <a
+                                    :href="study.data.external_url"
+                                    target="_blank"
+                                    class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600"
+                                >
+                                    <span
+                                        class="inline-flex items-center py-1 rounded text-md font-bold uppercase"
+                                    >
+                                        {{ study.data.external_id }}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="w-4 h-4 ml-3"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                                            />
+                                        </svg>
+                                    </span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Author Section -->
                         <div
                             v-if="
-                            study.data.authors && study.data.authors.length > 0
-                        "
+                                study.data.authors &&
+                                study.data.authors.length > 0
+                            "
                             class="mt-6"
                         >
-                        <div class="relative">
-                            <div
-                                class="absolute inset-0 flex items-center"
-                                aria-hidden="true"
-                            >
+                            <div class="relative">
                                 <div
-                                    class="w-full border-t border-gray-100"
-                                ></div>
-                            </div>
-                            <div
-                                class="relative flex items-center justify-between"
-                            >
-                                <span
-                                    class="pr-3 text-md bg-white font-medium text-gray-400"
+                                    class="absolute inset-0 flex items-center"
+                                    aria-hidden="true"
                                 >
-                                    Authors
-                                </span>
+                                    <div
+                                        class="w-full border-t border-gray-100"
+                                    ></div>
+                                </div>
+                                <div
+                                    class="relative flex items-center justify-between"
+                                >
+                                    <span
+                                        class="pr-3 text-md bg-white font-medium text-gray-400"
+                                    >
+                                        Authors
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div
+                                    class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
+                                >
+                                    <author-card
+                                        :authors="study.data.authors"
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <div
-                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
-                            >
-                                <author-card :authors="study.data.authors" />
-                            </div>
-                        </div>
-                        </div>
-
 
                         <div
                             v-if="
@@ -383,9 +376,7 @@
                                             class="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-teal-500/0 via-teal-500/70 to-teal-500/0 opacity-0 transition duration-300 group-hover:opacity-100"
                                         ></div>
 
-                                        <div
-                                            class="flex flex-1 flex-col gap-3"
-                                        >
+                                        <div class="flex flex-1 flex-col gap-3">
                                             <h3
                                                 class="line-clamp-2 text-[0.9375rem] font-semibold leading-snug text-gray-900 transition-colors group-hover:text-teal-700 dark:text-gray-100 dark:group-hover:text-teal-400"
                                             >
@@ -436,7 +427,6 @@
                                 </div>
                             </div>
                         </div>
-
 
                         <div
                             v-if="
@@ -642,7 +632,6 @@
                         </div>
                     </aside>
                 </div>
-
             </div>
         </template>
     </sample-layout>
@@ -743,10 +732,7 @@ export default {
             return count === 1 ? "Citation" : "Citations";
         },
         showDoiCitation() {
-            return (
-                this.study?.data?.is_public &&
-                this.study?.data?.doi != null
-            );
+            return this.study?.data?.is_public && this.study?.data?.doi != null;
         },
         hasSidebarContentAboveCitation() {
             return (

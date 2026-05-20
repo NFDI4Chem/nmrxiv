@@ -125,7 +125,10 @@ export function installBlockingDiagnostics() {
         return;
     }
 
-    if (typeof window === "undefined" || typeof PerformanceObserver === "undefined") {
+    if (
+        typeof window === "undefined" ||
+        typeof PerformanceObserver === "undefined"
+    ) {
         return;
     }
 

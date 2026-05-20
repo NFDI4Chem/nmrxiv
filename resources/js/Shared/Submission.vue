@@ -142,9 +142,7 @@
                                             >
                                                 {{ draft.eln.toUpperCase() }}
                                             </span>
-                                            <DraftStatusBadge
-                                                :draft="draft"
-                                            />
+                                            <DraftStatusBadge :draft="draft" />
                                         </div>
                                         <p
                                             class="text-sm font-medium text-gray-600 truncate pr-10"
@@ -2598,8 +2596,7 @@ export default {
                                 entries.forEach((entry) => {
                                     mergedEntries.push({
                                         baseURL,
-                                        relativePath:
-                                            entry?.relativePath ?? "",
+                                        relativePath: entry?.relativePath ?? "",
                                     });
                                 });
                             });
@@ -2620,7 +2617,9 @@ export default {
                             });
                         }
                         const version =
-                            nmriumState.version ?? parsedSpectra.version ?? null;
+                            nmriumState.version ??
+                            parsedSpectra.version ??
+                            null;
                         if (version) {
                             parsedSpectra.version = version;
                         }

@@ -1,6 +1,8 @@
 <template>
     <div class="flex w-full min-w-0 items-center">
-        <div class="flex w-full min-w-0 rounded-lg bg-white shadow ring-1 ring-gray-200">
+        <div
+            class="flex w-full min-w-0 rounded-lg bg-white shadow ring-1 ring-gray-200"
+        >
             <input
                 :id="inputId || undefined"
                 class="relative w-full rounded-lg border-0 px-4 py-2.5 focus:shadow-outline sm:px-5 sm:py-3"
@@ -62,7 +64,8 @@ export default {
 
     computed: {
         showClear() {
-            const q = this.modelValue != null ? String(this.modelValue).trim() : "";
+            const q =
+                this.modelValue != null ? String(this.modelValue).trim() : "";
 
             return q.length > 0 || this.filtersActive;
         },

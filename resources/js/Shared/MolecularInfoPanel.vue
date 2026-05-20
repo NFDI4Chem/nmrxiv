@@ -1,8 +1,5 @@
 <template>
-    <ul
-        role="list"
-        class="mt-4 space-y-8"
-    >
+    <ul role="list" class="mt-4 space-y-8">
         <li
             v-for="molecule in molecules"
             :key="moleculeKey(molecule)"
@@ -44,7 +41,10 @@
                 </div>
             </dl>
             <p
-                v-if="!hasSmiles(molecule) && moleculeFields(molecule).length === 0"
+                v-if="
+                    !hasSmiles(molecule) &&
+                    moleculeFields(molecule).length === 0
+                "
                 class="text-sm text-gray-500 dark:text-gray-400"
             >
                 No molecular data available
@@ -72,7 +72,11 @@ export default {
 
     methods: {
         moleculeKey(molecule) {
-            return molecule?.id ?? molecule?.standard_inchi ?? molecule?.canonical_smiles;
+            return (
+                molecule?.id ??
+                molecule?.standard_inchi ??
+                molecule?.canonical_smiles
+            );
         },
         hasSmiles(molecule) {
             const smiles = molecule?.canonical_smiles;

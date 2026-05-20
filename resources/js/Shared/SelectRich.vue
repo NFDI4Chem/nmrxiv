@@ -43,7 +43,9 @@
                     </div>
                     <template v-if="filteredGroupedItems">
                         <div
-                            v-for="(group, categoryName) in filteredGroupedItems"
+                            v-for="(
+                                group, categoryName
+                            ) in filteredGroupedItems"
                             :key="categoryName"
                         >
                             <div
@@ -405,11 +407,7 @@ export default {
             }
 
             return this.items.filter((item) => {
-                const haystack = [
-                    item.title,
-                    item.description,
-                    item.category,
-                ]
+                const haystack = [item.title, item.description, item.category]
                     .filter(Boolean)
                     .join(" ")
                     .toLowerCase();

@@ -4,242 +4,257 @@
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div class="pb-10 mb-10 pt-4 pb-6">
-                <div
-                    class="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6"
-                >
+                <div class="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6">
                     <div
                         :class="[
                             'min-w-0 space-y-4',
                             hasInfoSidebar ? 'lg:col-span-9' : 'lg:col-span-12',
                         ]"
                     >
-                    <!-- About project (original public layout + edit tools) -->
-                    <div>
-                        <div
-                            class="flex flex-wrap items-start justify-between gap-2"
-                        >
-                            <h3
-                                class="text-xl font-extrabold text-blue-gray-900 dark:text-gray-100"
+                        <!-- About project (original public layout + edit tools) -->
+                        <div>
+                            <div
+                                class="flex flex-wrap items-start justify-between gap-2"
                             >
-                                About project
-                            </h3>
-                            <button
-                                v-if="canUpdateProject"
-                                type="button"
-                                class="inline-flex shrink-0 items-center gap-1 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
-                                @click="toggleDetails"
-                            >
-                                <PencilIcon class="h-3.5 w-3.5" />
-                                <span>Edit</span>
-                            </button>
-                        </div>
-                        <div
-                            class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
-                        >
-                            <div class="col-span-6">
-                                <p
-                                    v-if="project.data.description"
-                                    style="max-width: 100ch !important"
-                                    class="mt-1 text-md text-blue-gray-500 dark:text-blue-gray-400"
-                                    v-html="md(project.data.description)"
-                                ></p>
-                                <p
-                                    v-else
-                                    class="mt-1 text-md text-blue-gray-500 dark:text-blue-gray-400"
+                                <h3
+                                    class="text-xl font-extrabold text-blue-gray-900 dark:text-gray-100"
                                 >
-                                    No description has been provided yet.
-                                </p>
+                                    About project
+                                </h3>
+                                <button
+                                    v-if="canUpdateProject"
+                                    type="button"
+                                    class="inline-flex shrink-0 items-center gap-1 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                                    @click="toggleDetails"
+                                >
+                                    <PencilIcon class="h-3.5 w-3.5" />
+                                    <span>Edit</span>
+                                </button>
                             </div>
-                        </div>
-                        <div
-                            v-if="workspace && dashboardProject"
-                            class="mt-4 flex flex-wrap items-center gap-3"
-                        >
-                            <Publish
-                                v-if="
-                                    !dashboardProject.is_public &&
-                                    !dashboardProject.is_published &&
-                                    !dashboardProject.is_deleted &&
-                                    !dashboardProject.doi &&
-                                    workspace.role != 'reviewer'
-                                "
-                                :project="dashboardProject"
-                            />
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="
-                            project.data.species &&
-                            project.data.species.length > 0
-                        "
-                        class="pt-2"
-                    >
-                        <h3
-                            class="text-xl font-extrabold text-blue-gray-900 dark:text-gray-100"
-                        >
-                            Organism
-                        </h3>
-                        <div class="pt-3">
                             <div
-                                v-for="(species, $index) in project.data.species"
-                                :key="$index"
-                                class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                                class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                             >
-                                <i
-                                    ><ontology-term-annotation
-                                        :annotation="species"
-                                    ></ontology-term-annotation
-                                ></i>
+                                <div class="col-span-6">
+                                    <p
+                                        v-if="project.data.description"
+                                        style="max-width: 100ch !important"
+                                        class="mt-1 text-md text-blue-gray-500 dark:text-blue-gray-400"
+                                        v-html="md(project.data.description)"
+                                    ></p>
+                                    <p
+                                        v-else
+                                        class="mt-1 text-md text-blue-gray-500 dark:text-blue-gray-400"
+                                    >
+                                        No description has been provided yet.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
-                        <div
-                            v-if="project.data.users && project.data.users.length"
-                            class="pt-2 sm:col-span-6"
-                        >
-                            <h2
-                                class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
-                            >
-                                {{ submittersLabel }}
-                            </h2>
-                        </div>
-
-                        <div
-                            v-if="project.data.users && project.data.users.length"
-                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                        >
                             <div
-                                v-for="u in project.data.users"
-                                :key="u.email"
-                                class="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm hover:shadow-lg transition-all duration-200 flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                v-if="workspace && dashboardProject"
+                                class="mt-4 flex flex-wrap items-center gap-3"
                             >
-                                <div class="flex-shrink-0">
-                                    <img
-                                        class="h-10 w-10 rounded-full"
-                                        :src="u.profile_photo_url"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <a class="focus:outline-none">
-                                        <span
-                                            class="absolute inset-0"
-                                            aria-hidden="true"
-                                        ></span>
-                                        <p
-                                            class="text-sm font-medium text-gray-900"
-                                        >
-                                            {{
-                                                u.first_name + " " + u.last_name
-                                            }}
-                                        </p>
-                                        <p
-                                            class="text-sm text-gray-500 truncate"
-                                        >
-                                            @ {{ u.username }}
-                                        </p>
-                                    </a>
-                                </div>
+                                <Publish
+                                    v-if="
+                                        !dashboardProject.is_public &&
+                                        !dashboardProject.is_published &&
+                                        !dashboardProject.is_deleted &&
+                                        !dashboardProject.doi &&
+                                        workspace.role != 'reviewer'
+                                    "
+                                    :project="dashboardProject"
+                                />
                             </div>
                         </div>
 
                         <div
                             v-if="
-                                canUpdateProject ||
-                                (project.data.authors &&
-                                    project.data.authors.length > 0) ||
-                                (project.data.citations &&
-                                    project.data.citations.length > 0)
+                                project.data.species &&
+                                project.data.species.length > 0
                             "
-                            class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                            class="pt-2"
                         >
-                            <template
+                            <h3
+                                class="text-xl font-extrabold text-blue-gray-900 dark:text-gray-100"
+                            >
+                                Organism
+                            </h3>
+                            <div class="pt-3">
+                                <div
+                                    v-for="(species, $index) in project.data
+                                        .species"
+                                    :key="$index"
+                                    class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                                >
+                                    <i
+                                        ><ontology-term-annotation
+                                            :annotation="species"
+                                        ></ontology-term-annotation
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
+                            <div
                                 v-if="
-                                    canUpdateProject ||
-                                    (project.data.authors &&
-                                        project.data.authors.length > 0)
+                                    project.data.users &&
+                                    project.data.users.length
                                 "
+                                class="pt-2 sm:col-span-6"
+                            >
+                                <h2
+                                    class="text-xl font-extrabold mb-3 text-blue-gray-900 dark:text-gray-100"
+                                >
+                                    {{ submittersLabel }}
+                                </h2>
+                            </div>
+
+                            <div
+                                v-if="
+                                    project.data.users &&
+                                    project.data.users.length
+                                "
+                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                             >
                                 <div
-                                    class="sm:col-span-6 flex flex-wrap items-center justify-between gap-2"
+                                    v-for="u in project.data.users"
+                                    :key="u.email"
+                                    class="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm hover:shadow-lg transition-all duration-200 flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
                                 >
-                                    <h2
-                                        class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
-                                    >
-                                        {{ authorsLabel }}
-                                    </h2>
-                                    <button
-                                        v-if="canUpdateProject"
-                                        type="button"
-                                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
-                                        @click="toggleManageAuthor"
-                                    >
-                                        <PencilIcon class="h-3.5 w-3.5 mr-1" />
-                                        Edit
-                                    </button>
+                                    <div class="flex-shrink-0">
+                                        <img
+                                            class="h-10 w-10 rounded-full"
+                                            :src="u.profile_photo_url"
+                                            alt=""
+                                        />
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <a class="focus:outline-none">
+                                            <span
+                                                class="absolute inset-0"
+                                                aria-hidden="true"
+                                            ></span>
+                                            <p
+                                                class="text-sm font-medium text-gray-900"
+                                            >
+                                                {{
+                                                    u.first_name +
+                                                    " " +
+                                                    u.last_name
+                                                }}
+                                            </p>
+                                            <p
+                                                class="text-sm text-gray-500 truncate"
+                                            >
+                                                @ {{ u.username }}
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
-
-                                <div
-                                    class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                                >
-                                    <author-card
-                                        :authors="project.data.authors || []"
-                                        :show-edit-delete="canUpdateProject"
-                                        @edit="onAuthorCardEdit"
-                                        @delete="onAuthorCardDelete"
-                                    />
-                                </div>
-                            </template>
+                            </div>
 
                             <div
                                 v-if="
                                     canUpdateProject ||
+                                    (project.data.authors &&
+                                        project.data.authors.length > 0) ||
                                     (project.data.citations &&
                                         project.data.citations.length > 0)
                                 "
                                 class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                             >
-                                <div
-                                    class="sm:col-span-6 flex flex-wrap items-center justify-between gap-2"
+                                <template
+                                    v-if="
+                                        canUpdateProject ||
+                                        (project.data.authors &&
+                                            project.data.authors.length > 0)
+                                    "
                                 >
-                                    <h2
-                                        class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
+                                    <div
+                                        class="sm:col-span-6 flex flex-wrap items-center justify-between gap-2"
                                     >
-                                        {{ citationsLabel }}
-                                    </h2>
-                                    <button
-                                        v-if="canUpdateProject"
-                                        type="button"
-                                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
-                                        @click="toggleManageCitation"
-                                    >
-                                        <PencilIcon class="h-3.5 w-3.5 mr-1" />
-                                        Edit
-                                    </button>
-                                </div>
+                                        <h2
+                                            class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
+                                        >
+                                            {{ authorsLabel }}
+                                        </h2>
+                                        <button
+                                            v-if="canUpdateProject"
+                                            type="button"
+                                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
+                                            @click="toggleManageAuthor"
+                                        >
+                                            <PencilIcon
+                                                class="h-3.5 w-3.5 mr-1"
+                                            />
+                                            Edit
+                                        </button>
+                                    </div>
 
-                                <dd
-                                    class="sm:col-span-6 mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
-                                >
                                     <div
                                         class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                     >
-                                        <citation-card
-                                            :citations="
-                                                project.data.citations || []
+                                        <author-card
+                                            :authors="
+                                                project.data.authors || []
                                             "
                                             :show-edit-delete="canUpdateProject"
-                                            @edit="onCitationCardEdit"
-                                            @delete="onCitationCardDelete"
+                                            @edit="onAuthorCardEdit"
+                                            @delete="onAuthorCardDelete"
                                         />
                                     </div>
-                                </dd>
+                                </template>
+
+                                <div
+                                    v-if="
+                                        canUpdateProject ||
+                                        (project.data.citations &&
+                                            project.data.citations.length > 0)
+                                    "
+                                    class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                                >
+                                    <div
+                                        class="sm:col-span-6 flex flex-wrap items-center justify-between gap-2"
+                                    >
+                                        <h2
+                                            class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
+                                        >
+                                            {{ citationsLabel }}
+                                        </h2>
+                                        <button
+                                            v-if="canUpdateProject"
+                                            type="button"
+                                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
+                                            @click="toggleManageCitation"
+                                        >
+                                            <PencilIcon
+                                                class="h-3.5 w-3.5 mr-1"
+                                            />
+                                            Edit
+                                        </button>
+                                    </div>
+
+                                    <dd
+                                        class="sm:col-span-6 mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                                    >
+                                        <div
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                                        >
+                                            <citation-card
+                                                :citations="
+                                                    project.data.citations || []
+                                                "
+                                                :show-edit-delete="
+                                                    canUpdateProject
+                                                "
+                                                @edit="onCitationCardEdit"
+                                                @delete="onCitationCardDelete"
+                                            />
+                                        </div>
+                                    </dd>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </div>
 
                     <aside
@@ -251,8 +266,7 @@
                         >
                             <div
                                 v-if="
-                                    (project.data &&
-                                        project.data.identifier) ||
+                                    (project.data && project.data.identifier) ||
                                     project.identifier
                                 "
                             >
@@ -294,10 +308,7 @@
                                 </div>
                             </div>
 
-                            <div
-                                v-if="showDoiCitation"
-                                class="w-full min-w-0"
-                            >
+                            <div v-if="showDoiCitation" class="w-full min-w-0">
                                 <Citation
                                     :model="'project'"
                                     :doi="project.data.doi"
@@ -395,8 +406,7 @@
                                     </a>
                                     <button
                                         v-if="
-                                            tagsList.length > 8 &&
-                                            !showAllTags
+                                            tagsList.length > 8 && !showAllTags
                                         "
                                         type="button"
                                         class="inline-flex items-center rounded-full border border-dashed border-gray-300 px-3 py-1 text-xs font-medium text-teal-700 hover:bg-teal-50 dark:border-gray-600 dark:text-teal-400 dark:hover:bg-teal-950/40"
@@ -406,8 +416,7 @@
                                     </button>
                                     <button
                                         v-if="
-                                            tagsList.length > 8 &&
-                                            showAllTags
+                                            tagsList.length > 8 && showAllTags
                                         "
                                         type="button"
                                         class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400"
@@ -425,9 +434,7 @@
                     v-if="workspace && dashboardProject"
                     ref="projectDetailsElement"
                     :project="dashboardProject"
-                    :project-permissions="
-                        workspace.projectPermissions
-                    "
+                    :project-permissions="workspace.projectPermissions"
                     :role="workspace.role"
                 />
                 <manage-author
@@ -511,8 +518,7 @@ export default {
             return !!this.workspace?.projectPermissions?.canUpdateProject;
         },
         tagsList() {
-            const raw =
-                this.project?.data?.tags || this.project?.tags || [];
+            const raw = this.project?.data?.tags || this.project?.tags || [];
 
             return Array.isArray(raw) ? raw : [];
         },
@@ -537,8 +543,7 @@ export default {
         },
         showDoiCitation() {
             return (
-                this.project?.data?.is_public &&
-                this.project?.data?.doi != null
+                this.project?.data?.is_public && this.project?.data?.doi != null
             );
         },
         submittersLabel() {
@@ -557,15 +562,15 @@ export default {
             return count === 1 ? "Citation" : "Citations";
         },
         hasInfoSidebar() {
-            const hasId =
-                !!(this.project?.data?.identifier || this.project?.identifier);
-            const hasDoi = !!(
-                this.project?.data?.doi || this.project?.doi
+            const hasId = !!(
+                this.project?.data?.identifier || this.project?.identifier
             );
+            const hasDoi = !!(this.project?.data?.doi || this.project?.doi);
             const hasDates = !!(
-                (this.project?.data?.release_date ||
-                    this.project?.release_date) ||
-                (this.project?.data?.created_at || this.project?.created_at)
+                this.project?.data?.release_date ||
+                this.project?.release_date ||
+                this.project?.data?.created_at ||
+                this.project?.created_at
             );
             const hasTags = this.tagsList.length > 0;
 
@@ -649,8 +654,7 @@ export default {
             }
             url.searchParams.delete("edit");
             const search = url.searchParams.toString();
-            const next =
-                url.pathname + (search ? `?${search}` : "") + url.hash;
+            const next = url.pathname + (search ? `?${search}` : "") + url.hash;
             window.history.replaceState({}, "", next);
         },
         handleEditQueryParam() {

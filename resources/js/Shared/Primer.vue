@@ -21,20 +21,14 @@
             </p>
         </header>
 
-        <section
-            class="mb-10"
-            aria-labelledby="primer-steps-heading"
-        >
+        <section class="mb-10" aria-labelledby="primer-steps-heading">
             <h2
                 id="primer-steps-heading"
                 class="text-sm font-semibold text-gray-900 mb-4"
             >
                 Submission in three steps
             </h2>
-            <ol
-                class="grid gap-4 sm:grid-cols-3"
-                role="list"
-            >
+            <ol class="grid gap-4 sm:grid-cols-3" role="list">
                 <li
                     v-for="(step, index) in steps"
                     :key="step.title"
@@ -44,10 +38,7 @@
                         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-teal-700"
                         aria-hidden="true"
                     >
-                        <component
-                            :is="step.icon"
-                            class="h-5 w-5"
-                        />
+                        <component :is="step.icon" class="h-5 w-5" />
                     </div>
                     <p
                         class="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-500"
@@ -64,10 +55,7 @@
             </ol>
         </section>
 
-        <section
-            class="mb-5"
-            aria-labelledby="primer-model-heading"
-        >
+        <section class="mb-5" aria-labelledby="primer-model-heading">
             <h2
                 id="primer-model-heading"
                 class="text-sm font-semibold text-gray-900 mb-2"
@@ -101,16 +89,8 @@
             </p>
         </section>
 
-        <section
-            class="mb-8"
-            aria-labelledby="primer-diagram-heading"
-        >
-            <h2
-                id="primer-diagram-heading"
-                class="sr-only"
-            >
-                Visual overview
-            </h2>
+        <section class="mb-8" aria-labelledby="primer-diagram-heading">
+            <h2 id="primer-diagram-heading" class="sr-only">Visual overview</h2>
             <figure
                 class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5"
             >
@@ -129,7 +109,9 @@
         <footer
             class="rounded-xl border border-gray-200 bg-gray-50/40 p-5 sm:p-6"
         >
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div
+                class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+            >
                 <div class="flex gap-3 min-w-0">
                     <div
                         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-teal-800"
@@ -171,7 +153,9 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-200/60 pt-4">
+            <div
+                class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-200/60 pt-4"
+            >
                 <a
                     class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded"
                     href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
@@ -181,9 +165,7 @@
                     Read the full submission guide
                     <ArrowTopRightOnSquareIcon class="h-4 w-4 shrink-0" />
                 </a>
-                <span
-                    class="hidden sm:inline text-gray-300"
-                    aria-hidden="true"
+                <span class="hidden sm:inline text-gray-300" aria-hidden="true"
                     >|</span
                 >
                 <a
@@ -193,7 +175,9 @@
                     rel="noopener noreferrer"
                 >
                     Folder structure reference
-                    <ArrowTopRightOnSquareIcon class="h-4 w-4 shrink-0 opacity-70" />
+                    <ArrowTopRightOnSquareIcon
+                        class="h-4 w-4 shrink-0 opacity-70"
+                    />
                 </a>
             </div>
         </footer>
@@ -274,7 +258,7 @@ const conceptCards = [
     {
         term: "Project",
         body: "Think of a project like your publication container: the title, description, and all related NMR data you want to share on nmrXiv in one place. A project includes multiple samples.",
-    },  
+    },
     {
         term: "Study",
         body: "A study is the set of NMR experiments for one sample—for example 1H, 13C, COSY, HSQC, HMBC, and NOESY together.",

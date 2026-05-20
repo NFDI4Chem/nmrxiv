@@ -2,9 +2,7 @@
     <Head :title="'License - ' + project.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
-            <div
-                class="pb-10 mb-10 py-6"
-            >
+            <div class="pb-10 mb-10 py-6">
                 <div
                     v-if="workspace && canManageProjectLicense"
                     class="mb-6 rounded-md border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:border-teal-900/40 dark:bg-teal-950/30 dark:text-teal-100"
@@ -12,10 +10,7 @@
                     <span>To change the license,</span>
                     <Link
                         :href="
-                            route(
-                                'dashboard.project.settings',
-                                project.data.id
-                            )
+                            route('dashboard.project.settings', project.data.id)
                         "
                         class="ml-1 font-semibold text-teal-800 underline hover:text-teal-950 dark:text-teal-200"
                     >

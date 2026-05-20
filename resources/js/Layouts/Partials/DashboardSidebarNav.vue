@@ -1,9 +1,6 @@
 <template>
     <nav :class="navClass" aria-label="Dashboard">
-        <div
-            v-for="(section, sectionIndex) in sections"
-            :key="section.title"
-        >
+        <div v-for="(section, sectionIndex) in sections" :key="section.title">
             <div
                 v-if="iconOnly && sectionIndex > 0"
                 class="mx-2 my-2 h-px bg-gray-200"
@@ -174,9 +171,7 @@ export default {
         },
         sidebarChildNavActive(child) {
             if (child.workspace) {
-                return (
-                    this.page.props.dashboardWorkspace === child.workspace
-                );
+                return this.page.props.dashboardWorkspace === child.workspace;
             }
 
             return this.page.url === child.href;
@@ -206,8 +201,8 @@ export default {
                     ? "h-5 w-5"
                     : "h-6 w-6"
                 : sub
-                  ? "h-4 w-4"
-                  : "h-5 w-5";
+                ? "h-4 w-4"
+                : "h-5 w-5";
 
             return [
                 size,
@@ -215,8 +210,8 @@ export default {
                 active
                     ? "text-white"
                     : this.iconOnly
-                      ? "text-gray-500 group-hover:text-gray-700"
-                      : "text-gray-400 group-hover:text-gray-500",
+                    ? "text-gray-500 group-hover:text-gray-700"
+                    : "text-gray-400 group-hover:text-gray-500",
             ].join(" ");
         },
     },

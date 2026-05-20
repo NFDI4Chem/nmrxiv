@@ -17,9 +17,7 @@
                         class="col-span-1 cursor-pointer divide-y divide-gray-200"
                     >
                         <div class="relative rounded-t-md bg-white">
-                            <div
-                                class="flex items-center justify-center"
-                            >
+                            <div class="flex items-center justify-center">
                                 <span
                                     v-if="
                                         molecules[0] &&
@@ -35,16 +33,15 @@
                                     ></Depictor2D>
                                 </span>
                                 <span v-else class="block w-full">
-                                    <div
-                                        class="relative h-48 sm:h-56"
-                                    >
+                                    <div class="relative h-48 sm:h-56">
                                         <div
                                             class="absolute inset-0 flex items-center justify-center px-3 text-center"
                                         >
                                             <p
                                                 class="text-sm font-medium leading-snug text-gray-500 dark:text-gray-400"
                                             >
-                                                No chemical structure is linked to this compound yet.
+                                                No chemical structure is linked
+                                                to this compound yet.
                                             </p>
                                         </div>
                                     </div>

@@ -147,10 +147,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div
-                                v-if="!canUpdateProject"
-                                class="shrink-0"
-                            >
+                            <div v-if="!canUpdateProject" class="shrink-0">
                                 <img
                                     v-if="project.project_photo_url"
                                     :src="project.project_photo_url"
@@ -174,8 +171,7 @@
                         </div>
                         <div
                             v-if="
-                                (project.is_public &&
-                                    project.doi != null) ||
+                                (project.is_public && project.doi != null) ||
                                 project.release_date ||
                                 project.created_at ||
                                 project.updated_at
@@ -185,8 +181,7 @@
                             <div class="space-y-4">
                                 <Citation
                                     v-if="
-                                        project.is_public &&
-                                        project.doi != null
+                                        project.is_public && project.doi != null
                                     "
                                     :model="'project'"
                                     :doi="project.doi"
@@ -209,197 +204,194 @@
                             class="flex min-w-0 flex-wrap items-center gap-y-2"
                         >
                             <access-dialogue
-                                    :available-roles="availableRoles"
-                                    :role="role"
-                                    :team="team"
-                                    :members="members"
-                                    :project="project"
-                                    called-from="projectView"
-                                    model="project"
-                                />
+                                :available-roles="availableRoles"
+                                :role="role"
+                                :team="team"
+                                :members="members"
+                                :project="project"
+                                called-from="projectView"
+                                model="project"
+                            />
 
-                                <a
-                                    class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
-                                    @click="toggleDetails"
-                                    ><svg
+                            <a
+                                class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
+                                @click="toggleDetails"
+                                ><svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    class="w-4 h-4"
+                                >
+                                    <path
+                                        d="M4 15a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h7a1 1 0 0 1 .7.3L13.42 5H21a1 1 0 0 1 .9 1.45L19.61 11l2.27 4.55A1 1 0 0 1 21 17h-8a1 1 0 0 1-.7-.3L10.58 15H4z"
+                                        class="fill-current text-gray-400"
+                                    ></path>
+                                    <rect
+                                        width="2"
+                                        height="20"
+                                        x="2"
+                                        y="2"
+                                        rx="1"
+                                        class="fill-current text-gray-600"
+                                    ></rect>
+                                </svg>
+                                <span class="ml-2">View details</span>
+                            </a>
+                            <a
+                                ><span
+                                    v-if="project.is_public"
+                                    class="inline-flex items-center"
+                                >
+                                    <svg
+                                        class="h-3 w-3 ml-4 text-green-400 inline"
                                         xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        class="w-4 h-4"
+                                        viewBox="0 0 64 64"
+                                        width="512"
+                                        height="512"
                                     >
-                                        <path
-                                            d="M4 15a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h7a1 1 0 0 1 .7.3L13.42 5H21a1 1 0 0 1 .9 1.45L19.61 11l2.27 4.55A1 1 0 0 1 21 17h-8a1 1 0 0 1-.7-.3L10.58 15H4z"
-                                            class="fill-current text-gray-400"
-                                        ></path>
-                                        <rect
-                                            width="2"
-                                            height="20"
-                                            x="2"
-                                            y="2"
-                                            rx="1"
-                                            class="fill-current text-gray-600"
-                                        ></rect>
+                                        <g id="globe">
+                                            <path
+                                                d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
+                                            />
+                                            <path
+                                                d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
+                                            />
+                                            <path
+                                                d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
+                                            />
+                                        </g>
                                     </svg>
-                                    <span class="ml-2">View details</span>
-                                </a>
-                                <a
-                                    ><span
-                                        v-if="project.is_public"
-                                        class="inline-flex items-center"
+                                    <span class="ml-2">Public</span>
+                                </span>
+                                <span
+                                    v-else
+                                    class="inline-flex ml-7 items-center"
+                                >
+                                    <svg
+                                        id="Capa_1"
+                                        class="h-3 w-3 text-gray-400 inline"
+                                        version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        x="0px"
+                                        y="0px"
+                                        viewBox="0 0 512 512"
+                                        style="
+                                            enable-background: new 0 0 512 512;
+                                        "
+                                        xml:space="preserve"
                                     >
-                                        <svg
-                                            class="h-3 w-3 ml-4 text-green-400 inline"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 64 64"
-                                            width="512"
-                                            height="512"
-                                        >
-                                            <g id="globe">
-                                                <path
-                                                    d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
-                                                />
-                                                <path
-                                                    d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
-                                                />
-                                                <path
-                                                    d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
-                                                />
-                                            </g>
-                                        </svg>
-                                        <span class="ml-2">Public</span>
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="inline-flex ml-7 items-center"
-                                    >
-                                        <svg
-                                            id="Capa_1"
-                                            class="h-3 w-3 text-gray-400 inline"
-                                            version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                                            x="0px"
-                                            y="0px"
-                                            viewBox="0 0 512 512"
-                                            style="
-                                                enable-background: new 0 0 512
-                                                    512;
-                                            "
-                                            xml:space="preserve"
-                                        >
+                                        <g>
                                             <g>
-                                                <g>
-                                                    <path
-                                                        d="M437.333,192h-32v-42.667C405.333,66.99,338.344,0,256,0S106.667,66.99,106.667,149.333V192h-32
+                                                <path
+                                                    d="M437.333,192h-32v-42.667C405.333,66.99,338.344,0,256,0S106.667,66.99,106.667,149.333V192h-32
                                 C68.771,192,64,196.771,64,202.667v266.667C64,492.865,83.135,512,106.667,512h298.667C428.865,512,448,492.865,448,469.333
                                 V202.667C448,196.771,443.229,192,437.333,192z M287.938,414.823c0.333,3.01-0.635,6.031-2.656,8.292
                                 c-2.021,2.26-4.917,3.552-7.948,3.552h-42.667c-3.031,0-5.927-1.292-7.948-3.552c-2.021-2.26-2.99-5.281-2.656-8.292l6.729-60.51
                                 c-10.927-7.948-17.458-20.521-17.458-34.313c0-23.531,19.135-42.667,42.667-42.667s42.667,19.135,42.667,42.667
                                 c0,13.792-6.531,26.365-17.458,34.313L287.938,414.823z M341.333,192H170.667v-42.667C170.667,102.281,208.948,64,256,64
                                 s85.333,38.281,85.333,85.333V192z"
-                                                    />
-                                                </g>
+                                                />
                                             </g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                        </svg>
-                                        <span class="ml-2">Private</span>
-                                    </span></a
-                                >
-                                <project-details
-                                    ref="projectDetailsElement"
-                                    :role="role"
-                                    :project-permissions="projectPermissions"
-                                    :project="project"
-                                />
-                                <manage-author
-                                    ref="manageAuthorElement"
-                                    :project="project"
-                                />
-                                <manage-citation
-                                    ref="manageCitationElement"
-                                    :project="project"
-                                />
-                                <span
-                                    class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                                >
-                                    <span v-if="role == 'reviewer'">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-6 w-6 py-1 mr-1"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                            />
-                                        </svg>
-                                    </span>
-                                    <span v-if="role == 'collaborator'">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-6 w-6 py-1 mr-1"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                            />
-                                        </svg>
-                                    </span>
-                                    <span
-                                        v-if="
-                                            role == 'owner' || role == 'creator'
-                                        "
+                                        </g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                        <g></g>
+                                    </svg>
+                                    <span class="ml-2">Private</span>
+                                </span></a
+                            >
+                            <project-details
+                                ref="projectDetailsElement"
+                                :role="role"
+                                :project-permissions="projectPermissions"
+                                :project="project"
+                            />
+                            <manage-author
+                                ref="manageAuthorElement"
+                                :project="project"
+                            />
+                            <manage-citation
+                                ref="manageCitationElement"
+                                :project="project"
+                            />
+                            <span
+                                class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                            >
+                                <span v-if="role == 'reviewer'">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 py-1 mr-1"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-6 w-6 py-1 mr-1"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
-                                            />
-                                        </svg>
-                                    </span>
-                                    {{ role }}
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                        />
+                                    </svg>
                                 </span>
-                                <Tag
-                                    v-if="project.identifier"
-                                    :identifier="project.identifier"
-                                    class="ml-4"
-                                />
-                            </div>
+                                <span v-if="role == 'collaborator'">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 py-1 mr-1"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                        />
+                                    </svg>
+                                </span>
+                                <span
+                                    v-if="role == 'owner' || role == 'creator'"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 py-1 mr-1"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
+                                        />
+                                    </svg>
+                                </span>
+                                {{ role }}
+                            </span>
+                            <Tag
+                                v-if="project.identifier"
+                                :identifier="project.identifier"
+                                class="ml-4"
+                            />
+                        </div>
                     </div>
                     <div class="flex flex-nowrap justify-between pb-3">
                         <div
@@ -730,7 +722,9 @@
                                                 <p class="font-medium">
                                                     Immediate publishing
                                                 </p>
-                                                <p class="mt-1 text-amber-900/90 dark:text-amber-200/90">
+                                                <p
+                                                    class="mt-1 text-amber-900/90 dark:text-amber-200/90"
+                                                >
                                                     Your release date will be
                                                     set to today and the
                                                     submission will be queued
@@ -948,7 +942,9 @@
                                                                             idx
                                                                         "
                                                                     >
-                                                                        {{ hint }}
+                                                                        {{
+                                                                            hint
+                                                                        }}
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -993,10 +989,11 @@
                                                 >
                                                 <div class="min-w-0 pl-1">
                                                     <p>
-                                                        Your project is submitted
-                                                        to the processing queue.
-                                                        You will receive an
-                                                        email when processing
+                                                        Your project is
+                                                        submitted to the
+                                                        processing queue. You
+                                                        will receive an email
+                                                        when processing
                                                         finishes, with citation
                                                         details and links to
                                                         share your data.
@@ -1587,8 +1584,7 @@ export default {
             }
             url.searchParams.delete("edit");
             const search = url.searchParams.toString();
-            const next =
-                url.pathname + (search ? `?${search}` : "") + url.hash;
+            const next = url.pathname + (search ? `?${search}` : "") + url.hash;
             window.history.replaceState({}, "", next);
         },
         publish() {

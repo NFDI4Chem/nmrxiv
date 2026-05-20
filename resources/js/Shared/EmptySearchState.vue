@@ -84,7 +84,9 @@ export default {
     emits: ["clear-search"],
     computed: {
         entityLabel() {
-            const raw = String(this.entityType || "").trim().toLowerCase();
+            const raw = String(this.entityType || "")
+                .trim()
+                .toLowerCase();
             if (!raw) {
                 return "results";
             }

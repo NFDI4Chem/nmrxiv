@@ -5,10 +5,7 @@
         <div class="px-5 py-4 border-b border-gray-100">
             <div class="flex items-start space-x-3">
                 <!-- Missing file warning indicator -->
-                <span
-                    v-if="file.status == 'missing'"
-                    class="flex-shrink-0"
-                >
+                <span v-if="file.status == 'missing'" class="flex-shrink-0">
                     <span
                         class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"
                     >
@@ -30,10 +27,7 @@
                 </span>
 
                 <!-- Integrity status badge -->
-                <span
-                    v-else-if="file.integrity_status"
-                    class="flex-shrink-0"
-                >
+                <span v-else-if="file.integrity_status" class="flex-shrink-0">
                     <span
                         v-if="file.integrity_status === 'verified'"
                         class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100"
@@ -108,7 +102,9 @@
             <dl class="grid grid-cols-1 gap-3">
                 <!-- Upload timestamp -->
                 <div class="flex justify-between items-center">
-                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <dt
+                        class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                         Uploaded
                     </dt>
                     <dd class="text-sm text-gray-900 font-medium">
@@ -118,10 +114,14 @@
 
                 <!-- Last modified -->
                 <div
-                    v-if="file.updated_at && file.updated_at !== file.created_at"
+                    v-if="
+                        file.updated_at && file.updated_at !== file.created_at
+                    "
                     class="flex justify-between items-center"
                 >
-                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <dt
+                        class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                         Modified
                     </dt>
                     <dd class="text-sm text-gray-900 font-medium">
@@ -131,7 +131,9 @@
 
                 <!-- File size -->
                 <div class="flex justify-between items-center">
-                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <dt
+                        class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                         Size
                     </dt>
                     <dd class="text-sm text-gray-900 font-medium">
@@ -144,7 +146,9 @@
                     v-if="fileExtension"
                     class="flex justify-between items-center"
                 >
-                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <dt
+                        class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                         Type
                     </dt>
                     <dd class="text-sm text-gray-900 font-medium">
@@ -188,12 +192,14 @@
                                     file.integrity_status === 'verified'
                                         ? 'bg-green-100 text-green-800'
                                         : file.integrity_status === 'failed'
-                                          ? 'bg-red-100 text-red-800'
-                                          : 'bg-yellow-100 text-yellow-800',
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-yellow-100 text-yellow-800',
                                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
                                 ]"
                             >
-                                {{ formatIntegrityStatus(file.integrity_status) }}
+                                {{
+                                    formatIntegrityStatus(file.integrity_status)
+                                }}
                             </span>
                         </dd>
                     </div>
@@ -263,9 +269,7 @@
             <!-- Legacy ETag (if available and no checksums) -->
             <div
                 v-if="
-                    fileInfo.ETag &&
-                    !file.checksum_sha256 &&
-                    !file.checksum_md5
+                    fileInfo.ETag && !file.checksum_sha256 && !file.checksum_md5
                 "
                 class="pt-3 border-t border-gray-100"
             >

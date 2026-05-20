@@ -110,7 +110,9 @@
                                 </dd>
                             </template>
                             <span
-                                v-if="molecularFormula && formattedMolecularWeight"
+                                v-if="
+                                    molecularFormula && formattedMolecularWeight
+                                "
                                 class="text-gray-300 dark:text-gray-600"
                                 aria-hidden="true"
                                 >·</span
@@ -300,11 +302,7 @@ export default {
             const raw =
                 this.molecule?.workspace_experiment_type_counts ??
                 this.molecule?.workspaceExperimentTypeCounts;
-            if (
-                raw == null ||
-                typeof raw !== "object" ||
-                Array.isArray(raw)
-            ) {
+            if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
                 return [];
             }
 
@@ -317,7 +315,7 @@ export default {
                 .filter((row) => row.count > 0)
                 .sort(
                     (a, b) =>
-                        b.count - a.count || a.label.localeCompare(b.label),
+                        b.count - a.count || a.label.localeCompare(b.label)
                 );
         },
         showWorkspaceGrouping() {
@@ -330,16 +328,16 @@ export default {
             const parts = [];
             const samples = this.workspaceSamplesNumber;
             if (samples > 0) {
-                parts.push(
-                    `${samples} sample${samples === 1 ? "" : "s"}`,
-                );
+                parts.push(`${samples} sample${samples === 1 ? "" : "s"}`);
             }
             const rows = this.experimentTypeRows;
             if (rows.length > 0) {
                 const kinds = rows.length;
                 const total = rows.reduce((sum, r) => sum + r.count, 0);
                 parts.push(
-                    `${kinds} experiment type${kinds === 1 ? "" : "s"} · ${total} dataset${total === 1 ? "" : "s"}`,
+                    `${kinds} experiment type${
+                        kinds === 1 ? "" : "s"
+                    } · ${total} dataset${total === 1 ? "" : "s"}`
                 );
             }
 

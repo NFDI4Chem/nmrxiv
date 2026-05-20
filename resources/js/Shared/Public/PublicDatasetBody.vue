@@ -20,10 +20,7 @@
                         {{ study.data.name }}
                     </span>
                 </li>
-                <li
-                    aria-hidden="true"
-                    class="text-gray-300 dark:text-gray-600"
-                >
+                <li aria-hidden="true" class="text-gray-300 dark:text-gray-600">
                     /
                 </li>
                 <li
@@ -107,7 +104,7 @@
                                         @click="
                                             copyToClipboard(
                                                 shareURL,
-                                                'datasetPublicURLCopy',
+                                                'datasetPublicURLCopy'
                                             )
                                         "
                                     >
@@ -125,15 +122,9 @@
         </div>
     </header>
 
-    <div
-        v-if="study.data.tags && study.data.tags.length > 0"
-        class="mt-4"
-    >
+    <div v-if="study.data.tags && study.data.tags.length > 0" class="mt-4">
         <div class="relative">
-            <div
-                class="absolute inset-0 flex items-center"
-                aria-hidden="true"
-            >
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
                 <div class="w-full border-t border-gray-100"></div>
             </div>
             <div class="relative flex items-center justify-between">
@@ -379,7 +370,7 @@ export default {
                     .map((v) =>
                         v !== null && typeof v === "object"
                             ? JSON.stringify(v)
-                            : String(v),
+                            : String(v)
                     )
                     .join(", ");
             }
