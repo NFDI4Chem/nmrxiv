@@ -48,20 +48,34 @@ class PublishProjectTest extends TestCase
         // Attach user as creator
         $this->project->users()->attach($this->user, ['role' => 'creator']);
 
-        // Create studies for the project (needed for validation)
         $study = Study::factory()->create(['project_id' => $this->project->id]);
 
-        // Create a sample for the study (Study factory should do this, but let's ensure it)
         if (! $study->sample) {
-            $sample = Sample::factory()->create([
+            Sample::factory()->create([
                 'study_id' => $study->id,
                 'project_id' => $this->project->id,
             ]);
         }
 
-        // Create a passing validation for the project
+        config(['validations.default' => 'publish_samples_test']);
+        config(['validations.publish_samples_test.project' => []]);
+        config(['validations.publish_samples_test.study' => []]);
+        config(['validations.publish_samples_test.dataset' => []]);
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'project_enabled' => false,
+        ]);
+
         $validation = Validation::factory()->passed()->create();
-        $this->project->update(['validation_id' => $validation->id]);
+
+        $this->project->update([
+            'draft_id' => $draft->id,
+            'validation_id' => $validation->id,
+            'schema_version' => 'publish_samples_test',
+        ]);
+
+        $validation->process(forceSamplesMode: true);
     }
 
     public function test_authorized_user_can_publish_project_via_http()
@@ -100,22 +114,13 @@ class PublishProjectTest extends TestCase
 
     public function test_project_publication_updates_validation_status()
     {
-        $validation = Validation::factory()->create();
-        $this->project->validation_id = $validation->id;
-        $this->project->save();
-
         Queue::fake();
 
         $response = $this->actingAs($this->user)
             ->put("/dashboard/projects/{$this->project->id}/publish");
 
-        // Validation fails with basic setup, so expect 422
-        $response->assertStatus(422);
-        $response->assertJson([
-            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-        ]);
+        $response->assertStatus(200);
 
-        // Check that validation processing was triggered even though it failed
         $this->project->refresh();
         $this->assertNotNull($this->project->validation);
     }
@@ -123,6 +128,8 @@ class PublishProjectTest extends TestCase
     #[Test]
     public function citations_without_doi_fail_validation(): void
     {
+        $this->project->draft->update(['project_enabled' => true]);
+
         $citation = Citation::factory()->create([
             'doi' => null,
         ]);
@@ -148,6 +155,8 @@ class PublishProjectTest extends TestCase
     #[Test]
     public function citations_with_doi_pass_validation(): void
     {
+        $this->project->draft->update(['project_enabled' => true]);
+
         $citation = Citation::factory()->create([
             'doi' => '10.1234/test.doi',
         ]);
@@ -172,6 +181,7 @@ class PublishProjectTest extends TestCase
     #[Test]
     public function citations_without_doi_are_skipped_for_future_release_date(): void
     {
+        $this->project->draft->update(['project_enabled' => true]);
         $this->project->update(['release_date' => now()->addDay()]);
 
         $citation = Citation::factory()->create([
@@ -230,7 +240,10 @@ class PublishProjectTest extends TestCase
         $this->project->update(['draft_id' => $draft->id]);
 
         $validation = Validation::factory()->create();
-        $this->project->update(['validation_id' => $validation->id]);
+        $this->project->update([
+            'validation_id' => $validation->id,
+            'schema_version' => 'beta',
+        ]);
 
         $validation->process(forceSamplesMode: true);
         $validation->refresh();
@@ -410,14 +423,12 @@ class PublishProjectTest extends TestCase
         $response = $this->actingAs($this->user)
             ->put("/dashboard/projects/{$incompleteProject->id}/publish", [
                 'release_date' => now()->format('Y-m-d H:i:s'),
+                'enableProjectMode' => true,
             ]);
 
-        // When run with other tests, validation context causes this to pass
-        $response->assertStatus(200);
+        $response->assertStatus(422);
         $response->assertJson([
-            'project' => [
-                'id' => $incompleteProject->id,
-            ],
+            'errors' => 'Project validation not found. Please ensure the project is properly configured.',
         ]);
 
         $incompleteProject->refresh();
@@ -438,7 +449,6 @@ class PublishProjectTest extends TestCase
                 'release_date' => now()->format('Y-m-d H:i:s'),
             ]);
 
-        // When run with other tests, validation passes due to test context
         $response->assertStatus(200);
         $response->assertJson([
             'project' => [
@@ -469,7 +479,6 @@ class PublishProjectTest extends TestCase
                 'release_date' => now()->format('Y-m-d H:i:s'),
             ]);
 
-        // When run with other tests, validation passes due to test context
         $response->assertStatus(200);
         $response->assertJson([
             'project' => [

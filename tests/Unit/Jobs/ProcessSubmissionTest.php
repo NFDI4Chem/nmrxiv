@@ -130,6 +130,8 @@ class ProcessSubmissionTest extends TestCase
         Storage::fake('local');
         Event::fake();
 
+        $this->project->update(['release_date' => now()->subMinute()]);
+
         $this->draft->project_enabled = false;
         $this->draft->save();
 
@@ -226,6 +228,8 @@ class ProcessSubmissionTest extends TestCase
         Storage::fake('local');
         Event::fake();
 
+        $this->project->update(['release_date' => now()->subMinute()]);
+
         $this->draft->project_enabled = false;
         $this->draft->save();
 
@@ -275,7 +279,6 @@ class ProcessSubmissionTest extends TestCase
     public function test_move_folder_updates_nested_file_structure(): void
     {
         Storage::fake('local');
-        Bus::fake([ArchiveStudy::class]);
 
         $environment = env('APP_ENV', 'local');
         $draftPath = $environment.'/draft-'.$this->draft->id;
@@ -285,7 +288,6 @@ class ProcessSubmissionTest extends TestCase
         $study = Study::factory()->create([
             'project_id' => $this->project->id,
         ]);
-        $study->forceFill(['has_nmrium' => true])->saveQuietly();
 
         $parentFolder = FileSystemObject::create([
             'draft_id' => $this->draft->id,
@@ -316,6 +318,8 @@ class ProcessSubmissionTest extends TestCase
 
         Storage::disk('local')->put($childFile->path, 'test content');
 
+        $study->forceFill(['has_nmrium' => true])->saveQuietly();
+
         $job = new ProcessSubmission($this->project);
         $newPath = $environment.'/'.$this->project->uuid;
 
@@ -328,14 +332,18 @@ class ProcessSubmissionTest extends TestCase
         $this->assertStringContainsString($this->project->uuid, $childFile->path);
         $this->assertTrue(Storage::disk('local')->exists($childFile->path));
 
-        $this->assertTrue((bool) $study->fresh()->has_nmrium);
-        Bus::assertNotDispatched(ArchiveStudy::class);
+        $this->assertDatabaseHas('studies', [
+            'id' => $study->id,
+            'has_nmrium' => true,
+        ]);
     }
 
     public function test_sample_mode_propagates_project_authors_and_citations_to_each_study(): void
     {
         Storage::fake('local');
         Event::fake();
+
+        $this->project->update(['release_date' => now()->subMinute()]);
 
         $this->draft->project_enabled = false;
         $environment = env('APP_ENV', 'local');

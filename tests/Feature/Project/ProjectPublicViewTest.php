@@ -8,7 +8,6 @@ use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class ProjectPublicViewTest extends TestCase
@@ -102,10 +101,8 @@ class ProjectPublicViewTest extends TestCase
             'tab' => 'license',
         ]));
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Project/Show')
-            ->where('tab', 'info'));
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Show');
+        $this->assertSame('info', $page['props']['tab']);
     }
 
     public function test_public_project_study_tab_view()

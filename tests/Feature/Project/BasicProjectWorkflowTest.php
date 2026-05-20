@@ -8,9 +8,8 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class BasicProjectWorkflowTest extends TestCase
+class BasicProjectWorkflowTest extends ProjectFeatureTestCase
 {
     use RefreshDatabase;
 

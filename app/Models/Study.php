@@ -67,6 +67,8 @@ class Study extends Model implements Auditable
         'validation_id',
         'metadata_bagit_generation_status',
         'metadata_bagit_generation_logs',
+        'has_nmrium',
+        'has_nmredata',
     ];
 
     /**

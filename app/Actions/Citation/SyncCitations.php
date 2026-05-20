@@ -6,6 +6,7 @@ use App\Models\Citation;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -153,7 +154,7 @@ class SyncCitations
         $existingCitation = null;
 
         if (! empty($citationData['id'])) {
-            $existingCitation = $this->citationCollection($owner)->firstWhere('id', (int) $citationData['id']);
+            $existingCitation = $this->findCitationByIdForOwner($owner, (int) $citationData['id']);
         }
 
         if (! $existingCitation && ! is_null($doi)) {
@@ -202,6 +203,23 @@ class SyncCitations
             $relationName = $owner instanceof Study ? 'linkedCitations' : 'citations';
             $owner->setRelation($relationName, $citations->push($citation));
         }
+    }
+
+    private function findCitationByIdForOwner(Project|Study $owner, int $id): ?Citation
+    {
+        return $this->citationCollection($owner)->firstWhere('id', $id)
+            ?? $this->citationRelationQuery($owner)->whereKey($id)->first()
+            ?? Citation::query()->find($id);
+    }
+
+    /**
+     * @return BelongsToMany<Citation, Project>|BelongsToMany<Citation, Study>
+     */
+    private function citationRelationQuery(Project|Study $owner)
+    {
+        return $owner instanceof Study
+            ? $owner->linkedCitations()
+            : $owner->citations();
     }
 
     private function loadCitationRelation(Project|Study $owner): void

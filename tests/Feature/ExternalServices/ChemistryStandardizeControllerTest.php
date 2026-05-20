@@ -82,11 +82,10 @@ class ChemistryStandardizeControllerTest extends TestCase
 
     public function test_inertia_shares_app_proxy_url_not_upstream_api(): void
     {
-        $response = $this->actingAs($this->user)->get(route('dashboard'));
+        $response = $this->actingAs($this->user)
+            ->get(route('dashboard'));
 
-        $response->assertOk();
-        $response->assertInertia(fn ($page) => $page
-            ->where('chemistryStandardizeUrl', route('chemistry.standardize'))
-        );
+        $page = $this->assertInertiaPageComponent($response, 'Dashboard');
+        $this->assertSame(route('chemistry.standardize'), $page['props']['chemistryStandardizeUrl']);
     }
 }

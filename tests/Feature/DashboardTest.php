@@ -11,8 +11,6 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
-use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -207,9 +205,12 @@ class DashboardTest extends TestCase
             ->get('/dashboard?tab=samples');
 
         $response->assertOk();
-        $this->assertMatchesRegularExpression(
-            '/"workspace_samples_count":\s*2\b/',
-            $response->getContent()
+
+        $page = $this->inertiaPageFromResponse($response);
+
+        $this->assertSame(
+            2,
+            $page['props']['samples']['data'][0]['sample']['molecules'][0]['workspace_samples_count']
         );
     }
 
@@ -264,10 +265,8 @@ class DashboardTest extends TestCase
             ->get('/dashboard?tab=samples');
 
         $response->assertStatus(200);
-        $this->assertMatchesRegularExpression(
-            '/["\']samples_per_page["\']\s*:\s*12\b/',
-            $response->getContent()
-        );
+
+        $this->assertSame(12, $this->inertiaPageFromResponse($response)['props']['filters']['samples_per_page']);
     }
 
     public function test_dashboard_compound_library_filters_by_public_visibility(): void
@@ -547,11 +546,14 @@ class DashboardTest extends TestCase
         }
 
         $response = $this->actingAs($this->user)
-            ->get('/dashboard?projects_page=2');
+            ->get('/dashboard?tab=projects&projects_page=2');
 
         $response->assertStatus(200);
-        $response->assertSee('Showing 11 to 11', false);
-        $response->assertSee('PaginatedProj11', false);
+
+        $projects = $this->inertiaPageFromResponse($response)['props']['projects'];
+
+        $this->assertSame(2, $projects['current_page']);
+        $this->assertSame('PaginatedProj11', $projects['data'][0]['name']);
     }
 
     public function test_dashboard_inertia_payload_includes_embargo_project_fields_for_scheduled_release_ui(): void
@@ -567,20 +569,19 @@ class DashboardTest extends TestCase
             'status' => 'embargo',
             'release_date' => now()->addDays(30),
             'obfuscationcode' => $obfuscation,
-        ])->forceFill(['provisional_doi' => $provisionalDoi])->save();
+            'provisional_doi' => $provisionalDoi,
+        ]);
 
         $response = $this->actingAs($this->user)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Dashboard')
-            ->has('projects.data', 1, fn (AssertableJson $json) => $json
-                ->where('status', 'embargo')
-                ->where('provisional_doi', $provisionalDoi)
-                ->where('provisional_doi_url', fn (mixed $url): bool => is_string($url) && str_contains((string) $url, $provisionalDoi))
-                ->where('obfuscationcode', $obfuscation)
-                ->where('is_public', false)
-            )
-        );
+        $page = $this->assertInertiaPageComponent($response, 'Dashboard');
+        $projectPayload = $page['props']['projects']['data'][0];
+
+        $this->assertSame('embargo', $projectPayload['status']);
+        $this->assertSame($provisionalDoi, $projectPayload['provisional_doi']);
+        $this->assertStringContainsString($provisionalDoi, (string) $projectPayload['provisional_doi_url']);
+        $this->assertSame($obfuscation, $projectPayload['obfuscationcode']);
+        $this->assertFalse($projectPayload['is_public']);
     }
 }

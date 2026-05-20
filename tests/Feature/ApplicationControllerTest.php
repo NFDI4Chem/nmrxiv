@@ -10,7 +10,6 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class ApplicationControllerTest extends TestCase
@@ -116,8 +115,7 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/compound/M188');
 
-        $response->assertOk();
-        $response->assertInertia(fn ($page) => $page->component('Public/Studies'));
+        $this->assertInertiaPageComponent($response, 'Public/Studies');
     }
 
     public function test_resolve_compound_with_lowercase_prefix(): void
@@ -128,8 +126,7 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/compound/m189');
 
-        $response->assertOk();
-        $response->assertInertia(fn ($page) => $page->component('Public/Studies'));
+        $this->assertInertiaPageComponent($response, 'Public/Studies');
     }
 
     public function test_resolve_compound_returns_404_for_non_existent_molecule(): void
@@ -171,10 +168,8 @@ class ApplicationControllerTest extends TestCase
     {
         $response = $this->get('/project/P1?tab=license');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Project/Show')
-            ->where('tab', 'info'));
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Show');
+        $this->assertSame('info', $page['props']['tab']);
     }
 
     public function test_resolve_project_returns_404_for_non_existent_project(): void
@@ -220,10 +215,7 @@ class ApplicationControllerTest extends TestCase
     {
         $response = $this->get('/sample/S1');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Project/Study')
-        );
+        $this->assertInertiaPageComponent($response, 'Public/Project/Study');
     }
 
     public function test_resolve_study_renders_study_without_project_when_no_project(): void
@@ -237,20 +229,14 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/sample/S2');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Sample/Show')
-        );
+        $this->assertInertiaPageComponent($response, 'Public/Sample/Show');
     }
 
     public function test_resolve_dataset_renders_dataset_tab(): void
     {
         $response = $this->get('/dataset/D1');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Project/Dataset')
-        );
+        $this->assertInertiaPageComponent($response, 'Public/Project/Dataset');
     }
 
     public function test_resolve_dataset_uses_study_project_when_dataset_project_id_is_null(): void
@@ -260,11 +246,8 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/dataset/D1');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Project/Dataset')
-            ->has('project')
-        );
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Dataset');
+        $this->assertArrayHasKey('project', $page['props']);
     }
 
     public function test_resolve_dataset_renders_without_project_when_neither_has_project(): void
@@ -286,11 +269,8 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/dataset/D2');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Sample/Dataset')
-            ->missing('project')
-        );
+        $page = $this->assertInertiaPageComponent($response, 'Public/Sample/Dataset');
+        $this->assertArrayNotHasKey('project', $page['props']);
     }
 
     public function test_resolve_dataset_includes_nmrium_info_when_nmrium_present(): void
@@ -308,11 +288,8 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/dataset/D1');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Public/Project/Dataset')
-            ->where('dataset.data.nmrium_info.version', '4')
-        );
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Dataset');
+        $this->assertSame('4', $page['props']['dataset']['data']['nmrium_info']['version']);
     }
 
     public function test_resolve_dataset_returns_404_for_non_existent_dataset(): void

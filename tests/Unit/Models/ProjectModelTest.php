@@ -142,6 +142,7 @@ class ProjectModelTest extends TestCase
             'access_type', 'team_id', 'owner_id', 'draft_id', 'fs_id',
             'project_photo_path', 'license_id', 'release_date', 'deleted_on', 'species',
             'provisional_doi', 'provisional_doi_registered_at',
+            'validation_id', 'validation_status', 'schema_version',
         ];
 
         $project = new Project;

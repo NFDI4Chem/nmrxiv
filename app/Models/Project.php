@@ -63,6 +63,9 @@ class Project extends Model implements Auditable
         'species',
         'provisional_doi',
         'provisional_doi_registered_at',
+        'validation_id',
+        'validation_status',
+        'schema_version',
     ];
 
     /**

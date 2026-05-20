@@ -14,6 +14,47 @@ class SearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createPublicCatalogMolecules(int $count, array $attributes = []): void
+    {
+        foreach (range(1, $count) as $_) {
+            $this->createMoleculeInPublicCatalog($attributes);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function createMoleculeInPublicCatalog(array $attributes = []): Molecule
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create($attributes);
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        return $molecule;
+    }
+
     /**
      * Test search validation with invalid parameters
      */
@@ -37,7 +78,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_valid_text_query()
     {
-        Molecule::factory()->create([
+        $this->createMoleculeInPublicCatalog([
             'name' => 'Aspirin',
             'synonyms' => json_encode(['Acetylsalicylic acid']),
         ]);
@@ -120,7 +161,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_pagination_with_limit_parameter()
     {
-        Molecule::factory()->count(50)->create();
+        $this->createPublicCatalogMolecules(50);
 
         $response = $this->postJson('/api/v1/search', [
             'limit' => 10,
@@ -149,10 +190,10 @@ class SearchControllerTest extends TestCase
 
     public function test_empty_browse_defaults_to_latest_compounds_first(): void
     {
-        $older = Molecule::factory()->create([
+        $older = $this->createMoleculeInPublicCatalog([
             'created_at' => now()->subDays(2),
         ]);
-        $newer = Molecule::factory()->create([
+        $newer = $this->createMoleculeInPublicCatalog([
             'created_at' => now(),
         ]);
 
@@ -167,7 +208,7 @@ class SearchControllerTest extends TestCase
 
     public function test_pagination_links_point_to_compounds_page(): void
     {
-        Molecule::factory()->count(30)->create();
+        $this->createPublicCatalogMolecules(30);
 
         $response = $this->postJson('/api/v1/search?limit=10&page=1&sort=recent', [
             'query' => '',
@@ -419,7 +460,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_empty_search_returns_all_molecules()
     {
-        Molecule::factory()->count(3)->create();
+        $this->createPublicCatalogMolecules(3);
 
         $response = $this->postJson('/api/v1/search', [
             'query' => '',
@@ -475,7 +516,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_page_parameter()
     {
-        Molecule::factory()->count(30)->create();
+        $this->createPublicCatalogMolecules(30);
 
         $response = $this->postJson('/api/v1/search', [
             'page' => 2,

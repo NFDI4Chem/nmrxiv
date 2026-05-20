@@ -6,7 +6,6 @@ use App\Models\License;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class ProjectShowRedirectsToPublicUrlTest extends TestCase
@@ -80,10 +79,7 @@ class ProjectShowRedirectsToPublicUrlTest extends TestCase
         $response = $this->actingAs($owner)
             ->get('/dashboard/projects/'.$project->id);
 
-        $response->assertOk();
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Project/Show')
-        );
+        $this->assertInertiaPageComponent($response, 'Project/Show');
     }
 
     public function test_outside_user_cannot_use_dashboard_project_show(): void

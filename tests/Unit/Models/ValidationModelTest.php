@@ -5,6 +5,7 @@ namespace Tests\Unit\Models;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
+use App\Models\Molecule;
 use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
@@ -327,6 +328,19 @@ class ValidationModelTest extends TestCase
         ]);
 
         $project->studies()->delete();
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+        $sample->molecules()->attach($molecule->id, ['percentage_composition' => '100']);
 
         $validation->process();
 

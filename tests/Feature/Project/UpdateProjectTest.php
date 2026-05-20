@@ -8,10 +8,8 @@ use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
-use Tests\TestCase;
 
-class UpdateProjectTest extends TestCase
+class UpdateProjectTest extends ProjectFeatureTestCase
 {
     use RefreshDatabase;
 
@@ -651,9 +649,6 @@ class UpdateProjectTest extends TestCase
         $response = $this->actingAs($this->owner)
             ->get("/dashboard/projects/{$embargoProject->id}?edit=release_date");
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Project/Show')
-        );
+        $this->assertInertiaPageComponent($response, 'Project/Show');
     }
 }

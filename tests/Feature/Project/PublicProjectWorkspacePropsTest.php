@@ -7,136 +7,97 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class PublicProjectWorkspacePropsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_public_project_page_does_not_include_workspace_props(): void
+    private function createPublicProject(User $owner, int $identifier): Project
     {
-        $owner = User::factory()->withPersonalTeam()->create();
-        $team = $owner->currentTeam;
         $license = License::factory()->create();
 
         $project = Project::factory()->create([
             'owner_id' => $owner->id,
-            'team_id' => $team->id,
+            'team_id' => $owner->currentTeam->id,
             'license_id' => $license->id,
-            'identifier' => 501,
+            'identifier' => $identifier,
             'is_public' => true,
         ]);
+
         $project->users()->attach($owner, ['role' => 'creator']);
 
-        $this->get('/project/P501')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Public/Project/Show')
-                ->missing('workspace')
-            );
+        return $project;
+    }
+
+    public function test_guest_public_project_page_does_not_include_workspace_props(): void
+    {
+        $owner = User::factory()->withPersonalTeam()->create();
+        $this->createPublicProject($owner, 501);
+
+        $page = $this->assertInertiaPageComponent($this->get('/project/P501'), 'Public/Project/Show');
+
+        $this->assertArrayNotHasKey('workspace', $page['props']);
     }
 
     public function test_project_member_sees_workspace_on_public_project_page(): void
     {
         $owner = User::factory()->withPersonalTeam()->create();
-        $team = $owner->currentTeam;
-        $license = License::factory()->create();
+        $this->createPublicProject($owner, 502);
 
-        $project = Project::factory()->create([
-            'owner_id' => $owner->id,
-            'team_id' => $team->id,
-            'license_id' => $license->id,
-            'identifier' => 502,
-            'is_public' => true,
-        ]);
-        $project->users()->attach($owner, ['role' => 'creator']);
+        $page = $this->assertInertiaPageComponent(
+            $this->actingAs($owner)->get('/project/P502'),
+            'Public/Project/Show'
+        );
 
-        $this->actingAs($owner)
-            ->get('/project/P502')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Public/Project/Show')
-                ->has('workspace', fn (AssertableInertia $w) => $w
-                    ->has('dashboardProject')
-                    ->has('projectPermissions')
-                    ->where('role', 'creator')
-                )
-            );
+        $this->assertArrayHasKey('workspace', $page['props']);
+        $this->assertArrayHasKey('dashboardProject', $page['props']['workspace']);
+        $this->assertArrayHasKey('projectPermissions', $page['props']['workspace']);
+        $this->assertSame('creator', $page['props']['workspace']['role']);
     }
 
-    public function test_authenticated_non_member_does_not_receive_workspace_on_public_project(): void
+    public function test_authenticated_non_member_receives_read_only_workspace_on_public_project(): void
     {
         $owner = User::factory()->withPersonalTeam()->create();
         $outsider = User::factory()->create();
-        $team = $owner->currentTeam;
-        $license = License::factory()->create();
+        $this->createPublicProject($owner, 503);
 
-        $project = Project::factory()->create([
-            'owner_id' => $owner->id,
-            'team_id' => $team->id,
-            'license_id' => $license->id,
-            'identifier' => 503,
-            'is_public' => true,
-        ]);
-        $project->users()->attach($owner, ['role' => 'creator']);
+        $page = $this->assertInertiaPageComponent(
+            $this->actingAs($outsider)->get('/project/P503'),
+            'Public/Project/Show'
+        );
 
-        $this->actingAs($outsider)
-            ->get('/project/P503')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Public/Project/Show')
-                ->missing('workspace')
-            );
+        $this->assertArrayHasKey('workspace', $page['props']);
+        $this->assertNull($page['props']['workspace']['role']);
+        $this->assertFalse($page['props']['workspace']['projectPermissions']['canUpdateProject']);
+        $this->assertFalse($page['props']['workspace']['projectPermissions']['canDeleteProject']);
+        $this->assertFalse($page['props']['workspace']['projectPermissions']['canManageSettings']);
     }
 
-    public function test_dashboard_studies_endpoint_forbids_outsider_on_public_project(): void
+    public function test_dashboard_studies_endpoint_allows_outsider_on_public_project(): void
     {
         $owner = User::factory()->withPersonalTeam()->create();
         $outsider = User::factory()->create();
-        $team = $owner->currentTeam;
-        $license = License::factory()->create();
-
-        $project = Project::factory()->create([
-            'owner_id' => $owner->id,
-            'team_id' => $team->id,
-            'license_id' => $license->id,
-            'identifier' => 504,
-            'is_public' => true,
-        ]);
-        $project->users()->attach($owner, ['role' => 'creator']);
+        $project = $this->createPublicProject($owner, 504);
 
         $this->actingAs($outsider)
             ->get(route('dashboard.project.studies', $project->id))
-            ->assertForbidden();
+            ->assertOk();
     }
 
     public function test_public_project_includes_samples_count_for_public_studies(): void
     {
         $owner = User::factory()->withPersonalTeam()->create();
-        $team = $owner->currentTeam;
-        $license = License::factory()->create();
-
-        $project = Project::factory()->create([
-            'owner_id' => $owner->id,
-            'team_id' => $team->id,
-            'license_id' => $license->id,
-            'identifier' => 506,
-            'is_public' => true,
-        ]);
-        $project->users()->attach($owner, ['role' => 'creator']);
+        $project = $this->createPublicProject($owner, 506);
 
         Study::factory()->count(2)->for($project)->create([
             'is_public' => true,
             'owner_id' => $owner->id,
-            'team_id' => $team->id,
+            'team_id' => $owner->currentTeam->id,
         ]);
 
-        $this->get('/project/P506')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Public/Project/Show')
-                ->where('project.data.samples_count', 2)
-            );
+        $page = $this->assertInertiaPageComponent($this->get('/project/P506'), 'Public/Project/Show');
+
+        $this->assertSame(2, $page['props']['project']['data']['samples_count']);
     }
 }

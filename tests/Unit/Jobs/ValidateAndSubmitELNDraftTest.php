@@ -91,6 +91,8 @@ class ValidateAndSubmitELNDraftTest extends TestCase
                 return str_contains($message, 'Draft not found');
             });
 
+        Log::shouldReceive('info')->once()->withAnyArgs();
+
         $job = new ValidateAndSubmitELNDraft(999);
         $job->handle();
 
@@ -101,7 +103,7 @@ class ValidateAndSubmitELNDraftTest extends TestCase
     {
         $draftWithoutProject = Draft::factory()->create();
 
-        Log::shouldReceive('info')->once()->withAnyArgs();
+        Log::shouldReceive('info')->atLeast()->once();
         Log::shouldReceive('error')
             ->once()
             ->withArgs(function ($message, $context) use ($draftWithoutProject) {

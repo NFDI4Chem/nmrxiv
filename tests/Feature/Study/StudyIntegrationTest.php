@@ -113,11 +113,10 @@ class StudyIntegrationTest extends TestCase
         $sample = Sample::factory()->create(['study_id' => $studyWithMolecule->id]);
         $sample->molecules()->attach($molecule);
 
-        $this->get(route('public.compound', ['id' => 'M123']))
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('Public/Studies')
-                ->has('molecule'));
+        $response = $this->get(route('public.compound', ['id' => 'M123']));
+        $page = $this->assertInertiaPageComponent($response, 'Public/Studies');
+
+        $this->assertArrayHasKey('molecule', $page['props']);
     }
 
     public function test_study_resource_transformation(): void
