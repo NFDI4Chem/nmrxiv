@@ -971,8 +971,8 @@ export default {
     },
     data() {
         return {
-            _projectSearchTimer: null,
-            _sampleSearchTimer: null,
+            projectSearchTimer: null,
+            sampleSearchTimer: null,
             perPageOptions: [5, 10, 25, 50],
             /** Compound library tab: page size options (default 12). */
             samplesPerPageOptions: [12, 24, 36, 48, 50],
@@ -1115,8 +1115,8 @@ export default {
     },
 
     beforeUnmount() {
-        clearTimeout(this._projectSearchTimer);
-        clearTimeout(this._sampleSearchTimer);
+        clearTimeout(this.projectSearchTimer);
+        clearTimeout(this.sampleSearchTimer);
     },
     methods: {
         /**
@@ -1206,8 +1206,8 @@ export default {
         },
 
         onProjectsSearchInput(value) {
-            clearTimeout(this._projectSearchTimer);
-            this._projectSearchTimer = setTimeout(() => {
+            clearTimeout(this.projectSearchTimer);
+            this.projectSearchTimer = setTimeout(() => {
                 this.visitDashboard({
                     projects_q: value || "",
                     projects_page: 1,
@@ -1216,8 +1216,8 @@ export default {
         },
 
         onSamplesSearchInput(value) {
-            clearTimeout(this._sampleSearchTimer);
-            this._sampleSearchTimer = setTimeout(() => {
+            clearTimeout(this.sampleSearchTimer);
+            this.sampleSearchTimer = setTimeout(() => {
                 this.visitDashboard({
                     samples_q: value || "",
                     samples_page: 1,
