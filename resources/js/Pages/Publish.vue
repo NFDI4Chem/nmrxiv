@@ -1557,35 +1557,6 @@ export default {
             samplesMetadataExpanded: false,
         };
     },
-    beforeUnmount() {
-        if (this.saveStatusTimer) {
-            clearTimeout(this.saveStatusTimer);
-            this.saveStatusTimer = null;
-        }
-    },
-    watch: {
-        "project.authors": {
-            deep: true,
-            handler() {
-                this.syncOrderedAuthorsFromProject();
-            },
-        },
-        "publishForm.enableProjectMode"(enabled) {
-            if (!enabled) {
-                this.samplesMetadataExpanded = false;
-                this.applySampleModeReleaseSchedule();
-            }
-        },
-    },
-    created() {
-        this.releaseVisibility = this.computeInitialReleaseVisibility();
-        if (this.releaseVisibility === "public") {
-            const d = new Date();
-            d.setHours(0, 0, 0, 0);
-            this.publishForm.release_date = d;
-        }
-        this.syncOrderedAuthorsFromProject();
-    },
     computed: {
         url() {
             return String(this.$page.props.url);
@@ -1664,6 +1635,35 @@ export default {
                 ? "Couldn't update author order"
                 : "Couldn't save changes";
         },
+    },
+    watch: {
+        "project.authors": {
+            deep: true,
+            handler() {
+                this.syncOrderedAuthorsFromProject();
+            },
+        },
+        "publishForm.enableProjectMode"(enabled) {
+            if (!enabled) {
+                this.samplesMetadataExpanded = false;
+                this.applySampleModeReleaseSchedule();
+            }
+        },
+    },
+    beforeUnmount() {
+        if (this.saveStatusTimer) {
+            clearTimeout(this.saveStatusTimer);
+            this.saveStatusTimer = null;
+        }
+    },
+    created() {
+        this.releaseVisibility = this.computeInitialReleaseVisibility();
+        if (this.releaseVisibility === "public") {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            this.publishForm.release_date = d;
+        }
+        this.syncOrderedAuthorsFromProject();
     },
 
     mounted() {

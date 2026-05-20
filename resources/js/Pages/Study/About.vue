@@ -713,11 +713,6 @@ export default {
             return this.$page.props.chemistryStandardizeUrl;
         },
     },
-    mounted() {
-        this.$nextTick(() => {
-            this.initStructureEditor();
-        });
-    },
     watch: {
         canUpdateStudy(value) {
             if (value && !this.editor) {
@@ -726,6 +721,11 @@ export default {
                 });
             }
         },
+    },
+    mounted() {
+        this.$nextTick(() => {
+            this.initStructureEditor();
+        });
     },
     methods: {
         initStructureEditor() {

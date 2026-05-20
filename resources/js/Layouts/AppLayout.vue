@@ -687,20 +687,15 @@
 </template>
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
-import Search from "@/Shared/Search.vue";
-import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
 import Create from "@/Shared/CreateButton.vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
-import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
 import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
-import StudyCreate from "@/Pages/Study/Partials/Create.vue";
-import Submission from "@/Shared/Submission.vue";
 import Notification from "@/Shared/Notification.vue";
 import DashboardSidebarNav from "@/Layouts/Partials/DashboardSidebarNav.vue";
 import { ref } from "vue";
@@ -708,10 +703,8 @@ import {
     DialogOverlay,
     Menu,
     MenuButton,
-    MenuItem,
     MenuItems,
     Dialog,
-    DialogPanel,
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
@@ -727,7 +720,6 @@ import {
     SwatchIcon,
     TrashIcon,
 } from "@heroicons/vue/24/outline";
-import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
 const userNavigation = [];
 
@@ -821,37 +813,22 @@ export default {
         JetApplicationLogo,
         JetApplicationMark,
         JetDropdownLink,
-        JetDropdown,
         Link,
         Head,
         Dialog,
         DialogOverlay,
         Menu,
         MenuButton,
-        MenuItem,
         MenuItems,
         TransitionChild,
         TransitionRoot,
         BellIcon,
         Bars3Icon,
-        MagnifyingGlassIcon,
         XMarkIcon,
-        PlusIcon,
         FlashMessages,
-        DialogPanel,
         AnnouncementBanner,
-        Search,
-        UnifiedSearch,
         Create,
-        ClockIcon,
-        UsersIcon,
-        StarIcon,
-        TrashIcon,
-        FolderIcon,
-        StudyCreate,
-        Submission,
         Notification,
-        SwatchIcon,
         DashboardSidebarNav,
     },
     props: {

@@ -27,8 +27,8 @@
                         :class="iconOnly ? 'relative group px-2 py-1' : ''"
                     >
                         <Link
-                            :href="item.href"
                             :id="item.id"
+                            :href="item.href"
                             :aria-current="
                                 primaryNavItemActive(item) ? 'page' : undefined
                             "
@@ -58,9 +58,9 @@
                     >
                         <Link
                             v-for="child in item.children"
+                            :id="child.id"
                             :key="child.name"
                             :href="child.href"
-                            :id="child.id"
                             :aria-current="
                                 sidebarChildNavActive(child)
                                     ? 'page'
@@ -92,8 +92,8 @@
                             class="relative group px-2 py-1"
                         >
                             <Link
-                                :href="child.href"
                                 :id="child.id"
+                                :href="child.href"
                                 :aria-current="
                                     sidebarChildNavActive(child)
                                         ? 'page'

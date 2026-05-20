@@ -350,8 +350,8 @@
                         >
                             <template v-for="tab in tabs" :key="tab.name">
                                 <div
-                                    ref="samplesTabAnchor"
                                     v-if="tab.name === 'samples'"
+                                    ref="samplesTabAnchor"
                                     :class="[
                                         isTabActive(tab.name)
                                             ? 'border-pink-500 text-gray-900'

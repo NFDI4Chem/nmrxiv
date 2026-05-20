@@ -969,15 +969,6 @@ export default {
             default: () => [],
         },
     },
-    data() {
-        return {
-            projectSearchTimer: null,
-            sampleSearchTimer: null,
-            perPageOptions: [5, 10, 25, 50],
-            /** Compound library tab: page size options (default 12). */
-            samplesPerPageOptions: [12, 24, 36, 48, 50],
-        };
-    },
     setup() {
         const app = getCurrentInstance();
         const openDatasetCreateDialog = (data) => {
@@ -996,6 +987,15 @@ export default {
 
         return {
             openDatasetCreateDialog,
+        };
+    },
+    data() {
+        return {
+            projectSearchTimer: null,
+            sampleSearchTimer: null,
+            perPageOptions: [5, 10, 25, 50],
+            /** Compound library tab: page size options (default 12). */
+            samplesPerPageOptions: [12, 24, 36, 48, 50],
         };
     },
     computed: {

@@ -1306,11 +1306,7 @@ import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
 import { StarIcon, PencilIcon } from "@heroicons/vue/24/solid";
-import {
-    ArrowTopRightOnSquareIcon,
-    GlobeAltIcon,
-    RectangleStackIcon,
-} from "@heroicons/vue/24/outline";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/vue/24/outline";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
@@ -1342,8 +1338,6 @@ export default {
         StarIcon,
         PencilIcon,
         ArrowTopRightOnSquareIcon,
-        GlobeAltIcon,
-        RectangleStackIcon,
         AccessDialogue,
         ManageAuthor,
         ToolTip,

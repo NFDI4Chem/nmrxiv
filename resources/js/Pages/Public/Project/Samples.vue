@@ -229,6 +229,17 @@ export default {
         },
     },
 
+    data() {
+        return {
+            /** Loading state indicator */
+            loading: false,
+            /** Studies/samples data with pagination meta */
+            studies: [],
+            /** Search query string */
+            query: "",
+        };
+    },
+
     computed: {
         workspace() {
             return this.$page.props.workspace ?? null;
@@ -239,17 +250,6 @@ export default {
                 this.workspace.projectPermissions?.canUpdateProject
             );
         },
-    },
-
-    data() {
-        return {
-            /** Loading state indicator */
-            loading: false,
-            /** Studies/samples data with pagination meta */
-            studies: [],
-            /** Search query string */
-            query: "",
-        };
     },
 
     mounted() {
