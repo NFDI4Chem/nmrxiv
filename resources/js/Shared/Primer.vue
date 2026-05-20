@@ -169,8 +169,8 @@
                     >|</span
                 >
                 <a
-                    class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded"
-                    href="https://docs.nmrxiv.org/submission-guides/submission/folder-structure"
+                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded"
+                    href="https://docs.nmrxiv.org/submission-guides/folder-structure"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
