@@ -375,6 +375,25 @@ class DraftFeatureTest extends TestCase
         $this->assertNotEmpty($content);
     }
 
+    public function test_draft_processed_mail_uses_published_copy_when_project_is_public_even_if_release_date_is_not_today(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'is_public' => true,
+            // Simulate a timezone/serialization edge where the stored timestamp is not "today"
+            // even though the project has been published.
+            'release_date' => Carbon::now()->subDay(),
+        ]);
+
+        $mailable = new DraftProcessed($project);
+        $content = $mailable->render();
+
+        $this->assertStringContainsString('published successfully', $content);
+        $this->assertStringNotContainsString('published as Embargo', $content);
+    }
+
     public function test_draft_processed_mail_contains_project_url(): void
     {
         $project = Project::factory()->create([
@@ -435,6 +454,23 @@ class DraftFeatureTest extends TestCase
         $content = $mailable->render();
 
         $this->assertNotEmpty($content);
+    }
+
+    public function test_draft_processed_notify_admins_mail_uses_published_copy_when_project_is_public(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'is_public' => true,
+            'release_date' => Carbon::now()->subDay(),
+        ]);
+
+        $mailable = new DraftProcessedNotifyAdmins($project, null);
+        $content = $mailable->render();
+
+        $this->assertStringContainsString('A new project has been published.', $content);
+        $this->assertStringNotContainsString('published as Embargo', $content);
     }
 
     public function test_draft_processed_notify_admins_mail_can_be_rendered_for_studies(): void

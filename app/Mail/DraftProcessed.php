@@ -13,45 +13,44 @@ class DraftProcessed extends Mailable
 
     public $project;
 
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
     public function __construct($project)
     {
         $this->project = $project;
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
     public function build()
     {
-        $releasedToday = false;
-        $releaseDate = Carbon::parse($this->project->release_date);
+        $project = $this->project;
 
-        if ($releaseDate->isToday()) {
-            $releasedToday = true;
-        }
+        /**
+         * This mail is sent after processing completes.
+         * Whether it's an embargo vs immediate public release should be based on
+         * the project's actual published state, not a timezone-sensitive date
+         * comparison.
+         */
+        $releasedToday = (bool) ($project->is_public ?? false);
+
+        $releaseDate = filled($project->release_date)
+            ? Carbon::parse($project->release_date)
+            : null;
 
         // Safely handle identifier parsing
         $publicUrlPath = '';
-        if ($this->project->identifier && str_contains($this->project->identifier, ':')) {
-            $identifierParts = explode(':', $this->project->identifier);
+        if ($project->identifier && str_contains($project->identifier, ':')) {
+            $identifierParts = explode(':', $project->identifier);
             if (count($identifierParts) > 1) {
                 $publicUrlPath = $identifierParts[1];
             }
         }
 
         return $this->markdown('vendor.mail.draft-processed', [
-            'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
-            'project' => $this->project,
+            'url' => url(config('app.url').'/dashboard/projects/'.$project->id),
+            'project' => $project,
             'releasedToday' => $releasedToday,
-            'releaseDate' => explode(' ', $releaseDate)[0],
-            'publicUrl' => $publicUrlPath ? url(config('app.url').'/'.$publicUrlPath) : url(config('app.url').'/dashboard/projects/'.$this->project->id),
-        ])->subject(__('Submission Processed'.' - '.$this->project->name));
+            'releaseDate' => $releaseDate?->toDateString(),
+            'publicUrl' => $publicUrlPath
+                ? url(config('app.url').'/'.$publicUrlPath)
+                : url(config('app.url').'/dashboard/projects/'.$project->id),
+        ])->subject(__('Submission Processed'.' - '.$project->name));
     }
 }
