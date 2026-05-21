@@ -1328,7 +1328,7 @@ export default {
             this.releaseDateModalError = null;
             this.releaseDateForm.put(
                 this.route(
-                    "dashboard.project.releaseNow",
+                    "dashboard.project.publishEmbargoProject",
                     this.dashboardProject.id
                 ),
                 {

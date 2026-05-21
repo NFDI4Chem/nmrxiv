@@ -8,7 +8,6 @@ use App\Models\Project;
 use App\Notifications\EmbargoReleaseReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
 class PublishEmbargoProjects extends Command
@@ -32,37 +31,34 @@ class PublishEmbargoProjects extends Command
      */
     public function handle(PublishEmbargoProject $embargoPublisher): int
     {
-        return DB::transaction(function () use ($embargoPublisher) {
-            $now = Carbon::now();
-            $remindersSent = 0;
-            $publishedCount = 0;
+        $now = Carbon::now();
+        $remindersSent = 0;
 
-            // Send 1 week reminders
-            $this->sendReminders($now->copy()->addDays(7), 7, 'week', $remindersSent);
+        // Send 1 week reminders
+        $this->sendReminders($now->copy()->addDays(7), 7, $remindersSent);
 
-            // Send 3 days reminders
-            $this->sendReminders($now->copy()->addDays(3), 3, 'days', $remindersSent);
+        // Send 3 days reminders
+        $this->sendReminders($now->copy()->addDays(3), 3, $remindersSent);
 
-            // Send 1 day reminders
-            $this->sendReminders($now->copy()->addDays(1), 1, 'day', $remindersSent);
+        // Send 1 day reminders
+        $this->sendReminders($now->copy()->addDays(1), 1, $remindersSent);
 
-            // Publish projects that have reached their release date
-            $publishedCount = $this->publishReadyProjects($embargoPublisher, $now);
+        // Publish projects that have reached their release date
+        $publishedCount = $this->publishReadyProjects($embargoPublisher, $now);
 
-            // Clean up old reminder records for published projects
-            $this->cleanupOldReminders();
+        // Clean up old reminder records for published projects
+        $this->cleanupOldReminders();
 
-            $this->info("Sent {$remindersSent} embargo release reminders.");
-            $this->info("Published {$publishedCount} embargo projects.");
+        $this->info("Sent {$remindersSent} embargo release reminders.");
+        $this->info("Published {$publishedCount} embargo projects.");
 
-            return 0;
-        });
+        return Command::SUCCESS;
     }
 
     /**
      * Send reminder notifications for projects approaching release date
      */
-    private function sendReminders(Carbon $targetDate, int $daysUntilRelease, string $reminderType, int &$remindersSent): void
+    private function sendReminders(Carbon $targetDate, int $daysUntilRelease, int &$remindersSent): void
     {
         $projects = Project::where([
             ['status', 'embargo'],

@@ -6,6 +6,7 @@ use App\Jobs\ProcessSubmission;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class PublishEmbargoProject
 {
@@ -21,38 +22,24 @@ class PublishEmbargoProject
     public function publish(Project $project): array
     {
         if ($project->is_public) {
-            return $this->publishPrefersJsonResponse($request)
-                ? new JsonResponse('', 200)
-                : back();
-        }
-
-        if ($project->status !== 'embargo') {
-            if ($this->publishPrefersJsonResponse($request)) {
-                return response()->json([
-                    'errors' => 'Project is not in embargo status.',
-                ], 422);
-            }
+            throw ValidationException::withMessages([
+                'publish' => 'Project is already public.',
+            ]);
         }
 
         if ($project->is_archived) {
-            if ($this->publishPrefersJsonResponse($request)) {
-                return response()->json([
-                    'errors' => 'Archived projects cannot be published.',
-                ], 422);
-            }
-
             throw ValidationException::withMessages([
                 'publish' => 'Archived projects cannot be published.',
             ]);
         }
 
-        if ($project->doi === null || $project->doi === '') {
-            if ($this->publishPrefersJsonResponse($request)) {
-                return response()->json([
-                    'errors' => 'A DOI is required before publishing this project.',
-                ], 422);
-            }
+        if ($project->status !== 'embargo') {
+            throw ValidationException::withMessages([
+                'publish' => 'Project is not in embargo status.',
+            ]);
+        }
 
+        if ($project->doi === null || $project->doi === '') {
             throw ValidationException::withMessages([
                 'publish' => 'A DOI is required before publishing this project.',
             ]);

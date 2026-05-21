@@ -509,15 +509,10 @@ class UpdateProjectTest extends ProjectFeatureTestCase
         $response = $this->actingAs($this->viewer)
             ->put("/dashboard/projects/{$this->project->id}/updateReleaseDate", $updateData);
 
-        // NOTE: This test currently fails because updateReleaseDate method
-        // is missing authorization check (bug in controller)
-        // It should return 403 but actually returns 302 (success)
-        $response->assertStatus(302);
-        $response->assertSessionHas('success', "Project's release date updated successfully");
+        $response->assertForbidden();
 
         $this->project->refresh();
-        // Since the update actually succeeds (due to missing auth), the date is set
-        $this->assertNotNull($this->project->release_date);
+        $this->assertNull($this->project->release_date);
     }
 
     public function test_project_release_date_update_response_includes_success_message()

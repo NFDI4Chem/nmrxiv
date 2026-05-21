@@ -79,7 +79,7 @@ class ProjectPolicy
      */
     public function publishProject(User $user, Project $project)
     {
-        if ($project->is_public || $project->is_archived || $project->is_deleted || $project->is_published) {
+        if ($project->is_public || $project->is_archived || $project->is_deleted) {
             return false;
         }
 
