@@ -64,8 +64,7 @@
                                 >{{
                                     formatDate(dashboardProject.release_date)
                                 }}</strong
-                            >. You cannot edit the project from this public
-                            page; create a new version to update its contents.
+                            >.
                             <button
                                 v-if="showReleaseDateEditLink"
                                 type="button"
