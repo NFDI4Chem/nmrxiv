@@ -114,22 +114,27 @@ class AnnouncementModelTest extends TestCase
     public function test_active_announcements_includes_current_time_boundaries(): void
     {
         $now = Carbon::now();
+        Carbon::setTestNow($now);
 
-        // Create announcement that starts exactly now
-        $startsNow = Announcement::factory()->create([
-            'status' => 'active',
-            'start_time' => $now->copy(),
-            'end_time' => $now->copy()->addDays(1),
-        ]);
+        try {
+            // Create announcement that starts exactly now
+            $startsNow = Announcement::factory()->create([
+                'status' => 'active',
+                'start_time' => $now->copy(),
+                'end_time' => $now->copy()->addDays(1),
+            ]);
 
-        // Create announcement that ends exactly now
-        $endsNow = Announcement::factory()->create([
-            'status' => 'active',
-            'start_time' => $now->copy()->subDays(1),
-            'end_time' => $now->copy(),
-        ]);
+            // Create announcement that ends exactly now
+            $endsNow = Announcement::factory()->create([
+                'status' => 'active',
+                'start_time' => $now->copy()->subDays(1),
+                'end_time' => $now->copy(),
+            ]);
 
-        $activeAnnouncements = Announcement::active();
+            $activeAnnouncements = Announcement::active();
+        } finally {
+            Carbon::setTestNow();
+        }
 
         $this->assertCount(2, $activeAnnouncements);
         $announcementIds = $activeAnnouncements->pluck('id')->toArray();

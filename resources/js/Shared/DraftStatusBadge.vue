@@ -114,7 +114,7 @@ export default {
     <span
         v-if="resolvedStatus"
         :title="label"
-        class="inline-flex min-w-[11rem] shrink-0 items-center justify-center truncate rounded-full px-2 py-1 text-center text-xs font-medium"
+        class="inline-flex w-fit shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 py-3 text-center text-xs font-medium leading-none"
         :class="colorClass"
     >
         {{ label }}
