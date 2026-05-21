@@ -390,7 +390,7 @@ class DraftFeatureTest extends TestCase
         $mailable = new DraftProcessed($project);
         $content = $mailable->render();
 
-        $this->assertStringContainsString('published successfully', $content);
+        $this->assertStringContainsString('your project is now published on nmrXiv', $content);
         $this->assertStringNotContainsString('published as Embargo', $content);
     }
 
@@ -469,7 +469,7 @@ class DraftFeatureTest extends TestCase
         $mailable = new DraftProcessedNotifyAdmins($project, null);
         $content = $mailable->render();
 
-        $this->assertStringContainsString('A new project has been published.', $content);
+        $this->assertStringContainsString('A project has been published and is now publicly available on nmrXiv.', $content);
         $this->assertStringNotContainsString('published as Embargo', $content);
     }
 
