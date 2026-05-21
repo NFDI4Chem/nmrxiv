@@ -745,31 +745,83 @@
             </template>
 
             <template #footer>
-                <jet-secondary-button
-                    type="button"
-                    @click="closeReleaseDateModal"
-                >
-                    Cancel
-                </jet-secondary-button>
-                <jet-success-button
-                    type="button"
-                    class="ml-2"
-                    :class="[
-                        !releaseDateAck.terms || !releaseDateAck.conditions
-                            ? 'bg-gray-200 cursor-not-allowed dark:bg-gray-700'
-                            : 'bg-primary-600 hover:bg-primary-700',
-                    ]"
-                    :disabled="
-                        releaseDateForm.processing ||
-                        !releaseDateAck.terms ||
-                        !releaseDateAck.conditions
-                    "
-                    @click="submitReleaseDateUpdate"
-                >
-                    Update release date
-                </jet-success-button>
+                <div class="flex items-center justify-between gap-3">
+                    <jet-success-button
+                        type="button"
+                        :class="{
+                            'opacity-25':
+                                releaseDateForm.processing ||
+                                !releaseDateAck.terms ||
+                                !releaseDateAck.conditions,
+                        }"
+                        :disabled="
+                            releaseDateForm.processing ||
+                            !releaseDateAck.terms ||
+                            !releaseDateAck.conditions
+                        "
+                        @click="confirmPublishNow"
+                    >
+                        Publish Now
+                    </jet-success-button>
+
+                    <div class="flex items-center justify-end gap-2">
+                        <jet-secondary-button
+                            type="button"
+                            @click="closeReleaseDateModal"
+                        >
+                            Cancel
+                        </jet-secondary-button>
+                        <jet-success-button
+                            type="button"
+                            :class="[
+                                !releaseDateAck.terms ||
+                                !releaseDateAck.conditions ||
+                                !hasReleaseDateChanged
+                                    ? 'bg-gray-200 cursor-not-allowed dark:bg-gray-700'
+                                    : 'bg-primary-600 hover:bg-primary-700',
+                            ]"
+                            :disabled="
+                                releaseDateForm.processing ||
+                                !releaseDateAck.terms ||
+                                !releaseDateAck.conditions ||
+                                !hasReleaseDateChanged
+                            "
+                            @click="submitReleaseDateUpdate"
+                        >
+                            Update release date
+                        </jet-success-button>
+                    </div>
+                </div>
             </template>
         </jet-dialog-modal>
+
+        <jet-confirmation-modal
+            :show="confirmingPublishNow"
+            @close="confirmingPublishNow = false"
+        >
+            <template #title> Publish Now </template>
+
+            <template #content>
+                Once the data is published you will no longer be able to change
+                the data uploaded! If published as a project, you may add more
+                samples (spectra) to the project later.
+            </template>
+
+            <template #footer>
+                <jet-secondary-button @click="confirmingPublishNow = false">
+                    Cancel
+                </jet-secondary-button>
+
+                <jet-success-button
+                    class="ml-2"
+                    :class="{ 'opacity-25': releaseDateForm.processing }"
+                    :disabled="releaseDateForm.processing"
+                    @click="submitPublishNow"
+                >
+                    Publish Now
+                </jet-success-button>
+            </template>
+        </jet-confirmation-modal>
     </app-layout>
 </template>
 
@@ -795,6 +847,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import SeededCoverBackground from "@/Shared/SeededCoverBackground.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 import Datepicker from "@vuepic/vue-datepicker";
@@ -819,6 +872,7 @@ export default {
         SeededCoverBackground,
         AccessDialogue,
         JetDialogModal,
+        JetConfirmationModal,
         JetSecondaryButton,
         JetSuccessButton,
         Datepicker,
@@ -877,12 +931,14 @@ export default {
     data() {
         return {
             showReleaseDateModal: false,
+            confirmingPublishNow: false,
             releaseDateModalError: null,
             releaseDateAck: {
                 conditions: false,
                 terms: false,
             },
             releaseDateForm: null,
+            originalReleaseDate: null,
             /**
              * Available navigation tabs for the project
              * Each tab represents a different section of project information
@@ -968,6 +1024,14 @@ export default {
 
             return !p.is_public && !p.is_published && Boolean(p.doi);
         },
+
+        hasReleaseDateChanged() {
+            return (
+                this.normalizeReleaseDate(
+                    this.releaseDateForm?.release_date
+                ) !== this.normalizeReleaseDate(this.originalReleaseDate)
+            );
+        },
     },
 
     created() {
@@ -993,6 +1057,23 @@ export default {
      * Component methods
      */
     methods: {
+        normalizeReleaseDate(value) {
+            if (value == null) {
+                return null;
+            }
+
+            if (value instanceof Date) {
+                return value.getTime();
+            }
+
+            const date = new Date(value);
+
+            if (!Number.isNaN(date.getTime())) {
+                return date.getTime();
+            }
+
+            return String(value);
+        },
         isTabActive(tabName) {
             if (tabName === "samples") {
                 return ["samples", "study", "dataset"].includes(
@@ -1138,6 +1219,7 @@ export default {
             if (!p?.id) {
                 return;
             }
+            this.confirmingPublishNow = false;
             this.releaseDateAck = { conditions: false, terms: false };
             this.releaseDateModalError = null;
             this.releaseDateForm.name = p.name;
@@ -1145,13 +1227,33 @@ export default {
                 p.enableProjectMode ?? p.enable_project_mode
             );
             this.releaseDateForm.release_date = p.release_date;
+            this.originalReleaseDate = p.release_date;
             this.releaseDateForm.clearErrors();
             this.showReleaseDateModal = true;
         },
 
         closeReleaseDateModal() {
             this.showReleaseDateModal = false;
+            this.confirmingPublishNow = false;
             this.releaseDateModalError = null;
+        },
+
+        confirmPublishNow() {
+            if (
+                this.releaseDateForm.processing ||
+                !this.releaseDateAck.conditions ||
+                !this.releaseDateAck.terms ||
+                !this.dashboardProject?.id
+            ) {
+                return;
+            }
+
+            this.confirmingPublishNow = true;
+        },
+
+        submitPublishNow() {
+            this.confirmingPublishNow = false;
+            this.submitReleaseNow();
         },
 
         stripReleaseDateEditQueryFromUrl() {
@@ -1180,6 +1282,7 @@ export default {
             if (
                 !this.releaseDateAck.conditions ||
                 !this.releaseDateAck.terms ||
+                !this.hasReleaseDateChanged ||
                 !this.dashboardProject?.id
             ) {
                 return;
@@ -1207,6 +1310,44 @@ export default {
                             this.releaseDateModalError = Array.isArray(v)
                                 ? v[0]
                                 : String(v ?? "Could not update release date.");
+                        }
+                    },
+                }
+            );
+        },
+
+        submitReleaseNow() {
+            if (
+                !this.releaseDateAck.conditions ||
+                !this.releaseDateAck.terms ||
+                !this.dashboardProject?.id
+            ) {
+                return;
+            }
+
+            this.releaseDateModalError = null;
+            this.releaseDateForm.put(
+                this.route(
+                    "dashboard.project.releaseNow",
+                    this.dashboardProject.id
+                ),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.showReleaseDateModal = false;
+                        router.reload({ only: ["project", "workspace"] });
+                    },
+                    onError: (errors) => {
+                        const keys = Object.keys(errors);
+                        if (keys.length === 0) {
+                            this.releaseDateModalError =
+                                "Could not publish project.";
+                        } else {
+                            const k = keys[0];
+                            const v = errors[k];
+                            this.releaseDateModalError = Array.isArray(v)
+                                ? v[0]
+                                : String(v ?? "Could not publish project.");
                         }
                     },
                 }

@@ -6,6 +6,7 @@ use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
+use App\Actions\Project\PublishEmbargoProject;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
@@ -630,9 +631,32 @@ class ProjectController extends Controller
 
     public function updateReleaseDate(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $updater->update($project, $request->all());
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', "Project's release date updated successfully");
+    }
+
+    public function publishEmbargoProject(Request $request, Project $project, PublishEmbargoProject $embargoPublisher): JsonResponse|RedirectResponse
+    {
+        if (! Gate::forUser($request->user())->allows('publishProject', $project)) {
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+
+            throw new AuthorizationException;
+        }
+
+        $result = $embargoPublisher->publish($project);
+
+        return $this->publishPrefersJsonResponse($request)
+            ? new JsonResponse('', 200)
+            : back()->with('success', $result['dispatched'] === 'async'
+                ? 'Your submission has been queued for processing.'
+                : 'Project published successfully');
     }
 
     public function destroy(Request $request, StatefulGuard $guard, Project $project, DeleteProject $creator)
