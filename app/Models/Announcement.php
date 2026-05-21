@@ -35,9 +35,11 @@ class Announcement extends Model
      */
     public static function active()
     {
-        return (new static)::where('status', 'active')->where(function ($q) {
-            $q->where('start_time', '<=', Carbon::now());
-            $q->where('end_time', '>=', Carbon::now());
+        $now = Carbon::now();
+
+        return (new static)::where('status', 'active')->where(function ($q) use ($now) {
+            $q->where('start_time', '<=', $now);
+            $q->where('end_time', '>=', $now);
         })->get();
     }
 }
