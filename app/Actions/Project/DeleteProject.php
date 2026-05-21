@@ -256,15 +256,19 @@ class DeleteProject
      */
     public function prepareSendList($project)
     {
-        $sendTo = [];
-        foreach ($project->allUsers() as $member) {
-            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
-                array_push($sendTo, $member);
-            } else {
-                array_push($sendTo, $project->owner);
+        $sendTo = collect();
+
+        if ($project->owner) {
+            $sendTo->push($project->owner);
+        }
+
+        foreach ($project->users as $member) {
+            $role = $member->projectMembership?->role;
+            if ($role === 'creator' || $role === 'owner') {
+                $sendTo->push($member);
             }
         }
 
-        return $sendTo;
+        return $sendTo->unique('id')->values()->all();
     }
 }
