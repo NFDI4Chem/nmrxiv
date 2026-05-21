@@ -2,12 +2,15 @@
 
 namespace Tests\Feature\Project;
 
+use App\Jobs\ProcessSubmission;
+use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 
 class UpdateProjectTest extends ProjectFeatureTestCase
 {
@@ -645,5 +648,40 @@ class UpdateProjectTest extends ProjectFeatureTestCase
             ->get("/dashboard/projects/{$embargoProject->id}?edit=release_date");
 
         $this->assertInertiaPageComponent($response, 'Project/Show');
+    }
+
+    public function test_project_owner_can_publish_overdue_embargo_project_via_release_now_route(): void
+    {
+        Queue::fake();
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'project_enabled' => true,
+        ]);
+        $embargoProject = Project::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'is_public' => false,
+            'status' => 'embargo',
+            'doi' => '10.5281/nmrxiv.release-now',
+            'release_date' => now()->subDay(),
+            'draft_id' => $draft->id,
+        ]);
+        $embargoProject->users()->attach($this->owner, ['role' => 'creator']);
+
+        $response = $this->actingAs($this->owner)
+            ->withHeader('X-Inertia', 'true')
+            ->from('/dashboard/projects')
+            ->put("/dashboard/projects/{$embargoProject->id}/releaseNow");
+
+        $response->assertRedirect('/dashboard/projects');
+        $response->assertSessionHas('success', 'Your submission has been queued for processing.');
+
+        $embargoProject->refresh();
+        $this->assertSame('queued', $embargoProject->status);
+        $this->assertSame(now()->startOfDay()->toDateString(), $embargoProject->release_date->toDateString());
+        Queue::assertPushed(ProcessSubmission::class, fn (ProcessSubmission $job) => $job->project->id === $embargoProject->id);
     }
 }
