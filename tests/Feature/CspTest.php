@@ -78,4 +78,14 @@ class CspTest extends TestCase
         $this->assertStringContainsString('http://localhost:*', $policyString, 'Local should allow localhost wildcards');
         $this->assertStringContainsString('http://127.0.0.1:*', $policyString, 'Local should allow 127.0.0.1 wildcards');
     }
+
+    public function test_csp_allows_tib_terminology_service_connections(): void
+    {
+        $policy = new Policy;
+        (new NmrxivPolicy)->configure($policy);
+
+        $policyString = $policy->getContents();
+
+        $this->assertStringContainsString('https://service.tib.eu', $policyString);
+    }
 }

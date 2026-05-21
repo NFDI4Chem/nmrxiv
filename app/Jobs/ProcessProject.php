@@ -152,7 +152,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
                 'project_id' => $project->id,
             ]);
 
-            Notification::send($project->owner, new DraftProcessedNotification($project));
+            Notification::send($project->owner, new DraftProcessedNotification($project->fresh()));
 
             Log::info('embargo_publish_trace', [
                 'stage' => 'process_project_complete',

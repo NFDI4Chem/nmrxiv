@@ -395,7 +395,7 @@ class Project extends Model implements Auditable
                 Notification::send($sendTo, new ProjectDeletionFailureNotification($this));
                 break;
             case 'publish':
-                event(new DraftProcessed($this, $sendTo));
+                event(new DraftProcessed($this->fresh() ?? $this, $sendTo));
                 break;
         }
     }
