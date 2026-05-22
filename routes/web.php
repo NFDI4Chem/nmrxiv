@@ -242,6 +242,9 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::put('projects/{project}/updateReleaseDate', [ProjectController::class, 'updateReleaseDate'])
             ->name('dashboard.project.updateReleaseDate');
 
+        Route::put('projects/{project}/releaseNow', [ProjectController::class, 'publishEmbargoProject'])
+            ->name('dashboard.project.publishEmbargoProject');
+
         Route::put('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');
 

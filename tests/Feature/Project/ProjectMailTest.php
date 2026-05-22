@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Project;
 
+use App\Mail\EmbargoReleaseReminder;
 use App\Mail\ProjectArchival;
 use App\Mail\ProjectArchivalNotifyAdmins;
 use App\Mail\ProjectDeletion;
@@ -12,8 +13,11 @@ use App\Models\Project;
 use App\Models\ProjectInvitation as ProjectInvitationModel;
 use App\Models\Team;
 use App\Models\User;
+use App\Notifications\EmbargoReleaseReminderNotification;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
@@ -105,6 +109,49 @@ class ProjectMailTest extends TestCase
 
         $this->assertSame($this->project->id, $mailable->project->id);
         $this->assertSame($this->project->name, $mailable->project->name);
+    }
+
+    public function test_embargo_release_reminder_mail_renders_release_copy(): void
+    {
+        $this->project->update([
+            'name' => 'Embargo Project',
+            'release_date' => Carbon::parse('2026-06-01'),
+        ]);
+
+        $mailable = new EmbargoReleaseReminder($this->project, 7);
+        $content = $mailable->render();
+
+        $this->assertStringContainsString('Embargo Project', $content);
+        $this->assertStringContainsString('Jun 01, 2026', $content);
+        $this->assertStringContainsString('scheduled to be automatically released', $content);
+    }
+
+    public function test_embargo_release_reminder_mail_subject_matches_reminder_window(): void
+    {
+        $this->project->update(['release_date' => Carbon::parse('2026-06-01')]);
+
+        foreach ([
+            7 => 'Your embargo project will be released in 1 week',
+            3 => 'Your embargo project will be released in 3 days',
+            1 => 'Your embargo project will be released tomorrow',
+            14 => 'Your embargo project release is approaching',
+        ] as $days => $subject) {
+            $mailable = new EmbargoReleaseReminder($this->project, $days);
+            $mailable->build();
+
+            $this->assertSame($subject.' - '.$this->project->name, $mailable->subject);
+        }
+    }
+
+    public function test_embargo_release_reminder_notification_builds_mail_message(): void
+    {
+        $notification = new EmbargoReleaseReminderNotification($this->project, 3);
+        $mail = $notification->toMail($this->owner);
+
+        $this->assertInstanceOf(ShouldQueue::class, $notification);
+        $this->assertSame(['mail'], $notification->via($this->owner));
+        $this->assertInstanceOf(Mailable::class, $mail);
+        $this->assertSame([$this->owner->email], collect($mail->to)->pluck('address')->all());
     }
 
     public function test_project_deletion_mail_can_be_rendered(): void

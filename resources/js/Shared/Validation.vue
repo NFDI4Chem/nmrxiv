@@ -93,10 +93,14 @@
                                     Name
                                 </p>
                                 <a
-                                    v-if="!getStatus(validation.project.title)"
+                                    v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
+                                        !getStatus(validation.project.title)
+                                    "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=title#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -117,13 +121,15 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(
                                             validation.project.description
                                         )
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=description#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -144,11 +150,13 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.keywords)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=keywords#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -169,11 +177,13 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.citations)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=citation#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -194,11 +204,13 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.authors)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=authors#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -219,11 +231,13 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.license)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=license#publish-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -243,10 +257,14 @@
                                     Project profile image
                                 </p>
                                 <a
-                                    v-if="!getStatus(validation.project.image)"
+                                    v-if="
+                                        showEditLinks &&
+                                        effectiveDraftId &&
+                                        !getStatus(validation.project.image)
+                                    "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=profile_image#publish-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -360,6 +378,7 @@
                                                     </p>
                                                     <a
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.keywords
                                                             )
@@ -388,6 +407,7 @@
                                                     </p>
                                                     <span
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.sample
                                                             )
@@ -424,6 +444,7 @@
                                                     </p>
                                                     <a
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.nmrium_info
                                                             )
@@ -455,6 +476,7 @@
                                                     </p>
                                                     <a
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.molecules
                                                             )
@@ -531,6 +553,7 @@
                                                                 </p>
                                                                 <span
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.files
                                                                         )
@@ -571,6 +594,7 @@
                                                                 </p>
                                                                 <a
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.nmrium_info
                                                                         )
@@ -605,6 +629,7 @@
                                                                 </p>
                                                                 <span
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.assay
                                                                         )
@@ -629,6 +654,7 @@
                                                                 </p>
                                                                 <a
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.assignments
                                                                         )
@@ -713,6 +739,15 @@ export default {
         validation: Object,
         mode: String,
         draft: Number,
+        showEditLinks: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    computed: {
+        effectiveDraftId() {
+            return this.draft ?? this.project?.draft_id ?? null;
+        },
     },
     methods: {
         getStatus(value) {

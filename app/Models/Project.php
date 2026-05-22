@@ -75,6 +75,8 @@ class Project extends Model implements Auditable
     {
         return [
             'provisional_doi_registered_at' => 'datetime',
+            'release_date' => 'datetime',
+            'deleted_on' => 'datetime',
         ];
     }
 
@@ -396,5 +398,10 @@ class Project extends Model implements Auditable
                 event(new DraftProcessed($this->fresh() ?? $this, $sendTo));
                 break;
         }
+    }
+
+    public function embargoReminders(): HasMany
+    {
+        return $this->hasMany(EmbargoReminder::class);
     }
 }

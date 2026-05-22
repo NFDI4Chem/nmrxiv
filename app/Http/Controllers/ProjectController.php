@@ -6,6 +6,7 @@ use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
+use App\Actions\Project\PublishEmbargoProject;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
@@ -421,7 +422,7 @@ class ProjectController extends Controller
 
                     if ($this->publishPrefersJsonResponse($request)) {
                         return response()->json([
-                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de',
                             'validation' => $validation,
                         ], 422);
                     }
@@ -432,7 +433,7 @@ class ProjectController extends Controller
                     );
 
                     throw ValidationException::withMessages([
-                        'publish' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                        'publish' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de',
                     ]);
                 }
             } else {
@@ -461,7 +462,7 @@ class ProjectController extends Controller
                 if (! $status) {
                     $project->refresh();
 
-                    $message = 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.';
+                    $message = 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de';
 
                     if ($this->publishPrefersJsonResponse($request)) {
                         return response()->json([
@@ -630,9 +631,86 @@ class ProjectController extends Controller
 
     public function updateReleaseDate(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $updater->update($project, $request->all());
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', "Project's release date updated successfully");
+    }
+
+    public function publishEmbargoProject(Request $request, Project $project, PublishEmbargoProject $embargoPublisher): JsonResponse|RedirectResponse
+    {
+        if (! Gate::forUser($request->user())->allows('publishProject', $project)) {
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+
+            throw new AuthorizationException;
+        }
+
+        $validation = $project->validation;
+        if (! $validation) {
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json([
+                    'errors' => 'Project validation not found. Please ensure the project is properly configured.',
+                ], 422);
+            }
+
+            throw ValidationException::withMessages([
+                'publish' => 'Project validation not found. Please ensure the project is properly configured.',
+            ]);
+        }
+
+        $originalReleaseDate = $project->release_date;
+        $project->release_date = now()->startOfDay()->toDateString();
+        $project->save();
+
+        $validation->process();
+        $publishAttemptValidation = $validation->fresh();
+
+        if (! $publishAttemptValidation['report']['project']['status']) {
+            $project->release_date = $originalReleaseDate;
+            $project->save();
+            $project->refresh();
+
+            // The publish-now attempt validates against today's release date, which can
+            // change the persisted validation report (e.g. DOI required). If publishing
+            // fails, restore the validation report to match the original release date.
+            if ($project->validation) {
+                $project->validation->process();
+            }
+
+            $message = 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de';
+
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json([
+                    'errors' => $message,
+                    'validation' => $publishAttemptValidation,
+                ], 422);
+            }
+
+            session()->now(
+                'publish_validation_hints',
+                $this->publishValidationHintsFromReport($publishAttemptValidation->report)
+            );
+
+            throw ValidationException::withMessages([
+                'publish' => $message,
+            ]);
+        }
+
+        $result = $embargoPublisher->publish($project);
+
+        return $this->publishPrefersJsonResponse($request)
+            ? response()->json([
+                'project' => $project->fresh(),
+                'validation' => $publishAttemptValidation,
+            ])
+            : back()->with('success', $result['dispatched'] === 'async'
+                ? 'Your submission has been queued for processing.'
+                : 'Project published successfully');
     }
 
     public function destroy(Request $request, StatefulGuard $guard, Project $project, DeleteProject $creator)

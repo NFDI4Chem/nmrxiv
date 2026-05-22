@@ -2,12 +2,17 @@
 
 namespace Tests\Feature\Project;
 
+use App\Jobs\ProcessSubmission;
+use App\Models\Citation;
+use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 
 class UpdateProjectTest extends ProjectFeatureTestCase
 {
@@ -45,6 +50,7 @@ class UpdateProjectTest extends ProjectFeatureTestCase
             'description' => 'Original description',
             'is_public' => false,
             'license_id' => $this->license->id,
+            'validation_id' => null,
         ]);
 
         // Attach users with different roles
@@ -509,15 +515,10 @@ class UpdateProjectTest extends ProjectFeatureTestCase
         $response = $this->actingAs($this->viewer)
             ->put("/dashboard/projects/{$this->project->id}/updateReleaseDate", $updateData);
 
-        // NOTE: This test currently fails because updateReleaseDate method
-        // is missing authorization check (bug in controller)
-        // It should return 403 but actually returns 302 (success)
-        $response->assertStatus(302);
-        $response->assertSessionHas('success', "Project's release date updated successfully");
+        $response->assertForbidden();
 
         $this->project->refresh();
-        // Since the update actually succeeds (due to missing auth), the date is set
-        $this->assertNotNull($this->project->release_date);
+        $this->assertNull($this->project->release_date);
     }
 
     public function test_project_release_date_update_response_includes_success_message()
@@ -650,5 +651,94 @@ class UpdateProjectTest extends ProjectFeatureTestCase
             ->get("/dashboard/projects/{$embargoProject->id}?edit=release_date");
 
         $this->assertInertiaPageComponent($response, 'Project/Show');
+    }
+
+    public function test_project_owner_can_publish_overdue_embargo_project_via_release_now_route(): void
+    {
+        Queue::fake();
+        config(['validations.embargo_release_now_pass.project' => []]);
+        config(['validations.embargo_release_now_pass.study' => []]);
+        config(['validations.embargo_release_now_pass.dataset' => []]);
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'project_enabled' => true,
+        ]);
+        $validation = Validation::factory()->passed()->create();
+        $embargoProject = Project::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'is_public' => false,
+            'status' => 'embargo',
+            'doi' => '10.5281/nmrxiv.release-now',
+            'release_date' => now()->subDay(),
+            'draft_id' => $draft->id,
+            'validation_id' => $validation->id,
+            'schema_version' => 'embargo_release_now_pass',
+        ]);
+        $embargoProject->users()->attach($this->owner, ['role' => 'creator']);
+        $citation = Citation::factory()->create(['doi' => '10.1234/citation']);
+        $embargoProject->citations()->attach($citation->id, [
+            'user' => $this->owner->id,
+        ]);
+
+        $response = $this->actingAs($this->owner)
+            ->withHeader('X-Inertia', 'true')
+            ->from('/dashboard/projects')
+            ->put("/dashboard/projects/{$embargoProject->id}/releaseNow");
+
+        $response->assertRedirect('/dashboard/projects');
+        $response->assertSessionHas('success', 'Your submission has been queued for processing.');
+
+        $embargoProject->refresh();
+        $this->assertSame('queued', $embargoProject->status);
+        $this->assertSame(now()->startOfDay()->toDateString(), $embargoProject->release_date->toDateString());
+        Queue::assertPushed(ProcessSubmission::class, fn (ProcessSubmission $job) => $job->project->id === $embargoProject->id);
+    }
+
+    public function test_release_now_returns_validation_report_when_embargo_project_fails_validation(): void
+    {
+        Queue::fake();
+        config(['validations.embargo_release_now_fail.project' => [
+            'citations' => 'required',
+        ]]);
+        config(['validations.embargo_release_now_fail.study' => []]);
+        config(['validations.embargo_release_now_fail.dataset' => []]);
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'project_enabled' => true,
+        ]);
+        $validation = Validation::factory()->passed()->create();
+        $originalReleaseDate = now()->subDays(3);
+        $embargoProject = Project::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'is_public' => false,
+            'status' => 'embargo',
+            'doi' => '10.5281/nmrxiv.release-now-validation',
+            'release_date' => $originalReleaseDate,
+            'draft_id' => $draft->id,
+            'validation_id' => $validation->id,
+            'schema_version' => 'embargo_release_now_fail',
+        ]);
+        $embargoProject->users()->attach($this->owner, ['role' => 'creator']);
+
+        $response = $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$embargoProject->id}/releaseNow");
+
+        $response->assertStatus(422)
+            ->assertJsonPath('errors', 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de')
+            ->assertJsonPath('validation.report.project.status', false)
+            ->assertJsonPath('validation.report.project.citations', 'false|required');
+
+        $embargoProject->refresh();
+        $this->assertSame('embargo', $embargoProject->status);
+        $this->assertSame($originalReleaseDate->toDateString(), $embargoProject->release_date->toDateString());
+        Queue::assertNothingPushed();
     }
 }
