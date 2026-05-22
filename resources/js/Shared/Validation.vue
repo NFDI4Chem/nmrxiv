@@ -93,7 +93,10 @@
                                     Name
                                 </p>
                                 <a
-                                    v-if="!getStatus(validation.project.title)"
+                                    v-if="
+                                        showEditLinks &&
+                                        !getStatus(validation.project.title)
+                                    "
                                     target="_blank"
                                     :href="
                                         route('publish', project.draft_id) +
@@ -117,6 +120,7 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
                                         !getStatus(
                                             validation.project.description
                                         )
@@ -144,6 +148,7 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
                                         !getStatus(validation.project.keywords)
                                     "
                                     target="_blank"
@@ -169,6 +174,7 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
                                         !getStatus(validation.project.citations)
                                     "
                                     target="_blank"
@@ -194,6 +200,7 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
                                         !getStatus(validation.project.authors)
                                     "
                                     target="_blank"
@@ -219,6 +226,7 @@
                                 </p>
                                 <a
                                     v-if="
+                                        showEditLinks &&
                                         !getStatus(validation.project.license)
                                     "
                                     target="_blank"
@@ -243,7 +251,10 @@
                                     Project profile image
                                 </p>
                                 <a
-                                    v-if="!getStatus(validation.project.image)"
+                                    v-if="
+                                        showEditLinks &&
+                                        !getStatus(validation.project.image)
+                                    "
                                     target="_blank"
                                     :href="
                                         route('publish', project.draft_id) +
@@ -360,6 +371,7 @@
                                                     </p>
                                                     <a
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.keywords
                                                             )
@@ -388,6 +400,7 @@
                                                     </p>
                                                     <span
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.sample
                                                             )
@@ -424,6 +437,7 @@
                                                     </p>
                                                     <a
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.nmrium_info
                                                             )
@@ -455,6 +469,7 @@
                                                     </p>
                                                     <a
                                                         v-if="
+                                                            showEditLinks &&
                                                             !getStatus(
                                                                 study.molecules
                                                             )
@@ -531,6 +546,7 @@
                                                                 </p>
                                                                 <span
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.files
                                                                         )
@@ -571,6 +587,7 @@
                                                                 </p>
                                                                 <a
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.nmrium_info
                                                                         )
@@ -605,6 +622,7 @@
                                                                 </p>
                                                                 <span
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.assay
                                                                         )
@@ -629,6 +647,7 @@
                                                                 </p>
                                                                 <a
                                                                     v-if="
+                                                                        showEditLinks &&
                                                                         !getStatus(
                                                                             dataset.assignments
                                                                         )
@@ -713,6 +732,10 @@ export default {
         validation: Object,
         mode: String,
         draft: Number,
+        showEditLinks: {
+            type: Boolean,
+            default: true,
+        },
     },
     methods: {
         getStatus(value) {

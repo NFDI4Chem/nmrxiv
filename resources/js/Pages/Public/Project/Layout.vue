@@ -654,15 +654,52 @@
                         class="rounded-md bg-red-50 p-4 dark:bg-red-950/40"
                         role="alert"
                     >
-                        <p
-                            class="text-sm font-medium text-red-800 dark:text-red-200"
-                        >
-                            Could not update release date
-                        </p>
-                        <p class="mt-1 text-sm text-red-700 dark:text-red-300">
-                            {{ releaseDateModalError }}
-                        </p>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg
+                                    class="h-5 w-5 text-red-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3
+                                    class="text-sm font-medium text-red-800 dark:text-red-200"
+                                >
+                                    Error publishing your project
+                                </h3>
+                                <div
+                                    class="mt-2 text-sm text-red-700 dark:text-red-300"
+                                >
+                                    <ul
+                                        role="list"
+                                        class="list-disc space-y-1 pl-5"
+                                    >
+                                        <li>
+                                            {{ releaseDateModalError }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="releaseDateValidation" class="mb-5">
+                    <Validation
+                        :project="dashboardProject"
+                        :validation="releaseDateValidation"
+                        :draft="dashboardProject?.draft_id"
+                        :show-edit-links="false"
+                    />
                 </div>
 
                 <label
@@ -750,11 +787,13 @@
                         :class="{
                             'opacity-25':
                                 releaseDateForm.processing ||
+                                releaseNowProcessing ||
                                 !releaseDateAck.terms ||
                                 !releaseDateAck.conditions,
                         }"
                         :disabled="
                             releaseDateForm.processing ||
+                            releaseNowProcessing ||
                             !releaseDateAck.terms ||
                             !releaseDateAck.conditions
                         "
@@ -813,8 +852,13 @@
 
                 <jet-success-button
                     class="ml-2"
-                    :class="{ 'opacity-25': releaseDateForm.processing }"
-                    :disabled="releaseDateForm.processing"
+                    :class="{
+                        'opacity-25':
+                            releaseDateForm.processing || releaseNowProcessing,
+                    }"
+                    :disabled="
+                        releaseDateForm.processing || releaseNowProcessing
+                    "
                     @click="submitPublishNow"
                 >
                     Publish Now
@@ -851,6 +895,7 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import { Link, router } from "@inertiajs/vue3";
+import Validation from "@/Shared/Validation.vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/vue/24/solid";
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/vue/24/outline";
@@ -875,6 +920,7 @@ export default {
         JetSecondaryButton,
         JetSuccessButton,
         Datepicker,
+        Validation,
         Link, // Inertia.js Link component for navigation
         Menu,
         MenuButton,
@@ -932,6 +978,8 @@ export default {
             showReleaseDateModal: false,
             confirmingPublishNow: false,
             releaseDateModalError: null,
+            releaseDateValidation: null,
+            releaseNowProcessing: false,
             releaseDateAck: {
                 conditions: false,
                 terms: false,
@@ -1221,6 +1269,7 @@ export default {
             this.confirmingPublishNow = false;
             this.releaseDateAck = { conditions: false, terms: false };
             this.releaseDateModalError = null;
+            this.releaseDateValidation = null;
             this.releaseDateForm.name = p.name;
             this.releaseDateForm.enableProjectMode = Boolean(
                 p.enableProjectMode ?? p.enable_project_mode
@@ -1235,11 +1284,13 @@ export default {
             this.showReleaseDateModal = false;
             this.confirmingPublishNow = false;
             this.releaseDateModalError = null;
+            this.releaseDateValidation = null;
         },
 
         confirmPublishNow() {
             if (
                 this.releaseDateForm.processing ||
+                this.releaseNowProcessing ||
                 !this.releaseDateAck.conditions ||
                 !this.releaseDateAck.terms ||
                 !this.dashboardProject?.id
@@ -1287,6 +1338,7 @@ export default {
                 return;
             }
             this.releaseDateModalError = null;
+            this.releaseDateValidation = null;
             this.releaseDateForm.put(
                 this.route(
                     "dashboard.project.updateReleaseDate",
@@ -1319,38 +1371,55 @@ export default {
             if (
                 !this.releaseDateAck.conditions ||
                 !this.releaseDateAck.terms ||
-                !this.dashboardProject?.id
+                !this.dashboardProject?.id ||
+                this.releaseNowProcessing
             ) {
                 return;
             }
 
             this.releaseDateModalError = null;
-            this.releaseDateForm.put(
-                this.route(
-                    "dashboard.project.publishEmbargoProject",
-                    this.dashboardProject.id
-                ),
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        this.showReleaseDateModal = false;
-                        router.reload({ only: ["project", "workspace"] });
-                    },
-                    onError: (errors) => {
+            this.releaseDateValidation = null;
+            this.releaseNowProcessing = true;
+
+            axios
+                .put(
+                    this.route(
+                        "dashboard.project.publishEmbargoProject",
+                        this.dashboardProject.id
+                    ),
+                    this.releaseDateForm.data()
+                )
+                .then(() => {
+                    this.showReleaseDateModal = false;
+                    router.reload({ only: ["project", "workspace"] });
+                })
+                .catch((error) => {
+                    const payload = error.response?.data ?? {};
+                    const errors = payload.errors;
+                    this.releaseDateValidation =
+                        payload.validation?.report ?? null;
+
+                    if (typeof errors === "string") {
+                        this.releaseDateModalError = errors;
+                        return;
+                    }
+
+                    if (errors && typeof errors === "object") {
                         const keys = Object.keys(errors);
-                        if (keys.length === 0) {
-                            this.releaseDateModalError =
-                                "Could not publish project.";
-                        } else {
-                            const k = keys[0];
-                            const v = errors[k];
-                            this.releaseDateModalError = Array.isArray(v)
-                                ? v[0]
-                                : String(v ?? "Could not publish project.");
+                        if (keys.length > 0) {
+                            const value = errors[keys[0]];
+                            this.releaseDateModalError = Array.isArray(value)
+                                ? value[0]
+                                : String(value ?? "Could not publish project.");
+                            return;
                         }
-                    },
-                }
-            );
+                    }
+
+                    this.releaseDateModalError = "Could not publish project.";
+                })
+                .finally(() => {
+                    this.releaseNowProcessing = false;
+                });
         },
 
         /**
