@@ -95,11 +95,12 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.title)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=title#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -121,13 +122,14 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(
                                             validation.project.description
                                         )
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=description#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -149,11 +151,12 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.keywords)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=keywords#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -175,11 +178,12 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.citations)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=citation#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -201,11 +205,12 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.authors)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=authors#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -227,11 +232,12 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.license)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=license#publish-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -253,11 +259,12 @@
                                 <a
                                     v-if="
                                         showEditLinks &&
+                                        effectiveDraftId &&
                                         !getStatus(validation.project.image)
                                     "
                                     target="_blank"
                                     :href="
-                                        route('publish', project.draft_id) +
+                                        route('publish', effectiveDraftId) +
                                         '?edit=profile_image#publish-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -735,6 +742,11 @@ export default {
         showEditLinks: {
             type: Boolean,
             default: true,
+        },
+    },
+    computed: {
+        effectiveDraftId() {
+            return this.draft ?? this.project?.draft_id ?? null;
         },
     },
     methods: {

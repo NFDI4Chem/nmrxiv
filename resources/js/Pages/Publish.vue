@@ -2064,8 +2064,12 @@ export default {
                 this.showDraftWarningModal = true;
                 return;
             }
-            // Check if project has only one sample and project mode is enabled
+            // For public/immediate publication, warn when project mode is enabled
+            // but only one sample is present. For embargo publication, always
+            // proceed as a project (sample embargo is not supported).
+            const isEmbargoPublication = this.releaseVisibility === "embargo";
             if (
+                !isEmbargoPublication &&
                 this.project.studies &&
                 this.project.studies.length === 1 &&
                 this.publishForm.enableProjectMode
