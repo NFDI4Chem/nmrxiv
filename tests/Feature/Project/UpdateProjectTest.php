@@ -741,4 +741,31 @@ class UpdateProjectTest extends ProjectFeatureTestCase
         $this->assertSame($originalReleaseDate->toDateString(), $embargoProject->release_date->toDateString());
         Queue::assertNothingPushed();
     }
+
+    public function test_release_now_returns_error_when_embargo_project_validation_record_is_missing(): void
+    {
+        Queue::fake();
+
+        $embargoProject = Project::factory()->create([
+            'owner_id' => $this->owner->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'is_public' => false,
+            'status' => 'embargo',
+            'doi' => '10.5281/nmrxiv.release-now-missing-validation',
+            'release_date' => now()->subDay(),
+            'validation_id' => null,
+        ]);
+        $embargoProject->users()->attach($this->owner, ['role' => 'creator']);
+
+        $response = $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$embargoProject->id}/releaseNow");
+
+        $response->assertStatus(422)
+            ->assertJsonPath('errors', 'Project validation not found. Please ensure the project is properly configured.');
+
+        $embargoProject->refresh();
+        $this->assertSame('embargo', $embargoProject->status);
+        Queue::assertNothingPushed();
+    }
 }

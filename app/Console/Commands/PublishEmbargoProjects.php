@@ -3,12 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Actions\Project\PublishEmbargoProject;
+use App\Exceptions\EmbargoPublicationFailed;
 use App\Models\EmbargoReminder;
 use App\Models\Project;
+use App\Models\User;
+use App\Models\Validation;
+use App\Notifications\EmbargoPublicationFailedNotification;
 use App\Notifications\EmbargoReleaseReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Notification;
+use Throwable;
 
 class PublishEmbargoProjects extends Command
 {
@@ -120,19 +125,43 @@ class PublishEmbargoProjects extends Command
             try {
                 $this->info("Publishing embargo project: {$project->name} (ID: {$project->id})");
 
-                $result = $embargoPublisher->publish($project);
+                $embargoPublisher->publish($project, restoreReleaseDateOnValidationFailure: true);
 
                 $publishedCount++;
                 $this->info("Successfully queued project for publication: {$project->name}");
 
-            } catch (\InvalidArgumentException $e) {
+            } catch (EmbargoPublicationFailed $e) {
                 $this->error("Failed to publish project {$project->name}: {$e->getMessage()}");
-            } catch (\Exception $e) {
+                $this->notifyPublicationFailure($project, $e->getMessage(), $e->validation, $e);
+            } catch (Throwable $e) {
                 $this->error("Unexpected error publishing project {$project->name}: {$e->getMessage()}");
+                $this->notifyPublicationFailure($project, $e->getMessage(), $project->validation?->fresh(), $e);
             }
         }
 
         return $publishedCount;
+    }
+
+    private function notifyPublicationFailure(Project $project, string $reason, ?Validation $validation = null, ?Throwable $exception = null): void
+    {
+        $project->loadMissing('owner');
+        $exceptionClass = $exception ? $exception::class : null;
+
+        if ($project->owner) {
+            Notification::send(
+                $project->owner,
+                new EmbargoPublicationFailedNotification($project, $reason, $validation, $exceptionClass)
+            );
+        }
+
+        $admins = User::role(['super-admin'])
+            ->when($project->owner, fn ($query) => $query->whereKeyNot($project->owner->getKey()))
+            ->get();
+
+        Notification::send(
+            $admins,
+            new EmbargoPublicationFailedNotification($project, $reason, $validation, $exceptionClass, admin: true)
+        );
     }
 
     /**

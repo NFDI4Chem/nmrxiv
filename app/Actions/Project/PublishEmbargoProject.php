@@ -2,8 +2,10 @@
 
 namespace App\Actions\Project;
 
+use App\Exceptions\EmbargoPublicationFailed;
 use App\Jobs\ProcessSubmission;
 use App\Models\Project;
+use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -17,9 +19,9 @@ class PublishEmbargoProject
      * so we dispatch asynchronously. When there is no draft, we dispatch synchronously so a
      * "publish now" path can take effect immediately.
      *
-     * @return array{hasDraft: bool, dispatched: 'sync'|'async'}
+     * @return array{hasDraft: bool, dispatched: 'sync'|'async', validation: Validation}
      */
-    public function publish(Project $project): array
+    public function publish(Project $project, bool $restoreReleaseDateOnValidationFailure = false): array
     {
         if ($project->is_public) {
             throw ValidationException::withMessages([
@@ -45,8 +47,8 @@ class PublishEmbargoProject
             ]);
         }
 
+        $validation = $this->validateForPublication($project, $restoreReleaseDateOnValidationFailure);
         $releaseDate = now()->startOfDay()->toDateString();
-
         $hasDraft = $project->draft_id !== null;
 
         DB::transaction(function () use ($project, $releaseDate) {
@@ -73,6 +75,7 @@ class PublishEmbargoProject
             return [
                 'hasDraft' => true,
                 'dispatched' => 'async',
+                'validation' => $validation,
             ];
         }
 
@@ -81,6 +84,46 @@ class PublishEmbargoProject
         return [
             'hasDraft' => false,
             'dispatched' => 'sync',
+            'validation' => $validation,
         ];
+    }
+
+    private function validateForPublication(Project $project, bool $restoreReleaseDateOnValidationFailure): Validation
+    {
+        $validation = $project->validation;
+
+        if (! $validation) {
+            throw ValidationException::withMessages([
+                'publish' => 'Project validation not found. Please ensure the project is properly configured.',
+            ]);
+        }
+
+        $originalReleaseDate = $project->release_date;
+
+        $project->release_date = now()->startOfDay()->toDateString();
+        $project->save();
+
+        $validation->process();
+        $publishAttemptValidation = $validation->fresh();
+
+        if (! $publishAttemptValidation['report']['project']['status']) {
+            if ($restoreReleaseDateOnValidationFailure) {
+                $project->release_date = $originalReleaseDate;
+                $project->save();
+                $project->refresh();
+
+                if ($project->validation) {
+                    $project->validation->process();
+                }
+            }
+
+            throw new EmbargoPublicationFailed(
+                $project,
+                'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de',
+                $publishAttemptValidation,
+            );
+        }
+
+        return $publishAttemptValidation;
     }
 }

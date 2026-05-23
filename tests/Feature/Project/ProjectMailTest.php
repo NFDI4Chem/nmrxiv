@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Project;
 
+use App\Mail\EmbargoPublicationFailed;
 use App\Mail\EmbargoReleaseReminder;
 use App\Mail\ProjectArchival;
 use App\Mail\ProjectArchivalNotifyAdmins;
@@ -13,6 +14,8 @@ use App\Models\Project;
 use App\Models\ProjectInvitation as ProjectInvitationModel;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Validation;
+use App\Notifications\EmbargoPublicationFailedNotification;
 use App\Notifications\EmbargoReleaseReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -152,6 +155,129 @@ class ProjectMailTest extends TestCase
         $this->assertSame(['mail'], $notification->via($this->owner));
         $this->assertInstanceOf(Mailable::class, $mail);
         $this->assertSame([$this->owner->email], collect($mail->to)->pluck('address')->all());
+    }
+
+    public function test_embargo_publication_failed_mail_renders_validation_details(): void
+    {
+        $validation = Validation::factory()->create([
+            'report' => [
+                'project' => [
+                    'status' => false,
+                    'title' => 'true|required',
+                    'description' => 'false|required',
+                    'keywords' => 'false|array|min:1',
+                    'citations' => 'false|required',
+                    'authors' => 'true|required',
+                    'license' => 'true|required',
+                    'image' => 'true|required',
+                    'citations_detail' => [
+                        [
+                            'name' => 'Citation without DOI',
+                            'doi' => 'false|required',
+                            'status' => false,
+                        ],
+                    ],
+                    'studies' => [],
+                ],
+                'missing' => [],
+                'errors' => [],
+                'version' => 1,
+            ],
+        ]);
+
+        $mailable = new EmbargoPublicationFailed(
+            $this->project,
+            'Validation failing.',
+            $validation,
+            EmbargoPublicationFailedNotification::class,
+            admin: true,
+        );
+        $content = $mailable->render();
+
+        $this->assertStringContainsString($this->project->name, $content);
+        $this->assertStringContainsString('Project description', $content);
+        $this->assertStringContainsString('Citation without DOI: DOI', $content);
+        $this->assertStringNotContainsString('Project keywords', $content);
+        $this->assertStringNotContainsString('Project citations', $content);
+        $this->assertStringContainsString(EmbargoPublicationFailedNotification::class, $content);
+    }
+
+    public function test_embargo_publication_failed_mail_renders_nested_required_failures(): void
+    {
+        $validation = Validation::factory()->create([
+            'report' => [
+                'project' => [
+                    'status' => false,
+                    'title' => 'true|required',
+                    'description' => 'true|required',
+                    'keywords' => 'true|array|min:1',
+                    'citations' => 'true|required',
+                    'authors' => 'true|required',
+                    'license' => 'true|required',
+                    'image' => 'true|required',
+                    'citations_detail' => [
+                        [
+                            'doi' => 'false|required',
+                            'status' => false,
+                        ],
+                    ],
+                    'studies' => [
+                        [
+                            'name' => 'compound_01',
+                            'title' => 'true|required',
+                            'description' => 'false|required',
+                            'keywords' => 'false|array|min:1',
+                            'sample' => 'false|required',
+                            'nmrium_info' => 'false|required',
+                            'molecules' => 'false|required|array|min:1',
+                            'datasets' => [
+                                [
+                                    'name' => 'dataset_01',
+                                    'files' => 'false|required',
+                                    'nmrium_info' => 'false|array|min:1',
+                                    'assay' => 'false|array|min:1',
+                                    'assignments' => 'false|array|min:1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'missing' => [],
+                'errors' => [],
+                'version' => 1,
+            ],
+        ]);
+
+        $content = (new EmbargoPublicationFailed($this->project, 'Validation failing.', $validation))->render();
+
+        $this->assertStringContainsString('Citation 1: DOI', $content);
+        $this->assertStringContainsString('compound_01: sample description', $content);
+        $this->assertStringContainsString('compound_01: sample metadata', $content);
+        $this->assertStringContainsString('compound_01: spectra', $content);
+        $this->assertStringContainsString('compound_01: compound information', $content);
+        $this->assertStringContainsString('dataset_01: files', $content);
+        $this->assertStringNotContainsString('compound_01: sample keywords', $content);
+        $this->assertStringNotContainsString('dataset_01: assignments', $content);
+    }
+
+    public function test_embargo_publication_failed_notification_builds_mail_message(): void
+    {
+        $notification = new EmbargoPublicationFailedNotification(
+            $this->project,
+            'Validation failing.',
+            exceptionClass: \RuntimeException::class,
+            admin: true,
+        );
+        $mail = $notification->toMail($this->owner);
+        $content = $mail->render();
+
+        $this->assertInstanceOf(ShouldQueue::class, $notification);
+        $this->assertSame(['mail'], $notification->via($this->owner));
+        $this->assertSame([], $notification->toArray($this->owner));
+        $this->assertInstanceOf(Mailable::class, $mail);
+        $this->assertSame([$this->owner->email], collect($mail->to)->pluck('address')->all());
+        $this->assertStringContainsString(\RuntimeException::class, $content);
+        $this->assertStringNotContainsString('Required items to complete', $content);
     }
 
     public function test_project_deletion_mail_can_be_rendered(): void
