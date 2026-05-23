@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Project;
 
+use App\Mail\EmbargoPublicationFailed;
 use App\Mail\EmbargoReleaseReminder;
 use App\Mail\ProjectArchival;
 use App\Mail\ProjectArchivalNotifyAdmins;
@@ -13,6 +14,8 @@ use App\Models\Project;
 use App\Models\ProjectInvitation as ProjectInvitationModel;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Validation;
+use App\Notifications\EmbargoPublicationFailedNotification;
 use App\Notifications\EmbargoReleaseReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -152,6 +155,51 @@ class ProjectMailTest extends TestCase
         $this->assertSame(['mail'], $notification->via($this->owner));
         $this->assertInstanceOf(Mailable::class, $mail);
         $this->assertSame([$this->owner->email], collect($mail->to)->pluck('address')->all());
+    }
+
+    public function test_embargo_publication_failed_mail_renders_validation_details(): void
+    {
+        $validation = Validation::factory()->create([
+            'report' => [
+                'project' => [
+                    'status' => false,
+                    'title' => 'true|required',
+                    'description' => 'false|required',
+                    'keywords' => 'false|array|min:1',
+                    'citations' => 'false|required',
+                    'authors' => 'true|required',
+                    'license' => 'true|required',
+                    'image' => 'true|required',
+                    'citations_detail' => [
+                        [
+                            'name' => 'Citation without DOI',
+                            'doi' => 'false|required',
+                            'status' => false,
+                        ],
+                    ],
+                    'studies' => [],
+                ],
+                'missing' => [],
+                'errors' => [],
+                'version' => 1,
+            ],
+        ]);
+
+        $mailable = new EmbargoPublicationFailed(
+            $this->project,
+            'Validation failing.',
+            $validation,
+            EmbargoPublicationFailedNotification::class,
+            admin: true,
+        );
+        $content = $mailable->render();
+
+        $this->assertStringContainsString($this->project->name, $content);
+        $this->assertStringContainsString('Project description', $content);
+        $this->assertStringContainsString('Citation without DOI: DOI', $content);
+        $this->assertStringNotContainsString('Project keywords', $content);
+        $this->assertStringNotContainsString('Project citations', $content);
+        $this->assertStringContainsString(EmbargoPublicationFailedNotification::class, $content);
     }
 
     public function test_project_deletion_mail_can_be_rendered(): void

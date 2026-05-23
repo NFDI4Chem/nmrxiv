@@ -10,6 +10,7 @@ use App\Actions\Project\PublishEmbargoProject;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
+use App\Exceptions\EmbargoPublicationFailed;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
 use App\Jobs\ProcessSubmission;
@@ -650,63 +651,38 @@ class ProjectController extends Controller
             throw new AuthorizationException;
         }
 
-        $validation = $project->validation;
-        if (! $validation) {
+        try {
+            $result = $embargoPublisher->publish($project, restoreReleaseDateOnValidationFailure: true);
+        } catch (EmbargoPublicationFailed $e) {
             if ($this->publishPrefersJsonResponse($request)) {
                 return response()->json([
-                    'errors' => 'Project validation not found. Please ensure the project is properly configured.',
-                ], 422);
-            }
-
-            throw ValidationException::withMessages([
-                'publish' => 'Project validation not found. Please ensure the project is properly configured.',
-            ]);
-        }
-
-        $originalReleaseDate = $project->release_date;
-        $project->release_date = now()->startOfDay()->toDateString();
-        $project->save();
-
-        $validation->process();
-        $publishAttemptValidation = $validation->fresh();
-
-        if (! $publishAttemptValidation['report']['project']['status']) {
-            $project->release_date = $originalReleaseDate;
-            $project->save();
-            $project->refresh();
-
-            // The publish-now attempt validates against today's release date, which can
-            // change the persisted validation report (e.g. DOI required). If publishing
-            // fails, restore the validation report to match the original release date.
-            if ($project->validation) {
-                $project->validation->process();
-            }
-
-            $message = 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us at info.nmrxiv@uni-jena.de';
-
-            if ($this->publishPrefersJsonResponse($request)) {
-                return response()->json([
-                    'errors' => $message,
-                    'validation' => $publishAttemptValidation,
+                    'errors' => $e->getMessage(),
+                    'validation' => $e->validation,
                 ], 422);
             }
 
             session()->now(
                 'publish_validation_hints',
-                $this->publishValidationHintsFromReport($publishAttemptValidation->report)
+                $this->publishValidationHintsFromReport($e->validation?->report)
             );
 
             throw ValidationException::withMessages([
-                'publish' => $message,
+                'publish' => $e->getMessage(),
             ]);
-        }
+        } catch (ValidationException $e) {
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json([
+                    'errors' => $e->errors()['publish'][0] ?? $e->getMessage(),
+                ], 422);
+            }
 
-        $result = $embargoPublisher->publish($project);
+            throw $e;
+        }
 
         return $this->publishPrefersJsonResponse($request)
             ? response()->json([
                 'project' => $project->fresh(),
-                'validation' => $publishAttemptValidation,
+                'validation' => $result['validation'],
             ])
             : back()->with('success', $result['dispatched'] === 'async'
                 ? 'Your submission has been queued for processing.'
