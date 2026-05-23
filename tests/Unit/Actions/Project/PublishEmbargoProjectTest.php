@@ -10,6 +10,7 @@ use App\Models\Draft;
 use App\Models\Project;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
@@ -123,6 +124,35 @@ class PublishEmbargoProjectTest extends TestCase
         $this->assertSame('queued', $project->status);
         $this->assertSame(now()->startOfDay()->toDateString(), $project->release_date->toDateString());
         Queue::assertPushed(ProcessSubmission::class, fn (ProcessSubmission $job) => $job->project->id === $project->id);
+    }
+
+    public function test_publish_without_draft_dispatches_processing_synchronously(): void
+    {
+        Bus::fake();
+        config(['validations.embargo_action_sync_pass.project' => []]);
+        config(['validations.embargo_action_sync_pass.study' => []]);
+        config(['validations.embargo_action_sync_pass.dataset' => []]);
+
+        $validation = Validation::factory()->passed()->create();
+        $project = Project::factory()->create([
+            'is_public' => false,
+            'status' => 'embargo',
+            'doi' => '10.1234/embargo-sync',
+            'release_date' => now()->subDay(),
+            'draft_id' => null,
+            'validation_id' => $validation->id,
+            'schema_version' => 'embargo_action_sync_pass',
+        ]);
+        $citation = Citation::factory()->create(['doi' => '10.1234/sync-citation']);
+        $project->citations()->attach($citation->id);
+
+        $result = $this->action->publish($project);
+
+        $project->refresh();
+        $this->assertSame(false, $result['hasDraft']);
+        $this->assertSame('sync', $result['dispatched']);
+        $this->assertSame('queued', $project->status);
+        Bus::assertDispatchedSync(ProcessSubmission::class, fn (ProcessSubmission $job) => $job->project->id === $project->id);
     }
 
     public function test_publish_rejects_embargo_project_when_validation_fails(): void
