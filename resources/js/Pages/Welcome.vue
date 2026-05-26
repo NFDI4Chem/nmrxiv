@@ -1092,7 +1092,7 @@ const footerNavigation = {
     ],
     About: [
         {
-            name: "Adivsory Board",
+            name: "Advisory Board",
             href: "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee",
         },
     ],
