@@ -424,6 +424,7 @@ class DraftFeatureTest extends TestCase
 
         $this->assertNotEmpty($content);
         $this->assertStringContainsString($project->name, $content);
+        $this->assertStringContainsString('You are receiving this email because you are on the nmrXiv admin list.', $content);
     }
 
     public function test_draft_processed_notify_admins_mail_has_project_property(): void
@@ -470,6 +471,7 @@ class DraftFeatureTest extends TestCase
         $content = $mailable->render();
 
         $this->assertStringContainsString('A project has been published and is now publicly available on nmrXiv.', $content);
+        $this->assertStringContainsString('You are receiving this email because you are on the nmrXiv admin list.', $content);
         $this->assertStringNotContainsString('published as Embargo', $content);
     }
 
@@ -488,6 +490,7 @@ class DraftFeatureTest extends TestCase
         $content = $mailable->render();
 
         $this->assertNotEmpty($content);
+        $this->assertStringContainsString('You are receiving this email because you are on the nmrXiv admin list.', $content);
     }
 
     public function test_draft_processed_notify_admins_mail_has_studies_property(): void

@@ -27,9 +27,13 @@ The embargo release for **{{ $project->name }}** could not be completed automati
 - Exception: {{ $exceptionClass }}
 @endif
 
+@if($admin)
+You are receiving this email because you are on the nmrXiv admin list.
+@else
 Please review the project and complete the missing information before trying again.
 
 If you need help, please contact us at {{ env('MAIL_FROM_ADDRESS') }}.
+@endif
 
 Regards,
 
