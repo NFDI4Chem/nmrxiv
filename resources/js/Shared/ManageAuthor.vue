@@ -906,8 +906,8 @@ export default {
          */
         loadInitial() {
             if (this.project && this.project.authors) {
-                this.authors = this.project.authors.sort(
-                    (a, b) => a.pivot.sort_order - b.pivot.sort_order
+                this.authors = [...this.project.authors].sort(
+                    (a, b) => this.authorSortOrder(a) - this.authorSortOrder(b)
                 );
             }
             this.form.contributor_type = {};
@@ -954,7 +954,7 @@ export default {
         onClose() {
             if (this.isEdit && this.selectedAuthor) {
                 this.authors.splice(
-                    this.selectedAuthor.pivot.sort_order,
+                    this.authorSortOrder(this.selectedAuthor),
                     0,
                     this.selectedAuthor
                 );
@@ -1000,10 +1000,10 @@ export default {
             this.form.affiliation = author.affiliation;
             this.form.ror_id = author.ror_id || null;
             this.form.orcid_id = author.orcid_id;
-            this.form.contributor_type = {};
-            this.form.contributor_type.title = author.pivot
-                ? author.pivot.contributor_type
-                : null;
+            this.form.contributor_type =
+                this.contributorType.find(
+                    (role) => role.title === this.authorContributorType(author)
+                ) || this.contributorType[0];
 
             this.displayAddAuthorForms = true;
             this.isEdit = true;
@@ -1351,7 +1351,7 @@ export default {
             if (this.authors.length > 0) {
                 if (this.selectedAuthor) {
                     this.authors.splice(
-                        this.selectedAuthor.pivot.sort_order,
+                        this.authorSortOrder(this.selectedAuthor),
                         0,
                         newAuthor
                     );
@@ -1584,7 +1584,7 @@ export default {
         onBack() {
             if (this.selectedAuthor) {
                 this.authors.splice(
-                    this.selectedAuthor.pivot.sort_order,
+                    this.authorSortOrder(this.selectedAuthor),
                     0,
                     this.selectedAuthor
                 );
@@ -1592,6 +1592,18 @@ export default {
             this.displayAddAuthorForms = false;
             this.isEdit = false;
             this.selectedAuthor = null;
+        },
+
+        authorContributorType(author) {
+            return (
+                author?.pivot?.contributor_type ||
+                author?.contributor_type ||
+                "Researcher"
+            );
+        },
+
+        authorSortOrder(author) {
+            return author?.pivot?.sort_order ?? author?.sort_order ?? 0;
         },
 
         /**
