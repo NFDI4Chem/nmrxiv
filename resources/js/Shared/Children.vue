@@ -83,6 +83,12 @@
                                     alt="Varian"
                                 />
                                 <img
+                                    v-else-if="file.instrument_type == 'magritek'"
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    src="/img/magritek.png"
+                                    alt="Magritek"
+                                />
+                                <img
                                     v-else-if="file.instrument_type == 'joel'"
                                     class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/joel.jpg"
@@ -254,6 +260,15 @@
                                                                     class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/varian.jpeg"
                                                                     alt="Varian"
+                                                                />
+                                                                <img
+                                                                    v-else-if="
+                                                                        sfile.instrument_type ==
+                                                                        'magritek'
+                                                                    "
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    src="/img/magritek.png"
+                                                                    alt="Magritek"
                                                                 />
                                                                 <img
                                                                     v-else-if="

@@ -291,7 +291,7 @@ class ProcessDraft
                 ['status', '<>', 'missing'],
                 ['dataset_id', null],
             ])
-            ->whereIn('instrument_type', ['bruker', 'joel', 'varian'])
+            ->whereIn('instrument_type', ['bruker', 'joel', 'varian', 'magritek'])
             ->orderBy('type')
             ->get();
 

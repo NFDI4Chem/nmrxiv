@@ -9,10 +9,12 @@ use App\Models\Study;
 use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
 use App\Services\StorageSignedUrlService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Handle file system operations and signed URL generation for file uploads.
@@ -30,8 +32,8 @@ class FileSystemController extends Controller
     /**
      * Generate signed URLs for draft file uploads.
      *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ValidationException
+     * @throws ModelNotFoundException
      */
     public function signedDraftStorageURL(Request $request): JsonResponse
     {
@@ -71,8 +73,8 @@ class FileSystemController extends Controller
     /**
      * Generate signed URLs for project file uploads.
      *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ValidationException
+     * @throws ModelNotFoundException
      */
     public function signedStorageURL(Request $request): JsonResponse
     {
@@ -108,7 +110,7 @@ class FileSystemController extends Controller
     /**
      * Delete a filesystem object and all its children recursively.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function deleteFSO(Request $request, Draft $draft, FileSystemObject $filesystemobject): JsonResponse
     {
@@ -239,6 +241,8 @@ class FileSystemController extends Controller
                         $this->saveInstrumentType($folder, 'bruker');
                     } elseif ($this->isVarian($folder)) {
                         $this->saveInstrumentType($folder, 'varian');
+                    } elseif ($this->isMagritek($folder)) {
+                        $this->saveInstrumentType($folder, 'magritek');
                     } else {
                         $this->processFolder($folder->children, $draft);
                     }
@@ -268,6 +272,9 @@ class FileSystemController extends Controller
                         $this->saveModelType($folder->parent, 'study');
                     } elseif ($this->isVarian($folder)) {
                         $this->saveInstrumentType($folder, 'varian');
+                        $this->saveModelType($folder->parent, 'study');
+                    } elseif ($this->isMagritek($folder)) {
+                        $this->saveInstrumentType($folder, 'magritek');
                         $this->saveModelType($folder->parent, 'study');
                     } else {
                         $this->processFolder($folder->children);
@@ -347,6 +354,21 @@ class FileSystemController extends Controller
     public function isVarian($folder): bool
     {
         $fileTypes = ['fid', 'log', 'text', 'procpar'];
+        $children = $folder->children;
+        $names = $children->pluck('name')->toArray();
+        if (array_intersect($fileTypes, $names) == $fileTypes) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if folder contains Magritek Spinsolve instrument files.
+     */
+    public function isMagritek($folder): bool
+    {
+        $fileTypes = ['acqu.par', 'data.1d', 'processing.script'];
         $children = $folder->children;
         $names = $children->pluck('name')->toArray();
         if (array_intersect($fileTypes, $names) == $fileTypes) {

@@ -31,6 +31,19 @@ In the following photo, because there is an "HSQC" folder above the actual spect
 <figcaption>The samples in nmrXiv resulting from submitting the project in the above image.</figcaption>
 </p>
 
+## Magritek Datasets
+
+Magritek Spinsolve data is submitted as **folders** (one folder per experiment), similar to Bruker. Each experiment folder typically contains files such as `acqu.par`, `data.1d`, `processing.script`, and `spectrum.1d`.
+
+Example hierarchy:
+
+- Project folder (e.g. `nmrXiv_smallAcids`)
+  - Sample folder / study (e.g. `MethylTiglate`)
+    - Magritek experiment folder / dataset (e.g. `60MHz_MT_10000u_600u_CDCl3`)
+    - Optional NMReData or mol files at the study level (same folder as the experiment folders)
+
+Place each Spinsolve experiment folder directly under the sample folder. Do not add an extra wrapper folder above the experiment folder, or nmrXiv may treat that wrapper as a separate study.
+
 ## JCAMP Datasets
 
 [Following this link](https://cloud.uni-jena.de/s/CrNXN46N9GBQ7cG), you can download a project with two analyzed samples. The analysis output is provided in JCAMP format.  After unzipping, the project "JCAMP Example" is ready for submission.
