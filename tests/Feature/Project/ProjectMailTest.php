@@ -104,6 +104,7 @@ class ProjectMailTest extends TestCase
 
         $this->assertNotEmpty($content);
         $this->assertStringContainsString($this->project->name, $content);
+        $this->assertStringContainsString('You are receiving this email because you are on the nmrXiv admin list.', $content);
     }
 
     public function test_project_archival_notify_admins_mail_has_project_data(): void
@@ -200,6 +201,9 @@ class ProjectMailTest extends TestCase
         $this->assertStringNotContainsString('Project keywords', $content);
         $this->assertStringNotContainsString('Project citations', $content);
         $this->assertStringContainsString(EmbargoPublicationFailedNotification::class, $content);
+        $this->assertStringContainsString('You are receiving this email because you are on the nmrXiv admin list.', $content);
+        $this->assertStringNotContainsString('Please review the project and complete the missing information before trying again.', $content);
+        $this->assertStringNotContainsString('If you need help, please contact us', $content);
     }
 
     public function test_embargo_publication_failed_mail_renders_nested_required_failures(): void
@@ -278,6 +282,7 @@ class ProjectMailTest extends TestCase
         $this->assertSame([$this->owner->email], collect($mail->to)->pluck('address')->all());
         $this->assertStringContainsString(\RuntimeException::class, $content);
         $this->assertStringNotContainsString('Required items to complete', $content);
+        $this->assertStringContainsString('You are receiving this email because you are on the nmrXiv admin list.', $content);
     }
 
     public function test_project_deletion_mail_can_be_rendered(): void

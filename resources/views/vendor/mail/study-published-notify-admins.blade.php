@@ -1,6 +1,6 @@
 @component('mail::message')
 
-Hello admin,
+Dear admin,
 
 New samples have been published and are now publicly available on nmrXiv.
 
@@ -18,7 +18,7 @@ View Samples
 @endcomponent
 
 @component('mail::subcopy')
-You are receiving this email because you are part of the admin list in nmrXiv.
+You are receiving this email because you are on the nmrXiv admin list.
 @endcomponent
 
 @endcomponent
