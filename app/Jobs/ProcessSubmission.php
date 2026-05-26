@@ -17,6 +17,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,7 +28,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     /**
      * The project instance.
      *
-     * @var \App\Models\Project
+     * @var Project
      */
     public $project;
 
@@ -46,12 +47,31 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
      */
     public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher): void
     {
-        $project = $this->project;
+        $project = $this->project->fresh();
+
+        $draft = $project->draft;
+
+        if (! $draft) {
+            if (is_null($project->draft_id) && in_array($project->status, ['complete', 'published'], true)) {
+                return;
+            }
+
+            Log::warning('ProcessSubmission skipped: project has no associated draft', [
+                'project_id' => $project->id,
+                'draft_id' => $project->draft_id,
+                'status' => $project->status,
+            ]);
+
+            if ($project->status === 'processing') {
+                $project->status = 'queued';
+                $project->save();
+            }
+
+            return;
+        }
 
         $project->status = 'processing';
         $project->save();
-
-        $draft = $project->draft;
 
         if ($draft->project_enabled) {
             $logs = 'Moving files in progress';
