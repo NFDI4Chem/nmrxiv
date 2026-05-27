@@ -83,7 +83,9 @@
                                     alt="Varian"
                                 />
                                 <img
-                                    v-else-if="file.instrument_type == 'magritek'"
+                                    v-else-if="
+                                        file.instrument_type == 'magritek'
+                                    "
                                     class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/magritek.png"
                                     alt="Magritek"
