@@ -47,6 +47,8 @@ class PublishReleasedProjects extends Command
                     }
                 }
             }
+
+            return Command::SUCCESS;
         });
     }
 }
