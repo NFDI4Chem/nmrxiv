@@ -12,6 +12,7 @@ use App\Models\Study;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Spatie\SchemaOrg\Schema;
@@ -240,7 +241,7 @@ class BioschemasController extends Controller
      *
      * @param  string  $username  NMRXIV username
      * @param  string  $projectName  Project slug identifier
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
 
@@ -487,7 +488,7 @@ class BioschemasController extends Controller
      * - Scientific workflow interoperability
      *
      * @param  string  $identifier  NMRXIV public identifier (P123, S456, D789)
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function modelSchemaByID(Request $request, $identifier)
     {

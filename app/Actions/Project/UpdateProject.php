@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,7 @@ class UpdateProject
     /**
      * Create a project.
      *
-     * @return \App\Models\Project
+     * @return Project
      */
     public function update(Project $project, array $input)
     {
@@ -188,7 +189,7 @@ class UpdateProject
     /**
      * Attach citations to a project.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @param  array  $citations
      * @return void
      */

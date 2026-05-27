@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
@@ -754,7 +755,7 @@ class ManageAuthorsTest extends TestCase
     /**
      * Prepare request body for author
      *
-     * @param  \App\Models\Author  $author
+     * @param  Author  $author
      * @return array $body
      */
     public function prepareBody($author)
@@ -791,8 +792,8 @@ class ManageAuthorsTest extends TestCase
     /**
      * Make Request to add author
      *
-     * @param  \App\Models\Author  $body
-     * @return \Illuminate\Http\Response
+     * @param  Author  $body
+     * @return Response
      */
     public function addAuthor($body, $projectId)
     {
@@ -804,8 +805,8 @@ class ManageAuthorsTest extends TestCase
     /**
      * Make Request to update author
      *
-     * @param  \App\Models\Author  $body
-     * @return \Illuminate\Http\Response
+     * @param  Author  $body
+     * @return Response
      */
     public function updateAuthor($author, $projectId)
     {
@@ -832,8 +833,8 @@ class ManageAuthorsTest extends TestCase
     /**
      * Make Request to detach author
      *
-     * @param  \App\Models\Author  $body
-     * @return \Illuminate\Http\Response
+     * @param  Author  $body
+     * @return Response
      */
     public function detachAuthor($body, $projectId)
     {

@@ -12,6 +12,7 @@ use App\Models\Author;
 use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class SyncProjectAuthorsActionTest extends TestCase
@@ -92,7 +93,7 @@ class SyncProjectAuthorsActionTest extends TestCase
 
     public function test_sync_authors_validates_required_fields(): void
     {
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         $authorsData = [
             [
                 'given_name' => '',

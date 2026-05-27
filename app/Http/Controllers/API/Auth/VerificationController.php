@@ -7,6 +7,8 @@ use App\Models\User;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
@@ -129,7 +131,7 @@ class VerificationController extends Controller
      * Verify user email address using signed URL
      *
      * @param  int  $user_id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return RedirectResponse|JsonResponse
      */
     public function verify($user_id, Request $request)
     {
@@ -273,7 +275,7 @@ class VerificationController extends Controller
      *
      * Resend email verification link
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function resend()
     {

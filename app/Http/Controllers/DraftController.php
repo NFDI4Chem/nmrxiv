@@ -10,7 +10,9 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -52,7 +54,7 @@ class DraftController extends Controller
     /**
      * Process draft and convert to project structure.
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return Response|JsonResponse|RedirectResponse
      */
     public function process(Request $request, Draft $draft)
     {

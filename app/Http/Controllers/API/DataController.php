@@ -9,7 +9,9 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class DataController extends Controller
@@ -252,7 +254,7 @@ class DataController extends Controller
      * and includes Bioschemas.org metadata for enhanced discoverability.
      *
      * @param  string  $model  The data model type (projects|samples|datasets)
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function all(Request $request, $model)
     {
@@ -482,7 +484,7 @@ class DataController extends Controller
      * - Usage statistics and engagement metrics
      *
      * @param  string  $id  NMRXIV identifier (P123, S456, D789)
-     * @return \App\Http\Resources\ProjectResource|\App\Http\Resources\StudyResource|\App\Http\Resources\DatasetResource|\Illuminate\Http\JsonResponse
+     * @return ProjectResource|StudyResource|DatasetResource|JsonResponse
      */
     public function id(Request $request, $id)
     {

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Molecule;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 class SanitizeMolecules extends Command
@@ -111,7 +112,7 @@ class SanitizeMolecules extends Command
                     return $cas;
                 }
             }
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (ConnectionException $e) {
             echo 'timed out: '.$smiles;
         }
     }
@@ -123,7 +124,7 @@ class SanitizeMolecules extends Command
             $response = Http::post($stdUrl, $mol);
 
             return $response->json();
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (ConnectionException $e) {
             echo 'timed out: '.$mol;
         }
     }

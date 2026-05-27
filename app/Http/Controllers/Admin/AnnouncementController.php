@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Pages\Announcement\Index;
 
 class AnnouncementController extends Controller
 {
     /**
      * Show all the list of Announcements created.
      *
-     * @return \Pages\Announcement\Index
+     * @return Index
      */
     public function index(Request $request)
     {
@@ -44,7 +46,7 @@ class AnnouncementController extends Controller
     /**
      * Create the new entry for the announcement.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -84,7 +86,7 @@ class AnnouncementController extends Controller
     /**
      * Update the specified announcement in the storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Announcement $announcement)
     {
@@ -117,7 +119,7 @@ class AnnouncementController extends Controller
     /**
      * Remove the specified announcement from the storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Announcement $announcement)
     {

@@ -18,7 +18,7 @@ class DeleteProjects implements ShouldQueue
     /**
      * The project instance.
      *
-     * @var \App\Models\Project
+     * @var Project
      */
     private $project;
 

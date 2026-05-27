@@ -164,7 +164,7 @@ class DownloadController extends Controller
     /**
      * Get the S3 storage client instance.
      *
-     * @return \Aws\S3\S3Client
+     * @return S3Client
      */
     protected function storageClient()
     {

@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
+use App\Services\PathGeneratorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -40,7 +41,7 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $method->setAccessible(true);
 
         // Mock the PathGeneratorService
-        $pathGenerator = $this->createMock(\App\Services\PathGeneratorService::class);
+        $pathGenerator = $this->createMock(PathGeneratorService::class);
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
@@ -85,7 +86,7 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $method->setAccessible(true);
 
         // Mock the PathGeneratorService
-        $pathGenerator = $this->createMock(\App\Services\PathGeneratorService::class);
+        $pathGenerator = $this->createMock(PathGeneratorService::class);
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 

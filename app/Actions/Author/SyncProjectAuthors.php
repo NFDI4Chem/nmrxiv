@@ -7,6 +7,7 @@ use App\Models\Author;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class SyncProjectAuthors
 {
@@ -18,7 +19,7 @@ class SyncProjectAuthors
      * @param  array<int, array<string,mixed>>  $authors
      * @return array<int, Author>
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function handle(Project $project, array $authors): array
     {

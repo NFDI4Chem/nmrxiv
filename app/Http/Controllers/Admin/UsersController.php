@@ -4,15 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\PasswordValidationRules;
+use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Pages\Console\Users\Create;
+use Pages\Console\Users\Edit;
+use Pages\Console\Users\Index;
 use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
@@ -22,7 +28,7 @@ class UsersController extends Controller
     /**
      * Render the index page with list of users.
      *
-     * @return \Pages\Console\Users\Index
+     * @return Index
      */
     public function index(Request $request)
     {
@@ -54,7 +60,7 @@ class UsersController extends Controller
     /**
      * Render the create user page.
      *
-     * @return \Pages\Console\Users\Create
+     * @return Create
      */
     public function create()
     {
@@ -70,7 +76,7 @@ class UsersController extends Controller
     /**
      * Store the newly created user.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(Request $request, CreateNewUser $creator)
     {
@@ -83,7 +89,7 @@ class UsersController extends Controller
     /**
      * Render the edit user page.
      *
-     * @return \Pages\Console\Users\Edit
+     * @return Edit
      */
     public function edit(User $user)
     {
@@ -105,8 +111,8 @@ class UsersController extends Controller
     /**
      * Save the updated user info.
      *
-     * @param  \App\Actions\Fortify\UpdateUserProfileInformation  $updater
-     * @return \Illuminate\Http\RedirectResponse
+     * @param  UpdateUserProfileInformation  $updater
+     * @return RedirectResponse
      */
     public function update(User $user, Request $request, UpdatesUserProfileInformation $updater)
     {
@@ -118,7 +124,7 @@ class UsersController extends Controller
     /**
      * Save the updated password for the user.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function updatePassword(User $user, Request $request)
     {
@@ -136,7 +142,7 @@ class UsersController extends Controller
     /**
      * Save the updated role for the user.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function updateRole(User $user, Request $request)
     {
@@ -162,7 +168,7 @@ class UsersController extends Controller
     /**
      * Check if user has password.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function checkPassword(Request $request)
     {
@@ -180,7 +186,7 @@ class UsersController extends Controller
     /**
      * Delete the profile photo.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroyPhoto(User $user, Request $request)
     {
@@ -193,7 +199,7 @@ class UsersController extends Controller
      * Mark notification as read.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function markNotificationAsRead(User $user, Request $request)
     {
@@ -210,7 +216,7 @@ class UsersController extends Controller
      * Mark all notification as read.
      *
      * @param  User  $user
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function markAllNotificationAsRead(Request $request)
     {

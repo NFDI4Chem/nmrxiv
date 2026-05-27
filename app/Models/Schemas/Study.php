@@ -3,6 +3,14 @@
 namespace App\Models\Schemas;
 
 use Spatie\SchemaOrg\BaseType;
+use Spatie\SchemaOrg\Contracts\BioChemEntityContract;
+use Spatie\SchemaOrg\Contracts\CreativeWorkContract;
+use Spatie\SchemaOrg\Contracts\DefinedTermContract;
+use Spatie\SchemaOrg\Contracts\MedicalEntityContract;
+use Spatie\SchemaOrg\Contracts\OrganizationContract;
+use Spatie\SchemaOrg\Contracts\PersonContract;
+use Spatie\SchemaOrg\Contracts\PropertyValueContract;
+use Spatie\SchemaOrg\Contracts\ThingContract;
 
 /**
  * A body of structured information describing some topic(s) of interest.
@@ -17,7 +25,7 @@ class Study extends BaseType
      * in that HTML 5 provides a special mechanism for indicating authorship via
      * the rel tag. That is equivalent to this and may be used interchangeably.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\OrganizationContract|\Spatie\SchemaOrg\Contracts\OrganizationContract[]|\Spatie\SchemaOrg\Contracts\PersonContract|\Spatie\SchemaOrg\Contracts\PersonContract[]  $author
+     * @param  OrganizationContract|OrganizationContract[]|PersonContract|PersonContract[]  $author
      * @return static
      *
      * @see https://schema.org/author
@@ -60,7 +68,7 @@ class Study extends BaseType
      * strings or as URL (URI) links. See [background
      * notes](/docs/datamodel.html#identifierBg) for more details.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $identifier
+     * @param  PropertyValueContract|PropertyValueContract[]|string|string[]  $identifier
      * @return static
      *
      * @see https://schema.org/identifier
@@ -88,7 +96,7 @@ class Study extends BaseType
      * functional genomics or earth science. Those domains can also have an ontology
      * reference.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $studyDomain
+     * @param  PropertyValueContract|PropertyValueContract[]|string|string[]  $studyDomain
      * @return static
      */
     public function studyDomain($studyDomain)
@@ -100,7 +108,7 @@ class Study extends BaseType
      * A subject of the study, i.e. one of the medical conditions, therapies, devices,
      * drugs, etc. investigated by the study.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\BioChemEntityContract|\Spatie\SchemaOrg\Contracts\MedicalEntityContract[]  $studySubject
+     * @param  BioChemEntityContract|MedicalEntityContract[]  $studySubject
      * @return static
      */
     public function studySubject($studySubject)
@@ -111,7 +119,7 @@ class Study extends BaseType
     /**
      * The subject matter of the content.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\ThingContract|\Spatie\SchemaOrg\Contracts\ThingContract[]  $about
+     * @param  ThingContract|ThingContract[]  $about
      * @return static
      *
      * @see https://schema.org/about
@@ -131,7 +139,7 @@ class Study extends BaseType
      * such data to be provided using those properties, rather than using the generic
      * property/value mechanism.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]  $additionalProperty
+     * @param  PropertyValueContract|PropertyValueContract[]  $additionalProperty
      * @return static
      *
      * @see https://schema.org/additionalProperty
@@ -145,7 +153,7 @@ class Study extends BaseType
      * A citation or reference to another creative work, such as another
      * publication, web page, scholarly article, etc.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\CreativeWorkContract|\Spatie\SchemaOrg\Contracts\CreativeWorkContract[]|string|string[]  $citation
+     * @param  CreativeWorkContract|CreativeWorkContract[]|string|string[]  $citation
      * @return static
      *
      * @see https://schema.org/citation
@@ -159,7 +167,7 @@ class Study extends BaseType
      * The creator/author of this CreativeWork. This is the same as the Author
      * property for CreativeWork.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\OrganizationContract|\Spatie\SchemaOrg\Contracts\OrganizationContract[]|\Spatie\SchemaOrg\Contracts\PersonContract|\Spatie\SchemaOrg\Contracts\PersonContract[]  $creator
+     * @param  OrganizationContract|OrganizationContract[]|PersonContract|PersonContract[]  $creator
      * @return static
      *
      * @see https://schema.org/creator
@@ -214,7 +222,7 @@ class Study extends BaseType
      * a keywords list are typically delimited by commas, or by repeating the
      * property.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\DefinedTermContract|\Spatie\SchemaOrg\Contracts\DefinedTermContract[]|string|string[]  $keywords
+     * @param  DefinedTermContract|DefinedTermContract[]|string|string[]  $keywords
      * @return static
      *
      * @see https://schema.org/keywords
@@ -228,7 +236,7 @@ class Study extends BaseType
      * TA process performed as part of an experiment or wider study, i.e. intentionally
      * designed. These processes can have ontology URL attached to.
      *
-     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $studyProcess
+     * @param  PropertyValueContract|PropertyValueContract[]|string|string[]  $studyProcess
      * @return static
      */
     public function studyProcess($studyProcess)

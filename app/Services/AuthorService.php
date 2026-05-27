@@ -8,6 +8,7 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AuthorService
 {
@@ -24,7 +25,7 @@ class AuthorService
      * Process and sync authors for a project.
      *
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function syncAuthors(Project $project, array $authors): array
     {
@@ -91,7 +92,7 @@ class AuthorService
      * Validate author data against validation rules.
      *
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     private function validateAuthorData(array $authorData): void
     {

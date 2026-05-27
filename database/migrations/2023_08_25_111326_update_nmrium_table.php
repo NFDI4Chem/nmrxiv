@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Dataset;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('nmrium', function (Blueprint $table) {
             $table->renameColumn('dataset_id', 'nmriumable_id');
-            $table->string('nmriumable_type')->default(\App\Models\Dataset::class);
+            $table->string('nmriumable_type')->default(Dataset::class);
         });
 
         Schema::table('studies', function (Blueprint $table) {

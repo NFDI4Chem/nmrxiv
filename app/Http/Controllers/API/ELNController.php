@@ -11,6 +11,7 @@ use App\Models\Study;
 use App\Services\ChemotionRepositoryTrackerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -207,7 +208,7 @@ class ELNController extends Controller
      * Handle file upload for a specific ELN entry
      *
      * @param  string  $eln
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function upload($eln, Request $request)
     {
@@ -540,7 +541,7 @@ class ELNController extends Controller
      *
      * @param  string  $eln
      * @param  string  $external_id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function status($eln, $external_id)
     {

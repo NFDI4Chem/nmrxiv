@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
@@ -261,7 +262,7 @@ class Study extends Model implements Auditable
     /**
      * Get all of the study's users including its owner.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function allUsers()
     {
@@ -296,7 +297,7 @@ class Study extends Model implements Auditable
     /**
      * Remove the given user from the study.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @return void
      */
     public function removeUser($user)
