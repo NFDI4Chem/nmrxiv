@@ -536,15 +536,16 @@ class ProjectModelTest extends TestCase
         $this->assertEquals($validation->id, $project->validation->id);
     }
 
-    public function test_is_published_with_release_date_logic(): void
+    public function test_is_published_requires_project_to_be_public(): void
     {
-        // Test with release date in past and DOI
+        // A crossed embargo release date does not mean the project was successfully published.
         $pastProject = Project::factory()->create([
             'is_public' => false,
+            'status' => 'embargo',
             'release_date' => Carbon::yesterday(),
             'doi' => '10.1234/example.doi',
         ]);
-        $this->assertTrue($pastProject->is_published);
+        $this->assertFalse($pastProject->is_published);
 
         // Test with release date in future and DOI
         $futureProject = Project::factory()->create([
