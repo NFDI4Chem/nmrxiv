@@ -247,14 +247,18 @@ class DashboardController extends Controller
             return;
         }
 
+        $normalized = function_exists('mb_strtolower')
+            ? mb_strtolower($term)
+            : strtolower($term);
+
         $table = $query->getModel()->getTable();
-        $like = '%'.addcslashes($term, '%_\\').'%';
+        $like = '%'.addcslashes($normalized, '%_\\').'%';
 
         $query->where(function (Builder $q) use ($like, $table) {
-            $q->where($table.'.name', 'like', $like)
-                ->orWhere($table.'.description', 'like', $like)
-                ->orWhereRaw('CAST('.$table.'.id AS VARCHAR) LIKE ?', [$like])
-                ->orWhere($table.'.uuid', 'like', $like);
+            $q->whereRaw('LOWER('.$table.'.name) LIKE ?', [$like])
+                ->orWhereRaw('LOWER('.$table.'.description) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(CAST('.$table.'.id AS VARCHAR)) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(CAST('.$table.'.uuid AS VARCHAR)) LIKE ?', [$like]);
         });
     }
 
@@ -265,14 +269,18 @@ class DashboardController extends Controller
             return;
         }
 
+        $normalized = function_exists('mb_strtolower')
+            ? mb_strtolower($term)
+            : strtolower($term);
+
         $table = $query->getModel()->getTable();
-        $like = '%'.addcslashes($term, '%_\\').'%';
+        $like = '%'.addcslashes($normalized, '%_\\').'%';
 
         $query->where(function (Builder $q) use ($like, $table) {
-            $q->where($table.'.name', 'like', $like)
-                ->orWhere($table.'.description', 'like', $like)
-                ->orWhereRaw('CAST('.$table.'.id AS VARCHAR) LIKE ?', [$like])
-                ->orWhere($table.'.uuid', 'like', $like);
+            $q->whereRaw('LOWER('.$table.'.name) LIKE ?', [$like])
+                ->orWhereRaw('LOWER('.$table.'.description) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(CAST('.$table.'.id AS VARCHAR)) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(CAST('.$table.'.uuid AS VARCHAR)) LIKE ?', [$like]);
         });
     }
 
