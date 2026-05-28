@@ -108,7 +108,7 @@
                             </p>
                             <p class="mt-0.5 text-xs text-gray-500">
                                 <time :datetime="project.created_at">
-                                    {{ formatDate(project.created_at) }}
+                                    {{ formatShortDate(project.created_at) }}
                                 </time>
                             </p>
                             <p
@@ -329,7 +329,7 @@
                                     />
                                 </svg>
                                 <time :datetime="project.created_at">
-                                    {{ formatDate(project.created_at) }}
+                                    {{ formatShortDate(project.created_at) }}
                                 </time>
                             </p>
                         </div>
@@ -424,20 +424,6 @@ export default {
             } else {
                 this.$inertia.visit(route("login"));
             }
-        },
-
-        formatDate(dateString) {
-            if (!dateString) {
-                return "";
-            }
-
-            const date = new Date(dateString);
-
-            return date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-            });
         },
     },
 };

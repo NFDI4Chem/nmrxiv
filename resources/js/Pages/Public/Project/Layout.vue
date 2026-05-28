@@ -62,7 +62,7 @@
                             <strong
                                 class="font-semibold text-teal-950 dark:text-teal-50"
                                 >{{
-                                    formatDate(dashboardProject.release_date)
+                                    formatUtcDate(dashboardProject.release_date)
                                 }}</strong
                             >.
                             <button
@@ -1555,28 +1555,6 @@ export default {
                     return word.charAt(0).toUpperCase() + word.slice(1);
                 })
                 .join(" ");
-        },
-
-        /**
-         * Format date for display in project metadata
-         *
-         * Converts ISO date strings to human-readable format
-         * suitable for displaying creation and publication dates.
-         *
-         * @param {String} dateString - ISO date string
-         * @returns {String} Formatted date string
-         */
-        formatDate(dateString) {
-            if (!dateString) return "";
-
-            const date = new Date(dateString);
-            const options = {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            };
-
-            return date.toLocaleDateString("en-US", options);
         },
     },
 };

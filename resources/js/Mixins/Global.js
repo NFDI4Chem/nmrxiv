@@ -150,12 +150,18 @@ export default {
             }
         },
         formatDate(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
             const date = new Date(timestamp);
             return new Intl.DateTimeFormat("default", {
                 dateStyle: "long",
             }).format(date);
         },
         formatDateTime(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
             const date = new Date(timestamp);
             return new Intl.DateTimeFormat("en", {
                 dateStyle: "full",
@@ -173,6 +179,58 @@ export default {
             return new Intl.DateTimeFormat(undefined, {
                 dateStyle: "medium",
                 timeStyle: "short",
+            }).format(date);
+        },
+
+        /**
+         * Date-only formatting in UTC (prevents off-by-one day shifts for Zulu timestamps).
+         */
+        formatUtcDate(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+
+            const date = new Date(timestamp);
+
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                timeZone: "UTC",
+            });
+        },
+
+        /**
+         * Short, date-only formatting (used in compact cards/sidebars).
+         */
+        formatShortDate(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+
+            const date = new Date(timestamp);
+
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+        },
+
+        /**
+         * UTC variant of formatRecordTimestamp (keeps date+time style but fixes timezone shifts).
+         */
+        formatRecordTimestampUtc(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+
+            const date = new Date(timestamp);
+
+            return new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+                timeZone: "UTC",
             }).format(date);
         },
         md(data) {
