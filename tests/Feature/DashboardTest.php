@@ -533,6 +533,29 @@ class DashboardTest extends TestCase
         $response->assertDontSee('BetaOtherThing', false);
     }
 
+    public function test_dashboard_project_search_is_case_insensitive(): void
+    {
+        Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'name' => 'MiXeDCaSeSearchToken',
+        ]);
+        Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'name' => 'OtherProjectName',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get('/dashboard?projects_q=mixedcasesearchtoken');
+
+        $response->assertStatus(200);
+        $response->assertSee('MiXeDCaSeSearchToken', false);
+        $response->assertDontSee('OtherProjectName', false);
+    }
+
     public function test_dashboard_projects_second_page(): void
     {
         foreach (range(1, 11) as $i) {
