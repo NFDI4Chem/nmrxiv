@@ -43,12 +43,33 @@
                         </p>
                     </div>
                     <div
-                        v-else-if="
-                            !dashboardProject.is_public &&
-                            !dashboardProject.is_published &&
-                            dashboardProject.doi &&
-                            !workspace.preview
-                        "
+                        v-else-if="showFailedEmbargoNotice"
+                        class="border-b border-red-200/80 bg-red-50 px-4 py-3 text-center text-red-900 dark:border-red-800/50 dark:bg-red-950/55 dark:text-red-100"
+                    >
+                        <p
+                            class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                        >
+                            <span
+                                class="font-semibold text-red-950 dark:text-red-50"
+                                >Embargo notice:</span
+                            >
+                            This project could not be published due to missing
+                            information or a technical issue. Please complete
+                            the required fields and click Publish Now via the
+                            Edit Release Date option, or contact us at
+                            info.nmrxiv@uni-jena.de
+                        </p>
+                        <button
+                            v-if="showReleaseDateEditLink"
+                            type="button"
+                            class="whitespace-nowrap font-semibold text-teal-800 underline decoration-teal-600/45 underline-offset-2 hover:text-teal-950 dark:text-teal-200 dark:decoration-teal-300/50 dark:hover:text-white"
+                            @click="openReleaseDateModal"
+                        >
+                            Edit release date
+                        </button>
+                    </div>
+                    <div
+                        v-else-if="showEmbargoReleaseNotice"
                         class="border-b border-teal-200/80 bg-teal-50 px-4 py-3 text-center text-teal-900 dark:border-teal-800/50 dark:bg-teal-950/55 dark:text-teal-100"
                     >
                         <p
@@ -1063,6 +1084,10 @@ export default {
             return sample != null && this.sampleDatasets(sample).length > 0;
         },
         showReleaseDateEditLink() {
+            return this.showEmbargoReleaseNotice;
+        },
+
+        showEmbargoReleaseNotice() {
             const p = this.dashboardProject;
             const w = this.workspace;
             if (!p || !w || w.preview) {
@@ -1070,6 +1095,19 @@ export default {
             }
 
             return !p.is_public && !p.is_published && Boolean(p.doi);
+        },
+
+        showFailedEmbargoNotice() {
+            if (!this.showEmbargoReleaseNotice) {
+                return false;
+            }
+
+            const releaseDate = new Date(this.dashboardProject.release_date);
+
+            return (
+                !Number.isNaN(releaseDate.getTime()) &&
+                releaseDate.getTime() <= Date.now()
+            );
         },
 
         hasReleaseDateChanged() {

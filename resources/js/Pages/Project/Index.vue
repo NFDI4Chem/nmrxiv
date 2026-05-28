@@ -330,7 +330,8 @@
                         </div>
                         <div
                             v-if="showScheduledReleaseCard(project)"
-                            class="mt-3 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-3 text-xs text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                            class="mt-3 rounded-lg border border-amber-200/90 px-3 py-3 text-xs text-amber-950 dark:border-amber-900 dark:text-amber-100"
+                            :class="scheduledReleaseCardClass(project)"
                         >
                             <div
                                 class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2"
@@ -635,6 +636,21 @@ export default {
             }
 
             return this.statusRibbonKey(project) === "embargo";
+        },
+        isScheduledReleaseOverdue(project) {
+            const releaseDate = new Date(project?.release_date);
+
+            return (
+                !Number.isNaN(releaseDate.getTime()) &&
+                releaseDate.getTime() <= Date.now()
+            );
+        },
+        scheduledReleaseCardClass(project) {
+            if (this.isScheduledReleaseOverdue(project)) {
+                return "bg-red-50 dark:bg-red-950/40";
+            }
+
+            return "bg-amber-50 dark:bg-amber-950/40";
         },
         isScheduledReleaseShareOpen(project) {
             return !!this.scheduledReleaseShareOpenByUuid[project.uuid];
