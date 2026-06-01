@@ -53,7 +53,7 @@ return [
         'api_path' => env('COMMON_CHEMISTRY_API_PATH', '/api'),
     ],
     'chemistry_standardize' => [
-        'url' => env('CHEMISTRY_STANDARDIZE_URL', 'https://api.cheminf.studio/latest/chem/standardize'),
+        'url' => env('CHEMISTRY_STANDARDIZE_URL', 'https://api.naturalproducts.net/latest/chem/standardize'),
     ],
 
 ];
