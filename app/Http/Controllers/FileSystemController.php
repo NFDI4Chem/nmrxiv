@@ -365,17 +365,63 @@ class FileSystemController extends Controller
 
     /**
      * Check if folder contains Magritek Spinsolve instrument files.
+     *
+     * Supports classic exports (acqu.par, data.1d, processing.script) and newer exports
+     * that add an Enhanced/ subfolder with its own acqu.par and data.1d files.
      */
     public function isMagritek($folder): bool
     {
-        $fileTypes = ['acqu.par', 'data.1d', 'processing.script'];
         $children = $folder->children;
         $names = $children->pluck('name')->toArray();
-        if (array_intersect($fileTypes, $names) == $fileTypes) {
+
+        if (! $this->hasMagritekCoreFiles($names)) {
+            return false;
+        }
+
+        if ($this->isClassicMagritek($names)) {
             return true;
         }
 
-        return false;
+        return $this->hasValidEnhancedSubfolder($children);
+    }
+
+    /**
+     * @param  list<string>  $names
+     */
+    private function hasMagritekCoreFiles(array $names): bool
+    {
+        return in_array('acqu.par', $names, true) && in_array('data.1d', $names, true);
+    }
+
+    /**
+     * @param  list<string>  $names
+     */
+    private function isClassicMagritek(array $names): bool
+    {
+        return in_array('processing.script', $names, true);
+    }
+
+    private function hasValidEnhancedSubfolder($children): bool
+    {
+        $enhanced = $children->first(
+            fn ($child) => $child->type === 'directory' && $child->name === 'Enhanced'
+        );
+
+        if (! $enhanced) {
+            return false;
+        }
+
+        if ($enhanced instanceof FileSystemObject && ! $enhanced->relationLoaded('children')) {
+            $enhanced->load('children');
+        }
+
+        if (! isset($enhanced->children)) {
+            return false;
+        }
+
+        $enhancedNames = $enhanced->children->pluck('name')->toArray();
+
+        return $this->hasMagritekCoreFiles($enhancedNames);
     }
 
     /**

@@ -23,18 +23,36 @@ class FileSystemControllerMagritekTest extends TestCase
     }
 
     /**
-     * @param  list<string>  $names
+     * @param  list<string|array{name: string, type?: string, children?: list<string>}>  $children
      */
-    private function folderWithChildNames(array $names): object
+    private function folderWithChildNames(array $children): object
     {
         return (object) [
-            'children' => Collection::make(
-                array_map(fn (string $name) => (object) ['name' => $name], $names)
-            ),
+            'children' => Collection::make(array_map(function ($child) {
+                if (is_string($child)) {
+                    return (object) ['name' => $child, 'type' => 'file'];
+                }
+
+                $item = (object) [
+                    'name' => $child['name'],
+                    'type' => $child['type'] ?? 'file',
+                ];
+
+                if (isset($child['children'])) {
+                    $item->children = Collection::make(
+                        array_map(
+                            fn (string $name) => (object) ['name' => $name, 'type' => 'file'],
+                            $child['children']
+                        )
+                    );
+                }
+
+                return $item;
+            }, $children)),
         ];
     }
 
-    public function test_is_magritek_returns_true_for_spinsolve_folder(): void
+    public function test_is_magritek_returns_true_for_classic_spinsolve_folder(): void
     {
         $folder = $this->folderWithChildNames([
             'acqu.par',
@@ -53,9 +71,66 @@ class FileSystemControllerMagritekTest extends TestCase
         $this->assertFalse($this->controller->isMagritek($folder));
     }
 
-    public function test_is_magritek_returns_false_when_required_files_missing(): void
+    public function test_is_magritek_returns_false_when_core_files_missing(): void
     {
         $folder = $this->folderWithChildNames(['acqu.par', 'data.1d']);
+
+        $this->assertFalse($this->controller->isMagritek($folder));
+    }
+
+    public function test_is_magritek_returns_true_for_modern_export_with_enhanced_subfolder(): void
+    {
+        $folder = $this->folderWithChildNames([
+            'acqu.par',
+            'data.1d',
+            'display.par',
+            'nmr_fid.dx',
+            'MTiglate.sdf',
+            [
+                'name' => 'Enhanced',
+                'type' => 'directory',
+                'children' => ['acqu.par', 'data.1d'],
+            ],
+        ]);
+
+        $this->assertTrue($this->controller->isMagritek($folder));
+    }
+
+    public function test_is_magritek_returns_false_when_enhanced_subfolder_is_empty(): void
+    {
+        $folder = $this->folderWithChildNames([
+            'acqu.par',
+            'data.1d',
+            'display.par',
+            'nmr_fid.dx',
+            ['name' => 'Enhanced', 'type' => 'directory', 'children' => []],
+        ]);
+
+        $this->assertFalse($this->controller->isMagritek($folder));
+    }
+
+    public function test_is_magritek_returns_false_when_enhanced_subfolder_lacks_core_files(): void
+    {
+        $folder = $this->folderWithChildNames([
+            'acqu.par',
+            'data.1d',
+            [
+                'name' => 'Enhanced',
+                'type' => 'directory',
+                'children' => ['acqu.par'],
+            ],
+        ]);
+
+        $this->assertFalse($this->controller->isMagritek($folder));
+    }
+
+    public function test_is_magritek_returns_false_when_enhanced_subfolder_is_not_loaded(): void
+    {
+        $folder = $this->folderWithChildNames([
+            'acqu.par',
+            'data.1d',
+            ['name' => 'Enhanced', 'type' => 'directory'],
+        ]);
 
         $this->assertFalse($this->controller->isMagritek($folder));
     }
