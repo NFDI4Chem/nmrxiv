@@ -89,6 +89,10 @@ class StudyPolicy
      */
     public function addStudyMember(User $user, Study $study)
     {
+        if ($study->project?->is_public || $study->is_public) {
+            return false;
+        }
+
         return $user->ownsStudy($study);
     }
 
@@ -99,6 +103,10 @@ class StudyPolicy
      */
     public function updateStudyMember(User $user, Study $study)
     {
+        if ($study->project?->is_public || $study->is_public) {
+            return false;
+        }
+
         return $user->ownsStudy($study);
     }
 
@@ -109,6 +117,10 @@ class StudyPolicy
      */
     public function removeStudyMember(User $user, Study $study)
     {
+        if ($study->project?->is_public || $study->is_public) {
+            return false;
+        }
+
         return $user->ownsStudy($study);
     }
 }

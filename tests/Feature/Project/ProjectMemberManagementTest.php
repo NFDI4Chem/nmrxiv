@@ -116,6 +116,55 @@ class ProjectMemberManagementTest extends TestCase
         $this->assertTrue($this->project->users->contains($this->owner));
     }
 
+    public function test_project_owner_cannot_invite_member_when_project_is_published(): void
+    {
+        $this->project->update(['is_public' => true]);
+
+        $newUser = User::factory()->create();
+
+        $response = $this->actingAs($this->owner)
+            ->post("/dashboard/projects/{$this->project->id}/members", [
+                'email' => $newUser->email,
+                'role' => 'collaborator',
+            ]);
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseMissing('project_invitations', [
+            'project_id' => $this->project->id,
+            'email' => $newUser->email,
+        ]);
+    }
+
+    public function test_project_owner_cannot_update_member_role_when_project_is_published(): void
+    {
+        $this->project->update(['is_public' => true]);
+
+        $response = $this->actingAs($this->owner)
+            ->put("/dashboard/projects/{$this->project->id}/members/{$this->viewer->id}", [
+                'role' => 'collaborator',
+            ]);
+
+        $response->assertStatus(403);
+
+        $this->project->refresh();
+        $member = $this->project->users->where('id', $this->viewer->id)->first();
+        $this->assertEquals('viewer', $member->projectMembership->role);
+    }
+
+    public function test_project_owner_cannot_remove_member_when_project_is_published(): void
+    {
+        $this->project->update(['is_public' => true]);
+
+        $response = $this->actingAs($this->owner)
+            ->delete("/dashboard/projects/{$this->project->id}/members/{$this->viewer->id}");
+
+        $response->assertStatus(403);
+
+        $this->project->refresh();
+        $this->assertTrue($this->project->users->contains($this->viewer));
+    }
+
     public function test_project_owner_cannot_remove_themselves()
     {
         $response = $this->actingAs($this->owner)
