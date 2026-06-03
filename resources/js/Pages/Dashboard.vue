@@ -1106,6 +1106,16 @@ export default {
         },
     },
 
+    watch: {
+        "filters.action"(action) {
+            if (action === "submission") {
+                this.emitter.emit("openDatasetCreateDialog", {
+                    draft_id: this.filters.draft_id,
+                });
+            }
+        },
+    },
+
     mounted() {
         if (this.filters.action == "submission") {
             this.emitter.emit("openDatasetCreateDialog", {
@@ -1195,6 +1205,7 @@ export default {
                 this.dashboardUrl(overrides),
                 {},
                 {
+                    preserveState: true,
                     preserveScroll: true,
                     replace: true,
                 }
