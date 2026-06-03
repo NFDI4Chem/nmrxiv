@@ -83,6 +83,8 @@
                                                                       project.obfuscationcode,
                                                                   ]
                                                               )
+                                                            : project.identifier
+                                                            ? project.public_url
                                                             : route(
                                                                   'dashboard.projects',
                                                                   [project.id]

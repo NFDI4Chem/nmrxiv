@@ -1,14 +1,17 @@
 <template>
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col" :class="compact ? '' : 'h-full'">
         <!-- Title Section -->
-        <div class="mb-6">
+        <div v-if="!compact" class="mb-6">
             <h2 class="text-3xl font-bold text-gray-900">Metadata Search</h2>
             <p class="mt-2 text-gray-600">
                 Search by free text or specific NMR metadata fields
             </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div
+            class="grid grid-cols-1 gap-6"
+            :class="compact ? 'gap-4 lg:grid-cols-2' : 'lg:grid-cols-2'"
+        >
             <!-- Left Column: Free Text Search -->
             <div class="space-y-4">
                 <div>
@@ -20,7 +23,7 @@
                     <textarea
                         v-model="freeText"
                         placeholder="Enter keywords to search across all metadata fields..."
-                        rows="4"
+                        :rows="compact ? 3 : 4"
                         class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
                     />
                 </div>
@@ -225,9 +228,15 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 export default {
+    props: {
+        compact: {
+            type: Boolean,
+            default: false,
+        },
+    },
     emits: ["search-params-updated"],
     setup(props, { emit }) {
         // Free text
@@ -294,6 +303,26 @@ export default {
                 instrumentModel: instrumentModel.value,
             });
         };
+
+        watch(
+            [
+                freeText,
+                solvent,
+                temperature,
+                tubeDiameter,
+                acquisitionNucleus,
+                protonFrequency,
+                nmrMethod,
+                pulseSequence,
+                numberOfScans,
+                manufacturer,
+                instrumentModel,
+            ],
+            () => {
+                emitParams();
+            },
+            { immediate: true }
+        );
 
         return {
             freeText,

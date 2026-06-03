@@ -13,6 +13,12 @@
         <nav class="flex-1 space-y-0" aria-label="Sidebar">
             <!-- Main disclosure container for root level folder -->
             <Disclosure
+                :key="
+                    'tree-root-' +
+                    String(file.id ?? file.relative_url ?? '') +
+                    '-' +
+                    (file.name == '/' || isExpanded(file.id) ? 'o' : 'c')
+                "
                 v-slot="{ open }"
                 as="div"
                 :default-open="file.name == '/' || isExpanded(file.id)"
@@ -33,10 +39,11 @@
                         'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                     ]"
                     @click.stop="handleFolderClick(file)"
+                    @contextmenu="onSampleFolderContextMenu($event, file)"
                 >
                     <!-- Disclosure button for expanding/collapsing -->
                     <DisclosureButton
-                        class="w-full text-left truncate ..."
+                        class="w-full text-left truncate flex items-center"
                         @click="() => handleDisclosureButtonClick(file.id)"
                     >
                         <!-- Loading spinner when fetching children -->
@@ -54,7 +61,7 @@
                                     open
                                         ? 'text-gray-700 rotate-90'
                                         : 'text-gray-300',
-                                    'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                    'ml-1 mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                 ]"
                                 aria-hidden="true"
                             />
@@ -64,7 +71,7 @@
                         <span
                             :class="[
                                 file.status == 'missing' ? 'text-red-800' : '',
-                                'break-all',
+                                'inline-flex items-center gap-1 min-w-0',
                             ]"
                         >
                             <!-- Dynamic icon for directories (instrument-specific or generic) -->
@@ -72,35 +79,35 @@
                                 <!-- Instrument-specific icons -->
                                 <img
                                     v-if="file.instrument_type == 'bruker'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/bruker.jpg"
                                     alt="Bruker"
                                 />
                                 <img
                                     v-else-if="file.instrument_type == 'varian'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/varian.jpeg"
                                     alt="Varian"
                                 />
                                 <img
                                     v-else-if="file.instrument_type == 'joel'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                     src="/img/joel.jpg"
                                     alt="JOEL"
                                 />
                                 <img
                                     v-else-if="file.instrument_type == 'jcamp'"
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                     src="/img/jcamp.png"
                                     alt="JCAMP"
                                 />
                                 <!-- Study folder with notification indicator -->
                                 <span
                                     v-else-if="file.model_type == 'study'"
-                                    class="relative inline-flex"
+                                    class="relative inline-flex flex-shrink-0"
                                 >
                                     <FolderIcon
-                                        class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                        class="h-5 w-5 text-gray-700"
                                         aria-hidden="true"
                                     />
                                     <span
@@ -117,18 +124,18 @@
                                 <!-- Default folder icon -->
                                 <FolderIcon
                                     v-else
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                     aria-hidden="true"
                                 />
                             </span>
                             <!-- Generic folder icon for non-directories -->
                             <span v-else>
                                 <FolderIcon
-                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                     aria-hidden="true"
                                 />
                             </span>
-                            <span :title="file.name">{{
+                            <span class="truncate" :title="file.name">{{
                                 truncateMiddle(file.name, 25)
                             }}</span>
                         </span>
@@ -138,7 +145,10 @@
                 <!-- Collapsible panel containing child items -->
                 <DisclosurePanel class="space-y-1">
                     <!-- Iterate through direct children -->
-                    <span v-for="sfile in file.children" :key="sfile.name">
+                    <span
+                        v-for="sfile in sortedChildren(file.children)"
+                        :key="sfile.id ?? sfile.name"
+                    >
                         <div class="ml-2">
                             <!-- Child item container with selection handling -->
                             <div
@@ -155,6 +165,14 @@
                                     <!-- Directory with children - create nested disclosure -->
                                     <span v-if="sfile.has_children">
                                         <Disclosure
+                                            :key="
+                                                'tree-folder-' +
+                                                sfile.id +
+                                                '-' +
+                                                (isExpanded(sfile.id)
+                                                    ? 'o'
+                                                    : 'c')
+                                            "
                                             v-slot="{ open }"
                                             as="div"
                                             class="space-y-1"
@@ -178,15 +196,21 @@
                                                         sfile.relative_url
                                                         ? 'cursor-pointer bg-gray-100 text-gray-900'
                                                         : 'cursor-pointer text-gray-600',
-                                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                                    'group w-full flex pr-4 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                                                 ]"
                                                 @click.stop="
                                                     handleFolderClick(sfile)
                                                 "
+                                                @contextmenu="
+                                                    onSampleFolderContextMenu(
+                                                        $event,
+                                                        sfile
+                                                    )
+                                                "
                                             >
                                                 <!-- Nested disclosure button -->
                                                 <DisclosureButton
-                                                    class="w-full text-left truncate ..."
+                                                    class="w-full text-left truncate flex items-center"
                                                     @click="
                                                         () =>
                                                             handleDisclosureButtonClick(
@@ -209,7 +233,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'ml-1 mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             aria-hidden="true"
                                                         />
@@ -223,7 +247,7 @@
                                                                 'missing'
                                                                     ? 'text-red-800'
                                                                     : '',
-                                                                '',
+                                                                'inline-flex items-center gap-1 min-w-0',
                                                             ]"
                                                             style="
                                                                 user-select: none;
@@ -242,7 +266,7 @@
                                                                         sfile.instrument_type ==
                                                                         'bruker'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/bruker.jpg"
                                                                     alt="Bruker"
                                                                 />
@@ -251,7 +275,7 @@
                                                                         sfile.instrument_type ==
                                                                         'varian'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/varian.jpeg"
                                                                     alt="Varian"
                                                                 />
@@ -260,7 +284,7 @@
                                                                         sfile.instrument_type ==
                                                                         'joel'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
                                                                     src="/img/joel.jpg"
                                                                     alt="JOEL"
                                                                 />
@@ -269,7 +293,7 @@
                                                                         sfile.instrument_type ==
                                                                         'jcamp'
                                                                     "
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                                                     src="/img/jcamp.png"
                                                                     alt="JCAMP"
                                                                 />
@@ -279,10 +303,10 @@
                                                                         sfile.model_type ==
                                                                         'study'
                                                                     "
-                                                                    class="relative inline-flex"
+                                                                    class="relative inline-flex flex-shrink-0"
                                                                 >
                                                                     <FolderIcon
-                                                                        class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                        class="h-5 w-5 text-gray-700"
                                                                         aria-hidden="true"
                                                                     />
                                                                     <span
@@ -299,18 +323,19 @@
                                                                 <!-- Default folder icon -->
                                                                 <FolderIcon
                                                                     v-else
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                                                     aria-hidden="true"
                                                                 />
                                                             </span>
                                                             <!-- Document icon for files -->
                                                             <span v-else>
                                                                 <DocumentTextIcon
-                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
                                                                     aria-hidden="true"
                                                                 />
                                                             </span>
                                                             <span
+                                                                class="truncate"
                                                                 :title="
                                                                     sfile.name
                                                                 "
@@ -330,8 +355,13 @@
                                             <DisclosurePanel class="space-y-0">
                                                 <!-- Deep nested items -->
                                                 <div
-                                                    v-for="subItem in sfile.children"
-                                                    :key="subItem.name"
+                                                    v-for="subItem in sortedChildren(
+                                                        sfile.children
+                                                    )"
+                                                    :key="
+                                                        subItem.id ??
+                                                        subItem.name
+                                                    "
                                                     as="div"
                                                     class="cursor-pointer group w-full flex pl-4 pr-2 py-0 font-medium text-gray-600 rounded-md"
                                                     @click.stop="
@@ -355,6 +385,12 @@
                                                             :expanded-folders="
                                                                 expandedFolders
                                                             "
+                                                            :tree-sort-by="
+                                                                treeSortBy
+                                                            "
+                                                            :tree-sort-order="
+                                                                treeSortOrder
+                                                            "
                                                             @toggle-expansion="
                                                                 (
                                                                     fsoId,
@@ -364,6 +400,13 @@
                                                                         'toggle-expansion',
                                                                         fsoId,
                                                                         isOpen
+                                                                    )
+                                                            "
+                                                            @study-context-menu="
+                                                                (payload) =>
+                                                                    $emit(
+                                                                        'study-context-menu',
+                                                                        payload
                                                                     )
                                                             "
                                                         />
@@ -504,14 +547,40 @@ export default {
      * @prop {Object} study - Study data object
      * @prop {Object} project - Project data object
      * @prop {Object} file - Current file/folder object to render
-     * @prop {Set} expandedFolders - Set of expanded folder IDs for state tracking
+     * @prop {String} treeSortBy - 'alphabetical' or 'timestamp' (sidebar tree)
+     * @prop {String} treeSortOrder - 'asc' or 'desc'
      */
-    props: ["study", "project", "file", "expandedFolders"],
+    props: {
+        study: {
+            type: Object,
+            default: null,
+        },
+        project: {
+            type: Object,
+            default: null,
+        },
+        file: {
+            type: Object,
+            default: null,
+        },
+        expandedFolders: {
+            type: Object,
+            default: null,
+        },
+        treeSortBy: {
+            type: String,
+            default: "alphabetical",
+        },
+        treeSortOrder: {
+            type: String,
+            default: "asc",
+        },
+    },
 
     /**
      * Events emitted by this component
      */
-    emits: ["toggle-expansion"],
+    emits: ["toggle-expansion", "study-context-menu"],
 
     /**
      * Composition API setup function
@@ -591,6 +660,54 @@ export default {
         },
 
         /**
+         * Return a sorted copy of folder children for the sidebar tree.
+         *
+         * @param {Array|null|undefined} children
+         * @returns {Array}
+         */
+        sortedChildren(children) {
+            if (!Array.isArray(children) || children.length === 0) {
+                return [];
+            }
+
+            const mode =
+                this.treeSortBy === "timestamp" ? "timestamp" : "alphabetical";
+            const order = this.treeSortOrder === "desc" ? "desc" : "asc";
+            const mult = order === "asc" ? 1 : -1;
+
+            return [...children].sort((a, b) => {
+                if (mode === "alphabetical") {
+                    const cmp = String(a.name || "").localeCompare(
+                        String(b.name || ""),
+                        undefined,
+                        { sensitivity: "base", numeric: true }
+                    );
+                    if (cmp !== 0) {
+                        return cmp * mult;
+                    }
+
+                    return 0;
+                }
+
+                const ta = new Date(
+                    a.updated_at || a.created_at || 0
+                ).getTime();
+                const tb = new Date(
+                    b.updated_at || b.created_at || 0
+                ).getTime();
+                if (ta !== tb) {
+                    return (ta < tb ? -1 : 1) * mult;
+                }
+
+                return String(a.name || "").localeCompare(
+                    String(b.name || ""),
+                    undefined,
+                    { sensitivity: "base", numeric: true }
+                );
+            });
+        },
+
+        /**
          * Handle folder click events
          *
          * When a folder is clicked, select it to show its contents in the
@@ -601,6 +718,29 @@ export default {
         handleFolderClick(file) {
             // Select the folder to show its contents in right panel
             this.displaySelected(file);
+        },
+
+        /**
+         * Right-click handler for folders. Only sample folders (those with
+         * `model_type == 'study'`) can be reset, so we only emit for those
+         * — all other folders fall through to the browser's native menu.
+         *
+         * @param {MouseEvent} event - Native contextmenu event
+         * @param {Object} file - The folder object the user right-clicked
+         */
+        onSampleFolderContextMenu(event, file) {
+            if (!file || file.model_type !== "study") {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.$emit("study-context-menu", {
+                file,
+                x: event.clientX,
+                y: event.clientY,
+            });
         },
 
         /**

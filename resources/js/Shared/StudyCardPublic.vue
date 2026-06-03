@@ -1,18 +1,18 @@
 <!--
-  Study Card Public Component
+  Compound card (public)
   
-  A modern card component for displaying study information in public project views.
+  A card for displaying a compound / study in public project views.
   Features responsive design, image carousel, molecular structure fallback, and
   comprehensive study metadata display with experiment types and status indicators.
 -->
 <template>
-    <!-- Main study card container with hover effects and transitions -->
+    <!-- Compound card: preview, structure, and metadata -->
     <div
         v-if="study"
         class="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 ease-in-out overflow-hidden"
     >
         <!-- Clickable card area linking to study details -->
-        <Link :href="study.public_url" class="block">
+        <Link :href="studyHref" class="block">
             <!-- Preview image section with multiple display options -->
             <div
                 class="relative bg-gray-50 overflow-hidden"
@@ -250,7 +250,20 @@ export default {
      * @prop {Object} study - Study data object containing all study information
      * @prop {Object} project - Parent project data object (optional)
      */
-    props: ["study", "project"],
+    props: {
+        study: {
+            type: Object,
+            required: true,
+        },
+        project: {
+            type: Object,
+            default: null,
+        },
+        reviewerPreview: {
+            type: Object,
+            default: null,
+        },
+    },
 
     /**
      * Composition API setup (currently unused)
@@ -331,6 +344,23 @@ export default {
         cleanIdentifier() {
             if (!this.study.identifier) return "";
             return this.study.identifier.replace(/^NMRXIV:\s*/, "");
+        },
+        studyHref() {
+            if (this.reviewerPreview?.obfuscationcode && this.study?.id) {
+                return (
+                    route("project.preview", [
+                        this.reviewerPreview.obfuscationcode,
+                    ]) +
+                    "?tab=study&study=" +
+                    encodeURIComponent(this.study.id)
+                );
+            }
+
+            if (this.study?.public_url && this.study?.identifier) {
+                return this.study.public_url;
+            }
+
+            return "#";
         },
     },
 

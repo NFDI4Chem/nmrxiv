@@ -10,9 +10,29 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
+     * Configured via the TRUSTED_PROXIES env var. Defaults to "*" only in
+     * production where a real reverse proxy terminates TLS. In local/Docker
+     * dev we trust nothing so Laravel\Sentinel does not flag every request
+     * coming in via the host interface as a public-proxy access attempt.
+     *
      * @var array|string|null
      */
-    protected $proxies = '*';
+    protected $proxies;
+
+    public function __construct()
+    {
+        $configured = config('app.trusted_proxies', env('TRUSTED_PROXIES'));
+
+        if ($configured === null) {
+            $this->proxies = app()->environment('production') ? '*' : null;
+
+            return;
+        }
+
+        $this->proxies = $configured === '*'
+            ? '*'
+            : array_filter(array_map('trim', explode(',', (string) $configured)));
+    }
 
     /**
      * The headers that should be used to detect proxies.

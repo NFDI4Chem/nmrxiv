@@ -18,7 +18,7 @@ Artisan::command('nmrxiv', function () {
     $this->comment('Welcome to nmrXiv!');
 })->purpose('Display nmrxiv info');
 
-// Schedule::command('nmrxiv:publish')->daily();
+Schedule::command('nmrxiv:publish-embargo-projects')->daily();
 Schedule::command('nmrxiv:delete-projects')->daily();
 Schedule::command('nmrxiv:index-molecules')->daily();
 Schedule::command('nmrxiv:delete-citations')->weekly();
@@ -27,3 +27,7 @@ if (App::environment('production')) {
     Schedule::command('nmrxiv:backup-postgres-dump')->daily();
 }
 Schedule::command('nmrxiv:backup-cleanup')->monthly()->onOneServer();
+Schedule::command('nmrxiv:repair-missing-compound-info')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->onOneServer();

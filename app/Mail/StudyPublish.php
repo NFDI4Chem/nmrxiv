@@ -5,7 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Carbon;
 
 class StudyPublish extends Mailable
 {
@@ -13,35 +12,18 @@ class StudyPublish extends Mailable
 
     public $studies;
 
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
     public function __construct($studies)
     {
         $this->studies = $studies;
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
     public function build()
     {
-        $releaseToday = false;
-        $releaseDate = Carbon::parse($this->studies[0]->release_date);
-
-        if ($releaseDate->isToday()) {
-            $releaseToday = true;
-        }
+        $studies = $this->studies;
 
         return $this->markdown('vendor.mail.study-published', [
-            'url' => url(config('app.url').'/spectra'),
-            'samples' => $this->studies,
-            'releaseToday' => $releaseToday,
-            'releaseDate' => $releaseDate,
+            'url' => url(config('app.url').'/projects'),
+            'samples' => $studies,
         ])->subject(__('Submission Processed.'));
     }
 }

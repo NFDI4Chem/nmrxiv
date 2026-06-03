@@ -33,8 +33,15 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('v1')->group(function () {
 
-    // Search
-    Route::post('/search/{smiles?}', [SearchController::class, 'search']);
+    Route::prefix('search')->name('api.search.')->group(function () {
+        Route::get('catalog', [SearchController::class, 'catalog'])->name('catalog');
+        Route::post('compounds/{smiles?}', [SearchController::class, 'search'])->name('compounds');
+    });
+
+    // Deprecated search routes (backward compatibility)
+    Route::get('text-search', [SearchController::class, 'catalogTextSearchLegacy'])->name('api.text-search');
+    Route::get('search', [SearchController::class, 'catalogLegacy'])->name('api.search.legacy.catalog');
+    Route::post('search/{smiles?}', [SearchController::class, 'searchLegacy'])->name('api.search.legacy.compounds');
 
     Route::prefix('files')->group(function () {
         Route::get('/children/{file}', [FileSystemController::class, 'children']);

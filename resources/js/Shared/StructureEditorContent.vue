@@ -1,25 +1,25 @@
 <template>
-    <div class="flex flex-col h-full">
+    <div class="flex min-h-0 flex-col" :class="compact ? '' : 'h-full'">
         <!-- Title Section -->
-        <div class="mb-6">
+        <div v-if="!compact" class="mb-4 shrink-0">
             <h2 class="text-3xl font-bold text-gray-900">Structure Search</h2>
-            <p class="mt-2 text-gray-600">
+            <p class="mt-1 text-gray-600">
                 Draw, paste, or import a chemical structure
             </p>
         </div>
 
         <!-- Input Options -->
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="mb-4 grid shrink-0 grid-cols-1 gap-3 md:grid-cols-2">
             <!-- File Upload -->
             <label
-                class="relative flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                class="relative flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-50 cursor-pointer"
                 :class="isDragging ? 'border-gray-900 bg-gray-50' : ''"
                 @dragover.prevent="isDragging = true"
                 @dragleave.prevent="isDragging = false"
                 @drop.prevent="handleDrop"
             >
                 <svg
-                    class="w-4 h-4 mr-2"
+                    class="mr-2 h-4 w-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -43,11 +43,13 @@
 
             <!-- Clipboard Paste -->
             <button
-                class="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                type="button"
+                class="flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                :disabled="!editorReady"
                 @click="pasteFromClipboard"
             >
                 <svg
-                    class="w-4 h-4 mr-2"
+                    class="mr-2 h-4 w-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -63,115 +65,118 @@
             </button>
         </div>
 
-        <!-- Structure Editor Card -->
+        <!-- Structure Editor (fills remaining modal height) -->
         <div
+            v-if="initError"
+            class="mb-4 flex h-[360px] w-full items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 text-center text-sm text-red-700"
+            :class="compact ? 'h-[360px]' : 'min-h-[360px] flex-1'"
+        >
+            Structure editor failed to load. Restart the dev server after
+            running npm install.
+        </div>
+        <div
+            v-else
             :id="editorId"
-            class="w-full bg-white rounded-xl border border-gray-200 shadow-sm mb-4"
-            style="height: 450px"
+            ref="editorHostRef"
+            class="mb-4 w-full shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+            :class="compact ? 'h-[360px]' : 'min-h-0 flex-1'"
         />
 
         <!-- Search Type Selection -->
-        <div class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Search Type
+        <div class="shrink-0">
+            <h3 class="mb-3 text-sm font-semibold text-gray-900">
+                How should your structure match?
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Exact Match -->
-                <label
-                    for="search-type-exact"
-                    class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                    :class="
-                        searchType === 'exact'
-                            ? 'border-gray-900 bg-gray-50'
-                            : ''
-                    "
-                >
-                    <input
-                        id="search-type-exact"
-                        name="search-type"
-                        value="exact"
-                        type="radio"
-                        :checked="searchType === 'exact'"
-                        class="sr-only"
-                        @input="$emit('update:searchType', 'exact')"
-                    />
-                    <div class="flex-1">
-                        <span class="block text-sm font-semibold text-gray-900">
-                            Exact Match
-                        </span>
-                        <span class="block text-xs text-gray-500 mt-1">
-                            Find identical structures
-                        </span>
-                    </div>
-                </label>
 
-                <!-- Substructure Search -->
-                <label
-                    for="search-type-sub"
-                    class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
+            <div
+                class="grid grid-cols-1 gap-2 sm:grid-cols-3"
+                role="radiogroup"
+                aria-label="Structure search type"
+            >
+                <button
+                    v-for="option in searchTypeOptions"
+                    :key="option.value"
+                    type="button"
+                    role="radio"
+                    :aria-checked="searchType === option.value"
+                    class="group relative flex items-start gap-2.5 rounded-lg px-3 py-3 text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                     :class="
-                        searchType === 'substructure'
-                            ? 'border-gray-900 bg-gray-50'
-                            : ''
+                        searchType === option.value
+                            ? 'bg-white shadow-md ring-2 ring-gray-900'
+                            : 'bg-white/70 ring-1 ring-gray-200/90 hover:bg-white hover:shadow-sm hover:ring-gray-300'
                     "
+                    @click="selectSearchType(option.value)"
                 >
-                    <input
-                        id="search-type-sub"
-                        name="search-type"
-                        type="radio"
-                        value="substructure"
-                        :checked="searchType === 'substructure'"
-                        class="sr-only"
-                        @input="$emit('update:searchType', 'substructure')"
-                    />
-                    <div class="flex-1">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors"
+                        :class="
+                            searchType === option.value
+                                ? 'bg-gray-900 text-white'
+                                : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                        "
+                    >
+                        <component
+                            :is="option.icon"
+                            class="h-5 w-5"
+                            aria-hidden="true"
+                        />
+                    </span>
+                    <span class="min-w-0 flex-1">
                         <span class="block text-sm font-semibold text-gray-900">
-                            Substructure
+                            {{ option.label }}
                         </span>
-                        <span class="block text-xs text-gray-500 mt-1">
-                            Find containing structures
+                        <span
+                            class="mt-0.5 block text-xs leading-snug text-gray-500"
+                        >
+                            {{ option.description }}
                         </span>
-                    </div>
-                </label>
-
-                <!-- Similarity Search -->
-                <label
-                    for="search-type-similar"
-                    class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                    :class="
-                        searchType === 'similarity'
-                            ? 'border-gray-900 bg-gray-50'
-                            : ''
-                    "
-                >
-                    <input
-                        id="search-type-similar"
-                        name="search-type"
-                        value="similarity"
-                        type="radio"
-                        :checked="searchType === 'similarity'"
-                        class="sr-only"
-                        @input="$emit('update:searchType', 'similarity')"
-                    />
-                    <div class="flex-1">
-                        <span class="block text-sm font-semibold text-gray-900">
-                            Similarity
-                        </span>
-                        <span class="block text-xs text-gray-500 mt-1">
-                            Find similar structures
-                        </span>
-                    </div>
-                </label>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
+import {
+    CheckBadgeIcon,
+    ViewfinderCircleIcon,
+    SparklesIcon,
+} from "@heroicons/vue/24/outline";
+import {
+    createStructureEditor,
+    loadOpenChemLib,
+    STRUCTURE_SEARCH_EDITOR_OPTIONS,
+} from "@/Utils/structureEditor";
+
+const searchTypeOptions = [
+    {
+        value: "exact",
+        label: "Exact match",
+        description: "Same atoms, bonds, and stereochemistry",
+        icon: CheckBadgeIcon,
+    },
+    {
+        value: "substructure",
+        label: "Substructure",
+        description: "Records that contain your drawn fragment",
+        icon: ViewfinderCircleIcon,
+    },
+    {
+        value: "similarity",
+        label: "Similarity",
+        description: "Structurally related compounds by fingerprint",
+        icon: SparklesIcon,
+    },
+];
 
 export default {
     props: {
+        compact: {
+            type: Boolean,
+            default: false,
+        },
         editorId: {
             type: String,
             default: "structureSearchEditor",
@@ -180,31 +185,132 @@ export default {
             type: String,
             default: "exact",
         },
-        editor: {
-            type: Object,
+        initialSmiles: {
+            type: String,
             default: null,
         },
     },
-    emits: ["update:searchType"],
-    setup(props) {
+    emits: ["update:searchType", "ready"],
+    setup(props, { emit }) {
         const isDragging = ref(false);
         const fileInput = ref(null);
+        const editorHostRef = ref(null);
+        const editorReady = ref(false);
+        const initError = ref(null);
+
+        let editorApi = null;
+
+        const applySmiles = async (smiles) => {
+            if (!editorApi || !smiles?.trim()) {
+                return;
+            }
+
+            const OCL = await loadOpenChemLib();
+            editorApi.setMolFile(
+                OCL.Molecule.fromSmiles(smiles.trim()).toMolfile()
+            );
+        };
+
+        const mountEditor = async () => {
+            if (editorApi) {
+                return true;
+            }
+
+            if (!editorHostRef.value) {
+                return false;
+            }
+
+            try {
+                editorApi = await createStructureEditor(
+                    editorHostRef.value,
+                    STRUCTURE_SEARCH_EDITOR_OPTIONS
+                );
+                editorReady.value = true;
+                emit("ready", editorApi);
+
+                if (props.initialSmiles) {
+                    await applySmiles(props.initialSmiles);
+                }
+
+                return true;
+            } catch (error) {
+                console.error("Failed to initialize structure editor:", error);
+                initError.value = error;
+
+                return true;
+            }
+        };
+
+        const mountEditorWhenReady = async () => {
+            await nextTick();
+
+            if (await mountEditor()) {
+                return;
+            }
+
+            await new Promise((resolve) => {
+                requestAnimationFrame(resolve);
+            });
+
+            if (await mountEditor()) {
+                return;
+            }
+
+            await new Promise((resolve) => {
+                requestAnimationFrame(resolve);
+            });
+
+            await mountEditor();
+        };
+
+        onMounted(() => {
+            mountEditorWhenReady();
+        });
+
+        onBeforeUnmount(() => {
+            if (editorApi?.destroy) {
+                editorApi.destroy();
+            }
+
+            editorApi = null;
+        });
+
+        watch(
+            () => props.initialSmiles,
+            (smiles) => {
+                if (smiles) {
+                    applySmiles(smiles);
+                }
+            }
+        );
+
+        const selectSearchType = (value) => {
+            emit("update:searchType", value);
+        };
 
         const handleFileSelect = async (event) => {
             const file = event.target.files[0];
-            if (!file) return;
+            if (!file) {
+                return;
+            }
+
             await loadFile(file);
         };
 
         const handleDrop = async (event) => {
             isDragging.value = false;
             const file = event.dataTransfer.files[0];
-            if (!file) return;
+            if (!file) {
+                return;
+            }
+
             await loadFile(file);
         };
 
         const loadFile = async (file) => {
-            if (!props.editor) return;
+            if (!editorApi) {
+                return;
+            }
 
             const validExtensions = [".mol", ".sdf", ".sd"];
             const fileName = file.name.toLowerCase();
@@ -219,7 +325,7 @@ export default {
 
             try {
                 const text = await file.text();
-                props.editor.setMolFile(text);
+                editorApi.setMolFile(text);
             } catch (error) {
                 console.error("Error loading file:", error);
                 alert("Error loading file");
@@ -227,21 +333,21 @@ export default {
         };
 
         const pasteFromClipboard = async () => {
-            if (!props.editor) return;
+            if (!editorApi) {
+                return;
+            }
 
             try {
                 const text = await navigator.clipboard.readText();
 
-                // Try as SMILES first
                 try {
-                    const OCL = (await import("openchemlib/full")).default;
+                    const OCL = await loadOpenChemLib();
                     const mol = OCL.Molecule.fromSmiles(text.trim());
-                    props.editor.setMolFile(mol.toMolfile());
+                    editorApi.setMolFile(mol.toMolfile());
                     return;
                 } catch {
-                    // If not SMILES, try as MOL file
                     if (text.includes("M  END") || text.includes("$$$$")) {
-                        props.editor.setMolFile(text);
+                        editorApi.setMolFile(text);
                     } else {
                         alert(
                             "Clipboard content is not a valid SMILES or MOL format"
@@ -257,8 +363,13 @@ export default {
         };
 
         return {
+            searchTypeOptions,
             isDragging,
             fileInput,
+            editorHostRef,
+            editorReady,
+            initError,
+            selectSearchType,
             handleFileSelect,
             handleDrop,
             pasteFromClipboard,

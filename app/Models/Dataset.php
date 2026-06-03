@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use OwenIt\Auditing\Contracts\Auditable;
 use Storage;
@@ -39,6 +38,7 @@ class Dataset extends Model implements Auditable
         'dataset_photo_path',
         'license_id',
         'external_url',
+        'assignments',
     ];
 
     /**
@@ -60,7 +60,30 @@ class Dataset extends Model implements Auditable
         return [
             'starred' => 'boolean',
             'is_public' => 'boolean',
+            'assignments' => 'array',
         ];
+    }
+
+    /**
+     * True when the dataset has user-supplied assignment content. We treat
+     * any non-empty `acs` string OR any `atom_peaks` rows as "assigned",
+     * which keeps the validator (`assignments|array|min:1`) and UI badges
+     * in sync with what the user actually saved on the Assignments tab.
+     */
+    public function hasAssignments(): bool
+    {
+        $a = $this->assignments;
+        if (! is_array($a)) {
+            return false;
+        }
+        if (! empty($a['acs']) && trim((string) $a['acs']) !== '') {
+            return true;
+        }
+        if (! empty($a['atom_peaks']) && is_array($a['atom_peaks']) && count($a['atom_peaks']) > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -131,9 +154,57 @@ class Dataset extends Model implements Auditable
         return $this->morphOne(NMRium::class, 'nmriumable');
     }
 
-    public function fsObject(): HasOne
+    /**
+     * NMRium workspace payload for this dataset, normalized for API and UI.
+     * Molecule headers are merged from the study sample when present.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function normalizedNmriumInfo(): ?array
     {
-        return $this->hasOne(FileSystemObject::class);
+        $nmrium = $this->nmrium;
+        if (! $nmrium) {
+            return null;
+        }
+
+        $nmriumInfo = $nmrium->nmrium_info;
+        if (is_string($nmriumInfo)) {
+            $nmriumInfo = json_decode($nmriumInfo, true);
+        }
+        if (! is_array($nmriumInfo)) {
+            $nmriumInfo = [];
+        }
+        if (! isset($nmriumInfo['data']) || ! is_array($nmriumInfo['data'])) {
+            $nmriumInfo['data'] = [];
+        }
+        if (! isset($nmriumInfo['data']['molecules']) || ! is_array($nmriumInfo['data']['molecules'])) {
+            $nmriumInfo['data']['molecules'] = [];
+        }
+
+        $sample = optional($this->study)->sample;
+        if ($sample) {
+            $nmriumInfo['data']['molecules'] = $sample
+                ->mergeNmriumMolecules($nmriumInfo['data']['molecules']);
+        }
+
+        return $nmriumInfo;
+    }
+
+    /**
+     * The directory/file backing this dataset.
+     *
+     * The canonical link is `datasets.fs_id -> file_system_objects.id`,
+     * which is set atomically when the dataset is created from a folder
+     * (see `App\Actions\Draft\ProcessDraft::createDatasetFromOrphanedFile`
+     * and the chemotion path nearby). The reverse `file_system_objects.dataset_id`
+     * back-pointer is only updated by a separate `save()` and gets out of
+     * sync after re-archive, partial reseed, or any flow that recreates the
+     * dataset row without re-walking the fs tree. Defining the relationship
+     * as `belongsTo` on `fs_id` keeps it correct in those cases too.
+     */
+    public function fsObject(): BelongsTo
+    {
+        return $this->belongsTo(FileSystemObject::class, 'fs_id');
     }
 
     /**

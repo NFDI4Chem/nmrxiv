@@ -45,316 +45,603 @@
             </div>
         </template>
         <div
-            v-if="projects.length > 0 || samples.length > 0"
-            class="px-8 py-8 mx-auto max-w-4xl"
+            v-if="showDashboardLists"
+            class="mx-auto w-full max-w-5xl min-w-0 px-4 pb-10 pt-6 sm:px-6 lg:px-8"
         >
-            <div>
-                <div class="sm:hidden">
-                    <label for="tabs" class="sr-only">Select a tab</label>
-                    <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
-                    <select
-                        id="tabs"
-                        name="tabs"
-                        class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+            <!-- Workspace filters: Shared / Recent / Starred / Trash -->
+            <section
+                v-if="isWorkspaceView"
+                class="flex w-full min-w-0 flex-col gap-8"
+                :aria-labelledby="workspaceSectionHeadingId"
+            >
+                <header>
+                    <h2
+                        :id="workspaceSectionHeadingId"
+                        class="text-lg font-semibold tracking-tight text-gray-900"
                     >
-                        <option
-                            :selected="selectedTab === 'projects'"
-                            value="projects"
+                        {{ workspaceCopy.title }}
+                    </h2>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        {{ workspaceCopy.description }}
+                    </p>
+                </header>
+
+                <div class="w-full min-w-0">
+                    <team-projects
+                        class="block w-full min-w-0 max-w-none"
+                        :team="team"
+                        :team-role="teamRole"
+                        mode="listing"
+                        :projects="workspaceProjects"
+                    >
+                        <template #emptyText>
+                            <div
+                                class="rounded-xl border border-gray-200/90 bg-gray-50/70 px-8 py-16 text-center dark:border-gray-800 dark:bg-gray-950/35"
+                                role="status"
+                                aria-live="polite"
+                            >
+                                <component
+                                    :is="workspaceCopy.emptyIcon"
+                                    class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+                                    aria-hidden="true"
+                                />
+                                <h3
+                                    class="mt-5 text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                                >
+                                    {{ workspaceCopy.emptyProjectsTitle }}
+                                </h3>
+                                <p
+                                    class="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-gray-600 dark:text-gray-400"
+                                >
+                                    {{ workspaceCopy.emptyProjectsBody }}
+                                </p>
+                            </div>
+                        </template>
+                    </team-projects>
+                </div>
+
+                <div
+                    v-if="workspaceStudies.length > 0"
+                    class="w-full min-w-0 border-t border-gray-100 pt-8"
+                >
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        Compound library
+                    </h3>
+                    <div
+                        class="mx-auto mt-4 grid max-w-md gap-8 sm:max-w-lg lg:max-w-7xl lg:grid-cols-3"
+                    >
+                        <div
+                            v-for="study in workspaceStudies"
+                            :key="study.uuid"
+                        >
+                            <Link
+                                :href="route('dashboard.studies', [study.id])"
+                            >
+                                <study-card :study="study" />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <template v-else>
+                <!-- Primary navigation: projects vs compound library -->
+                <div class="mb-8">
+                    <div class="sm:hidden">
+                        <label for="dashboard-tab-select" class="sr-only"
+                            >Choose projects or compound library</label
+                        >
+                        <select
+                            id="dashboard-tab-select"
+                            name="tabs"
+                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            :value="selectedTab"
+                            @change="onTabSelect($event)"
+                        >
+                            <option value="projects">Projects</option>
+                            <option value="samples">Compound library</option>
+                        </select>
+                    </div>
+                    <div
+                        class="hidden sm:flex sm:items-center sm:justify-between sm:gap-4"
+                    >
+                        <div
+                            class="inline-flex rounded-lg bg-gray-100 p-1 ring-1 ring-inset ring-gray-200/80"
+                            role="tablist"
+                            aria-label="Projects and compound library"
+                        >
+                            <Link
+                                :href="dashboardUrl({ tab: 'projects' })"
+                                role="tab"
+                                :class="[
+                                    selectedTab === 'projects'
+                                        ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                                        : 'text-gray-600 hover:bg-white/60 hover:text-gray-900',
+                                    'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors',
+                                ]"
+                                :aria-current="
+                                    selectedTab === 'projects'
+                                        ? 'page'
+                                        : undefined
+                                "
+                            >
+                                Projects
+                            </Link>
+                            <Link
+                                :href="dashboardUrl({ tab: 'samples' })"
+                                role="tab"
+                                :class="[
+                                    selectedTab === 'samples'
+                                        ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                                        : 'text-gray-600 hover:bg-white/60 hover:text-gray-900',
+                                    'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors',
+                                ]"
+                                :aria-current="
+                                    selectedTab === 'samples'
+                                        ? 'page'
+                                        : undefined
+                                "
+                            >
+                                Compound library
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <section
+                    v-if="selectedTab === 'projects'"
+                    aria-labelledby="dashboard-projects-heading"
+                    class="flex w-full min-w-0 flex-col gap-6"
+                >
+                    <header>
+                        <h2
+                            id="dashboard-projects-heading"
+                            class="text-lg font-semibold tracking-tight text-gray-900"
                         >
                             Projects
-                        </option>
-                        <option
-                            :selected="selectedTab === 'samples'"
-                            value="samples"
-                        >
-                            Samples
-                        </option>
-                    </select>
-                </div>
-                <div class="hidden sm:block">
-                    <nav class="flex space-x-4" aria-label="Tabs">
-                        <!-- Current: "bg-indigo-100 text-indigo-700", Default: "text-gray-500 hover:text-gray-700" -->
-                        <a
-                            href="?tab=projects"
-                            :class="[
-                                selectedTab == 'projects'
-                                    ? 'bg-indigo-100 text-indigo-700'
-                                    : '',
-                                'rounded-md px-3 py-2 text-sm font-medium',
-                            ]"
-                            aria-current="page"
-                            >Projects</a
-                        >
-                        <a
-                            href="?tab=samples"
-                            :class="[
-                                selectedTab == 'samples'
-                                    ? 'bg-indigo-100 text-indigo-700'
-                                    : '',
-                                'rounded-md px-3 py-2 text-sm font-medium',
-                            ]"
-                            >Samples</a
-                        >
-                    </nav>
-                </div>
-            </div>
-            <div v-if="selectedTab == 'projects'">
-                <div v-if="projects.length > 0" class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="text-sm text-gray-600">
-                            <span v-if="filteredProjects.length > 0">
-                                Showing
-                                {{
-                                    (currentProjectsPage - 1) *
-                                        projectsPerPage +
-                                    1
-                                }}
-                                to
-                                {{
-                                    Math.min(
-                                        currentProjectsPage * projectsPerPage,
-                                        filteredProjects.length
-                                    )
-                                }}
-                                of {{ filteredProjects.length }}
-                                {{
-                                    selectedProjectStatus !== "all"
-                                        ? selectedProjectStatus + " "
-                                        : ""
-                                }}projects
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <!-- Status Filter Dropdown -->
-                            <StatusFilter v-model="selectedProjectStatus" />
+                        </h2>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                            Search by name or description, narrow by status,
+                            then open a project to manage compounds, spectra,
+                            and files.
+                        </p>
+                    </header>
 
-                            <!-- Search Input -->
-                            <div class="w-72">
+                    <div
+                        v-if="hasProjects"
+                        class="flex w-full min-w-0 flex-col gap-6"
+                    >
+                        <div
+                            class="flex flex-nowrap items-center gap-2 sm:gap-3"
+                        >
+                            <div class="min-w-0 flex-1">
+                                <label
+                                    for="dashboard-projects-search"
+                                    class="sr-only"
+                                    >Search projects by name, description, or
+                                    ID</label
+                                >
                                 <SearchInput
-                                    v-model="searchProjectQuery"
+                                    input-id="dashboard-projects-search"
+                                    :model-value="filters.projects_q"
+                                    :filters-active="
+                                        filters.projects_status !== 'all'
+                                    "
                                     name="project-search"
-                                    placeholder="Search projects..."
-                                    @reset="searchProjectQuery = ''"
+                                    placeholder="Search by name, description, or ID…"
+                                    @update:model-value="onProjectsSearchInput"
+                                    @reset="clearProjectFilters"
+                                />
+                            </div>
+                            <div
+                                class="flex shrink-0 items-center border-l border-gray-200 pl-2 sm:pl-3"
+                            >
+                                <span class="sr-only">Filter by status</span>
+                                <StatusFilter
+                                    :model-value="filters.projects_status"
+                                    @update:model-value="onProjectsStatus"
                                 />
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div v-if="projects.length > 0 && filteredProjects.length > 0">
-                    <team-projects
-                        :team="team"
-                        :team-role="teamRole"
-                        :mode="'create'"
-                        :projects="paginatedProjects"
-                    ></team-projects>
-                </div>
 
-                <!-- Show original TeamProjects empty state only when there are genuinely no projects and no filters applied -->
-                <div v-if="projects.length === 0">
-                    <team-projects
-                        :team="team"
-                        :team-role="teamRole"
-                        :mode="'create'"
-                        :projects="[]"
-                    ></team-projects>
-                </div>
-
-                <!-- Empty search/filter results message for projects -->
-                <div
-                    v-if="
-                        projects.length > 0 &&
-                        (searchProjectQuery ||
-                            selectedProjectStatus !== 'all') &&
-                        filteredProjects.length === 0
-                    "
-                    class="text-center py-12"
-                >
-                    <EmptySearchState
-                        entity-type="projects"
-                        :search-query="
-                            searchProjectQuery ||
-                            (selectedProjectStatus !== 'all'
-                                ? `status: ${selectedProjectStatus}`
-                                : '')
-                        "
-                        :title="
-                            searchProjectQuery
-                                ? 'No matching projects found'
-                                : `No ${selectedProjectStatus} projects found`
-                        "
-                        @clear-search="clearProjectFilters"
-                    />
-                </div>
-
-                <div
-                    v-if="projects.length > 0 && totalProjectPages > 1"
-                    class="flex items-center justify-between px-6 py-3 border-t bg-white mt-4"
-                >
-                    <div class="text-sm text-gray-600">
-                        Page {{ currentProjectsPage }} of
-                        {{ totalProjectPages }}
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button
-                            type="button"
-                            class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
-                            :disabled="currentProjectsPage === 1"
-                            @click="
-                                currentProjectsPage = Math.max(
-                                    1,
-                                    currentProjectsPage - 1
-                                )
-                            "
+                        <div
+                            v-if="projects.total > 0"
+                            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-100 py-2"
                         >
-                            Previous
-                        </button>
-                        <button
-                            type="button"
-                            class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
-                            :disabled="
-                                currentProjectsPage === totalProjectPages
-                            "
-                            @click="
-                                currentProjectsPage = Math.min(
-                                    totalProjectPages,
-                                    currentProjectsPage + 1
-                                )
-                            "
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div v-if="selectedTab == 'samples'">
-                <div v-if="samples.length > 0" class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="text-sm text-gray-600">
-                            <span v-if="filteredSamples.length > 0">
+                            <p
+                                class="text-sm text-gray-600"
+                                role="status"
+                                aria-live="polite"
+                            >
                                 Showing
+                                <span class="tabular-nums">{{
+                                    projects.from
+                                }}</span>
+                                –
+                                <span class="tabular-nums">{{
+                                    projects.to
+                                }}</span>
+                                of
+                                <span class="tabular-nums">{{
+                                    projects.total
+                                }}</span>
                                 {{
-                                    (currentSamplesPage - 1) * samplesPerPage +
-                                    1
-                                }}
-                                to
-                                {{
-                                    Math.min(
-                                        currentSamplesPage * samplesPerPage,
-                                        filteredSamples.length
-                                    )
-                                }}
-                                of {{ filteredSamples.length }}
-                                {{
-                                    selectedSampleStatus !== "all"
-                                        ? selectedSampleStatus + " "
-                                        : ""
-                                }}samples
-                            </span>
+                                    filters.projects_status !== "all"
+                                        ? " " + filters.projects_status + " "
+                                        : " "
+                                }}projects
+                                <span
+                                    v-if="projects.last_page > 1"
+                                    class="text-gray-500"
+                                >
+                                    · Page {{ projects.current_page }} of
+                                    {{ projects.last_page }}
+                                </span>
+                            </p>
+                            <div
+                                v-if="showProjectsPerPageSelect"
+                                class="flex shrink-0 items-center sm:ml-auto"
+                            >
+                                <select
+                                    id="dashboard-projects-per-page-top"
+                                    aria-label="Rows per page"
+                                    class="block rounded-lg border-gray-300 py-1.5 pl-2.5 pr-8 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:min-w-[5.5rem]"
+                                    :value="
+                                        Number(filters.projects_per_page) || 10
+                                    "
+                                    @change="onProjectsPerPageChange"
+                                >
+                                    <option
+                                        v-for="n in perPageOptions"
+                                        :key="'proj-top-' + n"
+                                        :value="n"
+                                    >
+                                        {{ n }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <!-- Status Filter Dropdown for Samples -->
-                            <StatusFilter v-model="selectedSampleStatus" />
 
-                            <!-- Search Input -->
-                            <div class="w-72">
-                                <SearchInput
-                                    v-model="searchSampleQuery"
-                                    name="sample-search"
-                                    placeholder="Search samples..."
-                                    @reset="searchSampleQuery = ''"
+                        <div v-if="projects.total > 0" class="w-full min-w-0">
+                            <team-projects
+                                class="block w-full min-w-0 max-w-none"
+                                :team="team"
+                                :team-role="teamRole"
+                                mode="create"
+                                :projects="projects.data"
+                            />
+                        </div>
+
+                        <div
+                            v-if="
+                                projects.total === 0 &&
+                                (filters.projects_q ||
+                                    filters.projects_status !== 'all')
+                            "
+                            class="w-full min-w-0 py-12 text-center"
+                        >
+                            <EmptySearchState
+                                entity-type="projects"
+                                :search-query="
+                                    filters.projects_q ||
+                                    (filters.projects_status !== 'all'
+                                        ? `status: ${filters.projects_status}`
+                                        : '')
+                                "
+                                :title="
+                                    filters.projects_q
+                                        ? 'No projects match your search'
+                                        : filters.projects_status !== 'all'
+                                        ? 'No projects with this status'
+                                        : 'No projects to show'
+                                "
+                                :message="
+                                    filters.projects_q
+                                        ? 'Try different keywords or spelling. You can also clear the search to browse all projects in this workspace.'
+                                        : filters.projects_status !== 'all'
+                                        ? 'Try another status filter, or reset filters to see every project you have access to.'
+                                        : undefined
+                                "
+                                @clear-search="clearProjectFilters"
+                            />
+                        </div>
+
+                        <div
+                            v-if="
+                                projects.total > 0 &&
+                                (showProjectsPerPageSelect ||
+                                    projects.last_page > 1)
+                            "
+                            class="flex flex-col gap-4 border-t border-gray-100 pt-5 sm:flex-row-reverse sm:items-end sm:justify-between sm:gap-6"
+                        >
+                            <div
+                                v-if="showProjectsPerPageSelect"
+                                class="flex w-full shrink-0 items-center justify-end sm:w-auto"
+                                :class="
+                                    projects.last_page > 1 ? '' : 'sm:ml-auto'
+                                "
+                            >
+                                <select
+                                    id="dashboard-projects-per-page-bottom"
+                                    aria-label="Rows per page"
+                                    class="block w-full rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:w-auto sm:min-w-[5.5rem]"
+                                    :value="
+                                        Number(filters.projects_per_page) || 10
+                                    "
+                                    @change="onProjectsPerPageChange"
+                                >
+                                    <option
+                                        v-for="n in perPageOptions"
+                                        :key="'proj-' + n"
+                                        :value="n"
+                                    >
+                                        {{ n }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div
+                                v-if="projects.last_page > 1"
+                                class="min-w-0 flex-1"
+                            >
+                                <Pagination
+                                    :links="projects.links"
+                                    navigation-label="Projects pagination"
                                 />
                             </div>
                         </div>
                     </div>
-                </div>
-                <div v-if="samples.length > 0 && filteredSamples.length > 0">
-                    <team-samples
-                        :team="team"
-                        :team-role="teamRole"
-                        :mode="'create'"
-                        :studies="paginatedSamples"
-                    ></team-samples>
-                </div>
 
-                <!-- Show original TeamSamples empty state only when there are genuinely no samples -->
-                <div v-if="samples.length === 0">
-                    <team-samples
-                        :team="team"
-                        :team-role="teamRole"
-                        :mode="'create'"
-                        :studies="[]"
-                    ></team-samples>
-                </div>
-
-                <!-- Empty search/filter results message for samples -->
-                <div
-                    v-if="
-                        samples.length > 0 &&
-                        (searchSampleQuery || selectedSampleStatus !== 'all') &&
-                        filteredSamples.length === 0
-                    "
-                    class="text-center py-12"
-                >
-                    <EmptySearchState
-                        entity-type="samples"
-                        :search-query="
-                            searchSampleQuery ||
-                            (selectedSampleStatus !== 'all'
-                                ? `status: ${selectedSampleStatus}`
-                                : '')
-                        "
-                        :title="
-                            searchSampleQuery
-                                ? 'No matching samples found'
-                                : `No ${selectedSampleStatus} samples found`
-                        "
-                        @clear-search="clearSampleFilters"
-                    />
-                </div>
-
-                <div
-                    v-if="samples.length > 0 && totalSamplePages > 1"
-                    class="flex items-center justify-between px-6 py-3 border-t bg-white mt-4"
-                >
-                    <div class="text-sm text-gray-600">
-                        Page {{ currentSamplesPage }} of {{ totalSamplePages }}
+                    <div v-else class="w-full min-w-0">
+                        <team-projects
+                            class="block w-full min-w-0 max-w-none"
+                            :team="team"
+                            :team-role="teamRole"
+                            mode="create"
+                            :projects="[]"
+                        />
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button
-                            type="button"
-                            class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
-                            :disabled="currentSamplesPage === 1"
-                            @click="
-                                currentSamplesPage = Math.max(
-                                    1,
-                                    currentSamplesPage - 1
-                                )
-                            "
+                </section>
+
+                <!-- Compound library: grid of compound cards -->
+                <section
+                    v-if="selectedTab === 'samples'"
+                    aria-labelledby="dashboard-samples-heading"
+                    class="flex w-full min-w-0 flex-col gap-6"
+                >
+                    <header>
+                        <h2
+                            id="dashboard-samples-heading"
+                            class="text-lg font-semibold tracking-tight text-gray-900"
                         >
-                            Previous
-                        </button>
-                        <button
-                            type="button"
-                            class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
-                            :disabled="currentSamplesPage === totalSamplePages"
-                            @click="
-                                currentSamplesPage = Math.min(
-                                    totalSamplePages,
-                                    currentSamplesPage + 1
-                                )
-                            "
+                            Compound library
+                        </h2>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                            Every compound record in this workspace, including
+                            entries inside projects and standalone submissions.
+                            Search, filter by visibility, then open a record to
+                            continue.
+                        </p>
+                    </header>
+
+                    <div
+                        v-if="hasSamples"
+                        class="flex w-full min-w-0 flex-col gap-6"
+                    >
+                        <div
+                            class="flex flex-nowrap items-center gap-2 sm:gap-3"
                         >
-                            Next
-                        </button>
+                            <div class="min-w-0 flex-1">
+                                <label
+                                    for="dashboard-samples-search"
+                                    class="sr-only"
+                                    >Search compound library by name,
+                                    description, or ID</label
+                                >
+                                <SearchInput
+                                    input-id="dashboard-samples-search"
+                                    :model-value="filters.samples_q"
+                                    :filters-active="
+                                        filters.samples_status !== 'all'
+                                    "
+                                    name="compound-library-search"
+                                    placeholder="Search by name, description, or ID…"
+                                    @update:model-value="onSamplesSearchInput"
+                                    @reset="clearSampleFilters"
+                                />
+                            </div>
+                            <div
+                                class="flex shrink-0 items-center border-l border-gray-200 pl-2 sm:pl-3"
+                            >
+                                <span class="sr-only"
+                                    >Filter by visibility</span
+                                >
+                                <StatusFilter
+                                    variant="visibility"
+                                    :model-value="filters.samples_status"
+                                    @update:model-value="onSamplesStatus"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="samples.total > 0"
+                            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-100 py-2"
+                        >
+                            <p
+                                class="text-sm text-gray-600"
+                                role="status"
+                                aria-live="polite"
+                            >
+                                Showing
+                                <span class="tabular-nums">{{
+                                    samples.from
+                                }}</span>
+                                –
+                                <span class="tabular-nums">{{
+                                    samples.to
+                                }}</span>
+                                of
+                                <span class="tabular-nums">{{
+                                    samples.total
+                                }}</span>
+                                <template
+                                    v-if="filters.samples_status === 'public'"
+                                >
+                                    public
+                                </template>
+                                <template
+                                    v-else-if="
+                                        filters.samples_status === 'private'
+                                    "
+                                >
+                                    private
+                                </template>
+                                compounds
+                                <span
+                                    v-if="samples.last_page > 1"
+                                    class="text-gray-500"
+                                >
+                                    · Page {{ samples.current_page }} of
+                                    {{ samples.last_page }}
+                                </span>
+                            </p>
+                            <div
+                                v-if="showSamplesPerPageSelect"
+                                class="flex shrink-0 items-center sm:ml-auto"
+                            >
+                                <select
+                                    id="dashboard-samples-per-page-top"
+                                    aria-label="Rows per page"
+                                    class="block rounded-lg border-gray-300 py-1.5 pl-2.5 pr-8 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:min-w-[5.5rem]"
+                                    :value="
+                                        Number(filters.samples_per_page) || 12
+                                    "
+                                    @change="onSamplesPerPageChange"
+                                >
+                                    <option
+                                        v-for="n in samplesPerPageOptions"
+                                        :key="'samp-top-' + n"
+                                        :value="n"
+                                    >
+                                        {{ n }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div v-if="samples.total > 0" class="w-full min-w-0">
+                            <compound-cards
+                                class="block w-full min-w-0 max-w-none"
+                                :team="team"
+                                :team-role="teamRole"
+                                mode="create"
+                                :studies="samples.data"
+                            />
+                        </div>
+
+                        <div
+                            v-if="
+                                samples.total === 0 &&
+                                (filters.samples_q ||
+                                    filters.samples_status !== 'all')
+                            "
+                            class="w-full min-w-0 py-12 text-center"
+                        >
+                            <EmptySearchState
+                                entity-type="samples"
+                                :search-query="
+                                    filters.samples_q ||
+                                    (filters.samples_status !== 'all'
+                                        ? `visibility: ${filters.samples_status}`
+                                        : '')
+                                "
+                                :title="
+                                    filters.samples_q
+                                        ? 'No compounds match your search'
+                                        : filters.samples_status !== 'all'
+                                        ? filters.samples_status === 'public'
+                                            ? 'No public compounds'
+                                            : 'No private compounds'
+                                        : 'Nothing to show'
+                                "
+                                :message="
+                                    filters.samples_q
+                                        ? 'Try different keywords or spelling. You can also clear the search to browse your full compound library in this workspace.'
+                                        : filters.samples_status !== 'all'
+                                        ? 'Try another visibility filter, or reset filters to see every compound in this workspace.'
+                                        : undefined
+                                "
+                                @clear-search="clearSampleFilters"
+                            />
+                        </div>
+
+                        <div
+                            v-if="
+                                samples.total > 0 &&
+                                (showSamplesPerPageSelect ||
+                                    samples.last_page > 1)
+                            "
+                            class="flex flex-col gap-4 border-t border-gray-100 pt-5 sm:flex-row-reverse sm:items-end sm:justify-between sm:gap-6"
+                        >
+                            <div
+                                v-if="showSamplesPerPageSelect"
+                                class="flex w-full shrink-0 items-center justify-end sm:w-auto"
+                                :class="
+                                    samples.last_page > 1 ? '' : 'sm:ml-auto'
+                                "
+                            >
+                                <select
+                                    id="dashboard-samples-per-page-bottom"
+                                    aria-label="Rows per page"
+                                    class="block w-full rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:w-auto sm:min-w-[5.5rem]"
+                                    :value="
+                                        Number(filters.samples_per_page) || 12
+                                    "
+                                    @change="onSamplesPerPageChange"
+                                >
+                                    <option
+                                        v-for="n in samplesPerPageOptions"
+                                        :key="'samp-' + n"
+                                        :value="n"
+                                    >
+                                        {{ n }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div
+                                v-if="samples.last_page > 1"
+                                class="min-w-0 flex-1"
+                            >
+                                <Pagination
+                                    :links="samples.links"
+                                    navigation-label="Compound library pagination"
+                                />
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+
+                    <div v-else class="w-full min-w-0">
+                        <compound-cards
+                            class="block w-full min-w-0 max-w-none"
+                            :team="team"
+                            :team-role="teamRole"
+                            mode="create"
+                            :studies="[]"
+                        />
+                    </div>
+                </section>
+            </template>
         </div>
         <div v-else>
-            <div class="max-w-lg my-6 py-6 mx-auto">
-                <div class="text-center">
+            <div
+                class="mx-auto w-full max-w-5xl min-w-0 px-4 pb-10 pt-6 sm:px-6 lg:px-8"
+            >
+                <div
+                    class="rounded-xl border border-gray-200/90 bg-gray-50/60 px-8 py-14 text-center dark:border-gray-800 dark:bg-gray-950/40"
+                >
                     <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
+                        class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -364,32 +651,39 @@
                             vector-effect="non-scaling-stroke"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            stroke-width="2"
+                            stroke-width="1.5"
                             d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
                         />
                     </svg>
-                    <h3 class="mt-2 text-md font-medium text-gray-900">
-                        You have no <b>projects</b> or <b>samples</b> yet
+                    <h3
+                        class="mt-5 text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                    >
+                        Your workspace is empty
                     </h3>
-                    <div v-if="editableTeamRole" class="mt-2">
-                        <p class="mb-1 text-sm text-gray-500">
-                            Get started by uploading your data.
-                        </p>
-                        <create class="mt-5" mode="button"></create>
-                        <span
-                            class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
-                        >
+                    <p
+                        class="mx-auto mt-3 max-w-md text-sm leading-relaxed text-gray-600 dark:text-gray-400"
+                    >
+                        Projects and compounds will appear here once you begin a
+                        submission. Use Upload to add datasets and metadata to
+                        nmrXiv.
+                    </p>
+                    <div v-if="editableTeamRole" class="mt-8 space-y-4">
+                        <create class="inline-flex" mode="button"></create>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
-                                >Need Help?
-                            </a>
-                        </span>
+                                rel="noopener noreferrer"
+                                class="font-medium text-indigo-600 underline decoration-indigo-600/30 underline-offset-2 transition-colors hover:text-indigo-800 hover:decoration-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                >Submission guide</a
+                            >
+                            — step-by-step help for preparing your data.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="px-12 py-8 mx-auto max-w-4xl">
+        <div class="mx-auto w-full max-w-5xl min-w-0 px-4 py-8 sm:px-6 lg:px-8">
             <ul
                 role="list"
                 class="mt-6 border-b border-gray-200 divide-y divide-gray-200"
@@ -594,16 +888,24 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
-import TeamSamples from "@/Shared/Samples.vue";
+import CompoundCards from "@/Shared/CompoundCards.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
 import SearchInput from "@/Shared/SearchInput.vue";
 import EmptySearchState from "@/Shared/EmptySearchState.vue";
 import StatusFilter from "@/Shared/StatusFilter.vue";
+import Pagination from "@/Shared/Pagination.vue";
+import StudyCard from "@/Shared/StudyCard.vue";
+import {
+    ClockIcon,
+    StarIcon,
+    TrashIcon,
+    UserGroupIcon,
+} from "@heroicons/vue/24/outline";
 import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 
 const { meta, u } = useMagicKeys();
 
@@ -611,15 +913,62 @@ export default {
     components: {
         AppLayout,
         TeamProjects,
-        TeamSamples,
+        CompoundCards,
         Create,
         Onboarding,
         SearchInput,
         EmptySearchState,
         StatusFilter,
+        Pagination,
+        StudyCard,
         Link,
+        UserGroupIcon,
+        ClockIcon,
+        StarIcon,
+        TrashIcon,
     },
-    props: ["user", "team", "projects", "samples", "teamRole", "filters"],
+    props: {
+        user: {
+            type: Object,
+            required: true,
+        },
+        team: {
+            type: Object,
+            default: null,
+        },
+        projects: {
+            type: Object,
+            required: true,
+        },
+        samples: {
+            type: Object,
+            required: true,
+        },
+        teamRole: {
+            type: [String, Object],
+            default: null,
+        },
+        filters: {
+            type: Object,
+            required: true,
+        },
+        hasProjects: {
+            type: Boolean,
+            default: false,
+        },
+        hasSamples: {
+            type: Boolean,
+            default: false,
+        },
+        workspaceProjects: {
+            type: Array,
+            default: () => [],
+        },
+        workspaceStudies: {
+            type: Array,
+            default: () => [],
+        },
+    },
     setup() {
         const app = getCurrentInstance();
         const openDatasetCreateDialog = (data) => {
@@ -642,19 +991,13 @@ export default {
     },
     data() {
         return {
-            selectedTab: "projects",
-            searchProjectQuery: "",
-            currentProjectsPage: 1,
-            projectsPerPage: 10,
-            searchSampleQuery: "",
-            currentSamplesPage: 1,
-            samplesPerPage: 10,
-            searchDebounceTimer: null,
-            selectedProjectStatus: "all",
-            selectedSampleStatus: "all",
+            projectSearchTimer: null,
+            sampleSearchTimer: null,
+            perPageOptions: [5, 10, 25, 50],
+            /** Compound library tab: page size options (default 12). */
+            samplesPerPageOptions: [12, 24, 36, 48, 50],
         };
     },
-
     computed: {
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
@@ -664,51 +1007,8 @@ export default {
             return "mailto:" + String(this.$page.props.mailFromAddress);
         },
 
-        filteredProjects() {
-            let filtered = this.projects;
-
-            // Apply status filter first
-            if (this.selectedProjectStatus !== "all") {
-                filtered = filtered.filter((project) => {
-                    return project.status === this.selectedProjectStatus;
-                });
-            }
-
-            // Apply search filter
-            if (this.searchProjectQuery) {
-                const q = this.searchProjectQuery.toLowerCase().trim();
-                filtered = filtered.filter((project) => {
-                    const name = (project.name || "").toLowerCase();
-                    const description = (
-                        project.description || ""
-                    ).toLowerCase();
-                    const idText = String(project.id || "").toLowerCase();
-                    const uuid = String(project.uuid || "").toLowerCase();
-                    return (
-                        name.includes(q) ||
-                        description.includes(q) ||
-                        idText.includes(q) ||
-                        uuid.includes(q)
-                    );
-                });
-            }
-
-            return filtered;
-        },
-
-        paginatedProjects() {
-            const start = (this.currentProjectsPage - 1) * this.projectsPerPage;
-            return this.filteredProjects.slice(
-                start,
-                start + this.projectsPerPage
-            );
-        },
-
-        totalProjectPages() {
-            return Math.max(
-                1,
-                Math.ceil(this.filteredProjects.length / this.projectsPerPage)
-            );
+        selectedTab() {
+            return this.filters.tab === "samples" ? "samples" : "projects";
         },
 
         editableTeamRole() {
@@ -718,80 +1018,101 @@ export default {
             );
         },
 
-        filteredSamples() {
-            let filtered = this.samples;
-
-            // Apply status filter first
-            if (this.selectedSampleStatus !== "all") {
-                filtered = filtered.filter((sample) => {
-                    return sample.status === this.selectedSampleStatus;
-                });
+        showDashboardLists() {
+            if (!this.team) {
+                return false;
             }
-
-            // Apply search filter
-            if (this.searchSampleQuery) {
-                const q = this.searchSampleQuery.toLowerCase().trim();
-                filtered = filtered.filter((sample) => {
-                    const name = (sample.name || "").toLowerCase();
-                    const description = (
-                        sample.description || ""
-                    ).toLowerCase();
-                    const idText = String(sample.id || "").toLowerCase();
-                    const uuid = String(sample.uuid || "").toLowerCase();
-                    return (
-                        name.includes(q) ||
-                        description.includes(q) ||
-                        idText.includes(q) ||
-                        uuid.includes(q)
-                    );
-                });
-            }
-
-            return filtered;
+            return this.hasProjects || this.hasSamples || this.isWorkspaceView;
         },
 
-        paginatedSamples() {
-            const start = (this.currentSamplesPage - 1) * this.samplesPerPage;
-            return this.filteredSamples.slice(
-                start,
-                start + this.samplesPerPage
-            );
+        isWorkspaceView() {
+            const w = this.filters.workspace || "default";
+
+            return ["shared", "recent", "starred", "trashed"].includes(w);
         },
 
-        totalSamplePages() {
-            return Math.max(
-                1,
-                Math.ceil(this.filteredSamples.length / this.samplesPerPage)
-            );
+        workspaceSectionHeadingId() {
+            return "dashboard-workspace-heading";
+        },
+
+        workspaceCopy() {
+            const w = this.filters.workspace || "default";
+            /** @type {Record<string, Record<string, unknown>>} */
+            const map = {
+                shared: {
+                    title: "Shared with me",
+                    description:
+                        "Projects and compounds others have shared with you appear here once you accept an invitation.",
+                    emptyProjectsTitle: "Nothing shared yet",
+                    emptyProjectsBody:
+                        "When a colleague invites you to a project or grants access, it will be listed here. Invitations are sent by email—accept them to see shared items in this workspace.",
+                    emptyIcon: "UserGroupIcon",
+                },
+                recent: {
+                    title: "Recent",
+                    description:
+                        "Projects you have edited recently, across teams you belong to, sorted by latest activity.",
+                    emptyProjectsTitle: "No recent projects",
+                    emptyProjectsBody:
+                        "Once you create or update a project, it will appear here for quicker access. Open the main workspace view to start or continue a submission.",
+                    emptyIcon: "ClockIcon",
+                },
+                starred: {
+                    title: "Starred",
+                    description:
+                        "Pin projects and compounds you refer to often. Starred items are personal to your account.",
+                    emptyProjectsTitle: "No starred items",
+                    emptyProjectsBody:
+                        "Use the star action on a project or compound card to add it here. Starred items stay easy to find across sessions.",
+                    emptyIcon: "StarIcon",
+                },
+                trashed: {
+                    title: "Trash",
+                    description:
+                        "Projects you delete are retained here until they are permanently removed or restored.",
+                    emptyProjectsTitle: "Trash is empty",
+                    emptyProjectsBody:
+                        "Deleted projects will appear in this list. You may restore a project from its menu while it remains in trash, subject to your workspace rules.",
+                    emptyIcon: "TrashIcon",
+                },
+            };
+
+            const entry = map[w] ?? map.recent;
+            const iconMap = {
+                UserGroupIcon,
+                ClockIcon,
+                StarIcon,
+                TrashIcon,
+            };
+
+            return {
+                ...entry,
+                emptyIcon: iconMap[entry.emptyIcon] ?? ClockIcon,
+            };
+        },
+
+        showProjectsPerPageSelect() {
+            const total = Number(this.projects?.total) || 0;
+            const per = Number(this.filters.projects_per_page) || 10;
+
+            return total >= per;
+        },
+
+        showSamplesPerPageSelect() {
+            const total = Number(this.samples?.total) || 0;
+            const per = Number(this.filters.samples_per_page) || 12;
+
+            return total >= per;
         },
     },
 
     watch: {
-        searchProjectQuery() {
-            // Debounce the search query to avoid excessive pagination resets
-            if (this.searchDebounceTimer) {
-                clearTimeout(this.searchDebounceTimer);
+        "filters.action"(action) {
+            if (action === "submission") {
+                this.emitter.emit("openDatasetCreateDialog", {
+                    draft_id: this.filters.draft_id,
+                });
             }
-            this.searchDebounceTimer = setTimeout(() => {
-                this.currentProjectsPage = 1;
-            }, 300); // 300ms debounce delay
-        },
-        selectedProjectStatus() {
-            // Reset to first page when status filter changes
-            this.currentProjectsPage = 1;
-        },
-        selectedSampleStatus() {
-            // Reset to first page when status filter changes
-            this.currentSamplesPage = 1;
-        },
-        searchSampleQuery() {
-            // Debounce the search query to avoid excessive pagination resets
-            if (this.searchDebounceTimer) {
-                clearTimeout(this.searchDebounceTimer);
-            }
-            this.searchDebounceTimer = setTimeout(() => {
-                this.currentSamplesPage = 1;
-            }, 300); // 300ms debounce delay
         },
     },
 
@@ -801,26 +1122,170 @@ export default {
                 draft_id: this.filters.draft_id,
             });
         }
-
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlSearchParams.entries());
-        this.selectedTab = params["tab"] ? params["tab"] : "projects";
     },
 
     beforeUnmount() {
-        // Clean up the search debounce timer to prevent memory leaks
-        if (this.searchDebounceTimer) {
-            clearTimeout(this.searchDebounceTimer);
-        }
+        clearTimeout(this.projectSearchTimer);
+        clearTimeout(this.sampleSearchTimer);
     },
     methods: {
-        clearProjectFilters() {
-            this.searchProjectQuery = "";
-            this.selectedProjectStatus = "all";
+        /**
+         * Omit default / empty query keys so bookmarks and Inertia visits stay readable.
+         *
+         * @param {Record<string, unknown>} merged
+         */
+        compactDashboardParams(merged) {
+            const tab = merged.tab === "samples" ? "samples" : "projects";
+            const projectsPage = Number(merged.projects_page) || 1;
+            const samplesPage = Number(merged.samples_page) || 1;
+            const projectsPerPage = Number(merged.projects_per_page) || 10;
+            const samplesPerPage = Number(merged.samples_per_page) || 12;
+            const projectsStatus = merged.projects_status || "all";
+            const samplesStatus = merged.samples_status || "all";
+            const projectsQ = String(merged.projects_q || "").trim();
+            const samplesQ = String(merged.samples_q || "").trim();
+            const workspace = merged.workspace || "default";
+
+            /** @type {Record<string, string|number>} */
+            const out = {};
+
+            if (workspace !== "default") {
+                out.workspace = workspace;
+            }
+
+            if (tab !== "projects") {
+                out.tab = tab;
+            }
+            if (projectsPage !== 1) {
+                out.projects_page = projectsPage;
+            }
+            if (samplesPage !== 1) {
+                out.samples_page = samplesPage;
+            }
+            if (projectsPerPage !== 10) {
+                out.projects_per_page = projectsPerPage;
+            }
+            if (samplesPerPage !== 12) {
+                out.samples_per_page = samplesPerPage;
+            }
+            if (projectsStatus !== "all") {
+                out.projects_status = projectsStatus;
+            }
+            if (samplesStatus !== "all") {
+                out.samples_status = samplesStatus;
+            }
+            if (projectsQ !== "") {
+                out.projects_q = projectsQ;
+            }
+            if (samplesQ !== "") {
+                out.samples_q = samplesQ;
+            }
+            if (merged.action) {
+                out.action = merged.action;
+            }
+            if (
+                merged.draft_id !== null &&
+                merged.draft_id !== undefined &&
+                merged.draft_id !== ""
+            ) {
+                out.draft_id = merged.draft_id;
+            }
+
+            return out;
         },
+
+        dashboardUrl(overrides = {}) {
+            const merged = { ...this.filters, ...overrides };
+
+            return this.route("dashboard", this.compactDashboardParams(merged));
+        },
+
+        visitDashboard(overrides = {}) {
+            router.get(
+                this.dashboardUrl(overrides),
+                {},
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                }
+            );
+        },
+
+        onTabSelect(event) {
+            this.visitDashboard({ tab: event.target.value });
+        },
+
+        onProjectsSearchInput(value) {
+            clearTimeout(this.projectSearchTimer);
+            this.projectSearchTimer = setTimeout(() => {
+                this.visitDashboard({
+                    projects_q: value || "",
+                    projects_page: 1,
+                });
+            }, 300);
+        },
+
+        onSamplesSearchInput(value) {
+            clearTimeout(this.sampleSearchTimer);
+            this.sampleSearchTimer = setTimeout(() => {
+                this.visitDashboard({
+                    samples_q: value || "",
+                    samples_page: 1,
+                });
+            }, 300);
+        },
+
+        onProjectsStatus(status) {
+            this.visitDashboard({
+                projects_status: status,
+                projects_page: 1,
+            });
+        },
+
+        onSamplesStatus(status) {
+            this.visitDashboard({
+                samples_status: status,
+                samples_page: 1,
+            });
+        },
+
+        onProjectsPerPageChange(event) {
+            const n = Number(event.target.value);
+            if (!Number.isFinite(n)) {
+                return;
+            }
+            this.visitDashboard({
+                projects_per_page: n,
+                projects_page: 1,
+            });
+        },
+
+        onSamplesPerPageChange(event) {
+            const n = Number(event.target.value);
+            if (!Number.isFinite(n)) {
+                return;
+            }
+            this.visitDashboard({
+                samples_per_page: n,
+                samples_page: 1,
+            });
+        },
+
+        clearProjectFilters() {
+            this.visitDashboard({
+                projects_q: "",
+                projects_status: "all",
+                projects_page: 1,
+            });
+        },
+
         clearSampleFilters() {
-            this.searchSampleQuery = "";
-            this.selectedSampleStatus = "all";
+            this.visitDashboard({
+                samples_q: "",
+                samples_status: "all",
+                samples_page: 1,
+            });
         },
     },
 };

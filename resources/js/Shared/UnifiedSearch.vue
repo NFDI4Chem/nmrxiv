@@ -1,6 +1,206 @@
 <template>
     <div>
+        <div v-if="variant === 'hero'" class="w-full max-w-3xl mx-auto">
+            <label
+                v-if="heroSearchType.type === 'metadata'"
+                for="hero-search"
+                class="sr-only"
+            >
+                Search nmrXiv
+            </label>
+            <p v-else-if="heroSearchType.type === 'advanced'" class="sr-only">
+                Advanced metadata search for nmrXiv
+            </p>
+            <nav
+                class="mb-3 flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-gray-200 px-2"
+                aria-label="Search type"
+            >
+                <button
+                    v-for="option in heroSearchTypes"
+                    :key="option.type"
+                    type="button"
+                    class="-mb-px flex items-center gap-1.5 border-b-2 pb-2 text-sm font-medium transition-colors focus:outline-none"
+                    :class="
+                        heroSearchType.type === option.type
+                            ? 'border-indigo-600 text-indigo-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                    "
+                    :aria-current="
+                        heroSearchType.type === option.type ? 'page' : undefined
+                    "
+                    @click="heroSearchType = option"
+                >
+                    <component
+                        :is="option.icon"
+                        class="h-4 w-4 shrink-0"
+                        aria-hidden="true"
+                    />
+                    <span>{{ option.label }}</span>
+                    <span
+                        v-if="option.comingSoon"
+                        class="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-400"
+                    >
+                        Soon
+                    </span>
+                </button>
+            </nav>
+            <div
+                v-if="heroSearchType.type === 'structure'"
+                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+            >
+                <StructureEditorContent
+                    v-model:search-type="structureSearchType"
+                    editor-id="heroStructureSearchEditor"
+                    :initial-smiles="heroStructureInitialSmiles"
+                    compact
+                    @ready="onHeroStructureEditorReady"
+                />
+                <div class="mt-4 flex justify-end">
+                    <button
+                        type="button"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                        @click="performStructureSearch"
+                    >
+                        <MagnifyingGlassIcon
+                            class="h-4 w-4 shrink-0"
+                            aria-hidden="true"
+                        />
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div
+                v-else-if="heroSearchType.type === 'spectra'"
+                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+            >
+                <SpectraUploadContent
+                    compact
+                    @files-uploaded="handleSpectraFiles"
+                />
+                <div class="mt-4 flex justify-end">
+                    <button
+                        type="button"
+                        :disabled="spectraFiles.length === 0"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                        :class="
+                            spectraFiles.length === 0
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'hover:bg-gray-800'
+                        "
+                        @click="performSpectraSearch"
+                    >
+                        <MagnifyingGlassIcon
+                            class="h-4 w-4 shrink-0"
+                            aria-hidden="true"
+                        />
+                        Search{{
+                            spectraFiles.length > 0
+                                ? ` (${spectraFiles.length} file${
+                                      spectraFiles.length > 1 ? "s" : ""
+                                  })`
+                                : ""
+                        }}
+                    </button>
+                </div>
+            </div>
+            <div
+                v-else-if="heroSearchType.type === 'advanced'"
+                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+            >
+                <MetadataSearchContent
+                    compact
+                    @search-params-updated="handleMetadataParams"
+                />
+                <div class="mt-4 flex justify-end">
+                    <button
+                        type="button"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                        @click="performMetadataSearch"
+                    >
+                        <MagnifyingGlassIcon
+                            class="h-4 w-4 shrink-0"
+                            aria-hidden="true"
+                        />
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div
+                v-else-if="heroSearchType.type === 'metadata'"
+                class="flex items-center rounded-full border border-gray-200 bg-white pl-1 pr-2 py-1 shadow-lg ring-1 ring-gray-900/5 focus-within:ring-2 focus-within:ring-gray-900 transition-shadow"
+            >
+                <MagnifyingGlassIcon
+                    class="ml-3 h-5 w-5 shrink-0 text-gray-400"
+                    aria-hidden="true"
+                />
+                <input
+                    id="hero-search"
+                    ref="heroSearchInput"
+                    type="search"
+                    class="min-w-0 flex-1 border-0 bg-transparent py-2 pr-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-0"
+                    :placeholder="heroPlaceholder"
+                    @input="onHeroSearchInput"
+                    @keydown.enter.prevent="openHeroSearch"
+                />
+                <button
+                    type="button"
+                    class="shrink-0 rounded-full bg-gray-900 px-4 sm:px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+                    @click="openHeroSearch"
+                >
+                    Search
+                </button>
+            </div>
+            <div
+                class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+            >
+                <p
+                    v-if="heroSearchType.type === 'structure'"
+                    class="flex flex-wrap items-center gap-x-1 gap-y-1 text-sm text-gray-500"
+                >
+                    <span>Try:</span>
+                    <button
+                        type="button"
+                        class="font-medium text-gray-700 underline-offset-2 hover:text-gray-900 hover:underline"
+                        @click="
+                            tryHeroStructureExample(
+                                'Caffeine',
+                                caffeineExampleSmiles
+                            )
+                        "
+                    >
+                        Caffeine
+                    </button>
+                    <span>,</span>
+                    <button
+                        type="button"
+                        class="max-w-full break-all font-medium text-gray-700 underline-offset-2 hover:text-gray-900 hover:underline sm:break-normal"
+                        @click="
+                            tryHeroStructureExample(
+                                caffeineExampleSmiles,
+                                caffeineExampleSmiles
+                            )
+                        "
+                    >
+                        {{ caffeineExampleSmiles }}
+                    </button>
+                </p>
+
+                <a
+                    href="https://github.com/NFDI4Chem/nmrxiv/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="ml-auto shrink-0 text-sm text-gray-500 hover:text-gray-900"
+                >
+                    Report bugs:
+                    <span
+                        class="font-medium text-gray-700 underline-offset-2 hover:underline"
+                        >Issue Tracker</span
+                    >
+                </a>
+            </div>
+        </div>
         <button
+            v-else
             ref="searchButton"
             type="button"
             class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-white bg-gray-900 hover:bg-gray-800 transition-all duration-200"
@@ -168,24 +368,29 @@
                         leave-to="opacity-0 scale-95"
                     >
                         <DialogPanel
-                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                            class="mx-auto flex h-[90vh] w-[90vw] max-w-6xl transform flex-col overflow-hidden rounded-3xl bg-white shadow-2xl transition-all"
                         >
                             <!-- Main Content -->
-                            <div class="flex-1 overflow-y-auto">
-                                <div class="px-4 py-6 max-w-6xl mx-auto">
+                            <div class="min-h-0 flex-1 overflow-hidden">
+                                <div
+                                    class="mx-auto flex h-full min-h-0 max-w-6xl flex-col px-4 py-4"
+                                >
                                     <StructureEditorContent
                                         v-model:search-type="
                                             structureSearchType
                                         "
-                                        editor-id="structureSearchEditor"
-                                        :editor="structureEditor"
+                                        editor-id="unifiedStructureSearchEditor"
+                                        :initial-smiles="
+                                            modalStructureInitialSmiles
+                                        "
+                                        @ready="onModalStructureEditorReady"
                                     />
                                 </div>
                             </div>
 
                             <!-- Footer with Actions -->
                             <div
-                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                                class="flex shrink-0 items-center justify-between border-t border-gray-100 bg-gray-50 px-4 py-4"
                             >
                                 <a
                                     href="#"
@@ -368,7 +573,9 @@
 </template>
 
 <script>
-import { ref, watchEffect, onMounted, nextTick } from "vue";
+import { ref, computed, watch, watchEffect, onMounted, shallowRef } from "vue";
+import { router } from "@inertiajs/vue3";
+import { SEARCH_SCOPE, buildSearchPagePath } from "@/Utils/unifiedSearchApi.js";
 import { useMagicKeys } from "@vueuse/core";
 import {
     Dialog as HDialog,
@@ -376,8 +583,16 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/outline";
-import OCL from "openchemlib/full";
+import {
+    MagnifyingGlassIcon,
+    PlusIcon,
+    PencilIcon,
+    DocumentTextIcon,
+    BeakerIcon,
+    ChartBarIcon,
+    AdjustmentsHorizontalIcon,
+} from "@heroicons/vue/24/outline";
+import { loadOpenChemLib } from "@/Utils/structureEditor";
 import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
 import SpectraUploadContent from "@/Shared/SpectraUploadContent.vue";
 import PeakListSearchContent from "@/Shared/PeakListSearchContent.vue";
@@ -391,10 +606,19 @@ export default {
         TransitionRoot,
         MagnifyingGlassIcon,
         PlusIcon,
+        PencilIcon,
+        AdjustmentsHorizontalIcon,
         StructureEditorContent,
         SpectraUploadContent,
         PeakListSearchContent,
         MetadataSearchContent,
+    },
+    props: {
+        variant: {
+            type: String,
+            default: "button",
+            validator: (value) => ["button", "hero"].includes(value),
+        },
     },
     emits: ["search-type-selected"],
     setup(props, { emit }) {
@@ -405,12 +629,192 @@ export default {
         const showSpectraUpload = ref(false);
         const showPeakListSearch = ref(false);
         const showMetadataSearch = ref(false);
-        const structureEditor = ref(null);
+        const heroStructureEditor = shallowRef(null);
+        const modalStructureEditor = shallowRef(null);
         const structureSearchType = ref("exact");
         const spectraFiles = ref([]);
         const peakListParams = ref(null);
         const metadataParams = ref(null);
         const searchButton = ref(null);
+        const heroSearchInput = ref(null);
+        const caffeineExampleSmiles = "CN1C(=O)C2=C(N=CN2C)N(C)C1=O";
+        const pendingHeroStructureSmiles = ref(null);
+        const heroSearchQuery = ref("");
+        const heroStructureDraft = ref(null);
+
+        const heroSearchTypes = [
+            {
+                type: "metadata",
+                label: "Text search",
+                icon: DocumentTextIcon,
+                comingSoon: false,
+            },
+            {
+                type: "structure",
+                label: "Structure",
+                icon: BeakerIcon,
+                comingSoon: false,
+            },
+            {
+                type: "spectra",
+                label: "Spectra",
+                icon: ChartBarIcon,
+                comingSoon: false,
+            },
+            {
+                type: "advanced",
+                label: "Advanced",
+                icon: AdjustmentsHorizontalIcon,
+                comingSoon: false,
+            },
+        ];
+
+        const resolveHeroSearchTypeFromUrl = () => {
+            if (typeof window === "undefined") {
+                return heroSearchTypes[0];
+            }
+
+            const tabParam = new URL(window.location.href).searchParams.get(
+                "tab"
+            );
+
+            return (
+                heroSearchTypes.find((option) => option.type === tabParam) ??
+                heroSearchTypes[0]
+            );
+        };
+
+        const heroSearchType = ref(
+            props.variant === "hero"
+                ? resolveHeroSearchTypeFromUrl()
+                : heroSearchTypes[0]
+        );
+
+        const heroStructureInitialSmiles = computed(
+            () =>
+                pendingHeroStructureSmiles.value ??
+                heroStructureDraft.value ??
+                null
+        );
+
+        const modalStructureInitialSmiles = computed(
+            () =>
+                pendingHeroStructureSmiles.value ??
+                heroStructureDraft.value ??
+                null
+        );
+
+        watch(
+            () => heroSearchType.value.type,
+            (newType, oldType) => {
+                spectraFiles.value = [];
+
+                if (oldType === "advanced") {
+                    metadataParams.value = null;
+                }
+
+                if (props.variant !== "hero") {
+                    return;
+                }
+
+                const url = new URL(window.location.href);
+                url.searchParams.set("tab", newType);
+                window.history.replaceState({}, "", url.toString());
+
+                if (oldType === "structure") {
+                    persistHeroStructureDraft();
+                    heroStructureEditor.value = null;
+                }
+            },
+            { flush: "post" }
+        );
+
+        const heroPlaceholder = computed(() => {
+            switch (heroSearchType.value.type) {
+                case "spectra":
+                    return "Upload NMR spectra to find similar data...";
+                case "structure":
+                    return "Compound name, SMILES, InChI, InChIKey...";
+                case "metadata":
+                    return "Search across all metadata fields...";
+                case "advanced":
+                    return "Search by free text or specific NMR metadata fields";
+                default:
+                    return "Search across all metadata fields...";
+            }
+        });
+
+        const hasHeroStructure = computed(() => {
+            if (heroSearchQuery.value.trim() !== "") {
+                return true;
+            }
+
+            if (heroStructureDraft.value) {
+                return true;
+            }
+
+            if (heroStructureEditor.value) {
+                try {
+                    const smiles = heroStructureEditor.value
+                        .getSmiles()
+                        ?.trim();
+
+                    return Boolean(smiles);
+                } catch {
+                    return false;
+                }
+            }
+
+            return false;
+        });
+
+        const heroStructureActionLabel = computed(() =>
+            hasHeroStructure.value ? "Edit structure" : "Draw structure"
+        );
+
+        const onHeroSearchInput = (event) => {
+            heroSearchQuery.value = event.target.value;
+        };
+
+        const persistHeroStructureDraft = () => {
+            if (!heroStructureEditor.value) {
+                return;
+            }
+
+            try {
+                const smiles = heroStructureEditor.value.getSmiles()?.trim();
+
+                if (smiles) {
+                    heroStructureDraft.value = smiles;
+                }
+            } catch {
+                // Editor may not be ready yet
+            }
+        };
+
+        const onHeroStructureEditorReady = async (editor) => {
+            heroStructureEditor.value = editor;
+
+            const url = new URL(window.location.href);
+            const querySmiles = url.searchParams.get("query");
+
+            if (
+                querySmiles &&
+                !pendingHeroStructureSmiles.value &&
+                !heroStructureDraft.value
+            ) {
+                const OCL = await loadOpenChemLib();
+                const decoded = decodeURIComponent(querySmiles);
+                editor.setMolFile(OCL.Molecule.fromSmiles(decoded).toMolfile());
+                heroStructureDraft.value = decoded;
+            }
+
+            persistHeroStructureDraft();
+        };
+
+        const onModalStructureEditorReady = (editor) => {
+            modalStructureEditor.value = editor;
+        };
 
         const searchOptions = [
             {
@@ -433,7 +837,7 @@ export default {
                 image: "/img/instrument-format.png",
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
-                comingSoon: true,
+                comingSoon: false,
             },
             {
                 type: "peaks",
@@ -455,7 +859,7 @@ export default {
                 image: "/img/metadata-format.png",
                 bgClass: "bg-rose-100",
                 iconClass: "text-rose-600",
-                comingSoon: true,
+                comingSoon: false,
             },
         ];
 
@@ -482,13 +886,30 @@ export default {
             open.value = true;
             showStructureEditor.value = false;
             updateUrl(true);
-            // Blur the search button to prevent focus trap issues
-            if (searchButton.value) {
+            if (props.variant === "hero" && heroSearchInput.value) {
+                heroSearchInput.value.blur();
+            } else if (searchButton.value) {
                 searchButton.value.blur();
             }
         };
 
         const closeModal = () => {
+            if (showStructureEditor.value && modalStructureEditor.value) {
+                try {
+                    const smiles = modalStructureEditor.value
+                        .getSmiles()
+                        ?.trim();
+
+                    if (smiles) {
+                        heroStructureDraft.value = smiles;
+                    }
+                } catch {
+                    // Modal editor may not be ready yet
+                }
+            } else {
+                persistHeroStructureDraft();
+            }
+
             open.value = false;
             showStructureEditor.value = false;
             showSpectraUpload.value = false;
@@ -497,7 +918,24 @@ export default {
             spectraFiles.value = [];
             peakListParams.value = null;
             metadataParams.value = null;
+            modalStructureEditor.value = null;
+            pendingHeroStructureSmiles.value = null;
             updateUrl(false);
+        };
+
+        const tryHeroStructureExample = (inputValue, smiles) => {
+            heroSearchType.value =
+                heroSearchTypes.find((t) => t.type === "structure") ??
+                heroSearchTypes[0];
+
+            heroSearchQuery.value = inputValue;
+
+            if (heroSearchInput.value) {
+                heroSearchInput.value.value = inputValue;
+            }
+
+            heroStructureDraft.value = smiles;
+            pendingHeroStructureSmiles.value = smiles;
         };
 
         const selectAndProceed = (type) => {
@@ -510,10 +948,6 @@ export default {
             // Handle structure search differently - show editor instead of navigating
             if (type === "structure") {
                 showStructureEditor.value = true;
-                // Initialize the structure editor after DOM update
-                nextTick(() => {
-                    initializeStructureEditor();
-                });
                 return;
             }
 
@@ -536,31 +970,69 @@ export default {
             }
         };
 
-        const initializeStructureEditor = () => {
-            if (document.getElementById("structureSearchEditor")) {
-                structureEditor.value = OCL.StructureEditor.createSVGEditor(
-                    "structureSearchEditor",
-                    1
-                );
+        const resetModalToSearchOptions = () => {
+            selectedType.value = null;
+            showStructureEditor.value = false;
+            showSpectraUpload.value = false;
+            showPeakListSearch.value = false;
+            showMetadataSearch.value = false;
+        };
 
-                // Check if there's a query parameter in URL and load it
-                const url = new URL(window.location.href);
-                const querySmiles = url.searchParams.get("query");
-                if (querySmiles && structureEditor.value) {
-                    try {
-                        // Set the molecule from SMILES
-                        structureEditor.value.setMolFile(
-                            OCL.Molecule.fromSmiles(
-                                decodeURIComponent(querySmiles)
-                            ).toMolfile()
-                        );
-                    } catch (error) {
-                        console.error(
-                            "Error loading structure from query:",
-                            error
-                        );
-                    }
-                }
+        const hasMetadataCriteria = (params) => {
+            if (!params) {
+                return false;
+            }
+
+            return Object.values(params).some(
+                (value) => value !== null && value !== undefined && value !== ""
+            );
+        };
+
+        const hasOnlyFreeTextMetadata = (params) => {
+            if (!params?.freeText?.trim()) {
+                return false;
+            }
+
+            const rest = { ...params };
+            delete rest.freeText;
+
+            return !Object.values(rest).some(
+                (value) => value !== null && value !== undefined && value !== ""
+            );
+        };
+
+        const performTextSearch = (query) => {
+            const q = (query ?? heroSearchQuery.value).trim();
+            if (!q) {
+                return;
+            }
+
+            router.visit(buildSearchPagePath(SEARCH_SCOPE.CATALOG, { q }));
+        };
+
+        const openHeroSearch = () => {
+            if (heroSearchType.value.type === "metadata") {
+                performTextSearch();
+                return;
+            }
+
+            if (heroSearchType.value.type === "advanced") {
+                performMetadataSearch();
+                return;
+            }
+
+            if (
+                heroSearchType.value.type === "structure" &&
+                heroStructureDraft.value &&
+                !pendingHeroStructureSmiles.value
+            ) {
+                pendingHeroStructureSmiles.value = heroStructureDraft.value;
+            }
+
+            open.value = true;
+            selectAndProceed(heroSearchType.value.type);
+            if (heroSearchInput.value) {
+                heroSearchInput.value.blur();
             }
         };
 
@@ -573,6 +1045,7 @@ export default {
             peakListParams.value = null;
             metadataParams.value = null;
             selectedType.value = null;
+            modalStructureEditor.value = null;
         };
 
         const handleSpectraFiles = (files) => {
@@ -588,13 +1061,20 @@ export default {
         };
 
         const performStructureSearch = () => {
-            if (structureEditor.value) {
-                const smiles = structureEditor.value.getSmiles();
-                window.location.href =
-                    "/compounds/?query=" +
-                    encodeURI(smiles) +
-                    "&type=" +
-                    structureSearchType.value;
+            const editor =
+                open.value && showStructureEditor.value
+                    ? modalStructureEditor.value
+                    : heroStructureEditor.value;
+
+            if (editor) {
+                const smiles = editor.getSmiles();
+                window.location.href = buildSearchPagePath(
+                    SEARCH_SCOPE.COMPOUNDS,
+                    {
+                        query: smiles,
+                        type: structureSearchType.value,
+                    }
+                );
             }
         };
 
@@ -621,37 +1101,42 @@ export default {
         };
 
         const performMetadataSearch = () => {
-            if (!metadataParams.value) {
+            if (!hasMetadataCriteria(metadataParams.value)) {
                 alert("Please enter search criteria");
                 return;
             }
-            // TODO: Implement metadata search
-            console.log("Searching with metadata:", metadataParams.value);
-            alert("Metadata search functionality will be implemented next.");
+
+            if (hasOnlyFreeTextMetadata(metadataParams.value)) {
+                performTextSearch(metadataParams.value.freeText);
+                return;
+            }
+
+            alert(
+                "Field-specific metadata search will be implemented next. Use free text search for now."
+            );
         };
 
         // Check URL on mount and open modal if search param exists
         onMounted(() => {
             const url = new URL(window.location.href);
             const searchParam = url.searchParams.get("search");
+
             if (searchParam) {
-                // Open modal for any search param value
                 open.value = true;
-                // Set selected type if it matches a valid option
                 const validTypes = [
                     "structure",
                     "spectra",
                     "peaks",
                     "metadata",
                 ];
-                if (validTypes.includes(searchParam)) {
+
+                if (searchParam === "advanced" || searchParam === "open") {
+                    resetModalToSearchOptions();
+                } else if (validTypes.includes(searchParam)) {
                     selectedType.value = searchParam;
-                    // Show structure editor if structure type
+
                     if (searchParam === "structure") {
                         showStructureEditor.value = true;
-                        nextTick(() => {
-                            initializeStructureEditor();
-                        });
                     }
                 }
             }
@@ -664,14 +1149,26 @@ export default {
             showSpectraUpload,
             showPeakListSearch,
             showMetadataSearch,
-            structureEditor,
+            heroStructureInitialSmiles,
+            modalStructureInitialSmiles,
+            onHeroStructureEditorReady,
+            onModalStructureEditorReady,
             structureSearchType,
             spectraFiles,
             peakListParams,
             metadataParams,
             searchButton,
+            heroSearchInput,
+            heroSearchTypes,
+            heroSearchType,
+            heroPlaceholder,
+            heroStructureActionLabel,
+            onHeroSearchInput,
+            caffeineExampleSmiles,
+            tryHeroStructureExample,
             searchOptions,
             openModal,
+            openHeroSearch,
             closeModal,
             selectAndProceed,
             backToOptions,

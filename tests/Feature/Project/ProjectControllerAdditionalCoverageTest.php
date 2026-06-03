@@ -3,6 +3,7 @@
 namespace Tests\Feature\Project;
 
 use App\Http\Controllers\ProjectController;
+use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
@@ -118,6 +119,33 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $this->assertCount(3, $response->json('data'));
     }
 
+    public function test_public_studies_for_nav_includes_datasets(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'is_public' => true,
+            'owner_id' => $this->owner->id,
+            'name' => 'Nav Sample',
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->project->id,
+        ]);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->project->id,
+            'name' => 'First Dataset',
+        ]);
+
+        $response = $this->get("/projects/{$this->project->id}/studies?for_nav=1");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.name', 'Nav Sample');
+        $response->assertJsonPath('data.0.datasets.0.name', 'First Dataset');
+    }
+
     public function test_public_studies_endpoint_filters_search_and_sort()
     {
         $study = Study::factory()->create([
@@ -227,7 +255,11 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $response = $this->get("/project/{$this->privateProject->obfuscationcode}");
 
         $response->assertStatus(200);
-        // Just verify it renders successfully - this covers the review method
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Show');
+        $this->assertSame(
+            $this->privateProject->obfuscationcode,
+            $page['props']['reviewerPreview']['obfuscationcode']
+        );
     }
 
     public function test_review_endpoint_for_private_project_without_license()
@@ -235,13 +267,86 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $response = $this->get("/project/{$this->privateProject->obfuscationcode}");
 
         $response->assertStatus(200);
-        // Just verify the response is successful - this covers the null license branch
+        $this->assertInertiaPageComponent($response, 'Public/Project/Show');
+    }
+
+    public function test_review_endpoint_samples_tab_uses_unified_public_layout()
+    {
+        $response = $this->get(
+            '/project/'.$this->privateProject->obfuscationcode.'?tab=samples'
+        );
+
+        $response->assertStatus(200);
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Samples');
+        $this->assertArrayHasKey('reviewerPreview', $page['props']);
     }
 
     public function test_review_endpoint_redirects_public_project_to_public_route()
     {
         // Skip this test as project identifier format may vary
         $this->markTestSkipped('Project identifier format varies, skipping redirect test');
+    }
+
+    public function test_reviewer_studies_for_nav_returns_datasets(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->privateProject->id,
+            'owner_id' => $this->owner->id,
+            'name' => 'ReviewerNavStudy',
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->privateProject->id,
+        ]);
+
+        $response = $this->getJson(
+            '/project/'.$this->privateProject->obfuscationcode.'/studies?for_nav=1&per_page=100'
+        );
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('data'));
+        $this->assertSame('ReviewerNavStudy', $response->json('data.0.name'));
+    }
+
+    public function test_reviewer_preview_sample_link_renders_public_study_tab(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->privateProject->id,
+            'owner_id' => $this->owner->id,
+            'is_public' => false,
+            'name' => 'ReviewerPreviewStudy',
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->privateProject->id,
+        ]);
+
+        $response = $this->get(
+            '/project/'.$this->privateProject->obfuscationcode.'?tab=study&study='.$study->id
+        );
+
+        $response->assertOk();
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Study');
+        $this->assertSame('ReviewerPreviewStudy', $page['props']['study']['data']['name']);
+    }
+
+    public function test_review_endpoint_reports_full_samples_count_for_private_project(): void
+    {
+        Study::factory()->count(2)->create([
+            'project_id' => $this->privateProject->id,
+            'owner_id' => $this->owner->id,
+            'is_public' => false,
+        ]);
+
+        $page = $this->assertInertiaPageComponent(
+            $this->get('/project/'.$this->privateProject->obfuscationcode),
+            'Public/Project/Show'
+        );
+
+        $this->assertSame(2, $page['props']['reviewerPreview']['samples_count']);
+        $this->assertSame(2, $page['props']['project']['data']['samples_count']);
     }
 
     public function test_reviewer_studies_endpoint_returns_studies()

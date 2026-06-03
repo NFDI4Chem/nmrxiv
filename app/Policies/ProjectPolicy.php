@@ -79,7 +79,7 @@ class ProjectPolicy
      */
     public function publishProject(User $user, Project $project)
     {
-        if ($project->is_public || $project->is_archived || $project->is_deleted || $project->is_published) {
+        if ($project->is_public || $project->is_archived || $project->is_deleted) {
             return false;
         }
 
@@ -113,6 +113,10 @@ class ProjectPolicy
      */
     public function addProjectMember(User $user, Project $project)
     {
+        if ($project->is_public) {
+            return false;
+        }
+
         return $user->ownsProject($project);
     }
 
@@ -123,6 +127,10 @@ class ProjectPolicy
      */
     public function updateProjectMember(User $user, Project $project)
     {
+        if ($project->is_public) {
+            return false;
+        }
+
         return $user->ownsProject($project);
     }
 
@@ -133,6 +141,10 @@ class ProjectPolicy
      */
     public function removeProjectMember(User $user, Project $project)
     {
+        if ($project->is_public) {
+            return false;
+        }
+
         return $user->ownsProject($project);
     }
 }

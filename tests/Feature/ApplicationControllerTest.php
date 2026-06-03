@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Dataset;
 use App\Models\Molecule;
+use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
@@ -57,46 +58,32 @@ class ApplicationControllerTest extends TestCase
         ]);
     }
 
-    public function test_compounds_renders_view_with_default_parameters(): void
+    public function test_compounds_redirects_to_unified_search(): void
     {
-        $response = $this->get('/compounds');
-
-        $response->assertStatus(200);
+        $this->get('/compounds')
+            ->assertRedirect(route('search', ['scope' => 'compounds']));
     }
 
-    public function test_compounds_renders_view_with_query_parameter(): void
+    public function test_compounds_redirect_preserves_query_parameters(): void
     {
-        $response = $this->get('/compounds?query=caffeine');
-
-        $response->assertStatus(200);
+        $this->get('/compounds?query=caffeine&limit=50&page=2&tagType=organic')
+            ->assertRedirect(route('search', [
+                'scope' => 'compounds',
+                'query' => 'caffeine',
+                'limit' => '50',
+                'page' => '2',
+                'tagType' => 'organic',
+            ]));
     }
 
-    public function test_compounds_renders_view_with_custom_limit(): void
+    public function test_compounds_scope_renders_compounds_view(): void
     {
-        $response = $this->get('/compounds?limit=50');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_compounds_renders_view_with_default_limit_when_not_provided(): void
-    {
-        $response = $this->get('/compounds');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_compounds_renders_view_with_page_parameter(): void
-    {
-        $response = $this->get('/compounds?page=2');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_compounds_renders_view_with_tag_type(): void
-    {
-        $response = $this->get('/compounds?tagType=organic');
-
-        $response->assertStatus(200);
+        $this->followingRedirects()
+            ->get('/compounds?query=caffeine')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Public/Compounds')
+                ->where('query', 'caffeine'));
     }
 
     public function test_resolve_compound_returns_404_for_invalid_identifier(): void
@@ -106,26 +93,26 @@ class ApplicationControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_resolve_compound_redirects_to_spectra_for_valid_molecule(): void
+    public function test_resolve_compound_renders_studies_for_valid_molecule(): void
     {
-        $molecule = Molecule::factory()->create([
+        Molecule::factory()->create([
             'identifier' => 188,
         ]);
 
         $response = $this->get('/compound/M188');
 
-        $response->assertRedirect('/spectra?compound=188');
+        $this->assertInertiaPageComponent($response, 'Public/Studies');
     }
 
     public function test_resolve_compound_with_lowercase_prefix(): void
     {
-        $molecule = Molecule::factory()->create([
+        Molecule::factory()->create([
             'identifier' => 189,
         ]);
 
         $response = $this->get('/compound/m189');
 
-        $response->assertRedirect('/spectra?compound=189');
+        $this->assertInertiaPageComponent($response, 'Public/Studies');
     }
 
     public function test_resolve_compound_returns_404_for_non_existent_molecule(): void
@@ -163,11 +150,12 @@ class ApplicationControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_resolve_project_renders_license_tab(): void
+    public function test_resolve_project_license_tab_renders_info(): void
     {
         $response = $this->get('/project/P1?tab=license');
 
-        $response->assertStatus(200);
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Show');
+        $this->assertSame('info', $page['props']['tab']);
     }
 
     public function test_resolve_project_returns_404_for_non_existent_project(): void
@@ -213,7 +201,7 @@ class ApplicationControllerTest extends TestCase
     {
         $response = $this->get('/sample/S1');
 
-        $response->assertStatus(200);
+        $this->assertInertiaPageComponent($response, 'Public/Project/Study');
     }
 
     public function test_resolve_study_renders_study_without_project_when_no_project(): void
@@ -227,14 +215,67 @@ class ApplicationControllerTest extends TestCase
 
         $response = $this->get('/sample/S2');
 
-        $response->assertStatus(200);
+        $this->assertInertiaPageComponent($response, 'Public/Sample/Show');
     }
 
     public function test_resolve_dataset_renders_dataset_tab(): void
     {
         $response = $this->get('/dataset/D1');
 
-        $response->assertStatus(200);
+        $this->assertInertiaPageComponent($response, 'Public/Project/Dataset');
+    }
+
+    public function test_resolve_dataset_uses_study_project_when_dataset_project_id_is_null(): void
+    {
+        $this->dataset->project_id = null;
+        $this->dataset->save();
+
+        $response = $this->get('/dataset/D1');
+
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Dataset');
+        $this->assertArrayHasKey('project', $page['props']);
+    }
+
+    public function test_resolve_dataset_renders_without_project_when_neither_has_project(): void
+    {
+        $studyWithoutProject = Study::factory()->create([
+            'project_id' => null,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'identifier' => 3,
+        ]);
+
+        $datasetWithoutProject = Dataset::factory()->create([
+            'project_id' => null,
+            'study_id' => $studyWithoutProject->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'identifier' => 2,
+        ]);
+
+        $response = $this->get('/dataset/D2');
+
+        $page = $this->assertInertiaPageComponent($response, 'Public/Sample/Dataset');
+        $this->assertArrayNotHasKey('project', $page['props']);
+    }
+
+    public function test_resolve_dataset_includes_nmrium_info_when_nmrium_present(): void
+    {
+        NMRium::factory()->forDataset($this->dataset)->create([
+            'nmrium_info' => [
+                'version' => '4',
+                'data' => [
+                    'spectra' => [
+                        ['id' => 'test-spectrum'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->get('/dataset/D1');
+
+        $page = $this->assertInertiaPageComponent($response, 'Public/Project/Dataset');
+        $this->assertSame('4', $page['props']['dataset']['data']['nmrium_info']['version']);
     }
 
     public function test_resolve_dataset_returns_404_for_non_existent_dataset(): void
@@ -312,9 +353,14 @@ class ApplicationControllerTest extends TestCase
 
     public function test_compounds_with_all_parameters(): void
     {
-        $response = $this->get('/compounds?query=test&limit=10&page=3&tagType=sample');
-
-        $response->assertStatus(200);
+        $this->get('/compounds?query=test&limit=10&page=3&tagType=sample')
+            ->assertRedirect(route('search', [
+                'scope' => 'compounds',
+                'query' => 'test',
+                'limit' => '10',
+                'page' => '3',
+                'tagType' => 'sample',
+            ]));
     }
 
     public function test_resolve_badge_calculates_correct_svg_width(): void
@@ -359,9 +405,8 @@ class ApplicationControllerTest extends TestCase
 
     public function test_compounds_defaults_to_null_tag_type(): void
     {
-        $response = $this->get('/compounds');
-
-        $response->assertStatus(200);
+        $this->get('/compounds')
+            ->assertRedirect(route('search', ['scope' => 'compounds']));
     }
 
     public function test_resolve_project_with_invalid_tab_defaults_to_info(): void

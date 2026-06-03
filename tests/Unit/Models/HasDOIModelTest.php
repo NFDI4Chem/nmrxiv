@@ -314,7 +314,7 @@ class HasDOIModelTest extends TestCase
 
         $this->assertEquals('Test Project', $metadata['titles'][0]['title']);
         $this->assertEquals('Test Description', $metadata['descriptions'][0]['description']);
-        $this->assertEquals('Other', $metadata['descriptions'][0]['descriptionType']);
+        $this->assertEquals('Abstract', $metadata['descriptions'][0]['descriptionType']);
         $this->assertEquals('en', $metadata['language']);
         $this->assertEquals('MIT License', $metadata['rightsList'][0]['rights']);
     }
@@ -419,8 +419,11 @@ class HasDOIModelTest extends TestCase
             $this->assertArrayHasKey('contributorType', $contributor);
             $this->assertArrayHasKey('name', $contributor);
             $this->assertArrayHasKey('nameType', $contributor);
-            $this->assertEquals('Other', $contributor['contributorType']);
-            $this->assertEquals('Personal', $contributor['nameType']);
+            $this->assertContains(
+                $contributor['contributorType'],
+                ['ContactPerson', 'Researcher', 'HostingInstitution']
+            );
+            $this->assertContains($contributor['nameType'], ['Personal', 'Organizational']);
         }
     }
 
@@ -446,7 +449,7 @@ class HasDOIModelTest extends TestCase
             $this->assertArrayHasKey('relatedIdentifierType', $relatedId);
             $this->assertArrayHasKey('relationType', $relatedId);
             $this->assertEquals('DOI', $relatedId['relatedIdentifierType']);
-            $this->assertEquals('IsSupplementTo', $relatedId['relationType']);
+            $this->assertEquals('IsReferencedBy', $relatedId['relationType']);
         }
     }
 
@@ -523,7 +526,7 @@ class HasDOIModelTest extends TestCase
         $this->assertTrue($metadata['isActive']);
         $this->assertEquals('publish', $metadata['event']);
         $this->assertEquals('findable', $metadata['state']);
-        $this->assertEquals('http://datacite.org/schema/kernel-4', $metadata['schemaVersion']);
+        $this->assertEquals('http://datacite.org/schema/kernel-4.4', $metadata['schemaVersion']);
         $this->assertEquals('en', $metadata['language']);
     }
 

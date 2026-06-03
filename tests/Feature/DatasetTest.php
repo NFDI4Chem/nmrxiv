@@ -72,19 +72,21 @@ class DatasetTest extends TestCase
     }
 
     /**
-     * Test fetch NMRium returns NMRium info without molecules
+     * Test fetch NMRium returns NMRium info with persisted molecules so chemical
+     * structures added inside NMRium re-appear on subsequent reloads.
      */
-    public function test_fetch_nmrium_returns_info_without_molecules()
+    public function test_fetch_nmrium_returns_persisted_molecules()
     {
         $user = User::factory()->withPersonalTeam()->create();
         $project = Project::factory()->create(['owner_id' => $user->id]);
         $study = Study::factory()->create(['project_id' => $project->id]);
         $dataset = Dataset::factory()->create(['study_id' => $study->id]);
 
+        $molecules = [['smiles' => 'CCO']];
         $nmriumInfo = [
             'data' => [
                 'spectra' => ['test' => 'data'],
-                'molecules' => [['smiles' => 'CCO']],
+                'molecules' => $molecules,
             ],
             'version' => '1.0',
         ];
@@ -99,8 +101,7 @@ class DatasetTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertArrayHasKey('data', $response->json());
-        // Molecules should be empty array
-        $this->assertEquals([], $response->json('data.molecules'));
+        $this->assertEquals($molecules, $response->json('data.molecules'));
     }
 
     /**
@@ -153,7 +154,7 @@ class DatasetTest extends TestCase
 
         $this->assertTrue($dataset->has_nmrium);
         $this->assertNotNull($dataset->nmrium);
-        $this->assertEquals('1D,1H', $dataset->type);
+        $this->assertEquals('1H NMR - 1D', $dataset->type);
     }
 
     /**
@@ -193,7 +194,7 @@ class DatasetTest extends TestCase
         $nmrium = $dataset->nmrium;
         $this->assertEquals('2.0', $nmrium->nmrium_info['version']);
         $this->assertEquals($newSpectra, $nmrium->nmrium_info['spectra']);
-        $this->assertEquals('2D,13C-1H', $dataset->type);
+        $this->assertEquals('13C-1H NMR - 2D', $dataset->type);
     }
 
     /**

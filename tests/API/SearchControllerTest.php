@@ -2,7 +2,11 @@
 
 namespace Tests\API;
 
+use App\Models\Dataset;
 use App\Models\Molecule;
+use App\Models\NMRium;
+use App\Models\Sample;
+use App\Models\Study;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -10,12 +14,53 @@ class SearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createPublicCatalogMolecules(int $count, array $attributes = []): void
+    {
+        foreach (range(1, $count) as $_) {
+            $this->createMoleculeInPublicCatalog($attributes);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function createMoleculeInPublicCatalog(array $attributes = []): Molecule
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create($attributes);
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        return $molecule;
+    }
+
     /**
      * Test search validation with invalid parameters
      */
     public function test_search_validation_rejects_invalid_parameters()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => str_repeat('a', 1001), // Over max 1000 characters
             'type' => 'invalid_type',
             'limit' => 101, // Over max 100
@@ -33,7 +78,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_valid_text_query()
     {
-        Molecule::factory()->create([
+        $this->createMoleculeInPublicCatalog([
             'name' => 'Aspirin',
             'synonyms' => json_encode(['Acetylsalicylic acid']),
         ]);
@@ -42,7 +87,7 @@ class SearchControllerTest extends TestCase
             'name' => 'Caffeine',
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'Aspirin',
             'type' => 'text',
         ]);
@@ -60,7 +105,7 @@ class SearchControllerTest extends TestCase
             'standard_inchi_key' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
             'type' => 'inchikey',
         ]);
@@ -77,7 +122,7 @@ class SearchControllerTest extends TestCase
             'standard_inchi' => 'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)',
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'InChI=1S/C9H8O4',
             'type' => 'inchi',
         ]);
@@ -90,7 +135,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_automatic_detection_of_inchikey()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
         ]);
 
@@ -103,7 +148,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_automatic_detection_of_inchi()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12',
         ]);
 
@@ -116,9 +161,9 @@ class SearchControllerTest extends TestCase
      */
     public function test_pagination_with_limit_parameter()
     {
-        Molecule::factory()->count(50)->create();
+        $this->createPublicCatalogMolecules(50);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'limit' => 10,
             'page' => 1,
         ]);
@@ -136,11 +181,246 @@ class SearchControllerTest extends TestCase
     {
         Molecule::factory()->count(5)->create();
 
-        $response = $this->postJson('/api/v1/search?sort=recent', [
+        $response = $this->postJson('/api/v1/search/compounds?sort=recent', [
             'query' => '',
         ]);
 
         $response->assertStatus(200);
+    }
+
+    public function test_empty_browse_defaults_to_latest_compounds_first(): void
+    {
+        $older = $this->createMoleculeInPublicCatalog([
+            'created_at' => now()->subDays(2),
+        ]);
+        $newer = $this->createMoleculeInPublicCatalog([
+            'created_at' => now(),
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+        $ids = collect($response->json('data'))->pluck('id')->values()->all();
+        $this->assertSame([$newer->id, $older->id], $ids);
+    }
+
+    public function test_pagination_links_point_to_compounds_page(): void
+    {
+        $this->createPublicCatalogMolecules(30);
+
+        $response = $this->postJson('/api/v1/search/compounds?limit=10&page=1&sort=recent', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+        $nextLink = collect($response->json('links'))->first(fn (array $link) => str_contains($link['label'], 'Next'));
+
+        $this->assertNotNull($nextLink);
+        $this->assertStringContainsString('/search', $nextLink['url']);
+        $this->assertStringContainsString('scope=compounds', $nextLink['url']);
+        $this->assertStringContainsString('page=2', $nextLink['url']);
+        $this->assertStringContainsString('sort=recent', $nextLink['url']);
+    }
+
+    public function test_search_includes_public_sample_and_experiment_counts(): void
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '13C NMR - DEPT',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('id', $molecule->id);
+
+        $this->assertNotNull($row);
+        $this->assertSame(1, $row['workspace_samples_count']);
+        $this->assertSame(1, $row['workspace_experiment_type_counts']['1H NMR - 1D']);
+        $this->assertSame(1, $row['workspace_experiment_type_counts']['13C NMR - DEPT']);
+    }
+
+    public function test_search_response_includes_iupac_name_when_present(): void
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create([
+            'iupac_name' => 'ethanol',
+            'name' => 'user label',
+        ]);
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('id', $molecule->id);
+
+        $this->assertNotNull($row);
+        $this->assertSame('ethanol', $row['iupac_name']);
+    }
+
+    public function test_search_excludes_compounds_without_public_spectra(): void
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $withSpectra = Molecule::factory()->create();
+        $withoutSpectra = Molecule::factory()->create();
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $withSpectra->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        $privateStudy = Study::factory()->create([
+            'is_public' => false,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $privateSample = Sample::factory()->create([
+            'study_id' => $privateStudy->id,
+        ]);
+
+        $withoutSpectra->samples()->attach($privateSample->id, ['percentage_composition' => '100']);
+
+        Dataset::factory()->create([
+            'study_id' => $privateStudy->id,
+            'team_id' => $privateStudy->team_id,
+            'owner_id' => $privateStudy->owner_id,
+            'project_id' => $privateStudy->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+
+        $this->assertContains($withSpectra->id, $ids);
+        $this->assertNotContains($withoutSpectra->id, $ids);
+    }
+
+    public function test_search_includes_compound_with_study_level_public_nmrium_spectra(): void
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        NMRium::factory()->forStudy($study)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        ['id' => 'spec-1'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+
+        $this->assertNotNull(
+            collect($response->json('data'))->firstWhere('id', $molecule->id)
+        );
     }
 
     /**
@@ -148,7 +428,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_filters_type()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'mw:100..200',
             'type' => 'filters',
         ]);
@@ -167,7 +447,7 @@ class SearchControllerTest extends TestCase
 
         $molecule->attachTag('organic', 'chemical_class');
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'organic',
             'type' => 'tags',
             'tagType' => 'chemical_class',
@@ -181,9 +461,9 @@ class SearchControllerTest extends TestCase
      */
     public function test_empty_search_returns_all_molecules()
     {
-        Molecule::factory()->count(3)->create();
+        $this->createPublicCatalogMolecules(3);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -196,7 +476,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_respects_max_limit()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
             'limit' => 200, // Over max
         ]);
@@ -210,7 +490,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_invalid_type()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'type' => 'invalid_search_type',
         ]);
@@ -224,7 +504,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_sanitizes_query_input()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => "test\x00query\x1Fwith\x7Fcontrol",
         ]);
 
@@ -237,9 +517,9 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_page_parameter()
     {
-        Molecule::factory()->count(30)->create();
+        $this->createPublicCatalogMolecules(30);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'page' => 2,
             'limit' => 10,
         ]);
@@ -257,7 +537,7 @@ class SearchControllerTest extends TestCase
     {
         Molecule::factory()->count(30)->create();
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
             'limit' => 10,
         ]);
@@ -279,7 +559,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_invalid_smiles_query_returns_empty_results()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'INVALID_SMILES_STRING_###',
             'type' => 'smiles',
         ]);
@@ -293,7 +573,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_invalid_exact_match_query_returns_empty_results()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'INVALID###STRUCTURE',
             'type' => 'exact',
         ]);
@@ -307,7 +587,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_invalid_similarity_query_returns_empty_results()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'INVALID_FINGERPRINT',
             'type' => 'similarity',
         ]);
@@ -321,7 +601,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_range()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'mw:100..500',
             'type' => 'filters',
         ]);
@@ -334,7 +614,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_boolean_value()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'cs:true',
             'type' => 'filters',
         ]);
@@ -347,7 +627,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_or_conditions()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'mw:100..200 OR mw:300..400',
             'type' => 'filters',
         ]);
@@ -360,7 +640,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_array_contains()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'ds:ChEBI+PubChem|true',
             'type' => 'filters',
         ]);
@@ -373,7 +653,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_text_search()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'class:Organic+compounds',
             'type' => 'filters',
         ]);
@@ -386,7 +666,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_ignores_invalid_fields()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'invalid_field:value',
             'type' => 'filters',
         ]);
@@ -400,7 +680,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_tag_type_validation_with_invalid_characters()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'type' => 'tags',
             'tagType' => 'invalid-type-123',

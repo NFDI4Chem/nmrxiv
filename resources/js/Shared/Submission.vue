@@ -142,56 +142,7 @@
                                             >
                                                 {{ draft.eln.toUpperCase() }}
                                             </span>
-                                            <span
-                                                v-if="draft.status"
-                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                                :class="{
-                                                    'bg-blue-100 text-blue-800':
-                                                        ['received'].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                    'bg-yellow-100 text-yellow-800':
-                                                        [
-                                                            'zip_processed',
-                                                            'processing',
-                                                            'pending',
-                                                            'job_dispatched',
-                                                        ].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                    'bg-green-100 text-green-800':
-                                                        [
-                                                            'validated',
-                                                            'processed',
-                                                            'successful',
-                                                            'published',
-                                                        ].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                    'bg-red-100 text-red-800': [
-                                                        'failed',
-                                                    ].includes(
-                                                        draft.status.toLowerCase()
-                                                    ),
-                                                    'bg-gray-100 text-gray-800':
-                                                        ![
-                                                            'received',
-                                                            'zip_processed',
-                                                            'validated',
-                                                            'processed',
-                                                            'successful',
-                                                            'published',
-                                                            'failed',
-                                                            'processing',
-                                                            'pending',
-                                                            'job_dispatched',
-                                                        ].includes(
-                                                            draft.status.toLowerCase()
-                                                        ),
-                                                }"
-                                            >
-                                                {{ formatStatus(draft.status) }}
-                                            </span>
+                                            <DraftStatusBadge :draft="draft" />
                                         </div>
                                         <p
                                             class="text-sm font-medium text-gray-600 truncate pr-10"
@@ -271,129 +222,10 @@
                 </div>
                 <div v-else>
                     <div v-if="showPrimer" class="-mx-6 -my-4">
-                        <div>
-                            <section
-                                class="h-1/2 overflow-hidden bg-white overflow-hidden py-12"
-                            >
-                                <div
-                                    class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-                                >
-                                    <svg
-                                        class="absolute top-full right-full transform translate-x-1/3 -translate-y-1/4 lg:translate-x-1/2 xl:-translate-y-1/2"
-                                        width="404"
-                                        height="404"
-                                        fill="none"
-                                        viewBox="0 0 404 404"
-                                        role="img"
-                                        aria-labelledby="svg-nmrxiv"
-                                    >
-                                        <title id="svg-nmrxiv">nmrxiv</title>
-                                        <defs>
-                                            <pattern
-                                                id="ad119f34-7694-4c31-947f-5c9d249b21f3"
-                                                x="0"
-                                                y="0"
-                                                width="20"
-                                                height="20"
-                                                patternUnits="userSpaceOnUse"
-                                            >
-                                                <rect
-                                                    x="0"
-                                                    y="0"
-                                                    width="4"
-                                                    height="4"
-                                                    class="text-gray-200"
-                                                    fill="currentColor"
-                                                ></rect>
-                                            </pattern>
-                                        </defs>
-                                        <rect
-                                            width="404"
-                                            height="404"
-                                            fill="url(#ad119f34-7694-4c31-947f-5c9d249b21f3)"
-                                        ></rect>
-                                    </svg>
-                                    <div class="relative">
-                                        <blockquote>
-                                            <div
-                                                class="max-w-3xl mx-auto text-left text-xl leading-9 font-medium text-gray-900"
-                                            >
-                                                <p
-                                                    class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
-                                                >
-                                                    Basic Concepts
-                                                </p>
-                                                <p class="mt-3 text-lg">
-                                                    In nmrXiv, data is organised
-                                                    as
-                                                    <b class="text-teal-700"
-                                                        >projects</b
-                                                    >. Consider a project is
-                                                    equivalent to your
-                                                    publication with the
-                                                    corresponding NMR data to be
-                                                    uploaded to nmrXiv. A
-                                                    project can have multiple
-                                                    studies.
-                                                    <b class="text-teal-700"
-                                                        >A sample study
-                                                        corresponds to a group
-                                                        of NMR experiments of
-                                                        one sample</b
-                                                    >, e.g. 1H, 13C, APT, COSY
-                                                    HSQC, HMBC, NOESY in Bruker
-                                                    Format or (another study) in
-                                                    another format such as
-                                                    JCAMP-DX / Varian.
-                                                    <b class="text-teal-700"
-                                                        >Each NMR measurement in
-                                                        a study is referred to
-                                                        as a dataset</b
-                                                    >, e.g. 1H NMR or COSY (are
-                                                    each a dataset).
-                                                </p>
-                                                <img
-                                                    src="/img/primer.png"
-                                                    alt=""
-                                                />
-                                                <p
-                                                    class="text-md text-center leading-5 mb-3"
-                                                >
-                                                    <small
-                                                        >nmrXiv allows you to
-                                                        upload NMR raw data from
-                                                        any NMR instrument. We
-                                                        can currently
-                                                        auto-detect
-                                                        Bruker/Varian/JOEL
-                                                        formats & JCAMP files
-                                                        and will support more
-                                                        raw & processed file
-                                                        formats soon. Once you
-                                                        upload your raw or
-                                                        processed NMR data,
-                                                        nmrXiv will
-                                                        auto-generate the
-                                                        studies and datasets for
-                                                        you based on the
-                                                        uploaded folder
-                                                        structure.
-                                                        <i
-                                                            ><a
-                                                                class="text-xs"
-                                                                target="_blank"
-                                                                href="https://docs.nmrxiv.org/submission-guides/submission/folder-structure"
-                                                                >More info
-                                                                here</a
-                                                            ></i
-                                                        ></small
-                                                    >
-                                                </p>
-                                            </div>
-                                        </blockquote>
-                                    </div>
-                                </div>
-                            </section>
+                        <div
+                            class="max-h-[min(560px,72vh)] overflow-y-auto px-4 sm:px-8 py-6 bg-white"
+                        >
+                            <Primer />
                         </div>
                     </div>
                     <div v-else>
@@ -502,6 +334,11 @@
                                                     :draft="currentDraft"
                                                     @loading="
                                                         updateLoadingStatus
+                                                    "
+                                                    @show-processing-logs="
+                                                        showProcessingLogs(
+                                                            currentDraft
+                                                        )
                                                     "
                                                 ></file-system-browser>
                                             </div>
@@ -1913,11 +1750,14 @@ import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
 import slider from "vue3-slider";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
+import { createStructureEditor } from "@/Utils/structureEditor";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
+import Primer from "@/Shared/Primer.vue";
+import DraftStatusBadge from "@/Shared/DraftStatusBadge.vue";
 import {
     ExclamationTriangleIcon,
     ExclamationCircleIcon,
@@ -1940,6 +1780,8 @@ export default {
         PencilIcon,
         JetInputError,
         FileSystemBrowser,
+        Primer,
+        DraftStatusBadge,
         ExclamationTriangleIcon,
         ArrowDownOnSquareStackIcon,
         TrashIcon,
@@ -2245,8 +2087,16 @@ export default {
             }
         },
 
-        updateLoadingStatus(status) {
-            this.loadingStep = status;
+        updateLoadingStatus(payload) {
+            if (
+                payload &&
+                typeof payload === "object" &&
+                typeof payload.status === "boolean"
+            ) {
+                this.loadingStep = payload.status;
+            } else {
+                this.loadingStep = !!payload;
+            }
         },
 
         deleteMolecule(mol) {
@@ -2404,10 +2254,9 @@ export default {
             this.tabs.forEach((t) => {
                 if (t.name == tab.name) {
                     t.current = true;
-                    this.$nextTick(() => {
-                        this.editor = OCL.StructureEditor.createSVGEditor(
-                            "structureSearchEditor",
-                            1
+                    this.$nextTick(async () => {
+                        this.editor = await createStructureEditor(
+                            "structureSearchEditor"
                         );
                     });
                 } else {
@@ -2705,28 +2554,81 @@ export default {
                 let ownerUserName = this.$page.props.team
                     ? this.$page.props.team.owner.username
                     : this.project.owner.username;
+                const spectraParserUrl =
+                    this.$page.props.spectraParserUrl ||
+                    "https://dev.nmrkit.nmrxiv.org/latest/spectra/parse/url";
+                const datasetUrl =
+                    this.url +
+                    "/" +
+                    ownerUserName +
+                    "/datasets/" +
+                    datasetDetails.projectSlug +
+                    "/" +
+                    datasetDetails.studySlug +
+                    "/" +
+                    datasetDetails.datasetSlug;
+                let safeDatasetUrl = datasetUrl;
+                try {
+                    safeDatasetUrl = encodeURI(decodeURI(datasetUrl));
+                } catch (e) {
+                    safeDatasetUrl = encodeURI(datasetUrl);
+                }
                 axios
-                    .post("https://nodejs.nmrxiv.org/spectra-parser", {
-                        urls: [
-                            this.url +
-                                "/" +
-                                ownerUserName +
-                                "/datasets/" +
-                                datasetDetails.projectSlug +
-                                "/" +
-                                datasetDetails.studySlug +
-                                "/" +
-                                datasetDetails.datasetSlug,
-                        ],
-                        snapshot: false,
+                    .post(spectraParserUrl, {
+                        url: safeDatasetUrl,
+                        capture_snapshot: false,
                     })
                     .then((response) => {
+                        const nmriumState =
+                            response.data?.nmriumState ?? response.data ?? {};
+                        const parsedSpectra = nmriumState.data ?? {};
+                        if (
+                            !parsedSpectra.source &&
+                            Array.isArray(parsedSpectra.sources) &&
+                            parsedSpectra.sources.length > 0
+                        ) {
+                            const mergedEntries = [];
+                            parsedSpectra.sources.forEach((src) => {
+                                const baseURL = src?.baseURL ?? "";
+                                const entries = Array.isArray(src?.entries)
+                                    ? src.entries
+                                    : [];
+                                entries.forEach((entry) => {
+                                    mergedEntries.push({
+                                        baseURL,
+                                        relativePath: entry?.relativePath ?? "",
+                                    });
+                                });
+                            });
+                            if (mergedEntries.length > 0) {
+                                parsedSpectra.source = {
+                                    entries: mergedEntries,
+                                };
+                            }
+                        }
+                        if (Array.isArray(parsedSpectra.spectra)) {
+                            parsedSpectra.spectra.forEach((spec) => {
+                                if (!spec || typeof spec !== "object") {
+                                    return;
+                                }
+                                if (!spec.sourceSelector && spec.selector) {
+                                    spec.sourceSelector = spec.selector;
+                                }
+                            });
+                        }
+                        const version =
+                            nmriumState.version ??
+                            parsedSpectra.version ??
+                            null;
+                        if (version) {
+                            parsedSpectra.version = version;
+                        }
                         axios
                             .post(
                                 "/dashboard/datasets/" +
                                     datasetDetails.datasetId +
                                     "/nmriumInfo",
-                                response.data.data
+                                parsedSpectra
                             )
                             .then(() => {
                                 this.loadingStep = false;
@@ -2764,30 +2666,6 @@ export default {
             this.loading = true;
             return axios.get("/dashboard/drafts");
         },
-        formatStatus(status) {
-            if (!status) return "";
-
-            const statusMap = {
-                received: "Received",
-                zip_processed: "ZIP Processed",
-                validated: "Validated",
-                processed: "Processed",
-                successful: "Successful",
-                published: "Published",
-                failed: "Failed",
-                processing: "Processing",
-                pending: "Pending",
-                job_dispatched: "Job Dispatched",
-            };
-
-            return (
-                statusMap[status.toLowerCase()] ||
-                status
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())
-            );
-        },
-
         selectDraft(draft) {
             this.currentDraft = draft;
             this.draftForm.name = this.currentDraft.name;

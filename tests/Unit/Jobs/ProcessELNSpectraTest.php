@@ -80,6 +80,8 @@ class ProcessELNSpectraTest extends TestCase
                 return str_contains($message, 'Project not found');
             });
 
+        Log::shouldReceive('info')->atLeast()->once();
+
         $job = new ProcessELNSpectra(999);
         $job->handle();
 

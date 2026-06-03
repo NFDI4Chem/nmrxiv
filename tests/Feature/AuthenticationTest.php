@@ -34,11 +34,25 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
         $this->assertGuest();
+        $response->assertRedirect(route('login', absolute: false));
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function test_failed_login_redirects_to_login_even_when_previous_url_was_elsewhere(): void
+    {
+        $response = $this->from('/projects')->post('/login', [
+            'email' => 'nonexistent@example.com',
+            'password' => 'wrong-password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect(route('login', absolute: false));
+        $response->assertSessionHasErrors('email');
     }
 }

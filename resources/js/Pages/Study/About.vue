@@ -655,7 +655,11 @@ import {
 } from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
+import {
+    createStructureEditor,
+    STRUCTURE_SEARCH_EDITOR_OPTIONS,
+} from "@/Utils/structureEditor";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
@@ -712,15 +716,34 @@ export default {
             return this.$page.props.chemistryStandardizeUrl;
         },
     },
+    watch: {
+        canUpdateStudy(value) {
+            if (value && !this.editor) {
+                this.$nextTick(() => {
+                    this.initStructureEditor();
+                });
+            }
+        },
+    },
     mounted() {
         this.$nextTick(() => {
-            this.editor = OCL.StructureEditor.createSVGEditor(
-                "structureSearchEditor",
-                1
-            );
+            this.initStructureEditor();
         });
     },
     methods: {
+        async initStructureEditor() {
+            if (this.editor) {
+                return;
+            }
+            const host = document.getElementById("structureSearchEditor");
+            if (!host) {
+                return;
+            }
+            this.editor = await createStructureEditor(
+                "structureSearchEditor",
+                STRUCTURE_SEARCH_EDITOR_OPTIONS
+            );
+        },
         openStudyDetailsPane() {
             this.emitter.emit("openStudyDetails", {});
         },

@@ -12,9 +12,32 @@
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <!-- Main content container with responsive padding -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+            <div class="pt-4 pb-6">
+                <div
+                    v-if="workspace && canUpdateProject"
+                    class="mb-4 rounded-md border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:border-teal-900/40 dark:bg-teal-950/30 dark:text-teal-100"
+                >
+                    <span>Need to add or replace files?</span>
+                    <Link
+                        :href="
+                            route('dashboard.project.settings', project.data.id)
+                        "
+                        class="ml-1 font-semibold text-teal-800 underline hover:text-teal-950 dark:text-teal-200"
+                    >
+                        Open project settings
+                    </Link>
+                    <span class="hidden sm:inline">
+                        in the dashboard (upload and file tools).
+                    </span>
+                </div>
+                <div
+                    v-if="!project.data.files"
+                    class="rounded-lg border border-gray-200 bg-gray-50 px-6 py-10 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+                >
+                    No files have been uploaded for this project yet.
+                </div>
                 <!-- File browser section - only shown if project has files -->
-                <div v-if="project.data.files">
+                <div v-else>
                     <!-- Breadcrumb navigation - hidden on mobile, shown on desktop -->
                     <nav
                         v-if="$page.props.selectedFolder"
@@ -135,7 +158,7 @@ import FileSystemBrowser from "./../../../Shared/FileSystemBrowser.vue";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/vue/24/solid";
 
 // Inertia.js imports
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 export default {
     name: "ProjectFiles",
@@ -149,6 +172,7 @@ export default {
         HomeIcon, // Home icon for root breadcrumb
         FileSystemBrowser, // Main file browser component
         Head, // Inertia head component for page title
+        Link,
     },
 
     /**
@@ -172,6 +196,14 @@ export default {
      * Computed properties
      */
     computed: {
+        workspace() {
+            return this.$page.props.workspace ?? null;
+        },
+        canUpdateProject() {
+            return (
+                this.workspace?.projectPermissions?.canUpdateProject === true
+            );
+        },
         /**
          * Get the base URL from page props
          * @returns {String} Base application URL
@@ -204,6 +236,10 @@ export default {
      * Initialize the file browser with default values and load files
      */
     mounted() {
+        if (!this.project?.data?.files) {
+            return;
+        }
+
         // Set initial file system object to project files root
         this.$page.props.selectedFileSystemObject = this.project.data.files;
 

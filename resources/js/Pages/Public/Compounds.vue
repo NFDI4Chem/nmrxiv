@@ -177,96 +177,67 @@
                         </div>
                         <div v-if="results">
                             <div
-                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200 overflow-y-scroll"
-                                style="height: calc(100vh - 380px)"
+                                v-if="results.data.length > 0"
+                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200"
                             >
+                                <compound-cards
+                                    class="block w-full min-w-0 max-w-none"
+                                    :molecules="results.data"
+                                    :loading="false"
+                                />
                                 <div
-                                    v-if="results.data.length > 0"
-                                    class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
+                                    class="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between"
                                 >
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            Showing
-                                            <span class="font-medium">{{
-                                                results.from
-                                            }}</span>
-                                            to
-                                            <span class="font-medium">{{
-                                                results.to
-                                            }}</span>
-                                            of
-                                            <span class="font-medium">{{
-                                                results.total
-                                            }}</span>
-                                            results
-                                        </p>
-                                    </div>
-                                    <div v-if="results.last_page > 1">
-                                        <nav
-                                            class="isolate inline-flex -space-x-px shadow-sm"
-                                            aria-label="Pagination"
+                                    <p class="text-sm text-gray-700">
+                                        Showing
+                                        <span class="font-medium">{{
+                                            results.from
+                                        }}</span>
+                                        to
+                                        <span class="font-medium">{{
+                                            results.to
+                                        }}</span>
+                                        of
+                                        <span class="font-medium">{{
+                                            results.total
+                                        }}</span>
+                                        results
+                                    </p>
+                                    <Pagination
+                                        v-if="results.last_page > 1"
+                                        :links="results.links"
+                                    />
+                                </div>
+                            </div>
+                            <div v-else class="px-6 pb-24">
+                                <div v-if="error">
+                                    <div class="bg-white">
+                                        <div
+                                            class="mx-auto w-full max-w-7xl px-6 pb-16 sm:pb-24 lg:px-8"
                                         >
-                                            <a
-                                                v-for="link in results.links"
-                                                :key="link.label"
-                                                :class="[
-                                                    link.active
-                                                        ? 'bg-gray-200'
-                                                        : '',
-                                                    'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
-                                                ]"
-                                                @click="navigateTo(link)"
-                                                v-html="
-                                                    sanitizeHtml(link.label)
-                                                "
-                                            >
-                                            </a>
-                                        </nav>
-                                    </div>
-                                </div>
-                                <div
-                                    v-if="results.data.length > 0"
-                                    class="mx-auto grid mt-6 gap-5 lg:max-w-none md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6"
-                                >
-                                    <span
-                                        v-for="result in results.data"
-                                        :key="result.id"
-                                        class="rounded-lg hover:shadow-lg shadow border"
-                                    >
-                                        <MoleculeCard
-                                            :molecule="result"
-                                        ></MoleculeCard>
-                                    </span>
-                                </div>
-                                <div v-else>
-                                    <div v-if="error">
-                                        <div class="bg-white">
                                             <div
-                                                class="mx-auto w-full max-w-7xl px-6 pb-16 sm:pb-24 lg:px-8"
+                                                class="mx-auto mt-20 max-w-2xl text-center sm:mt-24"
                                             >
-                                                <div
-                                                    class="mx-auto mt-20 max-w-2xl text-center sm:mt-24"
+                                                <p
+                                                    class="text-base font-semibold leading-8 text-indigo-600"
                                                 >
-                                                    <p
-                                                        class="text-base font-semibold leading-8 text-indigo-600"
-                                                    >
-                                                        {{ error.status }}
-                                                    </p>
-                                                    <h1
-                                                        class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
-                                                    >
-                                                        {{ error.statusText }}
-                                                    </h1>
-                                                    <p
-                                                        class="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8"
-                                                    >
-                                                        {{ error.data.message }}
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    class="mx-auto mt-16 flow-root max-w-lg sm:mt-20"
+                                                    {{ error.status }}
+                                                </p>
+                                                <h1
+                                                    class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
                                                 >
-                                                    <!-- 
+                                                    {{ error.statusText }}
+                                                </h1>
+                                                <p
+                                                    class="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8"
+                                                >
+                                                    {{ error.data.message }}
+                                                </p>
+                                            </div>
+                                            <div
+                                                class="mx-auto mt-16 flow-root max-w-lg sm:mt-20"
+                                            >
+                                                <!-- 
                 <h2 class="sr-only">Popular pages</h2>
                 <ul
                   role="list"
@@ -442,102 +413,44 @@
                   </li>
                 </ul>
                  -->
-                                                    <div
-                                                        class="mt-10 flex justify-center"
+                                                <div
+                                                    class="mt-10 flex justify-center"
+                                                >
+                                                    <a
+                                                        href="/"
+                                                        class="text-sm font-semibold leading-6 text-indigo-600"
                                                     >
-                                                        <a
-                                                            href="/"
-                                                            class="text-sm font-semibold leading-6 text-indigo-600"
+                                                        <span aria-hidden="true"
+                                                            >&larr;</span
                                                         >
-                                                            <span
-                                                                aria-hidden="true"
-                                                                >&larr;</span
-                                                            >
-                                                            Back to home
-                                                        </a>
-                                                    </div>
+                                                        Back to home
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-else class="bg-white px-4 py-16">
-                                        <div class="text-center">
-                                            <svg
-                                                class="mx-auto h-16 w-16 text-gray-300"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                aria-hidden="true"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                                                />
-                                            </svg>
-                                            <h3
-                                                class="mt-4 text-base font-semibold text-gray-900"
-                                            >
-                                                No compounds found
-                                            </h3>
-                                            <p
-                                                class="mt-2 text-sm text-gray-500 max-w-md mx-auto"
-                                            >
-                                                Try refining your search or
-                                                browse all available compounds.
-                                                contact us.
-                                            </p>
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
-                            <div
-                                v-if="results.data.length > 0"
-                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md sticky bottom-0 border-t border-gray-200 mt-auto"
-                            >
                                 <div
-                                    class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
+                                    v-else
+                                    :class="publicEmptyStateSectionClasses"
                                 >
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            Showing
-                                            <span class="font-medium">{{
-                                                results.from
-                                            }}</span>
-                                            to
-                                            <span class="font-medium">{{
-                                                results.to
-                                            }}</span>
-                                            of
-                                            <span class="font-medium">{{
-                                                results.total
-                                            }}</span>
-                                            results
-                                        </p>
-                                    </div>
-                                    <div v-if="results.last_page > 1">
-                                        <nav
-                                            class="isolate inline-flex -space-x-px shadow-sm"
-                                            aria-label="Pagination"
-                                        >
-                                            <a
-                                                v-for="link in results.links"
-                                                :key="link.label"
-                                                :class="[
-                                                    link.active
-                                                        ? 'bg-gray-200'
-                                                        : '',
-                                                    'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
-                                                ]"
-                                                @click="navigateTo(link)"
-                                                v-html="
-                                                    sanitizeHtml(link.label)
-                                                "
-                                            >
-                                            </a>
-                                        </nav>
-                                    </div>
+                                    <EmptySearchState
+                                        layout="public"
+                                        entity-type="compounds"
+                                        :search-query="searchTerm || ''"
+                                        :title="
+                                            searchTerm
+                                                ? null
+                                                : 'No compounds available'
+                                        "
+                                        :message="
+                                            searchTerm
+                                                ? null
+                                                : 'Compounds will appear here once they are published.'
+                                        "
+                                        :show-clear-button="!!searchTerm"
+                                        @clear-search="clearSearch"
+                                    />
                                 </div>
                             </div>
                             <div
@@ -562,20 +475,72 @@
                                             class="-m-1 flex flex-wrap items-center"
                                         >
                                             <span
-                                                v-for="query in recentQueries"
-                                                :key="query"
-                                                class="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
+                                                v-for="entry in recentQueries"
+                                                :key="recentQueryKey(entry)"
+                                                class="m-1 inline-flex items-center rounded-lg border border-gray-200 bg-white py-1 pl-1 pr-2 text-sm font-medium text-gray-900"
                                             >
                                                 <a
-                                                    class="cursor-pointer"
-                                                    @click="search(query)"
-                                                    >{{ query }}</a
+                                                    class="inline-flex cursor-pointer items-center gap-2"
+                                                    :aria-label="
+                                                        recentQueryAriaLabel(
+                                                            entry
+                                                        )
+                                                    "
+                                                    @click="search(entry)"
                                                 >
+                                                    <span
+                                                        v-if="
+                                                            showStructureForRecent(
+                                                                entry
+                                                            )
+                                                        "
+                                                        class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white"
+                                                    >
+                                                        <img
+                                                            v-if="
+                                                                structureDepictionUrl(
+                                                                    normalizeRecentQuery(
+                                                                        entry
+                                                                    ).query
+                                                                )
+                                                            "
+                                                            :src="
+                                                                structureDepictionUrl(
+                                                                    normalizeRecentQuery(
+                                                                        entry
+                                                                    ).query
+                                                                )
+                                                            "
+                                                            alt=""
+                                                            class="max-h-full max-w-full object-contain"
+                                                        />
+                                                        <span
+                                                            v-else
+                                                            class="max-w-full truncate px-1 font-mono text-[10px]"
+                                                        >
+                                                            {{
+                                                                normalizeRecentQuery(
+                                                                    entry
+                                                                ).query
+                                                            }}
+                                                        </span>
+                                                    </span>
+                                                    <span
+                                                        v-else
+                                                        class="max-w-xs truncate px-2"
+                                                    >
+                                                        {{
+                                                            normalizeRecentQuery(
+                                                                entry
+                                                            ).query
+                                                        }}
+                                                    </span>
+                                                </a>
                                                 <button
                                                     type="button"
                                                     class="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
                                                     @click="
-                                                        removeSearchQuery(query)
+                                                        removeSearchQuery(entry)
                                                     "
                                                 >
                                                     <span class="sr-only"
@@ -634,19 +599,28 @@
 </template>
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import MoleculeCard from "@/App/MoleculeCard.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
-// Removed unused imports
+import CompoundCards from "@/Shared/CompoundCards.vue";
+import Pagination from "@/Shared/Pagination.vue";
+import EmptySearchState from "@/Shared/EmptySearchState.vue";
+import { publicEmptyStateSectionClasses } from "@/Utils/publicEmptyStateClasses.js";
+import {
+    fetchCompoundSearch,
+    syncCompoundsBrowserUrl,
+} from "@/Utils/unifiedSearchApi.js";
 
 export default {
     components: {
         AppLayout,
-        MoleculeCard,
+        CompoundCards,
         StructureSearch,
+        Pagination,
+        EmptySearchState,
     },
     props: ["page", "query", "limit", "tagType"],
     data() {
         return {
+            publicEmptyStateSectionClasses,
             results: null,
             loading: false,
             searchTerm: "",
@@ -666,10 +640,9 @@ export default {
         }
 
         if (typeof window !== "undefined") {
-            let recentQueries = localStorage.getItem("recentQueries");
-            if (recentQueries) {
-                this.recentQueries = JSON.parse(recentQueries);
-            }
+            this.recentQueries = this.parseRecentQueries(
+                localStorage.getItem("recentQueries")
+            );
         }
 
         if (window.location.hash) {
@@ -681,12 +654,12 @@ export default {
         }
     },
     methods: {
-        fetchCompounds(queryT) {
+        fetchCompounds(queryT, { resetPage = false } = {}) {
             this.error = null;
             this.results = null;
             this.loading = true;
             let queryTerm = null;
-            if (queryT) {
+            if (queryT !== undefined && queryT !== null) {
                 queryTerm = queryT;
             } else {
                 queryTerm = this.searchTerm ? this.searchTerm : "";
@@ -701,47 +674,47 @@ export default {
             }
 
             let sort = this.getParameterByName("sort");
+            if (!sort && queryTerm === "") {
+                sort = "recent";
+            }
 
-            if (typeof window !== "undefined") {
-                let recentQueries = localStorage.getItem("recentQueries");
-                recentQueries = recentQueries ? JSON.parse(recentQueries) : [];
-                recentQueries.push(queryTerm);
-                recentQueries = [...new Set(recentQueries)].filter((n) => n);
+            if (typeof window !== "undefined" && queryTerm) {
+                const resolvedType =
+                    this.type || this.tagQuery(queryTerm) || "text";
+                this.recentQueries = this.addRecentQuery({
+                    query: queryTerm,
+                    type: resolvedType,
+                });
                 localStorage.setItem(
                     "recentQueries",
-                    JSON.stringify(recentQueries)
+                    JSON.stringify(this.recentQueries)
                 );
             }
 
-            let url = new URL(window.location);
-            url.searchParams.set("query", queryTerm);
-            url.searchParams.set("page", 1);
-            url = this.sanitiseURL(url);
-            window.history.pushState(
-                null,
-                "",
-                queryTerm == ""
-                    ? window.location.href.split("?")[0]
-                    : url.toString()
-            );
-            let page = this.page ? this.page : 1;
-            let urlEndpoint =
-                "/api/v1/search/?limit=" + this.limit + "&page=" + page;
-            if (sort) {
-                urlEndpoint = urlEndpoint + "&sort=" + sort;
-            }
+            const page = resetPage
+                ? 1
+                : parseInt(
+                      this.getParameterByName("page") || this.page || "1",
+                      10
+                  ) || 1;
+            const limit = this.limit || 24;
+
+            this.syncBrowserUrl(queryTerm, page, sort);
 
             if (queryTerm == "") {
                 this.type = "";
             }
-            axios
-                .post(urlEndpoint, {
-                    query: queryTerm,
-                    type: this.type,
-                    tagType: this.tagType ? this.tagType : null,
-                })
-                .then((response) => {
-                    this.results = response.data;
+
+            fetchCompoundSearch({
+                query: queryTerm,
+                type: this.type,
+                tagType: this.tagType ? this.tagType : null,
+                limit,
+                page,
+                sort,
+            })
+                .then((data) => {
+                    this.results = data;
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -750,6 +723,16 @@ export default {
                     this.results["data"] = [];
                     this.error = err.response;
                 });
+        },
+        syncBrowserUrl(queryTerm, page, sort) {
+            const queryType = this.getParameterByName("type");
+
+            syncCompoundsBrowserUrl(
+                queryTerm,
+                page,
+                sort,
+                queryType || this.type
+            );
         },
         sanitiseURL(url) {
             for (const [key, value] of url.searchParams.entries()) {
@@ -764,38 +747,110 @@ export default {
             }
             return url;
         },
-        search(query) {
-            if (query) {
-                this.searchTerm = query;
-                this.type = "text";
-            }
-            this.fetchCompounds(query);
-        },
-        removeSearchQuery(query) {
-            if (typeof window !== "undefined") {
-                let recentQueries = localStorage.getItem("recentQueries");
-                recentQueries = recentQueries ? JSON.parse(recentQueries) : [];
-                recentQueries = recentQueries.filter(function (item) {
-                    return item !== query;
-                });
-                recentQueries = [...new Set(recentQueries)].filter((n) => n);
-                this.recentQueries = recentQueries;
-                localStorage.setItem(
-                    "recentQueries",
-                    JSON.stringify(recentQueries)
-                );
-            }
-        },
-        navigateTo(link) {
-            let queryType = this.getParameterByName("type");
-            let searchTerm = this.searchTerm;
-            let tagType = this.tagType;
-            let location = "/compounds" + link.url;
+        search(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
 
-            let query = queryType ? "&type=" + queryType : "";
-            query += searchTerm ? "&query=" + searchTerm : "";
-            tagType = tagType ? "&tagType=" + tagType : "";
-            window.location = location + query + tagType;
+            if (normalized.query) {
+                this.searchTerm = normalized.query;
+                this.type = normalized.type || this.tagQuery(normalized.query);
+            }
+
+            this.fetchCompounds(normalized.query, { resetPage: true });
+        },
+        clearSearch() {
+            this.searchTerm = "";
+            this.type = "";
+            this.fetchCompounds("", { resetPage: true });
+        },
+        removeSearchQuery(entry) {
+            if (typeof window === "undefined") {
+                return;
+            }
+
+            const query = this.normalizeRecentQuery(entry).query;
+            this.recentQueries = this.recentQueries.filter(
+                (item) => this.normalizeRecentQuery(item).query !== query
+            );
+            localStorage.setItem(
+                "recentQueries",
+                JSON.stringify(this.recentQueries)
+            );
+        },
+        normalizeRecentQuery(entry) {
+            if (typeof entry === "string") {
+                return {
+                    query: entry,
+                    type: this.tagQuery(entry) || "text",
+                };
+            }
+
+            return {
+                query: entry?.query || "",
+                type: entry?.type || this.tagQuery(entry?.query) || "text",
+            };
+        },
+        parseRecentQueries(storedValue) {
+            if (!storedValue) {
+                return [];
+            }
+
+            try {
+                const parsed = JSON.parse(storedValue);
+
+                if (!Array.isArray(parsed)) {
+                    return [];
+                }
+
+                return parsed
+                    .map((entry) => this.normalizeRecentQuery(entry))
+                    .filter((entry) => entry.query);
+            } catch {
+                return [];
+            }
+        },
+        addRecentQuery(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+            const existing = this.parseRecentQueries(
+                localStorage.getItem("recentQueries")
+            ).filter((item) => item.query !== normalized.query);
+
+            return [normalized, ...existing].slice(0, 12);
+        },
+        recentQueryKey(entry) {
+            return this.normalizeRecentQuery(entry).query;
+        },
+        showStructureForRecent(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+            const structureTypes = [
+                "smiles",
+                "exact",
+                "substructure",
+                "similarity",
+            ];
+
+            if (structureTypes.includes(normalized.type)) {
+                return true;
+            }
+
+            return this.tagQuery(normalized.query) === "smiles";
+        },
+        structureDepictionUrl(smiles) {
+            if (!smiles || !this.$page.props.CM_API) {
+                return null;
+            }
+
+            const encodedSmiles = encodeURIComponent(smiles);
+
+            return `${this.$page.props.CM_API}depict/2D?smiles=${encodedSmiles}&height=96&width=96&CIP=false&toolkit=cdk`;
+        },
+        recentQueryAriaLabel(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+
+            if (this.showStructureForRecent(entry)) {
+                return `Repeat structure search for ${normalized.query}`;
+            }
+
+            return `Repeat search for ${normalized.query}`;
         },
         getParameterByName(name, url = window.location.href) {
             name = name.replace(/[\[\]]/g, "\\$&");

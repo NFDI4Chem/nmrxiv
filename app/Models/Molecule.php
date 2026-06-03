@@ -34,6 +34,13 @@ class Molecule extends Model
      */
     protected $appends = ['public_url'];
 
+    protected function casts(): array
+    {
+        return [
+            'workspace_experiment_type_counts' => 'array',
+        ];
+    }
+
     /**
      * Get the molecule identifier
      */

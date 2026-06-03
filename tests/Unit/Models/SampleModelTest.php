@@ -155,6 +155,50 @@ class SampleModelTest extends TestCase
         $this->assertContains('percentage_composition', $pivotColumns);
     }
 
+    public function test_ensure_molfile_header_prepends_title_when_v2000_counts_is_at_index_2(): void
+    {
+        $body = "  6  6  0  0  0  0  0  0  0  0999 V2000\nM  END\n";
+        $input = "Actelion Java MolfileCreator 2.0\n\n".$body;
+
+        $result = Sample::ensureMolfileHeader($input, 'P1');
+
+        $this->assertSame("P1\nActelion Java MolfileCreator 2.0\n\n".$body, $result);
+    }
+
+    public function test_ensure_molfile_header_prepends_three_lines_when_v3000_counts_is_at_index_0(): void
+    {
+        $input = "  0  0  0  0  0  0              0 V3000\nM  V30 BEGIN CTAB\nM  END\n";
+
+        $result = Sample::ensureMolfileHeader($input, 'compound');
+
+        $expected = "compound\n\n\n  0  0  0  0  0  0              0 V3000\nM  V30 BEGIN CTAB\nM  END\n";
+        $this->assertSame($expected, $result);
+    }
+
+    public function test_ensure_molfile_header_uses_blank_line_when_no_label_supplied(): void
+    {
+        $body = "  6  6  0  0  0  0  0  0  0  0999 V2000\nM  END\n";
+        $input = "RDKit          2D\n\n".$body;
+
+        $result = Sample::ensureMolfileHeader($input);
+
+        $this->assertSame("\nRDKit          2D\n\n".$body, $result);
+    }
+
+    public function test_ensure_molfile_header_keeps_well_formed_molfile_unchanged(): void
+    {
+        $input = "(10R)-labda-8,14-dien-13-ol\nActelion Java MolfileCreator 2.0\n\n".
+            "  0  0  0  0  0  0              0 V3000\nM  V30 BEGIN CTAB\nM  END\n";
+
+        $this->assertSame($input, Sample::ensureMolfileHeader($input, 'ignored'));
+    }
+
+    public function test_ensure_molfile_header_returns_input_when_not_a_molfile(): void
+    {
+        $this->assertSame('', Sample::ensureMolfileHeader(''));
+        $this->assertSame('not a molfile', Sample::ensureMolfileHeader('not a molfile'));
+    }
+
     public function test_sample_types_can_be_different_values()
     {
         $sample = Sample::factory()->create();

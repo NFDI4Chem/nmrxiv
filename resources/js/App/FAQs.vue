@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white border-t border-gray-100">
+    <div class="bg-white">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
             <!-- Section Header -->
             <div class="text-center mb-10">
@@ -78,7 +78,12 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { ChevronDownIcon } from "@heroicons/vue/24/outline";
 
-const { limit } = defineProps(["limit"]);
+const { limit } = defineProps({
+    limit: {
+        type: Number,
+        default: undefined,
+    },
+});
 
 const faqs = [
     {

@@ -3,9 +3,11 @@
 namespace App\Http\Resources;
 
 use App\Models\FileSystemObject;
+use App\Models\Project;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectResource extends JsonResource
 {
@@ -54,6 +56,7 @@ class ProjectResource extends JsonResource
             'stats' => [
                 'likes' => $this->likesCount(),
             ],
+            'samples_count' => $this->samplesCountForTab($request),
             'license' => new LicenseResource(
                 $this->license
             ),
@@ -119,5 +122,27 @@ class ProjectResource extends JsonResource
                 ];
             }),
         ];
+    }
+
+    /**
+     * Count for the Samples tab: public studies for public projects; all studies for members on private projects.
+     */
+    protected function samplesCountForTab(Request $request): int
+    {
+        /** @var Project $project */
+        $project = $this->resource;
+
+        if ($request->routeIs('project.preview') || $request->routeIs('studies.preview')) {
+            return (int) $project->studies()->count();
+        }
+
+        if (! $project->is_public) {
+            $user = $request->user();
+            if ($user !== null && Gate::forUser($user)->check('viewProject', $project)) {
+                return (int) $project->studies()->count();
+            }
+        }
+
+        return (int) $project->studies()->where('is_public', true)->count();
     }
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="bg-white">
-        <Head title="Welcome to nmrXiv"></Head>
+        <Head title="About - nmrXiv"></Head>
         <FlashMessages />
         <main>
             <!-- Header and Hero with Animated Gradient -->
@@ -26,214 +26,37 @@
                     class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-white"
                 ></div>
 
-                <header class="relative">
-                    <Popover class="relative border-b border-white/20">
-                        <div
-                            class="flex justify-between items-center mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8"
-                        >
-                            <div class="flex justify-start items-center gap-10">
-                                <Link :href="'/'" class="flex-shrink-0">
-                                    <jet-application-logo
-                                        class="block h-9 w-auto"
-                                    />
-                                </Link>
-
-                                <!-- Desktop Navigation -->
-                                <PopoverGroup
-                                    as="nav"
-                                    class="hidden md:flex items-center gap-8"
+                <PublicSiteHeader variant="hero">
+                    <template #mobile-extra>
+                        <nav class="grid grid-cols-1 gap-4">
+                            <Link
+                                v-for="item in Search"
+                                :key="item.name"
+                                :href="item.href"
+                                class="flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                            >
+                                <div
+                                    class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-indigo-600 to-primary-500 text-white"
                                 >
-                                    <Link
-                                        href="/projects"
-                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                    >
-                                        Projects
-                                    </Link>
-                                    <Link
-                                        href="/spectra"
-                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                    >
-                                        Spectra
-                                    </Link>
-                                    <Link
-                                        href="/compounds"
-                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                    >
-                                        Compounds
-                                    </Link>
-                                    <Link
-                                        href="/about-us"
-                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                    >
-                                        About
-                                    </Link>
-                                </PopoverGroup>
-                            </div>
-
-                            <!-- Mobile menu button -->
-                            <div class="md:hidden">
-                                <PopoverButton
-                                    class="rounded-lg p-2 inline-flex items-center justify-center text-gray-900 hover:text-gray-600 hover:bg-white/50 focus:outline-none focus:ring-2 ring-brand transition-colors"
-                                >
-                                    <span class="sr-only">Open menu</span>
-                                    <Bars3Icon
-                                        class="h-6 w-6"
+                                    <component
+                                        :is="item.icon"
+                                        class="size-5"
                                         aria-hidden="true"
                                     />
-                                </PopoverButton>
-                            </div>
-
-                            <!-- Auth Buttons -->
-                            <div
-                                v-if="
-                                    $page.props.auth.user &&
-                                    $page.props.auth.user?.first_name != null
-                                "
-                                class="hidden md:flex items-center"
-                            >
-                                <Link
-                                    href="/dashboard"
-                                    class="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors shadow-sm"
+                                </div>
+                                <span
+                                    class="text-[0.9375rem] font-medium text-gray-900"
                                 >
-                                    Dashboard
-                                </Link>
-                            </div>
-                            <div
-                                v-else
-                                class="hidden md:flex items-center gap-4"
-                            >
-                                <Link
-                                    href="/login"
-                                    class="whitespace-nowrap text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-                                >
-                                    Login
-                                </Link>
-                                <Link
-                                    href="/register"
-                                    class="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors shadow-sm"
-                                >
-                                    Register
-                                </Link>
-                            </div>
-                        </div>
-
-                        <transition
-                            enter-active-class="duration-200 ease-out"
-                            enter-from-class="opacity-0 scale-95"
-                            enter-to-class="opacity-100 scale-100"
-                            leave-active-class="duration-100 ease-in"
-                            leave-from-class="opacity-100 scale-100"
-                            leave-to-class="opacity-0 scale-95"
-                        >
-                            <div v-if="true">
-                                <PopoverPanel
-                                    focus
-                                    class="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
-                                >
-                                    <div
-                                        class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50"
-                                    >
-                                        <div class="pt-5 pb-6 px-5">
-                                            <div
-                                                class="flex items-center justify-between"
-                                            >
-                                                <div>
-                                                    <jet-application-logo
-                                                        class="block h-10 p-0.5 ml-1.5 w-auto"
-                                                    />
-                                                </div>
-                                                <div class="-mr-2">
-                                                    <PopoverButton
-                                                        class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                                                    >
-                                                        <span class="sr-only"
-                                                            >Close menu</span
-                                                        >
-                                                        <XMarkIcon
-                                                            class="h-6 w-6"
-                                                            aria-hidden="true"
-                                                        />
-                                                    </PopoverButton>
-                                                </div>
-                                            </div>
-                                            <div class="mt-6">
-                                                <nav
-                                                    class="grid grid-cols-1 gap-7"
-                                                >
-                                                    <Link
-                                                        v-for="item in Search"
-                                                        :key="item.name"
-                                                        :href="item.href"
-                                                        class="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50"
-                                                    >
-                                                        <div
-                                                            class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-indigo-600 to-teal-600 text-white"
-                                                        >
-                                                            <component
-                                                                :is="item.icon"
-                                                                class="h-6 w-6"
-                                                                aria-hidden="true"
-                                                            />
-                                                        </div>
-                                                        <div
-                                                            class="ml-4 text-base font-medium text-gray-900"
-                                                        >
-                                                            {{ item.name }}
-                                                        </div>
-                                                    </Link>
-                                                </nav>
-                                            </div>
-                                        </div>
-                                        <div class="py-6 px-5">
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <Link
-                                                    href="/projects"
-                                                    class="text-base font-medium text-gray-900 hover:text-gray-700"
-                                                >
-                                                    Projects
-                                                </Link>
-                                                <Link
-                                                    href="/datasets"
-                                                    class="text-base font-medium text-gray-900 hover:text-gray-700"
-                                                >
-                                                    Datasets
-                                                </Link>
-                                                <Link
-                                                    href="/compounds"
-                                                    class="text-base font-medium text-gray-900 hover:text-gray-700"
-                                                >
-                                                    Compounds
-                                                </Link>
-                                            </div>
-                                            <div class="mt-6">
-                                                <Link
-                                                    href="/login"
-                                                    class="w-full flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
-                                                >
-                                                    Login
-                                                </Link>
-                                                <p
-                                                    class="mt-6 text-center text-base font-medium text-gray-500"
-                                                >
-                                                    <Link
-                                                        href="/register"
-                                                        class="text-gray-900"
-                                                    >
-                                                        Register
-                                                    </Link>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </PopoverPanel>
-                            </div>
-                        </transition>
-                    </Popover>
-                </header>
+                                    {{ item.name }}
+                                </span>
+                            </Link>
+                        </nav>
+                    </template>
+                </PublicSiteHeader>
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="relative py-20 sm:py-24 lg:py-32">
                         <div class="overflow-hidden">
-                            <div class="mx-auto max-w-6xl pb-8">
+                            <div class="pb-8">
                                 <div
                                     class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center"
                                 >
@@ -369,7 +192,7 @@
             <!-- Our Mission Section (on white background) -->
             <div class="relative bg-white z-10">
                 <div
-                    class="mx-auto -mt-12 max-w-6xl px-6 sm:mt-0 lg:px-8 xl:-mt-8"
+                    class="mx-auto -mt-12 max-w-7xl px-4 sm:mt-0 sm:px-6 lg:px-8 xl:-mt-8"
                 >
                     <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
                         <h2
@@ -454,17 +277,272 @@
                     </div>
                 </div>
 
+                <!-- FAIR Features Section -->
+                <div class="bg-gray-50 mt-32 sm:mt-40">
+                    <div class="py-20 sm:py-24">
+                        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                            <div class="flex items-end justify-between mb-12">
+                                <div class="max-w-3xl">
+                                    <h2
+                                        class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight"
+                                    >
+                                        Built to be FAIR from ground up
+                                    </h2>
+                                </div>
+                                <a
+                                    href="https://docs.nmrxiv.org"
+                                    target="_blank"
+                                    class="hidden sm:inline-flex items-center gap-1 text-brand font-medium text-brand-hover transition-colors text-sm"
+                                >
+                                    Learn more
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <div
+                                ref="scrollContainer"
+                                class="overflow-x-auto scrollbar-hide px-4 sm:px-6 lg:px-8"
+                            >
+                                <div
+                                    class="flex gap-3 pb-4"
+                                    style="width: max-content"
+                                >
+                                    <div
+                                        v-for="(feature, index) in features"
+                                        :key="feature.name"
+                                        class="relative bg-white rounded-3xl p-8 border border-gray-200 transition-all duration-300 flex-shrink-0 w-[320px] h-[320px] flex flex-col"
+                                    >
+                                        <div class="flex-1 flex flex-col">
+                                            <span
+                                                class="flex items-center justify-center h-12 w-12"
+                                            >
+                                                <component
+                                                    :is="feature.icon"
+                                                    class="h-12 w-12 text-gray-900"
+                                                    aria-hidden="true"
+                                                />
+                                            </span>
+                                            <div class="mt-6 flex-1">
+                                                <h3
+                                                    class="text-2xl font-bold text-gray-900 leading-tight mb-3"
+                                                >
+                                                    {{ feature.name }}
+                                                </h3>
+                                                <p
+                                                    v-if="
+                                                        feature.shortDescription
+                                                    "
+                                                    class="text-base text-gray-600 leading-relaxed"
+                                                >
+                                                    {{
+                                                        feature.shortDescription
+                                                    }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button
+                                                class="flex items-center justify-center h-11 w-11 rounded-3xl bg-gray-900 text-white hover:bg-gray-700 transition-colors flex-shrink-0"
+                                                :aria-label="`Learn more about ${feature.name}`"
+                                                @click="openFeatureModal(index)"
+                                            >
+                                                <svg
+                                                    class="h-5 w-5"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    stroke-width="2.5"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M12 4.5v15m7.5-7.5h-15"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                            <div class="flex justify-end gap-2 mt-6">
+                                <button
+                                    class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    :disabled="!canScrollLeft"
+                                    @click="scrollLeft"
+                                >
+                                    <svg
+                                        class="h-5 w-5 text-gray-900"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15.75 19.5 8.25 12l7.5-7.5"
+                                        />
+                                    </svg>
+                                </button>
+                                <button
+                                    class="h-10 w-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    :disabled="!canScrollRight"
+                                    @click="scrollRight"
+                                >
+                                    <svg
+                                        class="h-5 w-5 text-white"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Modal -->
+                <TransitionRoot appear :show="isFeatureModalOpen" as="template">
+                    <Dialog
+                        as="div"
+                        class="relative z-50"
+                        @close="closeFeatureModal"
+                    >
+                        <TransitionChild
+                            as="template"
+                            enter="duration-300 ease-out"
+                            enter-from="opacity-0"
+                            enter-to="opacity-100"
+                            leave="duration-200 ease-in"
+                            leave-from="opacity-100"
+                            leave-to="opacity-0"
+                        >
+                            <div
+                                class="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                            />
+                        </TransitionChild>
+
+                        <div class="fixed inset-0 overflow-y-auto">
+                            <div
+                                class="flex min-h-full items-center justify-center p-4"
+                            >
+                                <TransitionChild
+                                    as="template"
+                                    enter="duration-300 ease-out"
+                                    enter-from="opacity-0 scale-95"
+                                    enter-to="opacity-100 scale-100"
+                                    leave="duration-200 ease-in"
+                                    leave-from="opacity-100 scale-100"
+                                    leave-to="opacity-0 scale-95"
+                                >
+                                    <DialogPanel
+                                        class="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white p-8 sm:p-12 text-left align-middle shadow-2xl transition-all"
+                                    >
+                                        <div class="absolute right-6 top-6">
+                                            <button
+                                                class="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                                                @click="closeFeatureModal"
+                                            >
+                                                <XMarkIcon
+                                                    class="h-5 w-5 text-gray-900"
+                                                />
+                                            </button>
+                                        </div>
+
+                                        <div v-if="selectedFeature">
+                                            <p
+                                                class="text-sm font-medium text-gray-600 mb-2"
+                                            >
+                                                {{
+                                                    selectedFeature.category ||
+                                                    "Feature"
+                                                }}
+                                            </p>
+                                            <DialogTitle
+                                                as="h2"
+                                                class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight"
+                                            >
+                                                {{
+                                                    selectedFeature.modalTitle ||
+                                                    selectedFeature.name
+                                                }}
+                                            </DialogTitle>
+                                            <div
+                                                class="mt-6 text-base text-gray-700 space-y-4"
+                                            >
+                                                <p>
+                                                    {{
+                                                        selectedFeature.modalDescription
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <div
+                                                v-if="
+                                                    selectedFeature.learnMoreUrl
+                                                "
+                                                class="mt-8"
+                                            >
+                                                <a
+                                                    :href="
+                                                        selectedFeature.learnMoreUrl
+                                                    "
+                                                    target="_blank"
+                                                    class="inline-flex items-center gap-2 text-brand font-medium text-brand-hover transition-colors"
+                                                >
+                                                    Learn more
+                                                    <ArrowRightIcon
+                                                        class="h-4 w-4"
+                                                    />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </DialogPanel>
+                                </TransitionChild>
+                            </div>
+                        </div>
+                    </Dialog>
+                </TransitionRoot>
+
                 <!-- Image section -->
-                <div class="mt-32 sm:mt-40 xl:mx-auto xl:max-w-6xl xl:px-8">
+                <div
+                    class="mx-auto mt-32 max-w-7xl px-4 sm:mt-40 sm:px-6 lg:px-8"
+                >
                     <img
                         src="img/journals.png"
                         class="w-full object-cover xl:rounded-xl border shadow-lg"
                     />
                 </div>
 
-                <div class="mx-auto mt-32 max-w-5xl px-6 sm:mt-40 lg:px-8">
+                <div
+                    class="mx-auto mt-32 max-w-7xl px-4 sm:mt-40 sm:px-6 lg:px-8"
+                >
                     <dl
-                        class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 text-base leading-7 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3"
+                        class="mt-16 grid grid-cols-1 gap-x-8 gap-y-16 text-base leading-7 sm:grid-cols-2 lg:grid-cols-3"
                     >
                         <div>
                             <dt class="font-semibold text-gray-900">License</dt>
@@ -542,17 +620,17 @@
                     </dl>
                 </div>
 
-                <div class="mx-auto mt-32 max-w-5xl px-6 sm:mt-48 lg:px-8">
-                    <div class="mx-auto max-w-2xl lg:mx-0">
-                        <h2
-                            class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
-                        >
-                            Steering Committee
-                        </h2>
-                    </div>
+                <div
+                    class="mx-auto mt-32 max-w-7xl px-4 sm:mt-48 sm:px-6 lg:px-8"
+                >
+                    <h2
+                        class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                    >
+                        Steering Committee
+                    </h2>
                     <ul
                         role="list"
-                        class="mx-auto mt-20 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-16 text-center sm:grid-cols-3 md:grid-cols-4 lg:mx-0 lg:max-w-none lg:grid-cols-5 xl:grid-cols-6"
+                        class="mt-20 grid grid-cols-2 gap-x-8 gap-y-16 text-center sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
                     >
                         <li class="flex flex-col justify-center items-center">
                             <div
@@ -682,102 +760,349 @@
                         </li>
                     </ul>
                 </div>
-                <div class="relative isolate -z-10 mt-32 sm:mt-48">
-                    <div
-                        class="absolute inset-x-0 top-1/2 -z-10 flex -translate-y-1/2 justify-center overflow-hidden [mask-image:radial-gradient(50%_45%_at_50%_55%,white,transparent)]"
-                    >
-                        <svg
-                            class="h-[40rem] w-[80rem] flex-none stroke-gray-200"
-                            aria-hidden="true"
-                        >
-                            <defs>
-                                <pattern
-                                    id="e9033f3e-f665-41a6-84ef-756f6778e6fe"
-                                    width="200"
-                                    height="200"
-                                    x="50%"
-                                    y="50%"
-                                    patternUnits="userSpaceOnUse"
-                                    patternTransform="translate(-100 0)"
-                                >
-                                    <path d="M.5 200V.5H200" fill="none" />
-                                </pattern>
-                            </defs>
-                            <svg
-                                x="50%"
-                                y="50%"
-                                class="overflow-visible fill-gray-50"
-                            >
-                                <path
-                                    d="M-300 0h201v201h-201Z M300 200h201v201h-201Z"
-                                    stroke-width="0"
-                                />
-                            </svg>
-                            <rect
-                                width="100%"
-                                height="100%"
-                                stroke-width="0"
-                                fill="url(#e9033f3e-f665-41a6-84ef-756f6778e6fe)"
-                            />
-                        </svg>
-                    </div>
-                    <div class="mx-auto max-w-6xl px-6 lg:px-8">
-                        <h2
-                            class="text-center text-3xl tracking-tight font-bold leading-8 text-gray-900"
-                        >
-                            Academic & Other Partners
-                        </h2>
+                <!-- Academic and public/private partners Section -->
+                <div class="mt-32 sm:mt-48 border-t border-gray-100">
+                    <div class="py-20">
                         <div
-                            class="mx-auto mt-16 grid max-w-lg grid-cols-2 md:grid-cols-5 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5"
+                            class="mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8"
                         >
-                            <a href="https://cheminf.uni-jena.de/">
-                                <img
-                                    class="col-span-1 md:col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                    src="/img/FSU-Jena-logo.jpg"
-                                    alt="FSU"
-                                    width="158"
-                                    height="48"
-                                />
-                            </a>
-                            <a href="https://www.nfdi4chem.de/">
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                    src="/img/nfdi4chem-logo.png"
-                                    alt="NFDI4Chem"
-                                    width="158"
-                                    height="48"
-                            /></a>
-                            <a href="https://pharmacy.uic.edu/">
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                    src="/img/uic.png"
-                                    alt="UIC"
-                                    width="158"
-                                    height="48"
-                            /></a>
-                            <a href="https://www.nmrium.org/">
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
-                                    src="/img/nmrium-logo.png"
-                                    alt="NMRium"
-                                    width="158"
-                                    height="48"
-                            /></a>
-                            <a
-                                href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
-                            >
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
-                                    src="/img/ct.png"
-                                    alt="CT"
-                                    width="158"
-                                    height="48"
-                            /></a>
+                            <div class="max-w-3xl">
+                                <h2
+                                    class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4"
+                                >
+                                    Academic & Other Partners
+                                </h2>
+                                <p
+                                    class="text-lg text-gray-600 leading-relaxed"
+                                >
+                                    Our initiative consists of academic and
+                                    public/private partners that contribute
+                                    unique expertise and resources towards our
+                                    joint goal
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                                <div
+                                    id="partners-carousel"
+                                    class="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth"
+                                    style="
+                                        scrollbar-width: none;
+                                        -ms-overflow-style: none;
+                                        -webkit-overflow-scrolling: touch;
+                                    "
+                                >
+                                    <div
+                                        class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                    >
+                                        <a
+                                            href="https://nmrxiv.org"
+                                            target="_blank"
+                                            class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                        >
+                                            <div
+                                                class="relative h-full flex flex-col p-8"
+                                            >
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-medium text-gray-500 mb-2"
+                                                    >
+                                                        NFDI4Chem, Friedrich
+                                                        Schiller University Jena
+                                                    </p>
+                                                    <h3
+                                                        class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                    >
+                                                        Share FAIRly
+                                                    </h3>
+                                                    <p
+                                                        class="text-sm text-gray-600"
+                                                    >
+                                                        Research data
+                                                        infrastructure for
+                                                        chemistry, enabling FAIR
+                                                        sharing of raw and
+                                                        processed NMR data
+                                                        worldwide through
+                                                        nmrXiv.org
+                                                    </p>
+                                                </div>
+                                                <div class="mt-auto pt-8">
+                                                    <div
+                                                        class="flex flex-col gap-4 w-full max-w-[180px]"
+                                                    >
+                                                        <div class="w-full">
+                                                            <img
+                                                                class="w-full h-auto object-contain"
+                                                                src="/img/nfdi4chem-logo.png"
+                                                                alt="NFDI4Chem"
+                                                            />
+                                                        </div>
+                                                        <div class="w-full">
+                                                            <img
+                                                                class="w-full h-auto object-contain"
+                                                                src="/img/FSU-Jena-logo.jpg"
+                                                                alt="Friedrich Schiller University Jena"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div
+                                        class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                    >
+                                        <a
+                                            href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
+                                            target="_blank"
+                                            class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                        >
+                                            <div
+                                                class="relative h-full flex flex-col p-8"
+                                            >
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-medium text-gray-500 mb-2"
+                                                    >
+                                                        CT.nmrsolutions.io
+                                                    </p>
+                                                    <h3
+                                                        class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                    >
+                                                        Analyze & Automate
+                                                    </h3>
+                                                    <p
+                                                        class="text-sm text-gray-600"
+                                                    >
+                                                        Analyze experimental NMR
+                                                        spectra fully with
+                                                        CT.nmrsolutions.io and
+                                                        determine NMR parameters
+                                                        automatically
+                                                    </p>
+                                                </div>
+                                                <div class="mt-auto pt-8">
+                                                    <div
+                                                        class="w-full max-w-[200px]"
+                                                    >
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/ct.png"
+                                                            alt="CT NMR Solutions"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div
+                                        class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                    >
+                                        <a
+                                            href="https://www.nmrium.org/"
+                                            target="_blank"
+                                            class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                        >
+                                            <div
+                                                class="relative h-full flex flex-col p-8"
+                                            >
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-medium text-gray-500 mb-2"
+                                                    >
+                                                        NMRium
+                                                    </p>
+                                                    <h3
+                                                        class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                    >
+                                                        View & Process
+                                                    </h3>
+                                                    <p
+                                                        class="text-sm text-gray-600"
+                                                    >
+                                                        Enhance productivity
+                                                        with NMRium, offering
+                                                        intuitive, secure,
+                                                        browser-based processing
+                                                        of NMR spectra
+                                                    </p>
+                                                </div>
+                                                <div class="mt-auto pt-8">
+                                                    <div
+                                                        class="w-full max-w-[200px]"
+                                                    >
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/nmrium-logo.png"
+                                                            alt="NMRium"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div
+                                        class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                    >
+                                        <a
+                                            href="https://qnmr.org"
+                                            target="_blank"
+                                            class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                        >
+                                            <div
+                                                class="relative h-full flex flex-col p-8"
+                                            >
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-medium text-gray-500 mb-2"
+                                                    >
+                                                        University of Illinois
+                                                        Chicago
+                                                    </p>
+                                                    <h3
+                                                        class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                    >
+                                                        Quantify
+                                                    </h3>
+                                                    <p
+                                                        class="text-sm text-gray-600"
+                                                    >
+                                                        Metrologically quantify
+                                                        (qnmr.org) biomedical
+                                                        material, products, and
+                                                        samples
+                                                    </p>
+                                                </div>
+                                                <div class="mt-auto pt-8">
+                                                    <div
+                                                        class="w-full max-w-[200px]"
+                                                    >
+                                                        <img
+                                                            class="w-full h-auto object-contain"
+                                                            src="/img/uic.png"
+                                                            alt="University of Illinois Chicago"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div
+                                        class="flex-none w-[320px] sm:w-[350px] snap-start"
+                                    >
+                                        <a
+                                            href="https://nobs.naturalproducts.net/"
+                                            target="_blank"
+                                            class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
+                                        >
+                                            <div
+                                                class="relative h-full flex flex-col p-8"
+                                            >
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-medium text-gray-500 mb-2"
+                                                    >
+                                                        Natural Products
+                                                        Community
+                                                    </p>
+                                                    <h3
+                                                        class="text-2xl font-semibold text-gray-900 leading-tight mb-2"
+                                                    >
+                                                        Identify & Qualify
+                                                    </h3>
+                                                    <p
+                                                        class="text-sm text-gray-600"
+                                                    >
+                                                        Separate, identify, and
+                                                        qualify complex natural,
+                                                        pharmaceutical, and
+                                                        related health products
+                                                    </p>
+                                                </div>
+                                                <div class="mt-auto pt-8">
+                                                    <div
+                                                        class="flex flex-col gap-3 w-full max-w-[180px]"
+                                                    >
+                                                        <div class="w-full">
+                                                            <img
+                                                                class="w-full h-auto object-contain"
+                                                                src="/img/UniversiteDeGeneve.png"
+                                                                alt="University of Geneva"
+                                                            />
+                                                        </div>
+                                                        <div class="w-full">
+                                                            <img
+                                                                class="w-full h-auto object-contain"
+                                                                src="/img/UniversiteParisSaclay.png"
+                                                                alt="Université Paris-Saclay"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                                <div
+                                    class="mt-8 flex items-center justify-end gap-3"
+                                >
+                                    <button
+                                        type="button"
+                                        class="w-10 h-10 rounded-full bg-gray-200/80 hover:bg-gray-300/80 flex items-center justify-center transition-colors backdrop-blur-sm"
+                                        aria-label="Previous partners"
+                                        @click="scrollPartnersCarousel(-370)"
+                                    >
+                                        <svg
+                                            class="w-5 h-5 text-gray-700"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="w-10 h-10 rounded-full bg-gray-200/80 hover:bg-gray-300/80 flex items-center justify-center transition-colors backdrop-blur-sm"
+                                        aria-label="Next partners"
+                                        @click="scrollPartnersCarousel(370)"
+                                    >
+                                        <svg
+                                            class="w-5 h-5 text-gray-700"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mx-auto my-16 max-w-6xl">&nbsp;</div>
+                <div class="my-16" aria-hidden="true"></div>
             </div>
         </main>
 
@@ -790,18 +1115,25 @@
 
 <script>
 import { Head, Link } from "@inertiajs/vue3";
-import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+import PublicSiteHeader from "@/Shared/PublicSiteHeader.vue";
 import {
-    Popover,
-    PopoverButton,
-    PopoverGroup,
-    PopoverPanel,
+    Dialog,
+    DialogPanel,
+    DialogTitle,
+    TransitionRoot,
+    TransitionChild,
 } from "@headlessui/vue";
 import {
+    ShareIcon,
+    ScaleIcon,
+    ChatBubbleLeftIcon,
+    DocumentTextIcon,
     InboxIcon,
-    Bars3Icon,
+    PencilSquareIcon,
     MagnifyingGlassIcon,
     XMarkIcon,
+    CircleStackIcon,
+    ArrowRightIcon,
 } from "@heroicons/vue/24/outline";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 import Footer from "@/Shared/Footer.vue";
@@ -823,19 +1155,109 @@ const Search = [
     },
 ];
 
+const features = [
+    {
+        name: "Advanced Search",
+        shortDescription: "Find data with powerful search tools.",
+        category: "Discovery",
+        modalTitle: "Advanced search capabilities",
+        modalDescription:
+            "Search nmrXiv using multiple methods: browse datasets, search by structure similarity, or upload your own spectra for comparison. Our advanced search tools help you find exactly what you need from our comprehensive NMR database.",
+        learnMoreUrl: "https://docs.nmrxiv.org",
+        icon: MagnifyingGlassIcon,
+    },
+    {
+        name: "Open Source",
+        shortDescription: "Transparent and community-driven.",
+        category: "Philosophy",
+        modalTitle: "Built on open source principles",
+        modalDescription:
+            "nmrXiv is built entirely on open-source technologies and follows open science principles. Our codebase is publicly available, allowing the community to contribute, audit, and improve the platform. We believe in transparency and collaboration to advance scientific research.",
+        learnMoreUrl: "https://github.com/NFDI4Chem/nmrxiv",
+        icon: ScaleIcon,
+    },
+    {
+        name: "Auto Assignments",
+        shortDescription: "Automated spectral annotations.",
+        category: "Analysis",
+        modalTitle: "Automated spectral assignments",
+        modalDescription:
+            "Leverage machine learning and AI to automatically assign NMR peaks and annotations. Our system can help identify compounds and suggest assignments based on spectral patterns, saving researchers valuable time in data analysis.",
+        learnMoreUrl: "https://docs.nmrxiv.org",
+        icon: ShareIcon,
+    },
+    {
+        name: "Prediction",
+        shortDescription: "AI-powered spectrum prediction.",
+        category: "Analysis",
+        modalTitle: "Predict NMR spectra",
+        modalDescription:
+            "Use advanced computational methods to predict NMR spectra for your compounds. Compare predicted vs. experimental data to validate structures and identify discrepancies, accelerating your research workflow.",
+        learnMoreUrl: "https://docs.nmrxiv.org",
+        icon: PencilSquareIcon,
+    },
+    {
+        name: "Schemas & MIChI",
+        shortDescription: "Standardized data formats.",
+        category: "Standards",
+        modalTitle: "Standardized schemas and identifiers",
+        modalDescription:
+            "nmrXiv implements standardized data schemas and MIChI (Molecular Identifier for Chemical Information) to ensure data consistency and interoperability. This makes your data findable, accessible, and reusable across different platforms and tools.",
+        learnMoreUrl: "https://docs.nmrxiv.org",
+        icon: DocumentTextIcon,
+    },
+    {
+        name: "Community Challenges",
+        shortDescription: "Collaborative problem solving.",
+        category: "Engagement",
+        modalTitle: "Join community challenges",
+        modalDescription:
+            "Participate in structure elucidation challenges and collaborative research projects. Work with researchers worldwide to solve complex spectroscopy problems and contribute to advancing the field of NMR spectroscopy.",
+        learnMoreUrl: "https://docs.nmrxiv.org",
+        icon: ChatBubbleLeftIcon,
+    },
+    {
+        name: "Docs & API",
+        shortDescription: "Developer-friendly tools.",
+        category: "Integration",
+        modalTitle: "Comprehensive API and documentation",
+        modalDescription:
+            "Access our rich dataset through a well-documented RESTful API. Build custom tools, integrate nmrXiv data into your workflows, or create new applications. Our comprehensive documentation helps developers get started quickly.",
+        learnMoreUrl: "https://docs.nmrxiv.org/developer-guides/api.html",
+        icon: DocumentTextIcon,
+    },
+    {
+        name: "Backups",
+        shortDescription: "Secure and reliable storage.",
+        category: "Reliability",
+        modalTitle: "Enterprise-grade data backups",
+        modalDescription:
+            "Your data is protected with automated daily backups and redundant storage systems. We ensure your research data is safe, secure, and always accessible when you need it.",
+        learnMoreUrl: "https://docs.nmrxiv.org",
+        icon: CircleStackIcon,
+    },
+];
+
 export default {
     components: {
         Head,
         Link,
-        JetApplicationLogo,
+        PublicSiteHeader,
         InboxIcon,
-        Bars3Icon,
+        PencilSquareIcon,
         MagnifyingGlassIcon,
+        ShareIcon,
+        ScaleIcon,
+        ChatBubbleLeftIcon,
+        DocumentTextIcon,
+        CircleStackIcon,
+        ArrowRightIcon,
         XMarkIcon,
-        Popover,
-        PopoverButton,
-        PopoverGroup,
-        PopoverPanel,
+        Dialog,
+        DialogPanel,
+        DialogTitle,
+        TransitionRoot,
+        TransitionChild,
         FlashMessages,
         Footer,
     },
@@ -848,16 +1270,87 @@ export default {
     setup() {
         return {
             Search,
+            features,
         };
     },
 
     data() {
         return {
             schema: null,
+            isFeatureModalOpen: false,
+            selectedFeatureIndex: null,
+            canScrollLeft: false,
+            canScrollRight: true,
         };
     },
 
+    computed: {
+        selectedFeature() {
+            if (this.selectedFeatureIndex !== null) {
+                return features[this.selectedFeatureIndex];
+            }
+
+            return null;
+        },
+    },
+
+    mounted() {
+        this.$nextTick(() => {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                container.addEventListener("scroll", this.updateScrollButtons);
+                this.updateScrollButtons();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        const container = this.$refs.scrollContainer;
+        if (container) {
+            container.removeEventListener("scroll", this.updateScrollButtons);
+        }
+    },
+
     methods: {
+        openFeatureModal(index) {
+            this.selectedFeatureIndex = index;
+            this.isFeatureModalOpen = true;
+        },
+        closeFeatureModal() {
+            this.isFeatureModalOpen = false;
+            setTimeout(() => {
+                this.selectedFeatureIndex = null;
+            }, 300);
+        },
+        scrollLeft() {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                container.scrollBy({ left: -330, behavior: "smooth" });
+                setTimeout(() => this.updateScrollButtons(), 300);
+            }
+        },
+        scrollRight() {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                container.scrollBy({ left: 330, behavior: "smooth" });
+                setTimeout(() => this.updateScrollButtons(), 300);
+            }
+        },
+        updateScrollButtons() {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                this.canScrollLeft = container.scrollLeft > 0;
+                this.canScrollRight =
+                    container.scrollLeft <
+                    container.scrollWidth - container.clientWidth - 10;
+            }
+        },
+        scrollPartnersCarousel(offset) {
+            const carousel = document.getElementById("partners-carousel");
+            if (carousel) {
+                carousel.scrollBy({ left: offset, behavior: "smooth" });
+            }
+        },
         handleImageError(event) {
             const img = event.target;
             const parent = img.parentElement;
@@ -890,8 +1383,25 @@ export default {
 
 <style scoped>
 /* Custom brand color */
+.text-brand {
+    color: #fd0039;
+}
+
+.text-brand-hover:hover {
+    color: #d4002f;
+}
+
 .ring-brand {
     --tw-ring-color: #fd0039;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Blob animations */

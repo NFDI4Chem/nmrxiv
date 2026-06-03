@@ -3,22 +3,23 @@
 Dear admin,
 
 @if($releasedToday)
-A new project has been published. Please find the details below.
+A project has been published and is now publicly available on nmrXiv.
 
-{{ __('**Project Name**:') }}
-{{ __(':project', ['project' => $projectName]) }}
+**Project details**
 
-{{ __('**Project Id**:') }}
-{{ __(':projectId', ['projectId' => $projectId]) }}
+- **Project Name:** {{ $projectName }}
+- **Project ID:** {{ $projectId }}
 
 @else
-A new project has been published as Embargo. Please find the details below.
+A project has been processed and scheduled for public release under embargo.
 
-{{ __('**Project Name**:') }}
-{{ __(':project', ['project' => $projectName]) }}
+**Project details**
 
-{{ __('**Project Id**:') }}
-{{ __(':projectId', ['projectId' => $projectId]) }}
+- **Project Name:** {{ $projectName }}
+- **Project ID:** {{ $projectId }}
+@if(!empty($releaseDate))
+- **Scheduled Release Date:** {{ $releaseDate }}
+@endif
 
 @endif
 
@@ -31,7 +32,7 @@ View Project
 @endcomponent
 
 @component('mail::subcopy')
-You are recieving this mail because you are part of the admin list in nmrXiv.
+You are receiving this email because you are on the nmrXiv admin list.
 @endcomponent
 
 @endcomponent

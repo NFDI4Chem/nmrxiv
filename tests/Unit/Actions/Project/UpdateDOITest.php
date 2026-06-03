@@ -352,6 +352,21 @@ class UpdateDOITest extends TestCase
             public function deleteDOI($doi) {}
 
             public function getDOIActivity($doi) {}
+
+            public function createCustomDOI(string $doi, array $metadata = []): array
+            {
+                return [];
+            }
+
+            public function getRelatedIdentifiers(string $doi): array
+            {
+                return [];
+            }
+
+            public function putRelatedIdentifiers(string $doi, array $relatedIdentifiers, ?string $url = null): array
+            {
+                return [];
+            }
         };
 
         $action = new UpdateDOI($mockService);

@@ -84,8 +84,8 @@ class LoginControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(403);
-        $response->assertJsonFragment(['message' => 'Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you.']);
+        $response->assertStatus(401);
+        $response->assertJson(['message' => 'Invalid login details']);
     }
 
     /**

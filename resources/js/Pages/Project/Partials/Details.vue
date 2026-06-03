@@ -979,6 +979,7 @@ export default defineComponent({
                 tags: [],
                 doi: this.project.doi,
                 tags_array: [],
+                project_tags_updated: true,
                 photo: null,
             }),
             open: false,

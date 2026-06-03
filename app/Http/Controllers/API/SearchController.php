@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TextSearchRequest;
 use App\Models\Molecule;
+use App\Services\PublicTextSearchService;
+use App\Support\Public\PublicMoleculeAggregates;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,11 +17,156 @@ use Illuminate\Validation\Rule;
 
 class SearchController extends Controller
 {
+    public function __construct(private PublicTextSearchService $catalogSearch) {}
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/search/catalog",
+     *     operationId="searchCatalog",
+     *     tags={"Search"},
+     *     summary="Search public projects, samples, and spectra",
+     *     description="Free-text search across published projects, studies (samples), and datasets (spectra) by name and description. Matching is case- and whitespace-insensitive; multi-word queries require every token to appear (AND semantics).",
+     *
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         required=true,
+     *         description="Free-text search query",
+     *
+     *         @OA\Schema(type="string", maxLength=1000, example="caffeine nmr")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Results per entity group (default: 12, max: 24)",
+     *
+     *         @OA\Schema(type="integer", minimum=1, maximum=24, default=12)
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="projects_page",
+     *         in="query",
+     *         description="Page number for project results",
+     *
+     *         @OA\Schema(type="integer", minimum=1, default=1)
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="studies_page",
+     *         in="query",
+     *         description="Page number for sample (study) results",
+     *
+     *         @OA\Schema(type="integer", minimum=1, default=1)
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="datasets_page",
+     *         in="query",
+     *         description="Page number for spectra (dataset) results",
+     *
+     *         @OA\Schema(type="integer", minimum=1, default=1)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Grouped catalog search results",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="query", type="string", example="caffeine"),
+     *             @OA\Property(property="tokens", type="array", @OA\Items(type="string"), example={"caffeine"}),
+     *             @OA\Property(
+     *                 property="projects",
+     *                 type="object",
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(
+     *                     property="meta",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=1),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="per_page", type="integer", example=12),
+     *                     @OA\Property(property="last_page", type="integer", example=1)
+     *                 )
+     *             ),
+     *             @OA\Property(property="studies", type="object"),
+     *             @OA\Property(property="datasets", type="object")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function catalog(TextSearchRequest $request): JsonResponse
+    {
+        return response()->json($this->catalogSearch->searchFromRequest($request));
+    }
+
+    /**
+     * @deprecated Use GET /api/v1/search/catalog
+     *
+     * @OA\Get(
+     *     path="/api/v1/text-search",
+     *     operationId="searchCatalogTextSearchLegacy",
+     *     tags={"Search"},
+     *     summary="[Deprecated] Catalog search (legacy path)",
+     *     deprecated=true,
+     *     description="Deprecated alias of GET /api/v1/search/catalog.",
+     *
+     *     @OA\Parameter(name="q", in="query", required=true, @OA\Schema(type="string")),
+     *
+     *     @OA\Response(response=200, description="Grouped catalog search results"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function catalogTextSearchLegacy(TextSearchRequest $request): JsonResponse
+    {
+        return $this->catalog($request);
+    }
+
+    /**
+     * @deprecated Use GET /api/v1/search/catalog
+     *
+     * @OA\Get(
+     *     path="/api/v1/search",
+     *     operationId="searchCatalogLegacy",
+     *     tags={"Search"},
+     *     summary="[Deprecated] Catalog search via legacy URL",
+     *     deprecated=true,
+     *     description="Deprecated. Use GET /api/v1/search/catalog instead.",
+     *
+     *     @OA\Parameter(name="q", in="query", required=true, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="scope", in="query", @OA\Schema(type="string", enum={"catalog"})),
+     *
+     *     @OA\Response(response=200, description="Same payload as GET /api/v1/search/catalog"),
+     *     @OA\Response(response=405, description="Compound search is not supported on this route")
+     * )
+     */
+    public function catalogLegacy(Request $request): JsonResponse
+    {
+        if ($request->query('scope') === 'compounds') {
+            return response()->json([
+                'message' => 'Compound search is not available on this route. Use POST /api/v1/search/compounds instead.',
+            ], 405);
+        }
+
+        return $this->catalog(TextSearchRequest::createFrom($request));
+    }
+
     /**
      * @OA\Post(
-     *     path="/api/v1/search",
-     *     operationId="searchMolecules",
-     *     tags={"Chemical Search"},
+     *     path="/api/v1/search/compounds",
+     *     operationId="searchCompounds",
+     *     tags={"Search"},
      *     summary="Search chemical compounds by structure and properties",
      *     description="Advanced chemical search supporting multiple query types including SMILES, InChI, InChiKey, substructure matching, similarity search, and text-based name searches. Supports filtering by molecular properties and chemical classifications. Returns paginated results with comprehensive molecular data including calculated properties, classifications, and database references.",
      *
@@ -75,6 +223,15 @@ class SearchController extends Controller
      *         description="Tag type for tag-based searches",
      *
      *         @OA\Schema(type="string", example="chemical_class")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="smiles",
+     *         in="path",
+     *         required=false,
+     *         description="Optional SMILES string in the URL path (legacy). Prefer sending the query in the request body.",
+     *
+     *         @OA\Schema(type="string", example="CC(=O)OC1=CC=CC=C1C(=O)O")
      *     ),
      *
      *     @OA\Response(
@@ -226,10 +383,39 @@ class SearchController extends Controller
      * - **Tags**: Classification-based search
      * - **Filters**: Property-based filtering
      *
+     * @deprecated Use POST /api/v1/search/compounds
+     *
+     * @OA\Post(
+     *     path="/api/v1/search/{smiles}",
+     *     operationId="searchCompoundsLegacy",
+     *     tags={"Search"},
+     *     summary="[Deprecated] Compound search (legacy path)",
+     *     deprecated=true,
+     *     description="Deprecated alias of POST /api/v1/search/compounds. The optional {smiles} path segment is merged into the request body query.",
+     *
+     *     @OA\Parameter(name="smiles", in="path", required=false, @OA\Schema(type="string")),
+     *
+     *     @OA\Response(response=200, description="Paginated compound results"),
+     *     @OA\Response(response=400, description="Invalid input parameters")
+     * )
+     */
+    public function searchLegacy(Request $request, ?string $smiles = null): JsonResponse|LengthAwarePaginator
+    {
+        return $this->search($request, $smiles);
+    }
+
+    /**
      * @return LengthAwarePaginator|JsonResponse
      */
-    public function search(Request $request)
+    public function search(Request $request, ?string $smiles = null)
     {
+        if ($smiles !== null && $smiles !== '') {
+            $request->merge([
+                'query' => $smiles,
+                'type' => $request->input('type', 'smiles'),
+            ]);
+        }
+
         try {
             set_time_limit(300);
 
@@ -261,6 +447,10 @@ class SearchController extends Controller
             $offset = ($page - 1) * $limit;
 
             $query = $this->sanitizeQuery($request->get('query'));
+
+            if (($query === null || $query === '') && $sort === null) {
+                $sort = 'recent';
+            }
 
             $type = $request->query('type')
                 ? $request->query('type')
@@ -334,12 +524,17 @@ class SearchController extends Controller
 
             $queryType = strtolower($queryType);
 
+            $publicSpectraFilter = ' AND '.PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+
             $statement = null;
 
             if ($queryType == 'smiles' || $queryType == 'substructure') {
                 try {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM mols WHERE m@>? LIMIT ? OFFSET ?',
+                        "SELECT mols.id, COUNT(*) OVER () as count FROM mols
+                        INNER JOIN molecules ON molecules.id = mols.id
+                        WHERE m@>? AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
+                        LIMIT ? OFFSET ?",
                         [$query, $limit, $offset]
                     );
                 } catch (\Exception $e) {
@@ -349,18 +544,21 @@ class SearchController extends Controller
                 }
             } elseif ($queryType == 'inchi') {
                 $hits = DB::select(
-                    'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi LIKE ? LIMIT ? OFFSET ?',
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi LIKE ?{$publicSpectraFilter} LIMIT ? OFFSET ?",
                     ['%'.$query.'%', $limit, $offset]
                 );
             } elseif ($queryType == 'inchikey') {
                 $hits = DB::select(
-                    'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi_key LIKE ? LIMIT ? OFFSET ?',
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi_key LIKE ?{$publicSpectraFilter} LIMIT ? OFFSET ?",
                     ['%'.$query.'%', $limit, $offset]
                 );
             } elseif ($queryType == 'exact') {
                 try {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM mols WHERE m@=? LIMIT ? OFFSET ?',
+                        "SELECT mols.id, COUNT(*) OVER () as count FROM mols
+                        INNER JOIN molecules ON molecules.id = mols.id
+                        WHERE m@=? AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
+                        LIMIT ? OFFSET ?",
                         [$query, $limit, $offset]
                     );
                 } catch (\Exception $e) {
@@ -370,7 +568,10 @@ class SearchController extends Controller
             } elseif ($queryType == 'similarity') {
                 try {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM fps WHERE mfp2%morganbv_fp(?) LIMIT ? OFFSET ?',
+                        "SELECT fps.id, COUNT(*) OVER () as count FROM fps
+                        INNER JOIN molecules ON molecules.id = fps.id
+                        WHERE mfp2%morganbv_fp(?) AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
+                        LIMIT ? OFFSET ?",
                         [$query, $limit, $offset]
                     );
                 } catch (\Exception $e) {
@@ -378,8 +579,18 @@ class SearchController extends Controller
                     $hits = [];
                 }
             } elseif ($queryType == 'tags') {
-                $results = Molecule::withAnyTags([$query], $tagType)->paginate($limit)->items();
-                $count = Molecule::withAnyTags([$query], $tagType)->count();
+                $tagQuery = PublicMoleculeAggregates::scopePublicCatalog(
+                    Molecule::withAnyTags([$query], $tagType)
+                );
+                if ($sort === 'recent') {
+                    $tagQuery->orderByDesc('created_at');
+                }
+                $results = PublicMoleculeAggregates::enrich(
+                    $tagQuery->paginate($limit)->items()
+                );
+                $count = PublicMoleculeAggregates::scopePublicCatalog(
+                    Molecule::withAnyTags([$query], $tagType)
+                )->count();
             } elseif ($queryType == 'filters') {
                 $result = $this->buildSecureFilterQuery($query, $filterMap, $limit, $offset);
                 $hits = $result['hits'];
@@ -387,12 +598,13 @@ class SearchController extends Controller
             } else {
                 if ($query) {
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?) LIMIT ? OFFSET ?',
-                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
+                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
                     );
                 } else {
+                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
                     $hits = DB::select(
-                        'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL LIMIT ? OFFSET ?',
+                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL{$publicSpectraFilter} {$orderBy} LIMIT ? OFFSET ?",
                         [$limit, $offset]
                     );
                 }
@@ -432,14 +644,28 @@ class SearchController extends Controller
                     $results = [];
                 }
             }
+
+            if ($results !== []) {
+                $results = PublicMoleculeAggregates::enrich($results);
+            }
+
             $pagination = new LengthAwarePaginator(
                 $results,
                 $count,
                 $limit,
-                $page
+                $page,
+                ['path' => url('/search')]
             );
 
-            // dd($pagination);
+            $pagination->appends(array_filter([
+                'scope' => 'compounds',
+                'query' => $query !== null && $query !== '' ? $query : null,
+                'sort' => $sort,
+                'limit' => $limit !== 24 ? $limit : null,
+                'tagType' => $tagType,
+                'type' => $queryType !== 'text' ? $queryType : null,
+            ], fn ($value) => $value !== null && $value !== ''));
+
             return $pagination;
         } catch (QueryException $exception) {
             return response()->json(
@@ -572,7 +798,14 @@ class SearchController extends Controller
             }
 
             $whereClause = implode(' OR ', $whereConditions);
-            $sql = "SELECT molecule_id as id, COUNT(*) OVER () as count FROM properties WHERE {$whereClause} LIMIT ? OFFSET ?";
+            $publicSpectraFilter = PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+            $sql = "SELECT properties.molecule_id as id, COUNT(*) OVER () as count
+                FROM properties
+                INNER JOIN molecules ON molecules.id = properties.molecule_id
+                WHERE ({$whereClause})
+                  AND molecules.identifier IS NOT NULL
+                  AND {$publicSpectraFilter}
+                LIMIT ? OFFSET ?";
 
             $parameters[] = $limit;
             $parameters[] = $offset;

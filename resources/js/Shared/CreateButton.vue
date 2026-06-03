@@ -4,42 +4,22 @@
             <span v-if="!$page.props.auth.user?.email">
                 <Link
                     href="/login"
-                    class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    class="deposit-data-cta"
+                    :class="buttonClasses"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="mr-2 h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                    Submit Data
+                    <ArrowUpTrayIcon class="mr-2 h-5 w-5 shrink-0" />
+                    Deposit data
                 </Link>
             </span>
             <span v-else>
                 <Link
                     id="tour-step-upload"
                     :href="route('upload')"
-                    class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    class="deposit-data-cta"
+                    :class="buttonClasses"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="mr-2 h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                    Submit Data
+                    <ArrowUpTrayIcon class="mr-2 h-5 w-5 shrink-0" />
+                    Deposit data
                 </Link>
             </span>
         </span>
@@ -47,40 +27,22 @@
             <span v-if="!$page.props.auth.user">
                 <Link
                     href="/login"
-                    class="inline-flex items-center justify-center p-3 bg-blue-600 border border-transparent rounded-full text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    class="deposit-data-cta"
+                    :class="iconClasses"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
+                    <ArrowUpTrayIcon class="h-5 w-5" aria-hidden="true" />
+                    <span class="sr-only">Deposit data</span>
                 </Link>
             </span>
             <span v-else>
                 <Link
                     id="tour-step-upload"
                     :href="route('upload')"
-                    class="inline-flex items-center justify-center p-3 bg-blue-600 border border-transparent rounded-full text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    class="deposit-data-cta"
+                    :class="iconClasses"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
+                    <ArrowUpTrayIcon class="h-5 w-5" aria-hidden="true" />
+                    <span class="sr-only">Deposit data</span>
                 </Link>
             </span>
         </span>
@@ -89,15 +51,30 @@
 
 <script>
 import { Link } from "@inertiajs/vue3";
+import { ArrowUpTrayIcon } from "@heroicons/vue/24/solid";
+import { depositButtonClasses } from "@/Utils/depositButtonClasses";
+
 export default {
     components: {
         Link,
+        ArrowUpTrayIcon,
     },
     props: {
         mode: String,
+        compact: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup() {},
-    computed: {},
-    methods: {},
+    computed: {
+        buttonClasses() {
+            return depositButtonClasses({
+                size: this.compact ? "sidebarCompact" : "sidebar",
+            });
+        },
+        iconClasses() {
+            return depositButtonClasses({ size: "icon" });
+        },
+    },
 };
 </script>

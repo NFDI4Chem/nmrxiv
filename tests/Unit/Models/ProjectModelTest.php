@@ -141,6 +141,8 @@ class ProjectModelTest extends TestCase
             'is_deleted', 'is_archived', 'status', 'obfuscationcode', 'description', 'type', 'uuid', 'access',
             'access_type', 'team_id', 'owner_id', 'draft_id', 'fs_id',
             'project_photo_path', 'license_id', 'release_date', 'deleted_on', 'species',
+            'provisional_doi', 'provisional_doi_registered_at',
+            'validation_id', 'validation_status', 'schema_version',
         ];
 
         $project = new Project;
@@ -297,7 +299,7 @@ class ProjectModelTest extends TestCase
     public function test_it_has_correct_appended_attributes(): void
     {
         $project = Project::factory()->create();
-        $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
+        $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published', 'provisional_doi_url'];
 
         $this->assertEquals($appends, $project->getAppends());
     }
@@ -438,6 +440,8 @@ class ProjectModelTest extends TestCase
         $project = Project::factory()->create(['owner_id' => $owner->id]);
         $project->users()->attach($member->id, ['role' => 'editor']);
 
+        $this->assertSame('owner', $project->userProjectRole('owner@example.com'));
+
         $memberRole = $project->userProjectRole('member@example.com');
         $this->assertEquals('editor', $memberRole);
 
@@ -534,15 +538,16 @@ class ProjectModelTest extends TestCase
         $this->assertEquals($validation->id, $project->validation->id);
     }
 
-    public function test_is_published_with_release_date_logic(): void
+    public function test_is_published_requires_project_to_be_public(): void
     {
-        // Test with release date in past and DOI
+        // A crossed embargo release date does not mean the project was successfully published.
         $pastProject = Project::factory()->create([
             'is_public' => false,
+            'status' => 'embargo',
             'release_date' => Carbon::yesterday(),
             'doi' => '10.1234/example.doi',
         ]);
-        $this->assertTrue($pastProject->is_published);
+        $this->assertFalse($pastProject->is_published);
 
         // Test with release date in future and DOI
         $futureProject = Project::factory()->create([

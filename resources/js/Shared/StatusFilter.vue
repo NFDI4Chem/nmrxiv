@@ -3,7 +3,7 @@
         <Menu as="div" class="relative inline-block text-left">
             <div>
                 <MenuButton
-                    class="inline-flex items-center justify-center w-10 h-10 rounded-md bg-white text-gray-700 hover:bg-gray-50 focus:outline-none"
+                    class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
                 >
                     <AdjustmentsHorizontalIcon class="h-5 w-5 text-gray-400" />
                 </MenuButton>
@@ -18,9 +18,9 @@
                 leave-to-class="transform opacity-0 scale-95"
             >
                 <MenuItems
-                    class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                    class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
-                    <div class="py-1">
+                    <div v-if="variant === 'workflow'" class="py-1">
                         <MenuItem v-slot="{ active }">
                             <button
                                 :class="[
@@ -32,6 +32,7 @@
                                         : 'font-normal',
                                     'group flex w-full items-center px-4 py-2 text-sm',
                                 ]"
+                                type="button"
                                 @click="$emit('update:modelValue', 'all')"
                             >
                                 All Status
@@ -48,6 +49,7 @@
                                         : 'font-normal',
                                     'group flex w-full items-center px-4 py-2 text-sm',
                                 ]"
+                                type="button"
                                 @click="$emit('update:modelValue', 'draft')"
                             >
                                 Draft
@@ -64,6 +66,7 @@
                                         : 'font-normal',
                                     'group flex w-full items-center px-4 py-2 text-sm',
                                 ]"
+                                type="button"
                                 @click="$emit('update:modelValue', 'published')"
                             >
                                 Published
@@ -80,6 +83,7 @@
                                         : 'font-normal',
                                     'group flex w-full items-center px-4 py-2 text-sm',
                                 ]"
+                                type="button"
                                 @click="$emit('update:modelValue', 'archived')"
                             >
                                 Archived
@@ -96,9 +100,64 @@
                                         : 'font-normal',
                                     'group flex w-full items-center px-4 py-2 text-sm',
                                 ]"
+                                type="button"
                                 @click="$emit('update:modelValue', 'embargo')"
                             >
                                 Embargo
+                            </button>
+                        </MenuItem>
+                    </div>
+
+                    <div v-else class="py-1">
+                        <MenuItem v-slot="{ active }">
+                            <button
+                                :class="[
+                                    active
+                                        ? 'bg-gray-100 text-gray-900'
+                                        : 'text-gray-700',
+                                    modelValue === 'all'
+                                        ? 'font-semibold'
+                                        : 'font-normal',
+                                    'group flex w-full items-center px-4 py-2 text-sm',
+                                ]"
+                                type="button"
+                                @click="$emit('update:modelValue', 'all')"
+                            >
+                                All
+                            </button>
+                        </MenuItem>
+                        <MenuItem v-slot="{ active }">
+                            <button
+                                :class="[
+                                    active
+                                        ? 'bg-gray-100 text-gray-900'
+                                        : 'text-gray-700',
+                                    modelValue === 'public'
+                                        ? 'font-semibold'
+                                        : 'font-normal',
+                                    'group flex w-full items-center px-4 py-2 text-sm',
+                                ]"
+                                type="button"
+                                @click="$emit('update:modelValue', 'public')"
+                            >
+                                Public
+                            </button>
+                        </MenuItem>
+                        <MenuItem v-slot="{ active }">
+                            <button
+                                :class="[
+                                    active
+                                        ? 'bg-gray-100 text-gray-900'
+                                        : 'text-gray-700',
+                                    modelValue === 'private'
+                                        ? 'font-semibold'
+                                        : 'font-normal',
+                                    'group flex w-full items-center px-4 py-2 text-sm',
+                                ]"
+                                type="button"
+                                @click="$emit('update:modelValue', 'private')"
+                            >
+                                Private
                             </button>
                         </MenuItem>
                     </div>
@@ -124,6 +183,15 @@ export default {
         modelValue: {
             type: String,
             default: "all",
+        },
+        /**
+         * workflow: draft / published / … (projects).
+         * visibility: public / private (compound library studies).
+         */
+        variant: {
+            type: String,
+            default: "workflow",
+            validator: (v) => ["workflow", "visibility"].includes(v),
         },
     },
 };
