@@ -787,7 +787,7 @@ const navigationSections = [
             {
                 auth: false,
                 name: "Spectra Library",
-                href: "/compounds",
+                href: "/search?scope=compounds",
                 icon: SwatchIcon,
             },
         ],
