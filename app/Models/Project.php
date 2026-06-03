@@ -251,14 +251,16 @@ class Project extends Model implements Auditable
      */
     public function userProjectRole(string $email)
     {
+        $owner = $this->relationLoaded('owner') ? $this->owner : $this->owner()->first();
+
+        if ($owner && $owner->email === $email) {
+            return 'owner';
+        }
+
         $user = $this->userWithEmail($email);
 
-        if ($user) {
-            if ($user['projectMembership']) {
-                return $user['projectMembership']['role'];
-            } elseif ($this->owner_id == $user->id) {
-                return 'owner';
-            }
+        if ($user?->projectMembership) {
+            return $user->projectMembership->role;
         }
     }
 
