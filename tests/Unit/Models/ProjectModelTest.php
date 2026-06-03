@@ -440,6 +440,8 @@ class ProjectModelTest extends TestCase
         $project = Project::factory()->create(['owner_id' => $owner->id]);
         $project->users()->attach($member->id, ['role' => 'editor']);
 
+        $this->assertSame('owner', $project->userProjectRole('owner@example.com'));
+
         $memberRole = $project->userProjectRole('member@example.com');
         $this->assertEquals('editor', $memberRole);
 
