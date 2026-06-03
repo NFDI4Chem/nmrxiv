@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col h-full">
         <!-- Title Section -->
-        <div class="mb-6">
+        <div v-if="!compact" class="mb-6">
             <h2 class="text-3xl font-bold text-gray-900">Spectra Search</h2>
             <p class="mt-2 text-gray-600">
                 Upload your NMR spectra files to search
@@ -10,12 +10,13 @@
 
         <!-- Upload Area -->
         <label
-            class="relative flex flex-col items-center justify-center min-h-[450px] border-2 border-dashed rounded-2xl transition-all cursor-pointer"
-            :class="
+            class="relative flex flex-col items-center justify-center border-2 border-dashed rounded-2xl transition-all cursor-pointer"
+            :class="[
+                compact ? 'min-h-[260px] p-6' : 'min-h-[450px]',
                 isDragging
                     ? 'border-gray-900 bg-gray-50'
-                    : 'border-gray-300 bg-gray-50/50 hover:border-gray-400 hover:bg-gray-50'
-            "
+                    : 'border-gray-300 bg-gray-50/50 hover:border-gray-400 hover:bg-gray-50',
+            ]"
             @dragover.prevent="isDragging = true"
             @dragleave.prevent="isDragging = false"
             @drop.prevent="handleDrop"
@@ -30,10 +31,12 @@
             />
 
             <div
-                class="w-20 h-20 mb-6 rounded-full bg-gray-100 flex items-center justify-center"
+                class="rounded-full bg-gray-100 flex items-center justify-center"
+                :class="compact ? 'w-16 h-16 mb-4' : 'w-20 h-20 mb-6'"
             >
                 <svg
-                    class="w-10 h-10 text-gray-400"
+                    class="text-gray-400"
+                    :class="compact ? 'w-8 h-8' : 'w-10 h-10'"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -47,15 +50,22 @@
                 </svg>
             </div>
 
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            <h3
+                class="font-semibold text-gray-900 mb-2"
+                :class="compact ? 'text-base' : 'text-lg'"
+            >
                 Drop spectra files here
             </h3>
-            <p class="text-sm text-gray-500 mb-6 text-center max-w-sm">
+            <p
+                class="text-sm text-gray-500 text-center max-w-sm"
+                :class="compact ? 'mb-5' : 'mb-6'"
+            >
                 or click to browse from your computer
             </p>
 
             <span
-                class="px-6 py-3 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center pointer-events-none"
+                class="text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center pointer-events-none"
+                :class="compact ? 'px-5 py-2.5' : 'px-6 py-3'"
             >
                 <svg
                     class="w-5 h-5 mr-2"
@@ -95,6 +105,12 @@
 import { ref } from "vue";
 
 export default {
+    props: {
+        compact: {
+            type: Boolean,
+            default: false,
+        },
+    },
     emits: ["files-uploaded"],
     setup(props, { emit }) {
         const isDragging = ref(false);
