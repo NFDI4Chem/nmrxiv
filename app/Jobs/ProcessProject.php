@@ -43,6 +43,16 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
         $this->project = $project;
     }
 
+    public function uniqueId(): string
+    {
+        return (string) $this->project->id;
+    }
+
+    public function uniqueFor(): int
+    {
+        return 14400;
+    }
+
     /**
      * Execute the job.
      */
