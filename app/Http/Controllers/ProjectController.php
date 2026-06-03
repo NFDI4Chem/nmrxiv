@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
+use Laravel\Jetstream\Jetstream;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 
@@ -156,6 +157,7 @@ class ProjectController extends Controller
     public function review(Request $request, $obfuscationCode, GetLicense $getLicense)
     {
         $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
+        $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner');
 
         if ($project->is_public) {
             $rawIdentifier = $project->getRawOriginal('identifier');
@@ -170,12 +172,25 @@ class ProjectController extends Controller
             }
         }
 
-        return app(ApplicationController::class)->renderProjectForRequest(
-            $request,
-            $project,
-            $getLicense,
-            reviewerPreview: true
-        );
+        $license = null;
+        if ($project->license_id) {
+            $license = $getLicense->getLicensebyId($project->license_id);
+        }
+
+        return Inertia::render('Project/Show', [
+            'project' => $project,
+            'team' => null,
+            'members' => $project->allUsers(),
+            'availableRoles' => array_values(Jetstream::$roles),
+            'role' => 'reviewer',
+            'teamRole' => null,
+            'license' => $license,
+            'projectPermissions' => [
+                'canDeleteProject' => false,
+                'canUpdateProject' => false,
+            ],
+            'preview' => true,
+        ]);
     }
 
     public function reviewerStudies(Request $request, $obfuscationCode)
