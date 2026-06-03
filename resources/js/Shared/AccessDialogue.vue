@@ -1,108 +1,118 @@
 <template>
     <div
-        class="cursor-pointer flex flex-row-reverse justify-end mr-2"
+        v-if="!hideTrigger"
+        class="relative z-10 mr-2 flex flex-row-reverse items-center justify-end"
         @click="open = true"
     >
         <button
             v-if="members.length > 0"
-            class="tooltip rounded-full border-2 border-white bg-gray-100 pr-4"
-            alt=""
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-full border py-1 pl-1.5 pr-3 text-xs font-medium shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+            :class="
+                isSharingDisabled
+                    ? 'cursor-pointer border-gray-100 bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-400'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
+            "
+            :title="
+                isSharingDisabled
+                    ? 'View who has access (read-only)'
+                    : 'Manage sharing'
+            "
+            :aria-label="
+                isSharingDisabled ? 'View who has access' : 'Manage sharing'
+            "
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 m-1.5 text-gray-400 inline"
+                class="inline h-4 w-4 shrink-0 text-gray-400"
                 viewBox="0 0 20 20"
                 fill="currentColor"
+                aria-hidden="true"
             >
                 <path
                     d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
                 />
             </svg>
-            <div class="text-md text-gray-600 font-medium inline">SHARE</div>
-            <span
-                class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                >Click here to edit sharing options.</span
-            >
+            {{ isSharingDisabled ? "Shared with" : "Share" }}
         </button>
         <img
             v-for="user in members"
             :key="user.id"
-            class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
+            class="-mr-2 h-8 w-8 rounded-full border-2 border-white dark:border-gray-900"
             :src="user.profile_photo_url"
             :alt="user.first_name"
         />
         <img
             v-for="user in team ? team.users : []"
-            :key="user.id"
-            class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
+            :key="'team-' + user.id"
+            class="-mr-2 h-8 w-8 rounded-full border-2 border-white dark:border-gray-900"
             :src="user.profile_photo_url"
             :alt="user.first_name"
         />
         <img
             v-if="team && !team.personal_team"
-            class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
+            class="-mr-2 h-8 w-8 rounded-full border-2 border-white dark:border-gray-900"
             :src="team.owner.profile_photo_url"
             :alt="team.owner.first_name"
         />
     </div>
-    <TransitionRoot :show="open" as="template" appear @after-leave="query = ''">
-        <Dialog as="div" class="relative z-10 p-4" @close="open = false">
+    <TransitionRoot :show="open" as="template" appear>
+        <Dialog as="div" class="relative z-50" @close="open = false">
             <TransitionChild
                 as="template"
-                enter="ease-out duration-300"
+                enter="ease-out duration-200"
                 enter-from="opacity-0"
                 enter-to="opacity-100"
-                leave="ease-in duration-200"
+                leave="ease-in duration-150"
                 leave-from="opacity-100"
                 leave-to="opacity-0"
             >
                 <div
-                    class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"
+                    class="fixed inset-0 bg-gray-900/40 transition-opacity dark:bg-black/50"
                 />
             </TransitionChild>
 
-            <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+            <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6">
                 <TransitionChild
                     as="template"
-                    enter="ease-out duration-300"
+                    enter="ease-out duration-200"
                     enter-from="opacity-0 scale-95"
                     enter-to="opacity-100 scale-100"
-                    leave="ease-in duration-200"
+                    leave="ease-in duration-150"
                     leave-from="opacity-100 scale-100"
                     leave-to="opacity-0 scale-95"
                 >
                     <DialogPanel
-                        class="mx-auto max-w-xl transform rounded-xl bg-white p-2 shadow-2xl ring-1 ring-black ring-opacity-5 transition-all p-4"
+                        class="mx-auto w-full max-w-lg transform overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl transition-all dark:border-gray-700 dark:bg-gray-900"
                     >
                         <div
-                            class="sm:flex sm:items-start sm:justify-between border-b pb-2 border-gray-100"
+                            class="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4 dark:border-gray-800"
                         >
-                            <div class="w-full">
+                            <div class="min-w-0 flex-1">
                                 <h3
-                                    class="text-lg leading-6 font-medium text-gray-900"
+                                    class="text-base font-semibold text-gray-900 dark:text-gray-100"
                                 >
                                     Share with users
                                 </h3>
-                                <span
-                                    class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                <p
+                                    class="mt-1 text-xs text-gray-500 dark:text-gray-400"
                                 >
+                                    Manage who can access this {{ model }}.
                                     <a
                                         href="https://docs.nmrxiv.org/submission-guides/sharing.html"
                                         target="_blank"
-                                        >Learn more about sharing
+                                        rel="noopener noreferrer"
+                                        class="font-medium text-teal-700 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
+                                    >
+                                        Learn more
                                     </a>
-                                </span>
-                                <div
-                                    class="mt-2 max-w-xl text-sm text-gray-500"
-                                ></div>
+                                </p>
                             </div>
-                            <div
-                                class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center"
-                            >
+                            <div class="flex shrink-0 items-center gap-2">
                                 <button
-                                    v-if="!addUser && canChangeRole"
+                                    v-if="!addUser && canManageSharing"
                                     type="button"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none sm:text-sm"
+                                    class="inline-flex items-center gap-1.5 rounded-md bg-teal-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                                     @click="addUser = true"
                                 >
                                     <svg
@@ -112,27 +122,31 @@
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
                                         stroke-width="2"
+                                        aria-hidden="true"
                                     >
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
                                             d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                                        /></svg
-                                    >&nbsp; SHARE
+                                        />
+                                    </svg>
+                                    Add user
                                 </button>
                                 <button
-                                    v-if="addUser && canChangeRole"
+                                    v-if="addUser && canManageSharing"
                                     type="button"
-                                    class="inline-flex items-center px-4 py-2 border shadow-sm font-medium rounded-md text-dark bg-white-600 hover:bg-white-700 focus:outline-none sm:text-sm"
-                                    @click="addUser = false"
+                                    class="inline-flex items-center rounded-md border border-gray-200 bg-white px-2 py-1.5 text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    aria-label="Back to sharing overview"
+                                    @click="goBackToSharingOverview"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        class="h-6 w-6"
+                                        class="h-5 w-5"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
                                         stroke-width="2"
+                                        aria-hidden="true"
                                     >
                                         <path
                                             stroke-linecap="round"
@@ -144,122 +158,107 @@
                             </div>
                         </div>
 
-                        <div v-if="!addUser" class="flow-root mt-1">
-                            <ul
-                                v-if="members.length > 0"
-                                role="list"
-                                class="my-5 shadow divide-y divide-gray-200 rounded-md"
-                            >
-                                <li
-                                    v-for="person in members"
-                                    :key="person.email"
-                                >
-                                    <a class="block">
-                                        <div
-                                            class="flex items-center px-4 py-4 sm:px-6"
+                        <div
+                            v-if="isSharingDisabled"
+                            class="border-b border-amber-200/80 bg-amber-50 px-5 py-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100"
+                        >
+                            This project is published. Sharing settings are
+                            read-only.
+                        </div>
+
+                        <div class="px-5 py-4">
+                            <div v-if="!addUser" class="space-y-6">
+                                <div v-if="members.length > 0">
+                                    <h4
+                                        class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                    >
+                                        People with access
+                                    </h4>
+                                    <ul
+                                        role="list"
+                                        class="mt-3 divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-700"
+                                    >
+                                        <li
+                                            v-for="person in members"
+                                            :key="person.email"
                                         >
                                             <div
-                                                class="min-w-0 flex-1 pt-3 flex items-center"
+                                                class="flex items-center gap-3 px-3 py-3"
                                             >
-                                                <div class="flex-shrink-0">
-                                                    <img
-                                                        :key="person.id"
-                                                        class="h-12 w-12 rounded-full"
-                                                        :src="
-                                                            person.profile_photo_url
-                                                        "
-                                                        :alt="person.first_name"
-                                                    />
-                                                </div>
-                                                <div
-                                                    class="min-w-0 flex-1 px-4"
-                                                >
-                                                    <div>
-                                                        <p
-                                                            class="text-sm font-medium text-gray-600"
-                                                        >
-                                                            {{
-                                                                person.first_name
-                                                            }}
-                                                            {{
-                                                                person.last_name
-                                                            }}
-                                                            <span
-                                                                v-if="
-                                                                    $page.props
-                                                                        .auth
-                                                                        .user
-                                                                        .email ==
-                                                                    person.email
-                                                                "
-                                                                >(you)</span
-                                                            >
-                                                        </p>
-                                                        <p
-                                                            class="mt-2 flex items-center text-sm text-gray-500"
-                                                        >
-                                                            <svg
-                                                                class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 20 20"
-                                                                fill="currentColor"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <path
-                                                                    d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                                                                />
-                                                                <path
-                                                                    d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                                                                />
-                                                            </svg>
-                                                            <span>{{
-                                                                person.email
-                                                            }}</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="-mt-4">
-                                                <div
-                                                    v-if="
-                                                        canChangeRole &&
-                                                        !isProjectAlreadyShared
+                                                <img
+                                                    class="h-9 w-9 shrink-0 rounded-full"
+                                                    :src="
+                                                        person.profile_photo_url
                                                     "
+                                                    :alt="person.first_name"
+                                                />
+                                                <div class="min-w-0 flex-1">
+                                                    <p
+                                                        class="truncate text-sm font-medium text-gray-900 dark:text-gray-100"
+                                                    >
+                                                        {{ person.first_name }}
+                                                        {{ person.last_name }}
+                                                        <span
+                                                            v-if="
+                                                                $page.props.auth
+                                                                    .user
+                                                                    .email ==
+                                                                person.email
+                                                            "
+                                                            class="font-normal text-gray-500"
+                                                            >(you)</span
+                                                        >
+                                                    </p>
+                                                    <p
+                                                        class="truncate text-xs text-gray-500 dark:text-gray-400"
+                                                    >
+                                                        {{ person.email }}
+                                                    </p>
+                                                </div>
+                                                <div
+                                                    class="flex shrink-0 items-center gap-2"
                                                 >
                                                     <div
                                                         v-if="
-                                                            personRole(
-                                                                person
-                                                            ) &&
-                                                            personRole(
-                                                                person
-                                                            ) == 'creator'
+                                                            canManageSharing &&
+                                                            !isProjectAlreadyShared
                                                         "
                                                     >
-                                                        <span
-                                                            class="ml-6 text-sm text-dark-500"
-                                                        >
-                                                            Creator
-                                                        </span>
-                                                    </div>
-                                                    <div v-else>
-                                                        <button
-                                                            class="cursor-pointer mr-3 text-sm text-red-500 hover:text-red-700"
-                                                            @click="
-                                                                removeModelMember(
+                                                        <div
+                                                            v-if="
+                                                                personRole(
                                                                     person
-                                                                )
+                                                                ) == 'creator'
                                                             "
                                                         >
-                                                            Remove
-                                                        </button>
-                                                        <Menu
-                                                            as="div"
-                                                            class="relative inline-block text-left"
+                                                            <span
+                                                                class="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                                            >
+                                                                Creator
+                                                            </span>
+                                                        </div>
+                                                        <div
+                                                            v-else
+                                                            class="flex items-center gap-2"
                                                         >
-                                                            <div>
+                                                            <button
+                                                                type="button"
+                                                                class="text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400"
+                                                                @click="
+                                                                    removeModelMember(
+                                                                        person
+                                                                    )
+                                                                "
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                            <Menu
+                                                                as="div"
+                                                                class="relative text-left"
+                                                            >
                                                                 <MenuButton
-                                                                    class="inline-flex justify-center w-full rounded-md capitalize border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+                                                                    type="button"
+                                                                    class="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium capitalize text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                                                                 >
                                                                     {{
                                                                         personRole(
@@ -267,26 +266,22 @@
                                                                         )
                                                                     }}
                                                                     <ChevronDownIcon
-                                                                        class="-mr-1 ml-2 h-5 w-5"
+                                                                        class="h-4 w-4"
                                                                         aria-hidden="true"
                                                                     />
                                                                 </MenuButton>
-                                                            </div>
-                                                            <transition
-                                                                enter-active-class="transition ease-out duration-100"
-                                                                enter-from-class="transform opacity-0 scale-95"
-                                                                enter-to-class="transform opacity-100 scale-100"
-                                                                leave-active-class="transition ease-in duration-75"
-                                                                leave-from-class="transform opacity-100 scale-100"
-                                                                leave-to-class="transform opacity-0 scale-95"
-                                                            >
-                                                                <MenuItems
-                                                                    class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                                                <transition
+                                                                    enter-active-class="transition ease-out duration-100"
+                                                                    enter-from-class="transform opacity-0 scale-95"
+                                                                    enter-to-class="transform opacity-100 scale-100"
+                                                                    leave-active-class="transition ease-in duration-75"
+                                                                    leave-from-class="transform opacity-100 scale-100"
+                                                                    leave-to-class="transform opacity-0 scale-95"
                                                                 >
-                                                                    <div
-                                                                        class="py-1"
+                                                                    <MenuItems
+                                                                        class="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-md border border-gray-200 bg-white py-1 shadow-lg focus:outline-none dark:border-gray-600 dark:bg-gray-800"
                                                                     >
-                                                                        <span
+                                                                        <template
                                                                             v-for="role in availableRoles"
                                                                             :key="
                                                                                 role.key
@@ -298,7 +293,7 @@
                                                                                         model +
                                                                                             '_membership'
                                                                                     ]
-                                                                                        .role !=
+                                                                                        ?.role !=
                                                                                     role.key
                                                                                 "
                                                                                 v-slot="{
@@ -311,466 +306,365 @@
                                                                                     )
                                                                                 "
                                                                             >
-                                                                                <a
-                                                                                    href="#"
+                                                                                <button
+                                                                                    type="button"
                                                                                     :class="[
                                                                                         active
-                                                                                            ? 'bg-gray-100 text-gray-900'
-                                                                                            : 'text-gray-700',
-                                                                                        'block px-4 py-2 text-sm',
+                                                                                            ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                                                                                            : 'text-gray-700 dark:text-gray-200',
+                                                                                        'block w-full px-3 py-2 text-left text-sm',
                                                                                     ]"
-                                                                                    >{{
-                                                                                        role.name
-                                                                                    }}</a
                                                                                 >
+                                                                                    {{
+                                                                                        role.name
+                                                                                    }}
+                                                                                </button>
                                                                             </MenuItem>
-                                                                        </span>
-                                                                    </div>
-                                                                </MenuItems>
-                                                            </transition>
-                                                        </Menu>
+                                                                        </template>
+                                                                    </MenuItems>
+                                                                </transition>
+                                                            </Menu>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div v-else>
-                                                    <div
-                                                        v-if="
+                                                    <span
+                                                        v-else-if="
                                                             personRole(person)
                                                         "
+                                                        class="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                                                     >
-                                                        <span
-                                                            class="ml-6 text-sm capitalize text-dark-500"
-                                                        >
-                                                            {{
-                                                                personRole(
-                                                                    person
-                                                                )
-                                                            }}
-                                                        </span>
-                                                    </div>
+                                                        {{ personRole(person) }}
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            </ul>
-
-                            <div class="border-t -mx-4 px-4 pt-4">
-                                <span class="text-md font-medium">
-                                    General Access
-                                </span>
-                            </div>
-                            <div class="mt-2 flex-1 px-4 py-2 flex">
-                                <div class="flex-1 flex">
-                                    <GlobeAltIcon
-                                        class="-mr-1 mr-2 h-10 w-10 text-green-600"
-                                        aria-hidden="true"
-                                    />
-                                    <span
-                                        class="text-sm text-gray-900 font-medium mb-5"
-                                    >
-                                        Anyone with the link
-                                        <p class="text-xs text-gray-600 pr-4">
-                                            Anyone on the internet with the link
-                                            can view the project, along with
-                                            associated samples and datasets, in
-                                            a read-only mode.
-                                        </p>
-                                    </span>
+                                        </li>
+                                    </ul>
                                 </div>
-                                <div class="flex items-center">
-                                    <div>
+
+                                <div
+                                    class="rounded-lg border border-gray-200 bg-gray-50/60 p-4 dark:border-gray-700 dark:bg-gray-800/40"
+                                >
+                                    <div
+                                        class="flex items-start justify-between gap-3"
+                                    >
+                                        <div class="flex min-w-0 gap-3">
+                                            <GlobeAltIcon
+                                                class="mt-0.5 h-5 w-5 shrink-0 text-teal-600 dark:text-teal-400"
+                                                aria-hidden="true"
+                                            />
+                                            <div>
+                                                <p
+                                                    class="text-sm font-medium text-gray-900 dark:text-gray-100"
+                                                >
+                                                    Anyone with the link
+                                                </p>
+                                                <p
+                                                    class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400"
+                                                >
+                                                    View the {{ model }} and its
+                                                    samples and datasets in
+                                                    read-only mode.
+                                                </p>
+                                            </div>
+                                        </div>
                                         <button
                                             id="copyLink"
                                             type="button"
-                                            class="active:bg-green-500 inline-flex mb-4 items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                            @click="copyLinkToClipboard"
+                                            class="inline-flex shrink-0 items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                                            :disabled="!reviewerShareUrl"
+                                            @click.stop="copyLinkToClipboard"
                                         >
                                             <LinkIcon
-                                                class="w-4 h-4 mr-1 text-gray-600"
+                                                class="h-3.5 w-3.5"
+                                                aria-hidden="true"
                                             />
-                                            <span>Copy Link</span>
+                                            {{
+                                                linkCopied
+                                                    ? "Copied"
+                                                    : "Copy link"
+                                            }}
                                         </button>
-                                        <div
-                                            v-if="isVisible"
-                                            class="text-gray-500 text-xs"
-                                        >
-                                            Copied to clipboard!
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <span v-if="team && !team.personal_team">
-                                <div class="mb-2">
-                                    <h2
-                                        class="text-lg uppercase leading-6 font-medium text-gray-900"
+                                <div v-if="team && !team.personal_team">
+                                    <h4
+                                        class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                     >
                                         {{ team.name }}
-                                    </h2>
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        All the users (corresponding roles) in
-                                        the team will be applicable to this
+                                    </h4>
+                                    <p
+                                        class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                                    >
+                                        Team members inherit access to this
                                         {{ model }}.
                                     </p>
-                                </div>
-                                <div class="bg-white overflow-hidden">
                                     <ul
                                         role="list"
-                                        class="divide-y divide-gray-200"
+                                        class="mt-3 divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-700"
                                     >
                                         <li
                                             v-for="person in team.users"
                                             :key="person.email"
                                         >
-                                            <a class="block hover:bg-gray-50">
-                                                <div
-                                                    class="flex items-center px-4 py-4 sm:px-6"
-                                                >
-                                                    <div
-                                                        class="min-w-0 flex-1 flex items-center"
+                                            <div
+                                                class="flex items-center gap-3 px-3 py-3"
+                                            >
+                                                <img
+                                                    class="h-9 w-9 shrink-0 rounded-full"
+                                                    :src="
+                                                        person.profile_photo_url
+                                                    "
+                                                    :alt="person.first_name"
+                                                />
+                                                <div class="min-w-0 flex-1">
+                                                    <p
+                                                        class="truncate text-sm font-medium text-gray-900 dark:text-gray-100"
                                                     >
-                                                        <div
-                                                            class="flex-shrink-0"
-                                                        >
-                                                            <img
-                                                                :key="person.id"
-                                                                class="h-12 w-12 rounded-full"
-                                                                :src="
-                                                                    person.profile_photo_url
-                                                                "
-                                                                :alt="
-                                                                    person.first_name
-                                                                "
-                                                            />
-                                                        </div>
-                                                        <div
-                                                            class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"
-                                                        >
-                                                            <div>
-                                                                <p
-                                                                    class="text-sm font-medium text-gray-600 truncate"
-                                                                >
-                                                                    {{
-                                                                        person.first_name
-                                                                    }}
-                                                                </p>
-                                                                <p
-                                                                    class="mt-2 flex items-center text-sm text-gray-500"
-                                                                >
-                                                                    <svg
-                                                                        class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20"
-                                                                        fill="currentColor"
-                                                                        aria-hidden="true"
-                                                                    >
-                                                                        <path
-                                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                                                                        />
-                                                                        <path
-                                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                                                                        />
-                                                                    </svg>
-                                                                    <span
-                                                                        class="truncate"
-                                                                        >{{
-                                                                            person.email
-                                                                        }}</span
-                                                                    >
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <span
-                                                            class="inline-flex capitalize items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                                                            >{{
-                                                                person
-                                                                    .membership
-                                                                    .role
-                                                            }}</span
-                                                        >
-                                                    </div>
+                                                        {{ person.first_name }}
+                                                    </p>
+                                                    <p
+                                                        class="truncate text-xs text-gray-500 dark:text-gray-400"
+                                                    >
+                                                        {{ person.email }}
+                                                    </p>
                                                 </div>
-                                            </a>
+                                                <span
+                                                    class="inline-flex shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                                >
+                                                    {{ person.membership.role }}
+                                                </span>
+                                            </div>
                                         </li>
                                         <li>
-                                            <a class="block hover:bg-gray-50">
-                                                <div
-                                                    class="flex items-center px-4 py-4 sm:px-6"
-                                                >
-                                                    <div
-                                                        class="min-w-0 flex-1 flex items-center"
+                                            <div
+                                                class="flex items-center gap-3 px-3 py-3"
+                                            >
+                                                <img
+                                                    class="h-9 w-9 shrink-0 rounded-full"
+                                                    :src="
+                                                        team.owner
+                                                            .profile_photo_url
+                                                    "
+                                                    :alt="team.owner.first_name"
+                                                />
+                                                <div class="min-w-0 flex-1">
+                                                    <p
+                                                        class="truncate text-sm font-medium text-gray-900 dark:text-gray-100"
                                                     >
-                                                        <div
-                                                            class="flex-shrink-0"
-                                                        >
-                                                            <img
-                                                                :key="
-                                                                    team.owner
-                                                                        .id
-                                                                "
-                                                                class="h-12 w-12 rounded-full"
-                                                                :src="
-                                                                    team.owner
-                                                                        .profile_photo_url
-                                                                "
-                                                                :alt="
-                                                                    team.owner
-                                                                        .first_name
-                                                                "
-                                                            />
-                                                        </div>
-                                                        <div
-                                                            class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"
-                                                        >
-                                                            <div>
-                                                                <p
-                                                                    class="text-sm font-medium text-gray-600 truncate"
-                                                                >
-                                                                    {{
-                                                                        team
-                                                                            .owner
-                                                                            .first_name
-                                                                    }}
-                                                                </p>
-                                                                <p
-                                                                    class="mt-2 flex items-center text-sm text-gray-500"
-                                                                >
-                                                                    <svg
-                                                                        class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20"
-                                                                        fill="currentColor"
-                                                                        aria-hidden="true"
-                                                                    >
-                                                                        <path
-                                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                                                                        />
-                                                                        <path
-                                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                                                                        />
-                                                                    </svg>
-                                                                    <span
-                                                                        class="truncate"
-                                                                        >{{
-                                                                            team
-                                                                                .owner
-                                                                                .email
-                                                                        }}</span
-                                                                    >
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                                                            >owner</span
-                                                        >
-                                                    </div>
+                                                        {{
+                                                            team.owner
+                                                                .first_name
+                                                        }}
+                                                    </p>
+                                                    <p
+                                                        class="truncate text-xs text-gray-500 dark:text-gray-400"
+                                                    >
+                                                        {{ team.owner.email }}
+                                                    </p>
                                                 </div>
-                                            </a>
+                                                <span
+                                                    class="inline-flex shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                                >
+                                                    owner
+                                                </span>
+                                            </div>
                                         </li>
                                     </ul>
                                 </div>
-                            </span>
-                            <div
-                                v-if="modelInvitations.length > 0"
-                                class="pb-5"
-                            >
-                                <jet-modal-form-section class="mt-10 sm:mt-0">
+
+                                <div v-if="modelInvitations?.length > 0">
+                                    <h4
+                                        class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                    >
+                                        Pending invitations
+                                    </h4>
+                                    <p
+                                        class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                                    >
+                                        Invited users can join by accepting the
+                                        email invitation.
+                                    </p>
+                                    <ul
+                                        class="mt-3 divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-700"
+                                    >
+                                        <li
+                                            v-for="invitation in modelInvitations"
+                                            :key="invitation.id"
+                                            class="flex items-center justify-between gap-3 px-3 py-3"
+                                        >
+                                            <span
+                                                class="truncate text-sm text-gray-700 dark:text-gray-300"
+                                            >
+                                                {{ invitation.email }}
+                                            </span>
+                                            <button
+                                                v-if="canManageSharing"
+                                                type="button"
+                                                class="shrink-0 text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400"
+                                                @click="
+                                                    cancelModelInvitation(
+                                                        invitation
+                                                    )
+                                                "
+                                            >
+                                                Cancel
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div v-else-if="canManageSharing">
+                                <jet-modal-form-section
+                                    class="space-y-4"
+                                    @submitted="addModelMember"
+                                >
                                     <template #form>
-                                        <div class="mb-2 mt-5 col-span-12">
-                                            <h2
-                                                class="text-lg leading-6 font-medium text-gray-900"
-                                            >
-                                                Pending Project Invitations
-                                            </h2>
-                                            <p
-                                                class="mt-1 text-sm text-gray-500"
-                                            >
-                                                These people have been invited
-                                                to your {{ model }} and have
-                                                been sent an invitation email.
-                                                They may join the {{ model }} by
-                                                accepting the email invitation.
-                                            </p>
+                                        <p
+                                            class="col-span-12 text-sm text-gray-600 dark:text-gray-400"
+                                        >
+                                            Invite someone by email. They will
+                                            receive an invitation to join this
+                                            {{ model }}.
+                                        </p>
+                                        <div class="col-span-12">
+                                            <jet-label
+                                                for="email"
+                                                value="Email"
+                                            />
+                                            <jet-input
+                                                id="email"
+                                                v-model="addMemberForm.email"
+                                                type="email"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <jet-input-error
+                                                :message="
+                                                    addMemberForm.errors.email
+                                                "
+                                                class="mt-2"
+                                            />
                                         </div>
-                                        <div class="space-y-3 col-span-12 mb-3">
+                                        <div
+                                            v-if="availableRoles.length > 0"
+                                            class="col-span-12"
+                                        >
+                                            <jet-label
+                                                for="roles"
+                                                value="Role"
+                                            />
+                                            <jet-input-error
+                                                :message="
+                                                    addMemberForm.errors.role
+                                                "
+                                                class="mt-2"
+                                            />
                                             <div
-                                                v-for="invitation in modelInvitations"
-                                                :key="invitation.id"
-                                                class="flex px-4 items-center justify-between"
+                                                class="relative z-0 mt-1 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
                                             >
-                                                <div class="text-gray-600">
-                                                    {{ invitation.email }}
-                                                </div>
-                                                <div class="flex items-center">
-                                                    <button
-                                                        class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
-                                                        @click="
-                                                            cancelModelInvitation(
-                                                                invitation
-                                                            )
-                                                        "
+                                                <button
+                                                    v-for="(
+                                                        role, i
+                                                    ) in availableRoles"
+                                                    :key="role.key"
+                                                    type="button"
+                                                    class="relative inline-flex w-full px-4 py-3 text-left focus:z-10 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                                                    :class="{
+                                                        'border-t border-gray-200 dark:border-gray-700':
+                                                            i > 0,
+                                                        'bg-teal-50 dark:bg-teal-950/30':
+                                                            addMemberForm.role ==
+                                                            role.key,
+                                                    }"
+                                                    @click="
+                                                        addMemberForm.role =
+                                                            role.key
+                                                    "
+                                                >
+                                                    <div
+                                                        :class="{
+                                                            'opacity-50':
+                                                                addMemberForm.role &&
+                                                                addMemberForm.role !=
+                                                                    role.key,
+                                                        }"
                                                     >
-                                                        Cancel
-                                                    </button>
-                                                </div>
+                                                        <div
+                                                            class="flex items-center"
+                                                        >
+                                                            <span
+                                                                class="text-sm font-semibold text-gray-800 dark:text-gray-200"
+                                                            >
+                                                                {{ role.name }}
+                                                            </span>
+                                                            <svg
+                                                                v-if="
+                                                                    addMemberForm.role ==
+                                                                    role.key
+                                                                "
+                                                                class="ml-2 h-4 w-4 text-teal-600 dark:text-teal-400"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                                aria-hidden="true"
+                                                            >
+                                                                <path
+                                                                    stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M5 13l4 4L19 7"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                        <p
+                                                            class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                                                        >
+                                                            {{
+                                                                role.description
+                                                            }}
+                                                        </p>
+                                                    </div>
+                                                </button>
                                             </div>
                                         </div>
+                                        <div class="col-span-12">
+                                            <jet-label
+                                                for="message"
+                                                value="Message (optional)"
+                                            />
+                                            <jet-text-area
+                                                id="message"
+                                                v-model="addMemberForm.message"
+                                                :rows="3"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <jet-input-error
+                                                :message="
+                                                    addMemberForm.errors.message
+                                                "
+                                                class="mt-2"
+                                            />
+                                        </div>
+                                    </template>
+                                    <template #actions>
+                                        <jet-button
+                                            :class="{
+                                                'opacity-25':
+                                                    addMemberForm.processing,
+                                            }"
+                                            :disabled="addMemberForm.processing"
+                                        >
+                                            Send invitation
+                                        </jet-button>
+                                        <jet-action-message
+                                            :on="
+                                                addMemberForm.recentlySuccessful
+                                            "
+                                            class="mx-3 inline-flex text-sm text-gray-600"
+                                        >
+                                            Invitation sent.
+                                        </jet-action-message>
                                     </template>
                                 </jet-modal-form-section>
                             </div>
-                        </div>
-                        <div v-else>
-                            <jet-modal-form-section
-                                class="space-y-3"
-                                @submitted="addModelMember"
-                            >
-                                <template #form>
-                                    <div class="col-span-12">
-                                        <div
-                                            class="max-w-xl mt-2 text-sm text-gray-600"
-                                        >
-                                            Please provide the email address of
-                                            the person you would like to add.
-                                        </div>
-                                    </div>
-                                    <div class="col-span-12">
-                                        <jet-label for="email" value="Email" />
-                                        <jet-input
-                                            id="email"
-                                            v-model="addMemberForm.email"
-                                            type="email"
-                                            class="mt-1 block w-full"
-                                        />
-                                        <jet-input-error
-                                            :message="
-                                                addMemberForm.errors.email
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
-                                    <div
-                                        v-if="availableRoles.length > 0"
-                                        class="col-span-12"
-                                    >
-                                        <jet-label for="roles" value="Role" />
-                                        <jet-input-error
-                                            :message="addMemberForm.errors.role"
-                                            class="mt-2"
-                                        />
-                                        <div
-                                            class="relative z-0 mt-1 border border-gray-200 rounded-lg cursor-pointer"
-                                        >
-                                            <button
-                                                v-for="(
-                                                    role, i
-                                                ) in availableRoles"
-                                                :key="role.key"
-                                                type="button"
-                                                class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200"
-                                                :class="{
-                                                    'border-t border-gray-200 rounded-t-none':
-                                                        i > 0,
-                                                    'rounded-b-none':
-                                                        i !=
-                                                        Object.keys(
-                                                            availableRoles
-                                                        ).length -
-                                                            1,
-                                                }"
-                                                @click="
-                                                    addMemberForm.role =
-                                                        role.key
-                                                "
-                                            >
-                                                <div
-                                                    :class="{
-                                                        'opacity-50':
-                                                            addMemberForm.role &&
-                                                            addMemberForm.role !=
-                                                                role.key,
-                                                    }"
-                                                >
-                                                    <div
-                                                        class="flex items-center"
-                                                    >
-                                                        <div
-                                                            class="text-sm font-semibold text-gray-700"
-                                                            :class="{
-                                                                'font-semibold':
-                                                                    addMemberForm.role ==
-                                                                    role.key,
-                                                            }"
-                                                        >
-                                                            {{ role.name }}
-                                                        </div>
-                                                        <svg
-                                                            v-if="
-                                                                addMemberForm.role ==
-                                                                role.key
-                                                            "
-                                                            class="ml-2 h-5 w-5 text-green-400"
-                                                            fill="none"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                            ></path>
-                                                        </svg>
-                                                    </div>
-                                                    <div
-                                                        class="mt-2 text-xs text-gray-600 text-left"
-                                                    >
-                                                        {{ role.description }}
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-span-12">
-                                        <jet-label
-                                            for="message"
-                                            value="Message"
-                                        />
-                                        <jet-text-area
-                                            id="message"
-                                            v-model="addMemberForm.message"
-                                            :rows="3"
-                                            class="mt-1 block w-full"
-                                        />
-                                        <jet-input-error
-                                            :message="
-                                                addMemberForm.errors.message
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
-                                </template>
-                                <template #actions>
-                                    <jet-button
-                                        :class="{
-                                            'opacity-25':
-                                                addMemberForm.processing,
-                                        }"
-                                        :disabled="addMemberForm.processing"
-                                    >
-                                        SEND
-                                    </jet-button>
-                                    <jet-action-message
-                                        :on="addMemberForm.recentlySuccessful"
-                                        class="mx-3 inline-flex"
-                                    >
-                                        Added.
-                                    </jet-action-message>
-                                </template>
-                            </jet-modal-form-section>
                         </div>
                     </DialogPanel>
                 </TransitionChild>
@@ -800,7 +694,7 @@ import {
     GlobeAltIcon,
     LinkIcon,
 } from "@heroicons/vue/24/solid";
-import { copyText } from "vue3-clipboard";
+import { router } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -833,7 +727,12 @@ export default {
         role: String,
         model: String,
         calledFrom: String,
+        hideTrigger: {
+            type: Boolean,
+            default: false,
+        },
     },
+    emits: ["sharing-updated"],
     setup() {
         const open = ref(false);
         const addUser = ref(false);
@@ -853,7 +752,7 @@ export default {
                 role: null,
             }),
             removeModelMemberForm: this.$inertia.form({}),
-            isVisible: false,
+            linkCopied: false,
         };
     },
     computed: {
@@ -866,7 +765,7 @@ export default {
             return null;
         },
         modelInvitations() {
-            return this.modelObject[this.model + "_invitations"];
+            return this.modelObject?.[this.model + "_invitations"] ?? [];
         },
         //Check if project is already shared for when called from Study view.
         isProjectAlreadyShared() {
@@ -898,8 +797,101 @@ export default {
                 return true;
             }
         },
+        isSharingDisabled() {
+            if (this.project?.is_public) {
+                return true;
+            }
+
+            const modelObject = this.modelObject;
+
+            return Boolean(modelObject?.is_public);
+        },
+        canManageSharing() {
+            return this.canChangeRole && !this.isSharingDisabled;
+        },
+        reviewerShareUrl() {
+            if (this.model === "study" && this.study?.obfuscationcode) {
+                return this.route("preview", [
+                    this.study.obfuscationcode,
+                    this.study.id,
+                    "study",
+                ]);
+            }
+
+            if (this.project?.obfuscationcode) {
+                return this.route("project.preview", [
+                    this.project.obfuscationcode,
+                ]);
+            }
+
+            return null;
+        },
+        sharingReloadOnlyKeys() {
+            if (this.model === "study") {
+                return ["study", "members"];
+            }
+
+            if (this.model !== "project") {
+                return [];
+            }
+
+            const component = this.$page.component ?? "";
+
+            if (component === "Project/Show") {
+                return ["project", "members"];
+            }
+
+            if (component.includes("Public/Project")) {
+                return ["workspace", "project"];
+            }
+
+            if (component === "Dashboard") {
+                const workspace =
+                    this.$page.props.dashboardWorkspace ??
+                    this.$page.props.filters?.workspace;
+
+                if (workspace && workspace !== "default") {
+                    return ["workspaceProjects"];
+                }
+
+                return ["projects"];
+            }
+
+            return [];
+        },
     },
     methods: {
+        openDialog() {
+            this.open = true;
+            this.addUser = false;
+        },
+        refreshSharingData() {
+            const only = this.sharingReloadOnlyKeys;
+
+            if (!only.length) {
+                this.$emit("sharing-updated");
+
+                return Promise.resolve();
+            }
+
+            return new Promise((resolve) => {
+                router.reload({
+                    only,
+                    preserveScroll: true,
+                    onFinish: () => {
+                        this.$emit("sharing-updated");
+                        resolve();
+                    },
+                });
+            });
+        },
+        async goBackToSharingOverview() {
+            if (this.addMemberForm.recentlySuccessful) {
+                await this.refreshSharingData();
+            }
+
+            this.addUser = false;
+        },
         personRole(person) {
             if (person[this.model + "_membership"]) {
                 return person[this.model + "_membership"].role;
@@ -919,7 +911,11 @@ export default {
                 {
                     errorBag: "addModelMember",
                     preserveScroll: true,
-                    onSuccess: () => this.addMemberForm.reset(),
+                    onSuccess: async () => {
+                        this.addMemberForm.reset();
+                        await this.refreshSharingData();
+                        this.addUser = false;
+                    },
                 }
             );
         },
@@ -928,6 +924,7 @@ export default {
                 route(this.model + "-invitations.destroy", invitation),
                 {
                     preserveScroll: true,
+                    onSuccess: () => this.refreshSharingData(),
                 }
             );
         },
@@ -960,23 +957,34 @@ export default {
                 }
             );
         },
-        copyLinkToClipboard() {
-            let url =
-                this.$page.props.url +
-                "/project/" +
-                encodeURIComponent(this.project.obfuscationcode);
-            let targetInput = document.getElementById("copyLink");
-            if (targetInput) {
-                this.isVisible = true;
-                setTimeout(() => {
-                    this.isVisible = false;
-                }, 2500);
-                copyText(url, undefined, (error) => {
-                    if (error) {
-                        console.log(error);
-                    }
-                });
+        async copyLinkToClipboard() {
+            const url = this.reviewerShareUrl;
+            if (!url) {
+                return;
             }
+
+            try {
+                await navigator.clipboard.writeText(url);
+            } catch {
+                try {
+                    const el = document.createElement("textarea");
+                    el.value = url;
+                    el.setAttribute("readonly", "");
+                    el.style.position = "fixed";
+                    el.style.left = "-9999px";
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(el);
+                } catch {
+                    return;
+                }
+            }
+
+            this.linkCopied = true;
+            setTimeout(() => {
+                this.linkCopied = false;
+            }, 2500);
         },
     },
 };

@@ -58,46 +58,32 @@ class ApplicationControllerTest extends TestCase
         ]);
     }
 
-    public function test_compounds_renders_view_with_default_parameters(): void
+    public function test_compounds_redirects_to_unified_search(): void
     {
-        $response = $this->get('/compounds');
-
-        $response->assertStatus(200);
+        $this->get('/compounds')
+            ->assertRedirect(route('search', ['scope' => 'compounds']));
     }
 
-    public function test_compounds_renders_view_with_query_parameter(): void
+    public function test_compounds_redirect_preserves_query_parameters(): void
     {
-        $response = $this->get('/compounds?query=caffeine');
-
-        $response->assertStatus(200);
+        $this->get('/compounds?query=caffeine&limit=50&page=2&tagType=organic')
+            ->assertRedirect(route('search', [
+                'scope' => 'compounds',
+                'query' => 'caffeine',
+                'limit' => '50',
+                'page' => '2',
+                'tagType' => 'organic',
+            ]));
     }
 
-    public function test_compounds_renders_view_with_custom_limit(): void
+    public function test_compounds_scope_renders_compounds_view(): void
     {
-        $response = $this->get('/compounds?limit=50');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_compounds_renders_view_with_default_limit_when_not_provided(): void
-    {
-        $response = $this->get('/compounds');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_compounds_renders_view_with_page_parameter(): void
-    {
-        $response = $this->get('/compounds?page=2');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_compounds_renders_view_with_tag_type(): void
-    {
-        $response = $this->get('/compounds?tagType=organic');
-
-        $response->assertStatus(200);
+        $this->followingRedirects()
+            ->get('/compounds?query=caffeine')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Public/Compounds')
+                ->where('query', 'caffeine'));
     }
 
     public function test_resolve_compound_returns_404_for_invalid_identifier(): void
@@ -367,9 +353,14 @@ class ApplicationControllerTest extends TestCase
 
     public function test_compounds_with_all_parameters(): void
     {
-        $response = $this->get('/compounds?query=test&limit=10&page=3&tagType=sample');
-
-        $response->assertStatus(200);
+        $this->get('/compounds?query=test&limit=10&page=3&tagType=sample')
+            ->assertRedirect(route('search', [
+                'scope' => 'compounds',
+                'query' => 'test',
+                'limit' => '10',
+                'page' => '3',
+                'tagType' => 'sample',
+            ]));
     }
 
     public function test_resolve_badge_calculates_correct_svg_width(): void
@@ -414,9 +405,8 @@ class ApplicationControllerTest extends TestCase
 
     public function test_compounds_defaults_to_null_tag_type(): void
     {
-        $response = $this->get('/compounds');
-
-        $response->assertStatus(200);
+        $this->get('/compounds')
+            ->assertRedirect(route('search', ['scope' => 'compounds']));
     }
 
     public function test_resolve_project_with_invalid_tab_defaults_to_info(): void
