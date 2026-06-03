@@ -8,7 +8,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'nmrXiv - Swagger UI',
+                'title' => 'nmrXiv API Reference',
             ],
 
             'routes' => [
