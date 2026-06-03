@@ -32,7 +32,7 @@
 
                 <div class="md:hidden">
                     <PopoverButton
-                        class="rounded-lg p-2 inline-flex items-center justify-center text-gray-700 hover:text-gray-900 hover:bg-black/[0.04] focus:outline-none focus:ring-2 ring-brand transition-colors"
+                        class="rounded-lg p-2 inline-flex items-center justify-center text-gray-700 focus:outline-none focus:ring-2 ring-brand"
                     >
                         <span class="sr-only">Open menu</span>
                         <Bars3Icon class="size-6" aria-hidden="true" />

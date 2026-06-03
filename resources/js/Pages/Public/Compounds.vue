@@ -475,20 +475,72 @@
                                             class="-m-1 flex flex-wrap items-center"
                                         >
                                             <span
-                                                v-for="query in recentQueries"
-                                                :key="query"
-                                                class="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
+                                                v-for="entry in recentQueries"
+                                                :key="recentQueryKey(entry)"
+                                                class="m-1 inline-flex items-center rounded-lg border border-gray-200 bg-white py-1 pl-1 pr-2 text-sm font-medium text-gray-900"
                                             >
                                                 <a
-                                                    class="cursor-pointer"
-                                                    @click="search(query)"
-                                                    >{{ query }}</a
+                                                    class="inline-flex cursor-pointer items-center gap-2"
+                                                    :aria-label="
+                                                        recentQueryAriaLabel(
+                                                            entry
+                                                        )
+                                                    "
+                                                    @click="search(entry)"
                                                 >
+                                                    <span
+                                                        v-if="
+                                                            showStructureForRecent(
+                                                                entry
+                                                            )
+                                                        "
+                                                        class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white"
+                                                    >
+                                                        <img
+                                                            v-if="
+                                                                structureDepictionUrl(
+                                                                    normalizeRecentQuery(
+                                                                        entry
+                                                                    ).query
+                                                                )
+                                                            "
+                                                            :src="
+                                                                structureDepictionUrl(
+                                                                    normalizeRecentQuery(
+                                                                        entry
+                                                                    ).query
+                                                                )
+                                                            "
+                                                            alt=""
+                                                            class="max-h-full max-w-full object-contain"
+                                                        />
+                                                        <span
+                                                            v-else
+                                                            class="max-w-full truncate px-1 font-mono text-[10px]"
+                                                        >
+                                                            {{
+                                                                normalizeRecentQuery(
+                                                                    entry
+                                                                ).query
+                                                            }}
+                                                        </span>
+                                                    </span>
+                                                    <span
+                                                        v-else
+                                                        class="max-w-xs truncate px-2"
+                                                    >
+                                                        {{
+                                                            normalizeRecentQuery(
+                                                                entry
+                                                            ).query
+                                                        }}
+                                                    </span>
+                                                </a>
                                                 <button
                                                     type="button"
                                                     class="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
                                                     @click="
-                                                        removeSearchQuery(query)
+                                                        removeSearchQuery(entry)
                                                     "
                                                 >
                                                     <span class="sr-only"
@@ -552,6 +604,10 @@ import CompoundCards from "@/Shared/CompoundCards.vue";
 import Pagination from "@/Shared/Pagination.vue";
 import EmptySearchState from "@/Shared/EmptySearchState.vue";
 import { publicEmptyStateSectionClasses } from "@/Utils/publicEmptyStateClasses.js";
+import {
+    fetchCompoundSearch,
+    syncCompoundsBrowserUrl,
+} from "@/Utils/unifiedSearchApi.js";
 
 export default {
     components: {
@@ -584,10 +640,9 @@ export default {
         }
 
         if (typeof window !== "undefined") {
-            let recentQueries = localStorage.getItem("recentQueries");
-            if (recentQueries) {
-                this.recentQueries = JSON.parse(recentQueries);
-            }
+            this.recentQueries = this.parseRecentQueries(
+                localStorage.getItem("recentQueries")
+            );
         }
 
         if (window.location.hash) {
@@ -623,14 +678,16 @@ export default {
                 sort = "recent";
             }
 
-            if (typeof window !== "undefined") {
-                let recentQueries = localStorage.getItem("recentQueries");
-                recentQueries = recentQueries ? JSON.parse(recentQueries) : [];
-                recentQueries.push(queryTerm);
-                recentQueries = [...new Set(recentQueries)].filter((n) => n);
+            if (typeof window !== "undefined" && queryTerm) {
+                const resolvedType =
+                    this.type || this.tagQuery(queryTerm) || "text";
+                this.recentQueries = this.addRecentQuery({
+                    query: queryTerm,
+                    type: resolvedType,
+                });
                 localStorage.setItem(
                     "recentQueries",
-                    JSON.stringify(recentQueries)
+                    JSON.stringify(this.recentQueries)
                 );
             }
 
@@ -644,23 +701,20 @@ export default {
 
             this.syncBrowserUrl(queryTerm, page, sort);
 
-            let urlEndpoint =
-                "/api/v1/search/?limit=" + limit + "&page=" + page;
-            if (sort) {
-                urlEndpoint = urlEndpoint + "&sort=" + sort;
-            }
-
             if (queryTerm == "") {
                 this.type = "";
             }
-            axios
-                .post(urlEndpoint, {
-                    query: queryTerm,
-                    type: this.type,
-                    tagType: this.tagType ? this.tagType : null,
-                })
-                .then((response) => {
-                    this.results = response.data;
+
+            fetchCompoundSearch({
+                query: queryTerm,
+                type: this.type,
+                tagType: this.tagType ? this.tagType : null,
+                limit,
+                page,
+                sort,
+            })
+                .then((data) => {
+                    this.results = data;
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -671,42 +725,14 @@ export default {
                 });
         },
         syncBrowserUrl(queryTerm, page, sort) {
-            const url = new URL(window.location);
-
-            if (queryTerm) {
-                url.searchParams.set("query", queryTerm);
-            } else {
-                url.searchParams.delete("query");
-            }
-
-            if (page > 1) {
-                url.searchParams.set("page", String(page));
-            } else {
-                url.searchParams.delete("page");
-            }
-
-            if (sort) {
-                url.searchParams.set("sort", sort);
-            } else {
-                url.searchParams.delete("sort");
-            }
-
-            if (this.tagType) {
-                url.searchParams.set("tagType", this.tagType);
-            }
-
             const queryType = this.getParameterByName("type");
-            if (queryType) {
-                url.searchParams.set("type", queryType);
-            }
 
-            const cleaned = this.sanitiseURL(url);
-            const nextUrl =
-                [...cleaned.searchParams].length === 0
-                    ? cleaned.pathname
-                    : cleaned.toString();
-
-            window.history.replaceState(null, "", nextUrl);
+            syncCompoundsBrowserUrl(
+                queryTerm,
+                page,
+                sort,
+                queryType || this.type
+            );
         },
         sanitiseURL(url) {
             for (const [key, value] of url.searchParams.entries()) {
@@ -721,32 +747,110 @@ export default {
             }
             return url;
         },
-        search(query) {
-            if (query) {
-                this.searchTerm = query;
-                this.type = "text";
+        search(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+
+            if (normalized.query) {
+                this.searchTerm = normalized.query;
+                this.type = normalized.type || this.tagQuery(normalized.query);
             }
-            this.fetchCompounds(query, { resetPage: true });
+
+            this.fetchCompounds(normalized.query, { resetPage: true });
         },
         clearSearch() {
             this.searchTerm = "";
             this.type = "";
             this.fetchCompounds("", { resetPage: true });
         },
-        removeSearchQuery(query) {
-            if (typeof window !== "undefined") {
-                let recentQueries = localStorage.getItem("recentQueries");
-                recentQueries = recentQueries ? JSON.parse(recentQueries) : [];
-                recentQueries = recentQueries.filter(function (item) {
-                    return item !== query;
-                });
-                recentQueries = [...new Set(recentQueries)].filter((n) => n);
-                this.recentQueries = recentQueries;
-                localStorage.setItem(
-                    "recentQueries",
-                    JSON.stringify(recentQueries)
-                );
+        removeSearchQuery(entry) {
+            if (typeof window === "undefined") {
+                return;
             }
+
+            const query = this.normalizeRecentQuery(entry).query;
+            this.recentQueries = this.recentQueries.filter(
+                (item) => this.normalizeRecentQuery(item).query !== query
+            );
+            localStorage.setItem(
+                "recentQueries",
+                JSON.stringify(this.recentQueries)
+            );
+        },
+        normalizeRecentQuery(entry) {
+            if (typeof entry === "string") {
+                return {
+                    query: entry,
+                    type: this.tagQuery(entry) || "text",
+                };
+            }
+
+            return {
+                query: entry?.query || "",
+                type: entry?.type || this.tagQuery(entry?.query) || "text",
+            };
+        },
+        parseRecentQueries(storedValue) {
+            if (!storedValue) {
+                return [];
+            }
+
+            try {
+                const parsed = JSON.parse(storedValue);
+
+                if (!Array.isArray(parsed)) {
+                    return [];
+                }
+
+                return parsed
+                    .map((entry) => this.normalizeRecentQuery(entry))
+                    .filter((entry) => entry.query);
+            } catch {
+                return [];
+            }
+        },
+        addRecentQuery(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+            const existing = this.parseRecentQueries(
+                localStorage.getItem("recentQueries")
+            ).filter((item) => item.query !== normalized.query);
+
+            return [normalized, ...existing].slice(0, 12);
+        },
+        recentQueryKey(entry) {
+            return this.normalizeRecentQuery(entry).query;
+        },
+        showStructureForRecent(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+            const structureTypes = [
+                "smiles",
+                "exact",
+                "substructure",
+                "similarity",
+            ];
+
+            if (structureTypes.includes(normalized.type)) {
+                return true;
+            }
+
+            return this.tagQuery(normalized.query) === "smiles";
+        },
+        structureDepictionUrl(smiles) {
+            if (!smiles || !this.$page.props.CM_API) {
+                return null;
+            }
+
+            const encodedSmiles = encodeURIComponent(smiles);
+
+            return `${this.$page.props.CM_API}depict/2D?smiles=${encodedSmiles}&height=96&width=96&CIP=false&toolkit=cdk`;
+        },
+        recentQueryAriaLabel(entry) {
+            const normalized = this.normalizeRecentQuery(entry);
+
+            if (this.showStructureForRecent(entry)) {
+                return `Repeat structure search for ${normalized.query}`;
+            }
+
+            return `Repeat search for ${normalized.query}`;
         },
         getParameterByName(name, url = window.location.href) {
             name = name.replace(/[\[\]]/g, "\\$&");
