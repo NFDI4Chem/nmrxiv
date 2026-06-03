@@ -14,9 +14,10 @@ export const publicNavItems = [
     },
     {
         name: "Spectra Library",
-        href: "/compounds",
+        href: "/search?scope=compounds",
         icon: SwatchIcon,
         match: ["/compounds"],
+        searchScope: "compounds",
     },
     {
         name: "About",
@@ -33,6 +34,21 @@ export const publicNavItems = [
 ];
 
 export function isPublicNavActive(url, item) {
+    if (item.searchScope) {
+        try {
+            const parsed = new URL(url, "http://localhost");
+
+            if (
+                parsed.pathname === "/search" &&
+                parsed.searchParams.get("scope") === item.searchScope
+            ) {
+                return true;
+            }
+        } catch {
+            // fall through to path matching
+        }
+    }
+
     return item.match.some(
         (path) => url === path || url.startsWith(`${path}/`)
     );
