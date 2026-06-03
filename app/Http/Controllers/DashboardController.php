@@ -9,10 +9,12 @@ use App\Models\Team;
 use App\Models\User;
 use App\Support\Dashboard\CompoundLibraryRankedStudiesQuery;
 use App\Support\Dashboard\WorkspaceMoleculeAggregates;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -58,6 +60,7 @@ class DashboardController extends Controller
 
         if ($workspace !== 'default') {
             [$workspaceProjects, $workspaceStudies] = $this->workspaceProjectAndStudyLists($user, $workspace);
+            $workspaceProjects = $this->decorateProjectsForDashboard($workspaceProjects, $user);
 
             $hasProjects = $this->scopedProjectsQuery($user, $team)->exists();
             $hasSamples = $this->scopedSamplesQuery($user, $team)->exists();
@@ -77,18 +80,21 @@ class DashboardController extends Controller
         }
 
         $projectsQuery = $this->scopedProjectsQuery($user, $team)
-            ->with(['users', 'owner', 'tags', 'draft'])
+            ->with($this->dashboardProjectEagerLoads())
             ->orderByDesc('updated_at');
 
         $this->applyStatusFilter($projectsQuery, $filters['projects_status']);
         $this->applySearchToProjects($projectsQuery, $filters['projects_q']);
 
-        $projects = $projectsQuery->paginate(
-            $filters['projects_per_page'],
-            ['*'],
-            'projects_page',
-            $filters['projects_page']
-        )->withQueryString();
+        $projects = $this->decorateProjectsForDashboard(
+            $projectsQuery->paginate(
+                $filters['projects_per_page'],
+                ['*'],
+                'projects_page',
+                $filters['projects_page']
+            )->withQueryString(),
+            $user
+        );
 
         $samplesQuery = $this->scopedSamplesQuery($user, $team)
             ->with([
@@ -134,7 +140,7 @@ class DashboardController extends Controller
     {
         return match ($workspace) {
             'shared' => [
-                $user->sharedProjects()->with(['owner', 'tags', 'draft'])->get()->all(),
+                $user->sharedProjects()->with($this->dashboardProjectEagerLoads())->get()->all(),
                 $user->sharedStudies()->with(['owner', 'sample.molecules'])->get()->all(),
             ],
             'recent' => [
@@ -145,7 +151,7 @@ class DashboardController extends Controller
                 Project::query()
                     ->where('is_deleted', false)
                     ->whereHasBookmark($user)
-                    ->with(['owner', 'tags', 'draft'])
+                    ->with($this->dashboardProjectEagerLoads())
                     ->get()
                     ->all(),
                 Study::query()
@@ -159,7 +165,7 @@ class DashboardController extends Controller
                 Project::query()
                     ->where('owner_id', $user->id)
                     ->where('is_deleted', true)
-                    ->with(['owner', 'tags', 'draft'])
+                    ->with($this->dashboardProjectEagerLoads())
                     ->get()
                     ->all(),
                 [],
@@ -173,11 +179,12 @@ class DashboardController extends Controller
      */
     protected function recentProjectsForUser(User $user): array
     {
-        $projects = $user->activeProjects()->with(['owner', 'tags', 'draft'])->get();
+        $eagerLoads = $this->dashboardProjectEagerLoads();
+        $projects = $user->activeProjects()->with($eagerLoads)->get();
 
         foreach ($user->allTeams() as $teamModel) {
             $projects = $projects->concat(
-                $teamModel->activeProjects()->with(['owner', 'tags', 'draft'])->get()
+                $teamModel->activeProjects()->with($eagerLoads)->get()
             );
         }
 
@@ -216,6 +223,49 @@ class DashboardController extends Controller
                     ->where('ranked.rn', '=', 1);
             }
         );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function dashboardProjectEagerLoads(): array
+    {
+        return [
+            'users',
+            'owner',
+            'tags',
+            'draft',
+            'projectInvitations',
+            'team.owner',
+            'team.users',
+        ];
+    }
+
+    /**
+     * @param  LengthAwarePaginator<Project>|array<int, Project>|Collection<int, Project>  $projects
+     * @return LengthAwarePaginator<Project>|array<int, Project>|Collection<int, Project>
+     */
+    protected function decorateProjectsForDashboard(LengthAwarePaginator|array|Collection $projects, User $user): LengthAwarePaginator|array|Collection
+    {
+        $decorate = function (Project $project) use ($user): Project {
+            $project->setAttribute('viewer_role', $project->userProjectRole($user->email));
+
+            return $project;
+        };
+
+        if ($projects instanceof LengthAwarePaginator) {
+            $projects->setCollection(
+                $projects->getCollection()->map($decorate)
+            );
+
+            return $projects;
+        }
+
+        if ($projects instanceof Collection) {
+            return $projects->map($decorate);
+        }
+
+        return array_map($decorate, $projects);
     }
 
     protected function applyStatusFilter(Builder $query, string $status): void
