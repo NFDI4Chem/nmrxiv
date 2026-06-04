@@ -574,6 +574,8 @@
 
 <script>
 import { ref, computed, watch, watchEffect, onMounted, shallowRef } from "vue";
+import { router } from "@inertiajs/vue3";
+import { SEARCH_SCOPE, buildSearchPagePath } from "@/Utils/unifiedSearchApi.js";
 import { useMagicKeys } from "@vueuse/core";
 import {
     Dialog as HDialog,
@@ -986,7 +988,34 @@ export default {
             );
         };
 
+        const hasOnlyFreeTextMetadata = (params) => {
+            if (!params?.freeText?.trim()) {
+                return false;
+            }
+
+            const rest = { ...params };
+            delete rest.freeText;
+
+            return !Object.values(rest).some(
+                (value) => value !== null && value !== undefined && value !== ""
+            );
+        };
+
+        const performTextSearch = (query) => {
+            const q = (query ?? heroSearchQuery.value).trim();
+            if (!q) {
+                return;
+            }
+
+            router.visit(buildSearchPagePath(SEARCH_SCOPE.CATALOG, { q }));
+        };
+
         const openHeroSearch = () => {
+            if (heroSearchType.value.type === "metadata") {
+                performTextSearch();
+                return;
+            }
+
             if (heroSearchType.value.type === "advanced") {
                 performMetadataSearch();
                 return;
@@ -1039,11 +1068,13 @@ export default {
 
             if (editor) {
                 const smiles = editor.getSmiles();
-                window.location.href =
-                    "/compounds/?query=" +
-                    encodeURI(smiles) +
-                    "&type=" +
-                    structureSearchType.value;
+                window.location.href = buildSearchPagePath(
+                    SEARCH_SCOPE.COMPOUNDS,
+                    {
+                        query: smiles,
+                        type: structureSearchType.value,
+                    }
+                );
             }
         };
 
@@ -1074,9 +1105,15 @@ export default {
                 alert("Please enter search criteria");
                 return;
             }
-            // TODO: Implement metadata search
-            console.log("Searching with metadata:", metadataParams.value);
-            alert("Metadata search functionality will be implemented next.");
+
+            if (hasOnlyFreeTextMetadata(metadataParams.value)) {
+                performTextSearch(metadataParams.value.freeText);
+                return;
+            }
+
+            alert(
+                "Field-specific metadata search will be implemented next. Use free text search for now."
+            );
         };
 
         // Check URL on mount and open modal if search param exists

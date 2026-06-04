@@ -3457,14 +3457,229 @@
                 }
             }
         },
+        "/api/v1/search/catalog": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search public projects, samples, and spectra",
+                "description": "Free-text search across published projects, studies (samples), and datasets (spectra) by name and description. Matching is case- and whitespace-insensitive; multi-word queries require every token to appear (AND semantics).",
+                "operationId": "searchCatalog",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Free-text search query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 1000,
+                            "example": "caffeine nmr"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per entity group (default: 12, max: 24)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 12,
+                            "maximum": 24,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "projects_page",
+                        "in": "query",
+                        "description": "Page number for project results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "studies_page",
+                        "in": "query",
+                        "description": "Page number for sample (study) results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "datasets_page",
+                        "in": "query",
+                        "description": "Page number for spectra (dataset) results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grouped catalog search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "query": {
+                                            "type": "string",
+                                            "example": "caffeine"
+                                        },
+                                        "tokens": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "caffeine"
+                                            ]
+                                        },
+                                        "projects": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "studies": {
+                                            "type": "object"
+                                        },
+                                        "datasets": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/text-search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "[Deprecated] Catalog search (legacy path)",
+                "description": "Deprecated alias of GET /api/v1/search/catalog.",
+                "operationId": "searchCatalogTextSearchLegacy",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grouped catalog search results"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "deprecated": true
+            }
+        },
         "/api/v1/search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "[Deprecated] Catalog search via legacy URL",
+                "description": "Deprecated. Use GET /api/v1/search/catalog instead.",
+                "operationId": "searchCatalogLegacy",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "catalog"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Same payload as GET /api/v1/search/catalog"
+                    },
+                    "405": {
+                        "description": "Compound search is not supported on this route"
+                    }
+                },
+                "deprecated": true
+            }
+        },
+        "/api/v1/search/compounds": {
             "post": {
                 "tags": [
-                    "Chemical Search"
+                    "Search"
                 ],
                 "summary": "Search chemical compounds by structure and properties",
                 "description": "Advanced chemical search supporting multiple query types including SMILES, InChI, InChiKey, substructure matching, similarity search, and text-based name searches. Supports filtering by molecular properties and chemical classifications. Returns paginated results with comprehensive molecular data including calculated properties, classifications, and database references.",
-                "operationId": "searchMolecules",
+                "operationId": "searchCompounds",
                 "parameters": [
                     {
                         "name": "limit",
@@ -3508,6 +3723,16 @@
                             "type": "string",
                             "example": "chemical_class"
                         }
+                    },
+                    {
+                        "name": "smiles",
+                        "in": "path",
+                        "description": "Optional SMILES string in the URL path (legacy). Prefer sending the query in the request body.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "CC(=O)OC1=CC=CC=C1C(=O)O"
+                        }
                     }
                 ],
                 "requestBody": {
@@ -3523,7 +3748,8 @@
                                     "query": {
                                         "description": "Search query - format depends on search type",
                                         "type": "string",
-                                        "example": "AAAAWQOPBUPWEV-UHFFFAOYSA-N"
+                                        "example": "AAAAWQOPBUPWEV-UHFFFAOYSA-N",
+                                        "deprecated": true
                                     },
                                     "type": {
                                         "description": "Search query type - auto-detected if not specified",
@@ -3539,7 +3765,8 @@
                                             "tags",
                                             "filters"
                                         ],
-                                        "example": "inchikey"
+                                        "example": "inchikey",
+                                        "deprecated": true
                                     }
                                 },
                                 "type": "object"
@@ -3562,17 +3789,20 @@
                                                     "id": {
                                                         "description": "Molecule database ID",
                                                         "type": "integer",
-                                                        "example": 12345
+                                                        "example": 12345,
+                                                        "deprecated": true
                                                     },
                                                     "identifier": {
                                                         "description": "NMRXIV molecule identifier",
                                                         "type": "string",
-                                                        "example": "M001234"
+                                                        "example": "M001234",
+                                                        "deprecated": true
                                                     },
                                                     "name": {
                                                         "description": "Chemical name",
                                                         "type": "string",
-                                                        "example": "Aspirin"
+                                                        "example": "Aspirin",
+                                                        "deprecated": true
                                                     },
                                                     "synonyms": {
                                                         "description": "Alternative names",
@@ -3583,33 +3813,39 @@
                                                         "example": [
                                                             "Acetylsalicylic acid",
                                                             "2-Acetoxybenzoic acid"
-                                                        ]
+                                                        ],
+                                                        "deprecated": true
                                                     },
                                                     "molecular_formula": {
                                                         "description": "Molecular formula",
                                                         "type": "string",
-                                                        "example": "C9H8O4"
+                                                        "example": "C9H8O4",
+                                                        "deprecated": true
                                                     },
                                                     "molecular_weight": {
                                                         "description": "Molecular weight in g/mol",
                                                         "type": "number",
                                                         "format": "float",
-                                                        "example": 180.157
+                                                        "example": 180.157,
+                                                        "deprecated": true
                                                     },
                                                     "standard_inchi": {
                                                         "description": "International Chemical Identifier",
                                                         "type": "string",
-                                                        "example": "InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)"
+                                                        "example": "InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)",
+                                                        "deprecated": true
                                                     },
                                                     "standard_inchi_key": {
                                                         "description": "InChI Key",
                                                         "type": "string",
-                                                        "example": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
+                                                        "example": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
+                                                        "deprecated": true
                                                     },
                                                     "canonical_smiles": {
                                                         "description": "Canonical SMILES notation",
                                                         "type": "string",
-                                                        "example": "CC(=O)OC1=CC=CC=C1C(=O)O"
+                                                        "example": "CC(=O)OC1=CC=CC=C1C(=O)O",
+                                                        "deprecated": true
                                                     },
                                                     "properties": {
                                                         "description": "Calculated molecular properties",
@@ -3617,75 +3853,90 @@
                                                             "heavy_atom_count": {
                                                                 "description": "Number of heavy atoms",
                                                                 "type": "integer",
-                                                                "example": 13
+                                                                "example": 13,
+                                                                "deprecated": true
                                                             },
                                                             "total_atom_count": {
                                                                 "description": "Total atom count",
                                                                 "type": "integer",
-                                                                "example": 21
+                                                                "example": 21,
+                                                                "deprecated": true
                                                             },
                                                             "aromatic_ring_count": {
                                                                 "description": "Number of aromatic rings",
                                                                 "type": "integer",
-                                                                "example": 1
+                                                                "example": 1,
+                                                                "deprecated": true
                                                             },
                                                             "rotatable_bond_count": {
                                                                 "description": "Number of rotatable bonds",
                                                                 "type": "integer",
-                                                                "example": 3
+                                                                "example": 3,
+                                                                "deprecated": true
                                                             },
                                                             "h_bond_acceptor_count": {
                                                                 "description": "Hydrogen bond acceptors",
                                                                 "type": "integer",
-                                                                "example": 4
+                                                                "example": 4,
+                                                                "deprecated": true
                                                             },
                                                             "h_bond_donor_count": {
                                                                 "description": "Hydrogen bond donors",
                                                                 "type": "integer",
-                                                                "example": 1
+                                                                "example": 1,
+                                                                "deprecated": true
                                                             },
                                                             "alogp": {
                                                                 "description": "Lipophilicity (ALogP)",
                                                                 "type": "number",
                                                                 "format": "float",
-                                                                "example": 1.19
+                                                                "example": 1.19,
+                                                                "deprecated": true
                                                             },
                                                             "topo_psa": {
                                                                 "description": "Topological polar surface area",
                                                                 "type": "number",
                                                                 "format": "float",
-                                                                "example": 63.6
+                                                                "example": 63.6,
+                                                                "deprecated": true
                                                             },
                                                             "np_likeness_score": {
                                                                 "description": "Natural product likeness score",
                                                                 "type": "number",
                                                                 "format": "float",
-                                                                "example": 0.78
+                                                                "example": 0.78,
+                                                                "deprecated": true
                                                             }
                                                         },
-                                                        "type": "object"
+                                                        "type": "object",
+                                                        "deprecated": true
                                                     },
                                                     "classifications": {
                                                         "description": "Chemical taxonomy classifications",
                                                         "properties": {
                                                             "chemical_super_class": {
                                                                 "type": "string",
-                                                                "example": "Organic compounds"
+                                                                "example": "Organic compounds",
+                                                                "deprecated": true
                                                             },
                                                             "chemical_class": {
                                                                 "type": "string",
-                                                                "example": "Benzoic acids and derivatives"
+                                                                "example": "Benzoic acids and derivatives",
+                                                                "deprecated": true
                                                             },
                                                             "chemical_sub_class": {
                                                                 "type": "string",
-                                                                "example": "Salicylic acids"
+                                                                "example": "Salicylic acids",
+                                                                "deprecated": true
                                                             },
                                                             "direct_parent_classification": {
                                                                 "type": "string",
-                                                                "example": "Acetate esters"
+                                                                "example": "Acetate esters",
+                                                                "deprecated": true
                                                             }
                                                         },
-                                                        "type": "object"
+                                                        "type": "object",
+                                                        "deprecated": true
                                                     },
                                                     "database_links": {
                                                         "description": "External database identifiers",
@@ -3697,51 +3948,61 @@
                                                             "ChEBI:15365",
                                                             "PubChem:2244",
                                                             "DrugBank:DB00945"
-                                                        ]
+                                                        ],
+                                                        "deprecated": true
                                                     },
                                                     "created_at": {
                                                         "description": "Entry creation timestamp",
                                                         "type": "string",
-                                                        "format": "date-time"
+                                                        "format": "date-time",
+                                                        "deprecated": true
                                                     },
                                                     "updated_at": {
                                                         "description": "Last update timestamp",
                                                         "type": "string",
-                                                        "format": "date-time"
+                                                        "format": "date-time",
+                                                        "deprecated": true
                                                     }
                                                 },
                                                 "type": "object"
-                                            }
+                                            },
+                                            "deprecated": true
                                         },
                                         "current_page": {
                                             "description": "Current page number",
                                             "type": "integer",
-                                            "example": 1
+                                            "example": 1,
+                                            "deprecated": true
                                         },
                                         "per_page": {
                                             "description": "Results per page",
                                             "type": "integer",
-                                            "example": 24
+                                            "example": 24,
+                                            "deprecated": true
                                         },
                                         "total": {
                                             "description": "Total number of matching results",
                                             "type": "integer",
-                                            "example": 150
+                                            "example": 150,
+                                            "deprecated": true
                                         },
                                         "last_page": {
                                             "description": "Last page number",
                                             "type": "integer",
-                                            "example": 7
+                                            "example": 7,
+                                            "deprecated": true
                                         },
                                         "from": {
                                             "description": "Starting result number",
                                             "type": "integer",
-                                            "example": 1
+                                            "example": 1,
+                                            "deprecated": true
                                         },
                                         "to": {
                                             "description": "Ending result number",
                                             "type": "integer",
-                                            "example": 24
+                                            "example": 24,
+                                            "deprecated": true
                                         },
                                         "search_metadata": {
                                             "description": "Search execution metadata",
@@ -3749,21 +4010,25 @@
                                                 "query_type": {
                                                     "description": "Detected or specified query type",
                                                     "type": "string",
-                                                    "example": "inchikey"
+                                                    "example": "inchikey",
+                                                    "deprecated": true
                                                 },
                                                 "execution_time": {
                                                     "description": "Search execution time in seconds",
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": 0.125
+                                                    "example": 0.125,
+                                                    "deprecated": true
                                                 },
                                                 "database_hits": {
                                                     "description": "Raw database matches before filtering",
                                                     "type": "integer",
-                                                    "example": 152
+                                                    "example": 152,
+                                                    "deprecated": true
                                                 }
                                             },
-                                            "type": "object"
+                                            "type": "object",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -3779,7 +4044,8 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Invalid search query format"
+                                            "example": "Invalid search query format",
+                                            "deprecated": true
                                         },
                                         "errors": {
                                             "properties": {
@@ -3790,7 +4056,8 @@
                                                     },
                                                     "example": [
                                                         "The query field is required when type is specified."
-                                                    ]
+                                                    ],
+                                                    "deprecated": true
                                                 },
                                                 "type": {
                                                     "type": "array",
@@ -3799,10 +4066,12 @@
                                                     },
                                                     "example": [
                                                         "The selected type is invalid."
-                                                    ]
+                                                    ],
+                                                    "deprecated": true
                                                 }
                                             },
-                                            "type": "object"
+                                            "type": "object",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -3818,7 +4087,8 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "No chemical compounds found matching the search criteria"
+                                            "example": "No chemical compounds found matching the search criteria",
+                                            "deprecated": true
                                         },
                                         "suggestions": {
                                             "type": "array",
@@ -3829,7 +4099,8 @@
                                                 "Check spelling of chemical names",
                                                 "Try using SMILES notation",
                                                 "Use broader search terms"
-                                            ]
+                                            ],
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -3845,15 +4116,18 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Invalid SMILES notation provided"
+                                            "example": "Invalid SMILES notation provided",
+                                            "deprecated": true
                                         },
                                         "error_code": {
                                             "type": "string",
-                                            "example": "INVALID_CHEMICAL_STRUCTURE"
+                                            "example": "INVALID_CHEMICAL_STRUCTURE",
+                                            "deprecated": true
                                         },
                                         "details": {
                                             "type": "string",
-                                            "example": "Unable to parse SMILES string: invalid character 'X' at position 5"
+                                            "example": "Unable to parse SMILES string: invalid character 'X' at position 5",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -3869,12 +4143,14 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Too many search requests. Please try again later."
+                                            "example": "Too many search requests. Please try again later.",
+                                            "deprecated": true
                                         },
                                         "retry_after": {
                                             "description": "Seconds until next request allowed",
                                             "type": "integer",
-                                            "example": 60
+                                            "example": 60,
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -3890,15 +4166,18 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Chemical database search engine is temporarily unavailable"
+                                            "example": "Chemical database search engine is temporarily unavailable",
+                                            "deprecated": true
                                         },
                                         "error_code": {
                                             "type": "string",
-                                            "example": "SEARCH_ENGINE_ERROR"
+                                            "example": "SEARCH_ENGINE_ERROR",
+                                            "deprecated": true
                                         },
                                         "support_reference": {
                                             "type": "string",
-                                            "example": "REF-2024-001234"
+                                            "example": "REF-2024-001234",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -3907,6 +4186,35 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/search/{smiles}": {
+            "post": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "[Deprecated] Compound search (legacy path)",
+                "description": "Deprecated alias of POST /api/v1/search/compounds. The optional {smiles} path segment is merged into the request body query.",
+                "operationId": "searchCompoundsLegacy",
+                "parameters": [
+                    {
+                        "name": "smiles",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated compound results"
+                    },
+                    "400": {
+                        "description": "Invalid input parameters"
+                    }
+                },
+                "deprecated": true
             }
         }
     },
@@ -3943,8 +4251,8 @@
             "description": "Scientific Metadata Schemas"
         },
         {
-            "name": "Chemical Search",
-            "description": "Chemical Search"
+            "name": "Search",
+            "description": "Search"
         }
     ]
 }
