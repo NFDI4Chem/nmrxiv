@@ -123,92 +123,88 @@
                 </div>
             </div>
 
-            <!-- Metrics Section - Apple iPad Style -->
-            <div class="relative">
-                <!-- Gradient background: white -> gray -> white -->
+            <!-- Repository stats (secondary to hero search) -->
+            <div class="relative border-t border-gray-100">
                 <div
-                    class="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"
-                ></div>
-
-                <div
-                    class="relative max-w-6xl mx-auto px-6 pb-20 sm:px-8 sm:pb-24 pt-4 lg:px-12"
+                    class="relative mx-auto max-w-6xl px-6 py-16 sm:px-8 sm:py-20 lg:px-12"
                 >
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
                         <!-- Projects Card -->
                         <a
                             href="/projects"
-                            class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
+                            class="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 transition-colors hover:border-gray-200"
                         >
                             <div>
                                 <p
-                                    class="text-sm font-semibold text-gray-500 mb-2"
+                                    class="mb-1 text-xs font-medium uppercase tracking-wide text-gray-400"
                                 >
                                     Publications & Studies
                                 </p>
                                 <h3
-                                    class="text-3xl font-bold text-gray-900 leading-tight"
+                                    class="text-base font-semibold leading-snug text-gray-700"
                                 >
-                                    Explore<br />dataset<br />collections.
+                                    Explore dataset collections
                                 </h3>
-                                <p class="text-sm text-gray-600 mt-4">
-                                    Comprehensive collections of NMR data and
-                                    spectra organized by publication or research
-                                    study.
+                                <p
+                                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                                >
+                                    NMR data and spectra organized by
+                                    publication or research study.
                                 </p>
                             </div>
 
-                            <div class="mt-auto">
-                                <div class="text-gray-900 mb-6">
-                                    <div class="text-5xl font-bold">
-                                        {{ projects }}
-                                    </div>
-                                    <div class="text-lg mt-1 text-gray-600">
-                                        Projects
-                                    </div>
-                                    <small
-                                        v-if="
-                                            embargoed_projects &&
-                                            embargoed_projects > 0
-                                        "
-                                        class="text-sm text-gray-500"
-                                        >{{ embargoed_projects }} in
-                                        embargo</small
-                                    >
+                            <div class="mt-4 border-t border-gray-100 pt-3">
+                                <div
+                                    class="text-2xl font-semibold tabular-nums text-gray-800"
+                                >
+                                    {{ projects }}
                                 </div>
+                                <div class="text-xs text-gray-500">
+                                    Projects
+                                </div>
+                                <small
+                                    v-if="
+                                        embargoed_projects &&
+                                        embargoed_projects > 0
+                                    "
+                                    class="text-xs text-gray-400"
+                                    >{{ embargoed_projects }} in embargo</small
+                                >
                             </div>
                         </a>
 
                         <!-- Compounds Card -->
                         <a
                             href="/search?scope=compounds"
-                            class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
+                            class="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 transition-colors hover:border-gray-200"
                         >
                             <div>
                                 <p
-                                    class="text-sm font-semibold text-gray-500 mb-2"
+                                    class="mb-1 text-xs font-medium uppercase tracking-wide text-gray-400"
                                 >
                                     Chemical Structures
                                 </p>
                                 <h3
-                                    class="text-3xl font-bold text-gray-900 leading-tight"
+                                    class="text-base font-semibold leading-snug text-gray-700"
                                 >
-                                    Discover<br />compounds<br />spectra.
+                                    Discover compounds & spectra
                                 </h3>
-                                <p class="text-sm text-gray-600 mt-4">
-                                    Search and analyze chemical structures with
-                                    their associated experimental data and
-                                    measurements.
+                                <p
+                                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                                >
+                                    Structures with associated experimental data
+                                    and measurements.
                                 </p>
                             </div>
 
-                            <div class="mt-auto">
-                                <div class="text-gray-900 mb-6">
-                                    <div class="text-5xl font-bold">
-                                        {{ compounds }}
-                                    </div>
-                                    <div class="text-lg mt-1 text-gray-600">
-                                        Compounds
-                                    </div>
+                            <div class="mt-4 border-t border-gray-100 pt-3">
+                                <div
+                                    class="text-2xl font-semibold tabular-nums text-gray-800"
+                                >
+                                    {{ compounds }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    Compounds
                                 </div>
                             </div>
                         </a>
@@ -216,34 +212,34 @@
                         <!-- Spectra Card -->
                         <a
                             href="/projects"
-                            class="group relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-8 min-h-[400px] flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
+                            class="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 transition-colors hover:border-gray-200"
                         >
                             <div>
                                 <p
-                                    class="text-sm font-semibold text-gray-500 mb-2"
+                                    class="mb-1 text-xs font-medium uppercase tracking-wide text-gray-400"
                                 >
                                     Experimental data
                                 </p>
                                 <h3
-                                    class="text-3xl font-bold text-gray-900 leading-tight"
+                                    class="text-base font-semibold leading-snug text-gray-700"
                                 >
-                                    Access and<br />compare<br />spectra.
+                                    Access and compare spectra
                                 </h3>
-                                <p class="text-sm text-gray-600 mt-4">
-                                    Access raw NMR spectroscopy data with
-                                    complete experimental details and metadata.
+                                <p
+                                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                                >
+                                    Raw NMR data with experimental details and
+                                    metadata.
                                 </p>
                             </div>
 
-                            <div class="mt-auto">
-                                <div class="text-gray-900 mb-6">
-                                    <div class="text-5xl font-bold">
-                                        {{ spectra }}
-                                    </div>
-                                    <div class="text-lg mt-1 text-gray-600">
-                                        Spectra
-                                    </div>
+                            <div class="mt-4 border-t border-gray-100 pt-3">
+                                <div
+                                    class="text-2xl font-semibold tabular-nums text-gray-800"
+                                >
+                                    {{ spectra }}
                                 </div>
+                                <div class="text-xs text-gray-500">Spectra</div>
                             </div>
                         </a>
                     </div>
