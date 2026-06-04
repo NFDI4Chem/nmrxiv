@@ -158,40 +158,49 @@ class ProjectController extends Controller
     {
         $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
         $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner');
-        if (! $project->is_public) {
-            $license = null;
-            if ($project->license_id) {
-                $license = $getLicense->getLicensebyId($project->license_id);
+
+        if ($project->is_public) {
+            $rawIdentifier = $project->getRawOriginal('identifier');
+            if ($rawIdentifier !== null && $rawIdentifier !== '') {
+                $targetUrl = route('public.project.id', ['id' => 'P'.$rawIdentifier]);
+                $query = $request->query();
+                if ($query !== []) {
+                    $targetUrl .= '?'.http_build_query($query);
+                }
+
+                return redirect()->to($targetUrl);
             }
-
-            return Inertia::render('Project/Show', [
-                'project' => $project,
-                'team' => null,
-                'members' => $project->allUsers(),
-                'availableRoles' => array_values(Jetstream::$roles),
-                'role' => 'reviewer',
-                'teamRole' => null,
-                'license' => $license,
-                'projectPermissions' => [
-                    'canDeleteProject' => false,
-                    'canUpdateProject' => false,
-                ],
-                'preview' => true,
-            ]);
-        } else {
-            $identifier = explode(':', $project->identifier)[1];
-
-            return redirect()->route('public', $identifier);
         }
 
+        $license = null;
+        if ($project->license_id) {
+            $license = $getLicense->getLicensebyId($project->license_id);
+        }
+
+        return Inertia::render('Project/Show', [
+            'project' => $project,
+            'team' => null,
+            'members' => $project->allUsers(),
+            'availableRoles' => array_values(Jetstream::$roles),
+            'role' => 'reviewer',
+            'teamRole' => null,
+            'license' => $license,
+            'projectPermissions' => [
+                'canDeleteProject' => false,
+                'canUpdateProject' => false,
+            ],
+            'preview' => true,
+        ]);
     }
 
     public function reviewerStudies(Request $request, $obfuscationCode)
     {
-        $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-        if ($project) {
-            return StudyResource::collection(Study::where('project_id', $project->id)->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
-        }
+        $project = Project::where([
+            ['is_archived', false],
+            ['obfuscationcode', $obfuscationCode],
+        ])->firstOrFail();
+
+        return $this->projectStudiesResponse($request, $project, publicOnly: false);
     }
 
     public function studies(Request $request, Project $project)

@@ -154,7 +154,10 @@
                                         aria-hidden="true"
                                     />
                                 </button>
-                                <div class="tooltip">
+                                <div
+                                    v-if="showProjectSummaryLink(project)"
+                                    class="tooltip"
+                                >
                                     <a
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -245,6 +248,7 @@
                                 :release_date="project.release_date"
                                 :created_at="project.created_at"
                                 :updated_at="project.updated_at"
+                                :is_published="project.is_public"
                             />
                             <div
                                 class="flex shrink-0 items-center gap-2"
@@ -252,9 +256,7 @@
                             >
                                 <button
                                     v-if="
-                                        showFooterProvisionalDoiShare(
-                                            project
-                                        ) &&
+                                        showDashboardShareButton(project) &&
                                         statusRibbonKey(project) !== 'embargo'
                                     "
                                     type="button"
@@ -305,27 +307,64 @@
                             :id="'footer-share-doi-' + project.uuid"
                             class="mt-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-900 shadow-sm dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-100"
                         >
-                            <dl class="text-left">
-                                <dt
-                                    class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
-                                >
-                                    {{ dashboardDoiHeadingLabel(project) }}
-                                </dt>
-                                <dd class="mt-0.5 min-w-0">
-                                    <a
-                                        :href="dashboardDoiLinkHref(project)"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="inline-flex items-center gap-1 break-all font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
-                                        @click.stop
+                            <dl class="grid gap-2.5 text-left">
+                                <div v-if="hasDashboardDoiToShare(project)">
+                                    <dt
+                                        class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
                                     >
-                                        {{ dashboardDoiLinkText(project) }}
-                                        <ArrowTopRightOnSquareIcon
-                                            class="h-3.5 w-3.5 shrink-0 opacity-80"
-                                            aria-hidden="true"
-                                        />
-                                    </a>
-                                </dd>
+                                        {{ dashboardDoiHeadingLabel(project) }}
+                                    </dt>
+                                    <dd class="mt-0.5 min-w-0">
+                                        <a
+                                            :href="
+                                                dashboardDoiLinkHref(project)
+                                            "
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-1 break-all font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
+                                            @click.stop
+                                        >
+                                            {{ dashboardDoiLinkText(project) }}
+                                            <ArrowTopRightOnSquareIcon
+                                                class="h-3.5 w-3.5 shrink-0 opacity-80"
+                                                aria-hidden="true"
+                                            />
+                                        </a>
+                                    </dd>
+                                </div>
+                                <div
+                                    v-if="showDashboardUserShare(project)"
+                                    :class="
+                                        hasDashboardDoiToShare(project)
+                                            ? 'border-t border-gray-100 pt-2.5 dark:border-gray-800'
+                                            : ''
+                                    "
+                                >
+                                    <dt
+                                        class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                                    >
+                                        People
+                                    </dt>
+                                    <dd class="mt-1">
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-800 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                                            @click.stop="
+                                                openProjectUserShare(project)
+                                            "
+                                        >
+                                            <UserGroupIcon
+                                                class="h-3.5 w-3.5 shrink-0"
+                                                aria-hidden="true"
+                                            />
+                                            {{
+                                                project.is_public
+                                                    ? "View who has access"
+                                                    : "Share with users"
+                                            }}
+                                        </button>
+                                    </dd>
+                                </div>
                             </dl>
                         </div>
                         <div
@@ -449,6 +488,42 @@
                                             </a>
                                         </dd>
                                     </div>
+                                    <div
+                                        v-if="showDashboardUserShare(project)"
+                                        :class="
+                                            hasDashboardDoiToShare(project) ||
+                                            project.obfuscationcode
+                                                ? 'border-t border-amber-200/70 pt-2.5 dark:border-amber-800/80'
+                                                : ''
+                                        "
+                                    >
+                                        <dt
+                                            class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90"
+                                        >
+                                            People
+                                        </dt>
+                                        <dd class="mt-1">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-1.5 rounded-md border border-amber-200/80 bg-white/90 px-2.5 py-1.5 text-xs font-medium text-amber-950 shadow-sm hover:bg-amber-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1 dark:border-amber-800 dark:bg-amber-900/50 dark:text-amber-100 dark:hover:bg-amber-900/80"
+                                                @click.stop="
+                                                    openProjectUserShare(
+                                                        project
+                                                    )
+                                                "
+                                            >
+                                                <UserGroupIcon
+                                                    class="h-3.5 w-3.5 shrink-0"
+                                                    aria-hidden="true"
+                                                />
+                                                {{
+                                                    project.is_public
+                                                        ? "View who has access"
+                                                        : "Share with users"
+                                                }}
+                                            </button>
+                                        </dd>
+                                    </div>
                                     <div v-if="project.obfuscationcode">
                                         <dt
                                             class="text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 dark:text-amber-200/90"
@@ -523,6 +598,20 @@
                 </div>
             </article>
         </div>
+        <access-dialogue
+            v-if="activeUserShareProject"
+            :key="activeUserShareProject.uuid"
+            ref="projectUserShareDialogue"
+            hide-trigger
+            :available-roles="availableRoles"
+            :role="activeUserShareProject.viewer_role"
+            :team="projectShareTeam(activeUserShareProject)"
+            :members="projectMembers(activeUserShareProject)"
+            :project="activeUserShareProject"
+            called-from="projectView"
+            model="project"
+            @sharing-updated="syncActiveUserShareProject"
+        />
     </div>
 </template>
 <script>
@@ -541,9 +630,11 @@ import {
     ShieldExclamationIcon,
     TrashIcon,
     UserCircleIcon,
+    UserGroupIcon,
 } from "@heroicons/vue/24/outline";
 import Tag from "@/Shared/Tag.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
+import AccessDialogue from "@/Shared/AccessDialogue.vue";
 export default {
     components: {
         StarIcon,
@@ -561,8 +652,10 @@ export default {
         ShieldExclamationIcon,
         TrashIcon,
         UserCircleIcon,
+        UserGroupIcon,
         ShowProjectDates,
         Tag,
+        AccessDialogue,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},
@@ -572,9 +665,37 @@ export default {
             scheduledReleaseShareOpenByUuid: {},
             /** UUID → whether dashboard footer “Share” (DOI / provisional DOI) is expanded */
             dashboardFooterShareOpenByUuid: {},
+            /** Project whose “Share with users” modal is open */
+            activeUserShareProject: null,
         };
     },
+    computed: {
+        availableRoles() {
+            return this.$page.props.availableRoles ?? [];
+        },
+    },
+    watch: {
+        projects: {
+            deep: true,
+            handler() {
+                this.syncActiveUserShareProject();
+            },
+        },
+    },
     methods: {
+        syncActiveUserShareProject() {
+            if (!this.activeUserShareProject) {
+                return;
+            }
+
+            const fresh = this.projects.find(
+                (project) => project.id === this.activeUserShareProject.id
+            );
+
+            if (fresh) {
+                this.activeUserShareProject = fresh;
+            }
+        },
         openDatasetCreateDialog(data) {
             this.emitter.emit("openDatasetCreateDialog", data);
         },
@@ -621,6 +742,9 @@ export default {
 
             return this.route("dashboard.projects", [project.id]);
         },
+        showProjectSummaryLink(project) {
+            return this.statusRibbonKey(project) !== "draft";
+        },
         getProjectSummaryLink(project) {
             return this.projectHomeHref(project);
         },
@@ -666,6 +790,36 @@ export default {
         },
         showFooterProvisionalDoiShare(project) {
             return this.hasDashboardDoiToShare(project);
+        },
+        showDashboardUserShare(project) {
+            return Boolean(project && !project.is_deleted);
+        },
+        showDashboardShareButton(project) {
+            return (
+                this.showFooterProvisionalDoiShare(project) ||
+                this.showDashboardUserShare(project)
+            );
+        },
+        projectMembers(project) {
+            return project?.users ?? [];
+        },
+        projectShareTeam(project) {
+            const projectTeam = project?.team;
+            if (projectTeam && !projectTeam.personal_team) {
+                return projectTeam;
+            }
+
+            if (this.team && !this.team.personal_team) {
+                return this.team;
+            }
+
+            return null;
+        },
+        openProjectUserShare(project) {
+            this.activeUserShareProject = project;
+            this.$nextTick(() => {
+                this.$refs.projectUserShareDialogue?.openDialog();
+            });
         },
         hasDashboardDoiToShare(project) {
             const hasProvisional =
