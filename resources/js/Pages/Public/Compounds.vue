@@ -177,16 +177,15 @@
                         </div>
                         <div v-if="results">
                             <div
+                                v-if="results.data.length > 0"
                                 class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200"
                             >
                                 <compound-cards
-                                    v-if="results.data.length > 0"
                                     class="block w-full min-w-0 max-w-none"
                                     :molecules="results.data"
                                     :loading="false"
                                 />
                                 <div
-                                    v-if="results.data.length > 0"
                                     class="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <p class="text-sm text-gray-700">
@@ -209,35 +208,36 @@
                                         :links="results.links"
                                     />
                                 </div>
-                                <div v-else>
-                                    <div v-if="error">
-                                        <div class="bg-white">
+                            </div>
+                            <div v-else class="px-6 pb-24">
+                                <div v-if="error">
+                                    <div class="bg-white">
+                                        <div
+                                            class="mx-auto w-full max-w-7xl px-6 pb-16 sm:pb-24 lg:px-8"
+                                        >
                                             <div
-                                                class="mx-auto w-full max-w-7xl px-6 pb-16 sm:pb-24 lg:px-8"
+                                                class="mx-auto mt-20 max-w-2xl text-center sm:mt-24"
                                             >
-                                                <div
-                                                    class="mx-auto mt-20 max-w-2xl text-center sm:mt-24"
+                                                <p
+                                                    class="text-base font-semibold leading-8 text-indigo-600"
                                                 >
-                                                    <p
-                                                        class="text-base font-semibold leading-8 text-indigo-600"
-                                                    >
-                                                        {{ error.status }}
-                                                    </p>
-                                                    <h1
-                                                        class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
-                                                    >
-                                                        {{ error.statusText }}
-                                                    </h1>
-                                                    <p
-                                                        class="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8"
-                                                    >
-                                                        {{ error.data.message }}
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    class="mx-auto mt-16 flow-root max-w-lg sm:mt-20"
+                                                    {{ error.status }}
+                                                </p>
+                                                <h1
+                                                    class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
                                                 >
-                                                    <!-- 
+                                                    {{ error.statusText }}
+                                                </h1>
+                                                <p
+                                                    class="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8"
+                                                >
+                                                    {{ error.data.message }}
+                                                </p>
+                                            </div>
+                                            <div
+                                                class="mx-auto mt-16 flow-root max-w-lg sm:mt-20"
+                                            >
+                                                <!-- 
                 <h2 class="sr-only">Popular pages</h2>
                 <ul
                   role="list"
@@ -413,54 +413,44 @@
                   </li>
                 </ul>
                  -->
-                                                    <div
-                                                        class="mt-10 flex justify-center"
+                                                <div
+                                                    class="mt-10 flex justify-center"
+                                                >
+                                                    <a
+                                                        href="/"
+                                                        class="text-sm font-semibold leading-6 text-indigo-600"
                                                     >
-                                                        <a
-                                                            href="/"
-                                                            class="text-sm font-semibold leading-6 text-indigo-600"
+                                                        <span aria-hidden="true"
+                                                            >&larr;</span
                                                         >
-                                                            <span
-                                                                aria-hidden="true"
-                                                                >&larr;</span
-                                                            >
-                                                            Back to home
-                                                        </a>
-                                                    </div>
+                                                        Back to home
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-else class="bg-white px-4 py-16">
-                                        <div class="text-center">
-                                            <svg
-                                                class="mx-auto h-16 w-16 text-gray-300"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                aria-hidden="true"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                                                />
-                                            </svg>
-                                            <h3
-                                                class="mt-4 text-base font-semibold text-gray-900"
-                                            >
-                                                No compounds found
-                                            </h3>
-                                            <p
-                                                class="mt-2 text-sm text-gray-500 max-w-md mx-auto"
-                                            >
-                                                Try refining your search or
-                                                browse all available compounds.
-                                                contact us.
-                                            </p>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div
+                                    v-else
+                                    :class="publicEmptyStateSectionClasses"
+                                >
+                                    <EmptySearchState
+                                        layout="public"
+                                        entity-type="compounds"
+                                        :search-query="searchTerm || ''"
+                                        :title="
+                                            searchTerm
+                                                ? null
+                                                : 'No compounds available'
+                                        "
+                                        :message="
+                                            searchTerm
+                                                ? null
+                                                : 'Compounds will appear here once they are published.'
+                                        "
+                                        :show-clear-button="!!searchTerm"
+                                        @clear-search="clearSearch"
+                                    />
                                 </div>
                             </div>
                             <div
@@ -560,6 +550,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
 import CompoundCards from "@/Shared/CompoundCards.vue";
 import Pagination from "@/Shared/Pagination.vue";
+import EmptySearchState from "@/Shared/EmptySearchState.vue";
+import { publicEmptyStateSectionClasses } from "@/Utils/publicEmptyStateClasses.js";
 
 export default {
     components: {
@@ -567,10 +559,12 @@ export default {
         CompoundCards,
         StructureSearch,
         Pagination,
+        EmptySearchState,
     },
     props: ["page", "query", "limit", "tagType"],
     data() {
         return {
+            publicEmptyStateSectionClasses,
             results: null,
             loading: false,
             searchTerm: "",
@@ -733,6 +727,11 @@ export default {
                 this.type = "text";
             }
             this.fetchCompounds(query, { resetPage: true });
+        },
+        clearSearch() {
+            this.searchTerm = "";
+            this.type = "";
+            this.fetchCompounds("", { resetPage: true });
         },
         removeSearchQuery(query) {
             if (typeof window !== "undefined") {

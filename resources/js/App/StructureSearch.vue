@@ -61,22 +61,24 @@
                         leave-to="opacity-0 scale-95"
                     >
                         <DialogPanel
-                            class="mx-auto w-[95vw] max-w-6xl max-h-[95vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                            class="mx-auto flex h-[90vh] w-[95vw] max-w-6xl transform flex-col overflow-hidden rounded-3xl bg-white shadow-2xl transition-all"
                         >
                             <!-- Main Content -->
-                            <div class="flex-1 overflow-y-auto">
-                                <div class="px-4 py-6 max-w-6xl mx-auto">
+                            <div class="min-h-0 flex-1 overflow-hidden">
+                                <div
+                                    class="mx-auto flex h-full min-h-0 max-w-6xl flex-col px-4 py-4"
+                                >
                                     <StructureEditorContent
                                         v-model:search-type="type"
                                         editor-id="structureSearchEditor"
-                                        :editor="editor"
+                                        @ready="onStructureEditorReady"
                                     />
                                 </div>
                             </div>
 
                             <!-- Footer with Actions -->
                             <div
-                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+                                class="flex shrink-0 items-center justify-between border-t border-gray-100 bg-gray-50 px-4 py-4"
                             >
                                 <a
                                     href="#"
@@ -103,8 +105,7 @@
 
 <script>
 import { ref } from "vue";
-import OCL from "openchemlib";
-import { createStructureEditor } from "@/Utils/structureEditor";
+import { loadOpenChemLib } from "@/Utils/structureEditor";
 import {
     Dialog as HeadlessUiDialog,
     DialogPanel,
@@ -132,7 +133,7 @@ export default {
     },
     data() {
         return {
-            editor: "",
+            editor: null,
             open: ref(false),
             query: ref(""),
             smiles: null,
@@ -142,47 +143,35 @@ export default {
     computed: {},
     mounted() {},
     methods: {
+        async onStructureEditorReady(editor) {
+            this.editor = editor;
+
+            const url = new URL(window.location.href);
+            const querySmiles = url.searchParams.get("query");
+            const queryType = url.searchParams.get("type");
+
+            if (
+                queryType &&
+                ["exact", "substructure", "similarity"].includes(queryType)
+            ) {
+                this.type = queryType;
+            }
+
+            if (querySmiles) {
+                try {
+                    const OCL = await loadOpenChemLib();
+                    this.editor.setMolFile(
+                        OCL.Molecule.fromSmiles(
+                            decodeURIComponent(querySmiles)
+                        ).toMolfile()
+                    );
+                } catch (error) {
+                    console.error("Error loading structure from query:", error);
+                }
+            }
+        },
         openDialog(value) {
             this.open = value;
-            if (value) {
-                this.$nextTick(() => {
-                    this.editor = createStructureEditor(
-                        "structureSearchEditor"
-                    );
-
-                    // Check if there's a query parameter in URL and load it
-                    const url = new URL(window.location.href);
-                    const querySmiles = url.searchParams.get("query");
-                    const queryType = url.searchParams.get("type");
-
-                    // Load the search type if present
-                    if (
-                        queryType &&
-                        ["exact", "substructure", "similarity"].includes(
-                            queryType
-                        )
-                    ) {
-                        this.type = queryType;
-                    }
-
-                    // Load the structure if present
-                    if (querySmiles && this.editor) {
-                        try {
-                            // Set the molecule from SMILES
-                            this.editor.setMolFile(
-                                OCL.Molecule.fromSmiles(
-                                    decodeURIComponent(querySmiles)
-                                ).toMolfile()
-                            );
-                        } catch (error) {
-                            console.error(
-                                "Error loading structure from query:",
-                                error
-                            );
-                        }
-                    }
-                });
-            }
         },
         search() {
             this.$page.props.query = this.editor.getSmiles();

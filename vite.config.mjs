@@ -25,7 +25,11 @@ export default defineConfig({
         alias: {
             '@': '/resources/js',
             'ziggy-js': path.resolve('vendor/tightenco/ziggy'),
-        }
+        },
+        dedupe: ['openchemlib'],
+    },
+    optimizeDeps: {
+        include: ['openchemlib'],
     },
     server: {
         host: '0.0.0.0',
