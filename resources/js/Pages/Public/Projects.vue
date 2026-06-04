@@ -57,7 +57,9 @@
                 </section>
             </div>
         </div>
-        <div class="min-h-[calc(100vh-500px)] px-6 px-md-12 mb-24 mx-auto">
+        <div
+            class="min-h-[calc(100vh-500px)] w-full px-6 sm:px-6 lg:px-8 mb-24"
+        >
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
                     <Menu as="div" class="relative inline-block text-left">
@@ -203,32 +205,32 @@
                     <Pagination :links="projects.meta.links"></Pagination>
                 </div>
             </div>
-            <div v-else>
-                <div
-                    class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
+            <div v-else :class="publicEmptyStateSectionClasses">
+                <EmptySearchState
+                    layout="public"
+                    entity-type="projects"
+                    :search-query="filters.search || ''"
+                    :title="filters.search ? null : 'No projects yet'"
+                    :message="
+                        filters.search
+                            ? null
+                            : 'When researchers publish their work, shared NMR projects will show up here for you to explore.'
+                    "
+                    :show-clear-button="!!filters.search"
+                    @clear-search="reset"
                 >
-                    <svg
-                        class="mx-auto h-16 w-16 text-gray-300"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        aria-hidden="true"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
-                        />
-                    </svg>
-                    <h3 class="mt-4 text-base font-semibold text-gray-900">
-                        No projects available
-                    </h3>
-                    <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                        Public projects will appear here once they are
-                        published.
-                    </p>
-                </div>
+                    <template v-if="!filters.search" #actions>
+                        <a
+                            href="https://docs.nmrxiv.org/introduction/intro"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-teal-700 dark:hover:bg-teal-950/40 dark:hover:text-teal-200 dark:focus:ring-offset-gray-900"
+                        >
+                            Learn about projects
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </template>
+                </EmptySearchState>
             </div>
         </div>
     </app-layout>
@@ -247,6 +249,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import ProjectCard from "@/Shared/ProjectCard.vue";
 import ProjectSearch from "@/Shared/ProjectSearch.vue";
 import Pagination from "@/Shared/Pagination.vue";
+import EmptySearchState from "@/Shared/EmptySearchState.vue";
+import { publicEmptyStateSectionClasses } from "@/Utils/publicEmptyStateClasses.js";
 import pickBy from "lodash/pickBy";
 export default {
     components: {
@@ -261,6 +265,7 @@ export default {
         ProjectSearch,
         Pagination,
         Squares2X2Icon,
+        EmptySearchState,
     },
     props: {
         projects: {
@@ -278,6 +283,7 @@ export default {
     },
     data() {
         return {
+            publicEmptyStateSectionClasses,
             sortOptions: [
                 { name: "Creation", value: "creation", current: true },
                 { name: "Newest", value: "newest", current: false },
