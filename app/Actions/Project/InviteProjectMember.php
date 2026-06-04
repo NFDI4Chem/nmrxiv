@@ -24,7 +24,7 @@ class InviteProjectMember
      */
     public function invite($user, $project, string $email, ?string $role = null, ?string $message = null)
     {
-        // Gate::forUser($user)->authorize('addProjectMember', $project);
+        Gate::forUser($user)->authorize('addProjectMember', $project);
 
         $this->validate($project, $email, $role, $message);
 
