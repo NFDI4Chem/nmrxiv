@@ -74,7 +74,7 @@ class DataBackupJobTest extends TestCase
         // Mock artisan command call
         Artisan::shouldReceive('call')
             ->once()
-            ->with('backup:run --only-db');
+            ->with('backup:run', ['--only-db' => true]);
 
         $job = new DataBackupJob;
 
@@ -108,26 +108,38 @@ class DataBackupJobTest extends TestCase
 
     public function test_handle_completes_without_error_when_no_backups_exist(): void
     {
-        Storage::fake('s3');
+        config([
+            'backup.backup.name' => 'testing/database',
+            'backup.backup.destination.disks' => ['ceph'],
+        ]);
 
-        // Mock artisan command call
+        Storage::fake('ceph');
+
         Artisan::shouldReceive('call')
             ->once()
-            ->with('backup:run --only-db');
+            ->with('backup:run', ['--only-db' => true]);
 
-        $job = new DataBackupJob;
+        (new DataBackupJob)->handle();
 
-        // Should complete without error when no backup files exist (empty directory)
-        // The job will call listContents on an empty fake disk and handle it gracefully
-        $this->expectOutputString('');
+        $this->addToAssertionCount(1);
+    }
 
-        try {
-            $job->handle();
-            $this->assertTrue(true);
-        } catch (\Exception $e) {
-            // If an exception is thrown due to missing env vars or config,
-            // that's expected in test environment
-            $this->assertTrue(true);
-        }
+    public function test_handle_marks_latest_backup_file_public(): void
+    {
+        config([
+            'backup.backup.name' => 'testing/database',
+            'backup.backup.destination.disks' => ['ceph'],
+        ]);
+
+        Storage::fake('ceph');
+        Storage::disk('ceph')->put('testing/database/nmrxiv-data-dump-latest.zip', 'backup-contents');
+
+        Artisan::shouldReceive('call')
+            ->once()
+            ->with('backup:run', ['--only-db' => true]);
+
+        (new DataBackupJob)->handle();
+
+        $this->assertEquals('public', Storage::disk('ceph')->getVisibility('testing/database/nmrxiv-data-dump-latest.zip'));
     }
 }

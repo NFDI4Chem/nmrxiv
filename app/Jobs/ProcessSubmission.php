@@ -44,6 +44,19 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         $this->project = $project;
     }
 
+    public function uniqueId(): string
+    {
+        return (string) $this->project->id;
+    }
+
+    /**
+     * Prevent a crashed worker from leaving a global unique lock that blocks every project.
+     */
+    public function uniqueFor(): int
+    {
+        return 14400;
+    }
+
     /**
      * Execute the job.
      */

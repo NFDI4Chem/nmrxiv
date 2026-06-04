@@ -180,26 +180,26 @@ export default {
             if (this.iconOnly) {
                 return [
                     active
-                        ? "bg-gray-900 text-white shadow-sm"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
-                    "flex h-12 w-12 items-center justify-center rounded-full transition-colors duration-150",
+                        ? "bg-teal-50 text-teal-900 ring-1 ring-inset ring-teal-200/70"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-800",
+                    "flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-150",
                 ].join(" ");
             }
 
-            const size = sub ? "py-2" : "py-2.5";
+            const size = sub ? "py-1.5" : "py-2";
 
             return [
                 active
-                    ? "bg-gray-900 text-white shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
-                `group flex w-full items-center gap-3 rounded-full px-4 ${size} text-sm font-medium transition-colors duration-150`,
+                    ? "bg-teal-50/90 text-teal-900 ring-1 ring-inset ring-teal-200/60"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                `group flex w-full items-center gap-3 rounded-full px-3 ${size} text-sm font-medium transition-colors duration-150`,
             ].join(" ");
         },
         iconClasses(active, { sub = false } = {}) {
             const size = this.iconOnly
                 ? sub
                     ? "h-5 w-5"
-                    : "h-6 w-6"
+                    : "h-5 w-5"
                 : sub
                 ? "h-4 w-4"
                 : "h-5 w-5";
@@ -208,9 +208,9 @@ export default {
                 size,
                 "flex-shrink-0 transition-colors duration-150",
                 active
-                    ? "text-white"
+                    ? "text-teal-700"
                     : this.iconOnly
-                    ? "text-gray-500 group-hover:text-gray-700"
+                    ? "text-gray-400 group-hover:text-gray-600"
                     : "text-gray-400 group-hover:text-gray-500",
             ].join(" ");
         },
