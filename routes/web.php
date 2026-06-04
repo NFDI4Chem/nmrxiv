@@ -91,6 +91,10 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
+Route::get('/faqs', function () {
+    return Inertia::render('FAQs');
+})->name('faqs');
+
 Route::get('/predict', function () {
     return Inertia::render('Predict');
 })->name('predict');

@@ -5081,7 +5081,7 @@ export default {
             }
             const run = (retriesLeft) => {
                 this.$nextTick(() => {
-                    requestAnimationFrame(() => {
+                    requestAnimationFrame(async () => {
                         const el = document.getElementById(
                             "structureSearchEditor"
                         );
@@ -5103,7 +5103,7 @@ export default {
                             return;
                         }
                         if (!this.editor) {
-                            this.editor = createStructureEditor(
+                            this.editor = await createStructureEditor(
                                 "structureSearchEditor"
                             );
                             if (

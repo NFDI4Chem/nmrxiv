@@ -656,7 +656,10 @@ import {
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib";
-import { createStructureEditor } from "@/Utils/structureEditor";
+import {
+    createStructureEditor,
+    STRUCTURE_SEARCH_EDITOR_OPTIONS,
+} from "@/Utils/structureEditor";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
@@ -728,7 +731,7 @@ export default {
         });
     },
     methods: {
-        initStructureEditor() {
+        async initStructureEditor() {
             if (this.editor) {
                 return;
             }
@@ -736,7 +739,10 @@ export default {
             if (!host) {
                 return;
             }
-            this.editor = createStructureEditor("structureSearchEditor");
+            this.editor = await createStructureEditor(
+                "structureSearchEditor",
+                STRUCTURE_SEARCH_EDITOR_OPTIONS
+            );
         },
         openStudyDetailsPane() {
             this.emitter.emit("openStudyDetails", {});

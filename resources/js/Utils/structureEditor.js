@@ -1,10 +1,40 @@
-import OCL from "openchemlib";
+/** @type {import("openchemlib").default | null} */
+let oclModule = null;
+
+/** @type {Promise<import("openchemlib").default> | null} */
+let oclLoadPromise = null;
 
 /**
- * Make every implicit hydrogen explicit and lay out the full structure in 2D
- * space using OCL's CoordinateInventor so the editor's auto-fit can scale the
- * whole structure (heavy atoms + H's) to the available canvas width.
+ * Load the full openchemlib ESM build (avoids Vite tree-shaking away CanvasEditor).
  *
+ * @returns {Promise<import("openchemlib").default>}
+ */
+export async function loadOpenChemLib() {
+    if (oclModule) {
+        return oclModule;
+    }
+
+    if (!oclLoadPromise) {
+        oclLoadPromise = (async () => {
+            const imported = await import("openchemlib");
+            const OCL = imported.default ?? imported;
+
+            if (typeof OCL.CanvasEditor !== "function") {
+                throw new Error(
+                    "Structure editor requires openchemlib v9 or newer (CanvasEditor). Run npm install, then restart the Vite dev server."
+                );
+            }
+
+            oclModule = OCL;
+
+            return OCL;
+        })();
+    }
+
+    return oclLoadPromise;
+}
+
+/**
  * @param {import("openchemlib").Molecule} molecule
  */
 function expandHydrogens(molecule) {
@@ -16,14 +46,11 @@ function expandHydrogens(molecule) {
 }
 
 /**
- * Strip every explicit hydrogen from the molecule by round-tripping through
- * canonical SMILES (which omits explicit H by default), then regenerate 2D
- * coordinates for the heavy-atom skeleton.
- *
  * @param {import("openchemlib").Molecule} molecule
+ * @param {import("openchemlib").default} OCL
  * @returns {import("openchemlib").Molecule}
  */
-function collapseHydrogens(molecule) {
+function collapseHydrogens(molecule, OCL) {
     if (!molecule) {
         return molecule;
     }
@@ -31,15 +58,10 @@ function collapseHydrogens(molecule) {
 }
 
 /**
- * Flag every stereo center whose configuration is not specified as
- * "configuration unknown" (parity `cAtomParityUnknown`). The editor renders
- * those atoms with a wavy stereo indicator. Stereo centers with an explicit
- * R/S parity, or that the user has explicitly declared unknown, are left
- * untouched.
- *
  * @param {import("openchemlib").Molecule} molecule
+ * @param {import("openchemlib").default} OCL
  */
-function markUnassignedStereo(molecule) {
+function markUnassignedStereo(molecule, OCL) {
     if (!molecule) {
         return;
     }
@@ -56,12 +78,6 @@ function markUnassignedStereo(molecule) {
 }
 
 /**
- * Assign a small superscript number (1..N) as a custom atom label on every
- * atom. Prefixing the label with `]` is OCL's marker for "render as
- * superscript", which makes the label appear as small text next to the
- * element symbol for heteroatoms and as a small standalone number for
- * carbons (which have no visible element label otherwise).
- *
  * @param {import("openchemlib").Molecule} molecule
  */
 function applyAtomNumbering(molecule) {
@@ -74,25 +90,59 @@ function applyAtomNumbering(molecule) {
     }
 }
 
+/** Preset for structure search modals: hides Expand H and atom number toggles. */
+export const STRUCTURE_SEARCH_EDITOR_OPTIONS = {
+    showExpandHydrogensToggle: false,
+    showAtomNumbersToggle: false,
+};
+
 /**
- * Build a small toggle overlay that sits inside the host element, anchored to
- * the top-right corner ABOVE the canvas. Returns the canvas container
- * element where the CanvasEditor should be mounted; that container fills the
- * entire host so the editor keeps its full intended dimensions.
+ * Only apply percentage height when the host has no usable height from CSS.
+ * Inline `height: 100%` overrides Tailwind classes (e.g. h-[360px]) and collapses
+ * the canvas when ancestors use auto height (hero structure tab on Welcome).
  *
  * @param {HTMLElement} host
+ */
+function ensureHostHasRenderableHeight(host) {
+    if (host.style.height) {
+        return;
+    }
+
+    const { height, minHeight } = window.getComputedStyle(host);
+    const heightPx = parseFloat(height);
+    const minHeightPx = parseFloat(minHeight);
+
+    if (Number.isFinite(heightPx) && heightPx > 0) {
+        return;
+    }
+
+    if (Number.isFinite(minHeightPx) && minHeightPx > 0) {
+        host.style.height = `${minHeightPx}px`;
+        return;
+    }
+
+    host.style.height = "100%";
+}
+
+/**
+ * @param {HTMLElement} host
  * @param {{ expandHydrogens: boolean, showAtomNumbers: boolean }} flags
- * @param {{ onExpandHydrogensChange: (value: boolean) => void, onShowAtomNumbersChange: (value: boolean) => void }} handlers
+ * @param {{
+ *   showExpandHydrogensToggle: boolean,
+ *   showAtomNumbersToggle: boolean,
+ *   onExpandHydrogensChange: (value: boolean) => void,
+ *   onShowAtomNumbersChange: (value: boolean) => void,
+ * }} controls
  * @returns {HTMLElement}
  */
-function buildToggleUI(host, flags, handlers) {
+function buildToggleUI(host, flags, controls) {
     host.innerHTML = "";
     if (!host.style.position || host.style.position === "static") {
         host.style.position = "relative";
     }
-    // Clip the absolutely-positioned canvas to the host's border-radius so
-    // wrappers with `rounded-*` classes still have rounded corners.
     host.style.overflow = "hidden";
+    host.style.minHeight = "0";
+    ensureHostHasRenderableHeight(host);
 
     const canvasContainer = document.createElement("div");
     canvasContainer.style.cssText =
@@ -137,61 +187,48 @@ function buildToggleUI(host, flags, handlers) {
         return label;
     };
 
-    bar.appendChild(
-        makeToggle(
-            "Expand H",
-            flags.expandHydrogens,
-            handlers.onExpandHydrogensChange
-        )
-    );
-    bar.appendChild(
-        makeToggle(
-            "Atom numbers",
-            flags.showAtomNumbers,
-            handlers.onShowAtomNumbersChange
-        )
-    );
+    if (controls.showExpandHydrogensToggle) {
+        bar.appendChild(
+            makeToggle(
+                "Expand H",
+                flags.expandHydrogens,
+                controls.onExpandHydrogensChange
+            )
+        );
+    }
 
-    host.appendChild(bar);
+    if (controls.showAtomNumbersToggle) {
+        bar.appendChild(
+            makeToggle(
+                "Atom numbers",
+                flags.showAtomNumbers,
+                controls.onShowAtomNumbersChange
+            )
+        );
+    }
+
+    if (bar.childElementCount > 0) {
+        host.appendChild(bar);
+    }
 
     return canvasContainer;
 }
 
 /**
- * Thin compatibility adapter that exposes the old `StructureEditor.createSVGEditor()`
- * surface (`setSmiles`, `getSmiles`, `setMolFile`, `getMolFile`, `getMolecule`)
- * on top of openchemlib v9's canvas-based `CanvasEditor`.
- *
- * The legacy SVG editor was removed in openchemlib v9.0.0. This wrapper lets
- * existing call sites continue to work with minimal changes while we migrate
- * to the new canvas/Molecule-object API.
- *
- * Two opt-in toggles are rendered above the canvas:
- *   - "Expand H": expands all implicit hydrogens into explicit H atoms and
- *     re-lays out the structure so the editor's auto-fit can scale it to the
- *     available width.
- *   - "Atom numbers": labels every atom with `<element><index>` (e.g. `C1`).
- *
- * Stereo centers with no assigned configuration are always flagged so the
- * editor renders the wavy "unknown" stereo indicator.
- *
- * @param {string|HTMLElement} target - DOM element or its id attribute.
- * @param {import("openchemlib").CanvasEditorOptions & { expandHydrogens?: boolean, showAtomNumbers?: boolean }} [options]
- * @returns {{
- *   instance: import("openchemlib").CanvasEditor,
- *   setSmiles: (smiles: string) => void,
- *   getSmiles: () => string,
- *   setMolFile: (molfile: string) => void,
- *   getMolFile: () => string,
- *   getMolecule: () => import("openchemlib").Molecule,
- *   setMolecule: (molecule: import("openchemlib").Molecule) => void,
- *   setExpandHydrogens: (value: boolean) => void,
- *   setShowAtomNumbers: (value: boolean) => void,
- *   onChange: (callback: import("openchemlib").OnChangeListenerCallback) => void,
- *   destroy: () => void,
- * }}
+ * @typedef {import("openchemlib").CanvasEditorOptions & {
+ *   expandHydrogens?: boolean,
+ *   showAtomNumbers?: boolean,
+ *   showExpandHydrogensToggle?: boolean,
+ *   showAtomNumbersToggle?: boolean,
+ * }} StructureEditorOptions
  */
-export function createStructureEditor(target, options = {}) {
+
+/**
+ * @param {import("openchemlib").default} OCL
+ * @param {string|HTMLElement} target
+ * @param {StructureEditorOptions} [options]
+ */
+function createStructureEditorWithOcl(OCL, target, options = {}) {
     const host =
         typeof target === "string" ? document.getElementById(target) : target;
 
@@ -206,15 +243,19 @@ export function createStructureEditor(target, options = {}) {
     const {
         expandHydrogens: initialExpandH = false,
         showAtomNumbers: initialAtomNumbers = false,
+        showExpandHydrogensToggle = true,
+        showAtomNumbersToggle = true,
         ...editorOptions
     } = options;
 
     const flags = {
-        expandHydrogens: initialExpandH,
-        showAtomNumbers: initialAtomNumbers,
+        expandHydrogens: showExpandHydrogensToggle ? initialExpandH : false,
+        showAtomNumbers: showAtomNumbersToggle ? initialAtomNumbers : false,
     };
 
     const canvasContainer = buildToggleUI(host, flags, {
+        showExpandHydrogensToggle,
+        showAtomNumbersToggle,
         onExpandHydrogensChange: (value) => {
             flags.expandHydrogens = value;
             rebuildFromCurrent();
@@ -240,7 +281,7 @@ export function createStructureEditor(target, options = {}) {
         if (flags.expandHydrogens) {
             expandHydrogens(molecule);
         }
-        markUnassignedStereo(molecule);
+        markUnassignedStereo(molecule, OCL);
         if (flags.showAtomNumbers) {
             applyAtomNumbering(molecule);
         }
@@ -253,16 +294,6 @@ export function createStructureEditor(target, options = {}) {
         suppressOnChange = false;
     };
 
-    /**
-     * Re-render the editor's current molecule with the latest flag values.
-     * Used when the user flips a toggle.
-     *
-     * Whenever explicit hydrogens need to be removed we round-trip the
-     * molecule through canonical SMILES so the result is a fresh `Molecule`
-     * instance — this guarantees `setMolecule()` triggers a redraw even
-     * though the editor's internal molecule reference is the same one we'd
-     * otherwise be mutating in place.
-     */
     const rebuildFromCurrent = () => {
         const current = editor.getMolecule();
         if (!current) {
@@ -270,7 +301,7 @@ export function createStructureEditor(target, options = {}) {
         }
         const base = flags.expandHydrogens
             ? current
-            : collapseHydrogens(current);
+            : collapseHydrogens(current, OCL);
         decorate(base);
         suppressOnChange = true;
         editor.setMolecule(base);
@@ -278,10 +309,6 @@ export function createStructureEditor(target, options = {}) {
         suppressOnChange = false;
     };
 
-    // Re-apply the decoration pipeline after every user edit so newly-drawn
-    // atoms get protons + labels too. The `isUserEvent` guard plus a manual
-    // re-entry flag prevent a feedback loop with the `moleculeChanged()` call
-    // we trigger ourselves.
     editor.setOnChangeListener((event) => {
         if (
             !suppressOnChange &&
@@ -335,11 +362,17 @@ export function createStructureEditor(target, options = {}) {
         },
 
         setExpandHydrogens(value) {
+            if (!showExpandHydrogensToggle) {
+                return;
+            }
             flags.expandHydrogens = Boolean(value);
             rebuildFromCurrent();
         },
 
         setShowAtomNumbers(value) {
+            if (!showAtomNumbersToggle) {
+                return;
+            }
             flags.showAtomNumbers = Boolean(value);
             rebuildFromCurrent();
         },
@@ -354,4 +387,14 @@ export function createStructureEditor(target, options = {}) {
             }
         },
     };
+}
+
+/**
+ * @param {string|HTMLElement} target
+ * @param {StructureEditorOptions} [options]
+ */
+export async function createStructureEditor(target, options = {}) {
+    const OCL = await loadOpenChemLib();
+
+    return createStructureEditorWithOcl(OCL, target, options);
 }
