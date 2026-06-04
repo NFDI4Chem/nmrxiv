@@ -30,8 +30,14 @@
                         in the dashboard (upload and file tools).
                     </span>
                 </div>
+                <div
+                    v-if="!project.data.files"
+                    class="rounded-lg border border-gray-200 bg-gray-50 px-6 py-10 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+                >
+                    No files have been uploaded for this project yet.
+                </div>
                 <!-- File browser section - only shown if project has files -->
-                <div v-if="project.data.files">
+                <div v-else>
                     <!-- Breadcrumb navigation - hidden on mobile, shown on desktop -->
                     <nav
                         v-if="$page.props.selectedFolder"
@@ -230,6 +236,10 @@ export default {
      * Initialize the file browser with default values and load files
      */
     mounted() {
+        if (!this.project?.data?.files) {
+            return;
+        }
+
         // Set initial file system object to project files root
         this.$page.props.selectedFileSystemObject = this.project.data.files;
 

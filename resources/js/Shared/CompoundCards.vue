@@ -157,7 +157,7 @@ export default {
         publicCompoundHref(molecule) {
             const numericId = this.compoundNumericId(molecule);
             if (numericId === "") {
-                return "/compounds";
+                return "/search?scope=compounds";
             }
 
             return this.route("public.compound", { id: `M${numericId}` });

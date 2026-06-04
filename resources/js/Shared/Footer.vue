@@ -201,7 +201,11 @@ const linkSections = [
         title: "Explore",
         links: [
             { name: "Projects", href: "/projects", external: false },
-            { name: "Spectra Library", href: "/compounds", external: false },
+            {
+                name: "Spectra Library",
+                href: "/search?scope=compounds",
+                external: false,
+            },
             { name: "FAQs", href: "/faqs", external: false },
         ],
     },
