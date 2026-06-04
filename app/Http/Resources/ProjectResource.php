@@ -132,6 +132,10 @@ class ProjectResource extends JsonResource
         /** @var Project $project */
         $project = $this->resource;
 
+        if ($request->routeIs('project.preview') || $request->routeIs('studies.preview')) {
+            return (int) $project->studies()->count();
+        }
+
         if (! $project->is_public) {
             $user = $request->user();
             if ($user !== null && Gate::forUser($user)->check('viewProject', $project)) {
