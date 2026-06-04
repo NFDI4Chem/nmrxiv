@@ -255,7 +255,9 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $response = $this->get("/project/{$this->privateProject->obfuscationcode}");
 
         $response->assertStatus(200);
-        // Just verify it renders successfully - this covers the review method
+        $page = $this->assertInertiaPageComponent($response, 'Project/Show');
+        $this->assertTrue($page['props']['preview']);
+        $this->assertSame('reviewer', $page['props']['role']);
     }
 
     public function test_review_endpoint_for_private_project_without_license()
@@ -263,13 +265,50 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $response = $this->get("/project/{$this->privateProject->obfuscationcode}");
 
         $response->assertStatus(200);
-        // Just verify the response is successful - this covers the null license branch
+        $this->assertInertiaPageComponent($response, 'Project/Show');
+    }
+
+    public function test_review_endpoint_samples_tab_uses_unified_public_layout()
+    {
+        $this->markTestSkipped('Unified public reviewer layout ships with the public browse pages refactor.');
     }
 
     public function test_review_endpoint_redirects_public_project_to_public_route()
     {
         // Skip this test as project identifier format may vary
         $this->markTestSkipped('Project identifier format varies, skipping redirect test');
+    }
+
+    public function test_reviewer_studies_for_nav_returns_datasets(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->privateProject->id,
+            'owner_id' => $this->owner->id,
+            'name' => 'ReviewerNavStudy',
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->privateProject->id,
+        ]);
+
+        $response = $this->getJson(
+            '/project/'.$this->privateProject->obfuscationcode.'/studies?for_nav=1&per_page=100'
+        );
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('data'));
+        $this->assertSame('ReviewerNavStudy', $response->json('data.0.name'));
+    }
+
+    public function test_reviewer_preview_sample_link_renders_public_study_tab(): void
+    {
+        $this->markTestSkipped('Unified public reviewer layout ships with the public browse pages refactor.');
+    }
+
+    public function test_review_endpoint_reports_full_samples_count_for_private_project(): void
+    {
+        $this->markTestSkipped('Unified public reviewer layout ships with the public browse pages refactor.');
     }
 
     public function test_reviewer_studies_endpoint_returns_studies()

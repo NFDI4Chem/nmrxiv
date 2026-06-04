@@ -119,8 +119,8 @@ export default {
     methods: {
         loadStructureEditor(id) {
             this.edit = true;
-            this.$nextTick(() => {
-                this.editor = createStructureEditor(id);
+            this.$nextTick(async () => {
+                this.editor = await createStructureEditor(id);
                 if (this.modelValue) {
                     this.editor.setSmiles(this.modelValue);
                 }

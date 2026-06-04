@@ -1,27 +1,16 @@
 <template>
-    <div class="bg-white">
-        <Head title="Privacy Policy" />
+    <div class="bg-white min-h-screen flex flex-col">
+        <Head title="Privacy Policy - nmrXiv" />
+        <FlashMessages />
+        <main class="flex-1">
+            <PublicSiteHeader :bordered="false" />
 
-        <!-- Header -->
-        <header class="border-b border-gray-200">
-            <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
-                <Link href="/" class="inline-block">
-                    <JetApplicationLogo class="h-10 w-auto" />
-                </Link>
-            </div>
-        </header>
-
-        <!-- Content -->
-        <main class="min-h-screen">
-            <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-12 sm:py-16">
-                <!-- Page Header -->
-                <div class="mb-12">
-                    <h1
-                        class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3"
-                    >
+            <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+                <div class="mb-10 text-center sm:text-left">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                         Privacy Policy
                     </h1>
-                    <p class="text-gray-500">
+                    <p class="mt-3 text-gray-500">
                         Last updated:
                         {{
                             new Date().toLocaleDateString("en-US", {
@@ -33,23 +22,22 @@
                     </p>
                 </div>
 
-                <!-- Policy Content -->
                 <div
-                    class="prose prose-gray max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-teal-600 hover:prose-a:text-teal-700 prose-strong:text-gray-900"
+                    class="prose prose-gray max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-blue-900 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900"
                     v-html="sanitizeHtml(policy)"
-                ></div>
+                />
 
-                <!-- Back Link -->
-                <div class="mt-12 pt-8 border-t border-gray-200">
+                <div class="mt-12 pt-8 border-t border-gray-100">
                     <Link
                         href="/"
-                        class="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium transition-colors"
+                        class="inline-flex items-center gap-2 text-[0.9375rem] font-medium text-gray-600 hover:text-gray-900 transition-colors"
                     >
                         <svg
                             class="h-5 w-5"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
+                            aria-hidden="true"
                         >
                             <path
                                 stroke-linecap="round"
@@ -58,29 +46,35 @@
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
                             />
                         </svg>
-                        Back to Home
+                        Back to home
                     </Link>
                 </div>
             </div>
         </main>
 
-        <!-- Footer -->
         <Footer />
     </div>
 </template>
 
 <script>
 import { Head, Link } from "@inertiajs/vue3";
-import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+import FlashMessages from "@/Shared/FlashMessages.vue";
 import Footer from "@/Shared/Footer.vue";
+import PublicSiteHeader from "@/Shared/PublicSiteHeader.vue";
 
 export default {
     components: {
         Head,
         Link,
-        JetApplicationLogo,
+        FlashMessages,
         Footer,
+        PublicSiteHeader,
     },
-    props: ["policy"],
+    props: {
+        policy: {
+            type: String,
+            required: true,
+        },
+    },
 };
 </script>
