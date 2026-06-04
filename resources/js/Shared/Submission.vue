@@ -2254,8 +2254,8 @@ export default {
             this.tabs.forEach((t) => {
                 if (t.name == tab.name) {
                     t.current = true;
-                    this.$nextTick(() => {
-                        this.editor = createStructureEditor(
+                    this.$nextTick(async () => {
+                        this.editor = await createStructureEditor(
                             "structureSearchEditor"
                         );
                     });
