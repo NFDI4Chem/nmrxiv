@@ -50,6 +50,20 @@ class ProcessProjectJobTest extends TestCase
         $this->assertInstanceOf(ShouldBeUnique::class, $job);
     }
 
+    public function test_unique_id_is_scoped_to_the_project(): void
+    {
+        $job = new ProcessProject($this->project);
+
+        $this->assertSame((string) $this->project->id, $job->uniqueId());
+    }
+
+    public function test_unique_for_limits_orphaned_lock_duration(): void
+    {
+        $job = new ProcessProject($this->project);
+
+        $this->assertSame(14400, $job->uniqueFor());
+    }
+
     public function test_it_implements_should_queue_interface(): void
     {
         $job = new ProcessProject($this->project);
