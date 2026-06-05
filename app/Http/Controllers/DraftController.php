@@ -10,8 +10,10 @@ use App\Jobs\ProcessFiles;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Models\Study;
 use App\Models\User;
 use App\Support\ProvisionalDoi;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,7 +48,9 @@ class DraftController extends Controller
     {
         $user = Auth::user();
 
-        $drafts = $this->userDrafts->execute($user);
+        $excludeCommunity = $request->get('deposition') === 'publication';
+
+        $drafts = $this->userDrafts->execute($user, $excludeCommunity);
         $defaultDraft = $this->userDrafts->getOrCreateDefaultDraft($user);
         $sharedDrafts = $this->userDrafts->getSharedDrafts($user);
 
@@ -64,6 +68,8 @@ class DraftController extends Controller
      */
     public function process(Request $request, Draft $draft)
     {
+        $this->authorize('updateDraft', $draft);
+
         $user = Auth::user();
 
         return $this->processDraft->execute($request, $draft, $user);
@@ -74,9 +80,23 @@ class DraftController extends Controller
      */
     public function files(Request $request, Draft $draft): JsonResponse
     {
+        $this->authorize('updateDraft', $draft);
+
         $filesData = $this->draftFiles->files($draft);
 
         return response()->json($filesData);
+    }
+
+    /**
+     * Load additional root-level sample folders when the draft uses paginated loading.
+     */
+    public function sampleFolders(Request $request, Draft $draft): JsonResponse
+    {
+        $this->authorize('updateDraft', $draft);
+
+        $page = max(1, $request->integer('page', 1));
+
+        return response()->json($this->draftFiles->sampleFoldersPage($draft, $page));
     }
 
     /**
@@ -84,6 +104,8 @@ class DraftController extends Controller
      */
     public function missingFiles(Request $request, Draft $draft): JsonResponse
     {
+        $this->authorize('updateDraft', $draft);
+
         $missingFilesData = $this->draftFiles->missing($draft);
 
         return response()->json($missingFilesData);
@@ -95,13 +117,7 @@ class DraftController extends Controller
      */
     public function resetSampleFolder(Request $request, Draft $draft, FileSystemObject $filesystemobject): JsonResponse
     {
-        /** @var User $user */
-        $user = Auth::user();
-        [$user_id] = $user->getUserTeamData();
-
-        if ($draft->owner_id !== $user_id) {
-            abort(403);
-        }
+        $this->authorize('updateDraft', $draft);
 
         if ($filesystemobject->draft_id !== $draft->id) {
             return response()->json([
@@ -120,13 +136,7 @@ class DraftController extends Controller
      */
     public function show(Request $request, Draft $draft): JsonResponse
     {
-        /** @var User $user */
-        $user = Auth::user();
-        [$user_id] = $user->getUserTeamData();
-
-        if ($draft->owner_id !== $user_id) {
-            abort(403);
-        }
+        $this->authorize('updateDraft', $draft);
 
         return response()->json([
             'draft' => $draft->load(['Tags', 'project:id,slug,status,draft_id']),
@@ -138,6 +148,8 @@ class DraftController extends Controller
      */
     public function update(Request $request, Draft $draft): JsonResponse
     {
+        $this->authorize('updateDraft', $draft);
+
         $project_enabled = $request->has('project_enabled') ? $request->get('project_enabled') : $draft->project_enabled;
         if ($project_enabled == 1) {
             $project_enabled = true;
@@ -158,7 +170,16 @@ class DraftController extends Controller
      */
     public function complete(Request $request, Draft $draft): JsonResponse
     {
+        $this->authorize('updateDraft', $draft);
+
         $project = Project::where('draft_id', $draft->id)->first();
+
+        if (! $project) {
+            return response()->json([
+                'project' => null,
+                'validation' => null,
+            ], 422);
+        }
 
         $validation = $project->validation;
         $validation->process();
@@ -174,6 +195,8 @@ class DraftController extends Controller
      */
     public function info(Request $request, Draft $draft): JsonResponse
     {
+        $this->authorize('updateDraft', $draft);
+
         $project = Project::where('draft_id', $draft->id)->first();
 
         if (! $project) {
@@ -184,9 +207,7 @@ class DraftController extends Controller
         }
 
         $project->load(['owner']);
-        $studies = $project->studies()
-            ->with(['datasets', 'sample.molecules', 'tags'])
-            ->get();
+        $studies = $this->draftWorkspaceStudies($project, $draft);
 
         return response()->json([
             'project' => $project,
@@ -199,13 +220,7 @@ class DraftController extends Controller
      */
     public function status(Request $request, Draft $draft): JsonResponse
     {
-        /** @var User $user */
-        $user = Auth::user();
-        [$user_id] = $user->getUserTeamData();
-
-        if ($draft->owner_id !== $user_id) {
-            abort(403);
-        }
+        $this->authorize('updateDraft', $draft);
 
         $project = Project::where('draft_id', $draft->id)->first();
 
@@ -217,10 +232,12 @@ class DraftController extends Controller
             ]);
         }
 
-        $studies = $project->studies()
-            ->select(['id', 'name', 'slug', 'internal_status', 'has_nmrium', 'project_id'])
-            ->orderBy('name')
-            ->get();
+        $studies = $this->draftWorkspaceStudies($project, $draft)
+            ->map(function (Study $study) {
+                $study->setAttribute('has_structure', $study->hasAssignedStructure());
+
+                return $study;
+            });
 
         return response()->json([
             'project_id' => $project->id,
@@ -230,11 +247,25 @@ class DraftController extends Controller
     }
 
     /**
+     * Studies still part of this draft workspace (excludes samples submitted for publication).
+     *
+     * @return Collection<int, Study>
+     */
+    private function draftWorkspaceStudies(Project $project, Draft $draft)
+    {
+        return $project->studies()
+            ->onDraftWorkspace($draft)
+            ->with(['datasets', 'sample.molecules', 'tags'])
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
      * Create or return the draft project's provisional DOI (not registered with DataCite).
      */
     public function storeProvisionalDoi(Request $request, Draft $draft): JsonResponse
     {
-        $this->authorizeDraftOwner($draft);
+        $this->authorize('updateDraft', $draft);
 
         /** @var User $user */
         $user = Auth::user();
@@ -278,7 +309,7 @@ class DraftController extends Controller
      */
     public function destroyProvisionalDoi(Request $request, Draft $draft): Response
     {
-        $this->authorizeDraftOwner($draft);
+        $this->authorize('updateDraft', $draft);
 
         $project = Project::query()->where('draft_id', $draft->id)->first();
 
@@ -296,22 +327,13 @@ class DraftController extends Controller
         return response()->noContent();
     }
 
-    private function authorizeDraftOwner(Draft $draft): void
-    {
-        /** @var User $user */
-        $user = Auth::user();
-        [$user_id] = $user->getUserTeamData();
-
-        if ($draft->owner_id !== $user_id) {
-            abort(403);
-        }
-    }
-
     /**
      * Trigger file annotation processing for draft folders.
      */
     public function annotate(Request $request, Draft $draft): JsonResponse
     {
+        $this->authorize('updateDraft', $draft);
+
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],

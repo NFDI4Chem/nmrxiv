@@ -9,6 +9,7 @@ use App\Notifications\ProjectDeletionFailureNotification;
 use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -173,6 +174,17 @@ class Project extends Model implements Auditable
     public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    /**
+     * Hide staging projects for the community contribution workspace from the dashboard.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeExcludingCommunityContributionStaging(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('draft', fn (Builder $draft) => $draft->communityContribution());
     }
 
     public function likesCount()
