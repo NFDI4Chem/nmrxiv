@@ -247,7 +247,9 @@
                     <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
-                    <div class="flex-1 flex"></div>
+                    <div class="flex min-w-0 flex-1 items-center">
+                        <slot name="navbar" />
+                    </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center gap-1 md:ml-6">
                         <span

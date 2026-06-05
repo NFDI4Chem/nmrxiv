@@ -31,115 +31,133 @@
                 <div
                     style="user-select: none"
                     :class="[
-                        $page.props.selectedFileSystemObject &&
-                        $page.props.selectedFileSystemObject.relative_url ==
+                        selectedFileSystemObject &&
+                        selectedFileSystemObject.relative_url ==
                             file.relative_url
-                            ? 'cursor-pointer bg-gray-100'
-                            : 'cursor-pointer text-gray-600',
-                        'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                            ? 'bg-gray-100 text-gray-900'
+                            : 'text-gray-600',
+                        'group flex w-full items-center rounded-md py-1 pr-2 text-left font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500',
                     ]"
-                    @click.stop="handleFolderClick(file)"
-                    @contextmenu="onSampleFolderContextMenu($event, file)"
                 >
-                    <!-- Disclosure button for expanding/collapsing -->
+                    <!-- Expand/collapse chevron only — does not select the folder -->
                     <DisclosureButton
-                        class="w-full text-left truncate flex items-center"
-                        @click="() => handleDisclosureButtonClick(file.id)"
+                        class="flex-shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        :aria-label="open ? 'Collapse folder' : 'Expand folder'"
                     >
-                        <!-- Loading spinner when fetching children -->
                         <span v-if="file.loading">
                             <ArrowPathIcon
-                                class="animate-spin mr-3 ml-1 h-5 w-5 text-dark inline"
+                                class="ml-1 inline h-4 w-4 animate-spin text-dark"
                                 aria-hidden="true"
                             />
                         </span>
-
-                        <!-- Expand/collapse chevron icon -->
-                        <span v-else>
-                            <ChevronRightIcon
-                                :class="[
-                                    open
-                                        ? 'text-gray-700 rotate-90'
-                                        : 'text-gray-300',
-                                    'ml-1 mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
-                                ]"
-                                aria-hidden="true"
-                            />
-                        </span>
-
-                        <!-- File/folder name with icon and status styling -->
-                        <span
+                        <ChevronRightIcon
+                            v-else
                             :class="[
-                                file.status == 'missing' ? 'text-red-800' : '',
-                                'inline-flex items-center gap-1 min-w-0',
+                                open
+                                    ? 'rotate-90 text-gray-700'
+                                    : 'text-gray-300',
+                                'ml-1 h-4 w-4 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-700',
                             ]"
-                        >
-                            <!-- Dynamic icon for directories (instrument-specific or generic) -->
-                            <span v-if="file.type == 'directory'">
-                                <!-- Instrument-specific icons -->
-                                <img
-                                    v-if="file.instrument_type == 'bruker'"
-                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
-                                    src="/img/bruker.jpg"
-                                    alt="Bruker"
-                                />
-                                <img
-                                    v-else-if="file.instrument_type == 'varian'"
-                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
-                                    src="/img/varian.jpeg"
-                                    alt="Varian"
-                                />
-                                <img
-                                    v-else-if="file.instrument_type == 'joel'"
-                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
-                                    src="/img/joel.jpg"
-                                    alt="JOEL"
-                                />
-                                <img
-                                    v-else-if="file.instrument_type == 'jcamp'"
-                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
-                                    src="/img/jcamp.png"
-                                    alt="JCAMP"
-                                />
-                                <!-- Study folder with notification indicator -->
-                                <span
-                                    v-else-if="file.model_type == 'study'"
-                                    class="relative inline-flex flex-shrink-0"
-                                >
-                                    <FolderIcon
-                                        class="h-5 w-5 text-gray-700"
-                                        aria-hidden="true"
-                                    />
-                                    <span
-                                        class="flex absolute h-2 w-2 top-0 right-0"
-                                    >
-                                        <span
-                                            class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-                                        ></span>
-                                        <span
-                                            class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"
-                                        ></span>
-                                    </span>
-                                </span>
-                                <!-- Default folder icon -->
-                                <FolderIcon
-                                    v-else
-                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
-                                    aria-hidden="true"
-                                />
-                            </span>
-                            <!-- Generic folder icon for non-directories -->
-                            <span v-else>
-                                <FolderIcon
-                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
-                                    aria-hidden="true"
-                                />
-                            </span>
-                            <span class="truncate" :title="file.name">{{
-                                truncateMiddle(file.name, 25)
-                            }}</span>
-                        </span>
+                            aria-hidden="true"
+                        />
                     </DisclosureButton>
+
+                    <!-- Folder label — selects without expanding -->
+                    <span
+                        :class="sampleFolderRowClasses(file)"
+                        :aria-disabled="
+                            isSampleFolderProcessing(file) ? 'true' : undefined
+                        "
+                        @click.stop="handleFolderClick(file)"
+                        @contextmenu="onSampleFolderContextMenu($event, file)"
+                    >
+                        <!-- Dynamic icon for directories (instrument-specific or generic) -->
+                        <span v-if="file.type == 'directory'">
+                            <!-- Instrument-specific icons -->
+                            <img
+                                v-if="file.instrument_type == 'bruker'"
+                                class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
+                                src="/img/bruker.jpg"
+                                alt="Bruker"
+                            />
+                            <img
+                                v-else-if="file.instrument_type == 'varian'"
+                                class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
+                                src="/img/varian.jpeg"
+                                alt="Varian"
+                            />
+                            <img
+                                v-else-if="file.instrument_type == 'joel'"
+                                class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
+                                src="/img/joel.jpg"
+                                alt="JOEL"
+                            />
+                            <img
+                                v-else-if="file.instrument_type == 'jcamp'"
+                                class="flex-shrink-0 h-5 w-5 text-gray-700"
+                                src="/img/jcamp.png"
+                                alt="JCAMP"
+                            />
+                            <!-- Study folder: processing, ready to publish, or incomplete -->
+                            <span
+                                v-else-if="isSampleFolder(file)"
+                                class="relative inline-flex flex-shrink-0"
+                                :title="sampleFolderStatusTitle(file)"
+                            >
+                                <FolderIcon
+                                    :class="[
+                                        'h-5 w-5',
+                                        isSampleFolderSubmitted(file)
+                                            ? 'text-gray-400'
+                                            : isSampleFolderProcessing(file)
+                                            ? 'text-gray-400'
+                                            : isSampleFolderReady(file)
+                                            ? 'text-green-600'
+                                            : 'text-gray-700',
+                                    ]"
+                                    aria-hidden="true"
+                                />
+                                <ArrowPathIcon
+                                    v-if="
+                                        isSampleFolderProcessing(file) &&
+                                        !isSampleFolderSubmitted(file)
+                                    "
+                                    class="absolute -right-1 -top-1 h-3.5 w-3.5 animate-spin text-teal-600"
+                                    aria-hidden="true"
+                                />
+                                <span
+                                    v-else-if="
+                                        isSampleFolderPending(file) ||
+                                        !isSampleFolderReady(file)
+                                    "
+                                    class="absolute right-0 top-0 flex h-2 w-2"
+                                >
+                                    <span
+                                        class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+                                    ></span>
+                                    <span
+                                        class="relative inline-flex h-2 w-2 rounded-full bg-sky-500"
+                                    ></span>
+                                </span>
+                            </span>
+                            <!-- Default folder icon -->
+                            <FolderIcon
+                                v-else
+                                class="flex-shrink-0 h-5 w-5 text-gray-700"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <!-- Generic folder icon for non-directories -->
+                        <span v-else>
+                            <FolderIcon
+                                class="flex-shrink-0 h-5 w-5 text-gray-700"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span class="truncate" :title="file.name">{{
+                            truncateMiddle(file.name, 25)
+                        }}</span>
+                    </span>
                 </div>
 
                 <!-- Collapsible panel containing child items -->
@@ -156,9 +174,18 @@
                                     sfile.current
                                         ? 'text-gray-900'
                                         : 'cursor-pointer text-gray-600',
-                                    'cursor-pointer group w-full flex items-center font-medium rounded-md',
+                                    'group w-full flex items-center font-medium rounded-md',
+                                    sfile.type !== 'directory' ||
+                                    !sfile.has_children
+                                        ? 'cursor-pointer'
+                                        : '',
                                 ]"
-                                @click.stop="displaySelected(sfile)"
+                                @click.stop="
+                                    sfile.type !== 'directory' ||
+                                    !sfile.has_children
+                                        ? displaySelected(sfile)
+                                        : undefined
+                                "
                             >
                                 <!-- Handle directory children -->
                                 <span v-if="sfile.type == 'directory'">
@@ -188,167 +215,198 @@
                                             <!-- Nested directory header -->
                                             <div
                                                 :class="[
-                                                    $page.props
-                                                        .selectedFileSystemObject &&
-                                                    $page.props
-                                                        .selectedFileSystemObject
-                                                        .relative_url ==
+                                                    selectedFileSystemObject &&
+                                                    selectedFileSystemObject.relative_url ==
                                                         sfile.relative_url
-                                                        ? 'cursor-pointer bg-gray-100 text-gray-900'
-                                                        : 'cursor-pointer text-gray-600',
-                                                    'group w-full flex pr-4 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                                        ? 'bg-gray-100 text-gray-900'
+                                                        : 'text-gray-600',
+                                                    'group flex w-full rounded-md py-1 pr-4 text-left font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500',
                                                 ]"
-                                                @click.stop="
-                                                    handleFolderClick(sfile)
-                                                "
-                                                @contextmenu="
-                                                    onSampleFolderContextMenu(
-                                                        $event,
-                                                        sfile
-                                                    )
-                                                "
                                             >
-                                                <!-- Nested disclosure button -->
                                                 <DisclosureButton
-                                                    class="w-full text-left truncate flex items-center"
-                                                    @click="
-                                                        () =>
-                                                            handleDisclosureButtonClick(
-                                                                sfile.id
-                                                            )
+                                                    class="flex-shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                                    :aria-label="
+                                                        open
+                                                            ? 'Collapse folder'
+                                                            : 'Expand folder'
                                                     "
                                                 >
-                                                    <!-- Loading state for nested directory -->
                                                     <span v-if="sfile.loading">
                                                         <ArrowPathIcon
-                                                            class="animate-spin ml-1 mr-3 h-5 w-5 text-dark inline"
+                                                            class="ml-1 inline h-4 w-4 animate-spin text-dark"
                                                             aria-hidden="true"
                                                         />
                                                     </span>
+                                                    <ChevronRightIcon
+                                                        v-else
+                                                        :class="[
+                                                            open
+                                                                ? 'rotate-90 text-gray-700'
+                                                                : 'text-gray-300',
+                                                            'ml-1 h-4 w-4 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-700',
+                                                        ]"
+                                                        aria-hidden="true"
+                                                    />
+                                                </DisclosureButton>
 
-                                                    <!-- Nested chevron icon -->
-                                                    <span v-else>
-                                                        <ChevronRightIcon
-                                                            :class="[
-                                                                open
-                                                                    ? 'text-gray-700 rotate-90'
-                                                                    : 'text-gray-300',
-                                                                'ml-1 mr-2 flex-shrink-0 h-4 w-4 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
-                                                            ]"
-                                                            aria-hidden="true"
+                                                <span
+                                                    :class="
+                                                        sampleFolderRowClasses(
+                                                            sfile
+                                                        )
+                                                    "
+                                                    style="user-select: none"
+                                                    :aria-disabled="
+                                                        isSampleFolderProcessing(
+                                                            sfile
+                                                        )
+                                                            ? 'true'
+                                                            : undefined
+                                                    "
+                                                    @click.stop="
+                                                        handleFolderClick(sfile)
+                                                    "
+                                                    @contextmenu="
+                                                        onSampleFolderContextMenu(
+                                                            $event,
+                                                            sfile
+                                                        )
+                                                    "
+                                                >
+                                                    <span
+                                                        v-if="
+                                                            sfile.type ==
+                                                            'directory'
+                                                        "
+                                                    >
+                                                        <!-- Instrument-specific icons -->
+                                                        <img
+                                                            v-if="
+                                                                sfile.instrument_type ==
+                                                                'bruker'
+                                                            "
+                                                            class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
+                                                            src="/img/bruker.jpg"
+                                                            alt="Bruker"
                                                         />
-                                                    </span>
-
-                                                    <!-- Nested directory name and icon -->
-                                                    <span>
+                                                        <img
+                                                            v-else-if="
+                                                                sfile.instrument_type ==
+                                                                'varian'
+                                                            "
+                                                            class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
+                                                            src="/img/varian.jpeg"
+                                                            alt="Varian"
+                                                        />
+                                                        <img
+                                                            v-else-if="
+                                                                sfile.instrument_type ==
+                                                                'joel'
+                                                            "
+                                                            class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
+                                                            src="/img/joel.jpg"
+                                                            alt="JOEL"
+                                                        />
+                                                        <img
+                                                            v-else-if="
+                                                                sfile.instrument_type ==
+                                                                'jcamp'
+                                                            "
+                                                            class="flex-shrink-0 h-5 w-5 text-gray-700"
+                                                            src="/img/jcamp.png"
+                                                            alt="JCAMP"
+                                                        />
+                                                        <!-- Study folder: processing, ready to publish, or incomplete -->
                                                         <span
-                                                            :class="[
-                                                                sfile.status ==
-                                                                'missing'
-                                                                    ? 'text-red-800'
-                                                                    : '',
-                                                                'inline-flex items-center gap-1 min-w-0',
-                                                            ]"
-                                                            style="
-                                                                user-select: none;
+                                                            v-else-if="
+                                                                isSampleFolder(
+                                                                    sfile
+                                                                )
+                                                            "
+                                                            class="relative inline-flex flex-shrink-0"
+                                                            :title="
+                                                                sampleFolderStatusTitle(
+                                                                    sfile
+                                                                )
                                                             "
                                                         >
-                                                            <!-- Dynamic icon for nested directory -->
-                                                            <span
-                                                                v-if="
-                                                                    sfile.type ==
-                                                                    'directory'
-                                                                "
-                                                            >
-                                                                <!-- Instrument-specific icons -->
-                                                                <img
-                                                                    v-if="
-                                                                        sfile.instrument_type ==
-                                                                        'bruker'
-                                                                    "
-                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
-                                                                    src="/img/bruker.jpg"
-                                                                    alt="Bruker"
-                                                                />
-                                                                <img
-                                                                    v-else-if="
-                                                                        sfile.instrument_type ==
-                                                                        'varian'
-                                                                    "
-                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
-                                                                    src="/img/varian.jpeg"
-                                                                    alt="Varian"
-                                                                />
-                                                                <img
-                                                                    v-else-if="
-                                                                        sfile.instrument_type ==
-                                                                        'joel'
-                                                                    "
-                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700 border rounded-md"
-                                                                    src="/img/joel.jpg"
-                                                                    alt="JOEL"
-                                                                />
-                                                                <img
-                                                                    v-else-if="
-                                                                        sfile.instrument_type ==
-                                                                        'jcamp'
-                                                                    "
-                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
-                                                                    src="/img/jcamp.png"
-                                                                    alt="JCAMP"
-                                                                />
-                                                                <!-- Study folder with notification indicator -->
-                                                                <span
-                                                                    v-else-if="
-                                                                        sfile.model_type ==
-                                                                        'study'
-                                                                    "
-                                                                    class="relative inline-flex flex-shrink-0"
-                                                                >
-                                                                    <FolderIcon
-                                                                        class="h-5 w-5 text-gray-700"
-                                                                        aria-hidden="true"
-                                                                    />
-                                                                    <span
-                                                                        class="flex absolute h-2 w-2 top-0 right-0"
-                                                                    >
-                                                                        <span
-                                                                            class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-                                                                        ></span>
-                                                                        <span
-                                                                            class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"
-                                                                        ></span>
-                                                                    </span>
-                                                                </span>
-                                                                <!-- Default folder icon -->
-                                                                <FolderIcon
-                                                                    v-else
-                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
-                                                                    aria-hidden="true"
-                                                                />
-                                                            </span>
-                                                            <!-- Document icon for files -->
-                                                            <span v-else>
-                                                                <DocumentTextIcon
-                                                                    class="flex-shrink-0 h-5 w-5 text-gray-700"
-                                                                    aria-hidden="true"
-                                                                />
-                                                            </span>
-                                                            <span
-                                                                class="truncate"
-                                                                :title="
-                                                                    sfile.name
-                                                                "
-                                                                >{{
-                                                                    truncateMiddle(
-                                                                        sfile.name,
-                                                                        25
+                                                            <FolderIcon
+                                                                :class="[
+                                                                    'h-5 w-5',
+                                                                    isSampleFolderSubmitted(
+                                                                        sfile
                                                                     )
-                                                                }}</span
+                                                                        ? 'text-gray-400'
+                                                                        : isSampleFolderProcessing(
+                                                                              sfile
+                                                                          )
+                                                                        ? 'text-gray-400'
+                                                                        : isSampleFolderReady(
+                                                                              sfile
+                                                                          )
+                                                                        ? 'text-green-600'
+                                                                        : 'text-gray-700',
+                                                                ]"
+                                                                aria-hidden="true"
+                                                            />
+                                                            <ArrowPathIcon
+                                                                v-if="
+                                                                    isSampleFolderProcessing(
+                                                                        sfile
+                                                                    ) &&
+                                                                    !isSampleFolderSubmitted(
+                                                                        sfile
+                                                                    )
+                                                                "
+                                                                class="absolute -right-1 -top-1 h-3.5 w-3.5 animate-spin text-teal-600"
+                                                                aria-hidden="true"
+                                                            />
+                                                            <span
+                                                                v-else-if="
+                                                                    isSampleFolderPending(
+                                                                        sfile
+                                                                    ) ||
+                                                                    (!isSampleFolderSubmitted(
+                                                                        sfile
+                                                                    ) &&
+                                                                        !isSampleFolderReady(
+                                                                            sfile
+                                                                        ))
+                                                                "
+                                                                class="absolute right-0 top-0 flex h-2 w-2"
                                                             >
+                                                                <span
+                                                                    class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+                                                                ></span>
+                                                                <span
+                                                                    class="relative inline-flex h-2 w-2 rounded-full bg-sky-500"
+                                                                ></span>
+                                                            </span>
                                                         </span>
+                                                        <!-- Default folder icon -->
+                                                        <FolderIcon
+                                                            v-else
+                                                            class="flex-shrink-0 h-5 w-5 text-gray-700"
+                                                            aria-hidden="true"
+                                                        />
                                                     </span>
-                                                </DisclosureButton>
+                                                    <span v-else>
+                                                        <DocumentTextIcon
+                                                            class="h-5 w-5 flex-shrink-0 text-gray-700"
+                                                            aria-hidden="true"
+                                                        />
+                                                    </span>
+                                                    <span
+                                                        class="truncate"
+                                                        :title="sfile.name"
+                                                        >{{
+                                                            truncateMiddle(
+                                                                sfile.name,
+                                                                25
+                                                            )
+                                                        }}</span
+                                                    >
+                                                </span>
                                             </div>
 
                                             <!-- Panel for nested directory children -->
@@ -382,6 +440,19 @@
                                                             "
                                                             :study="study"
                                                             :project="project"
+                                                            :studies="studies"
+                                                            :isolate-selection="
+                                                                isolateSelection
+                                                            "
+                                                            :submitted-study-ids="
+                                                                submittedStudyIds
+                                                            "
+                                                            :studies-workspace-ready="
+                                                                studiesWorkspaceReady
+                                                            "
+                                                            :draft-processing="
+                                                                draftProcessing
+                                                            "
                                                             :expanded-folders="
                                                                 expandedFolders
                                                             "
@@ -409,6 +480,13 @@
                                                                         payload
                                                                     )
                                                             "
+                                                            @sample-folder-selected="
+                                                                (folder) =>
+                                                                    $emit(
+                                                                        'sample-folder-selected',
+                                                                        folder
+                                                                    )
+                                                            "
                                                         />
                                                     </span>
 
@@ -416,11 +494,8 @@
                                                     <span
                                                         v-else
                                                         :class="[
-                                                            $page.props
-                                                                .selectedFileSystemObject &&
-                                                            $page.props
-                                                                .selectedFileSystemObject
-                                                                .relative_url ==
+                                                            selectedFileSystemObject &&
+                                                            selectedFileSystemObject.relative_url ==
                                                                 subItem.relative_url
                                                                 ? 'cursor-pointer bg-gray-100'
                                                                 : 'cursor-pointer bg-white text-gray-600',
@@ -462,9 +537,9 @@
                                 <span
                                     v-else
                                     :class="[
-                                        $page.props.selectedFileSystemObject &&
-                                        $page.props.selectedFileSystemObject
-                                            .relative_url == sfile.relative_url
+                                        selectedFileSystemObject &&
+                                        selectedFileSystemObject.relative_url ==
+                                            sfile.relative_url
                                             ? 'cursor-pointer bg-gray-100'
                                             : 'cursor-pointer bg-white text-gray-600',
                                         'p-1 ml-5 rounded-md truncate ...',
@@ -525,6 +600,14 @@ import {
 
 // HeadlessUI imports for disclosure functionality
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
+import {
+    isSampleFolderReadyToPublish,
+    isStudyActivelyProcessing,
+    isStudyFolderSubmitted,
+    isStudyFolderProcessing,
+    findStudyForFolder,
+    isDraftSampleFolder,
+} from "@/Composables/useDraftProcessing";
 
 export default {
     name: "Children",
@@ -575,12 +658,32 @@ export default {
             type: String,
             default: "asc",
         },
+        studies: {
+            type: Array,
+            default: () => [],
+        },
+        isolateSelection: {
+            type: Boolean,
+            default: false,
+        },
+        submittedStudyIds: {
+            type: Array,
+            default: () => [],
+        },
+        studiesWorkspaceReady: {
+            type: Boolean,
+            default: false,
+        },
+        draftProcessing: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     /**
      * Events emitted by this component
      */
-    emits: ["toggle-expansion", "study-context-menu"],
+    emits: ["toggle-expansion", "study-context-menu", "sample-folder-selected"],
 
     /**
      * Composition API setup function
@@ -590,23 +693,37 @@ export default {
         return {};
     },
 
-    /**
-     * Component reactive data
-     * @returns {Object} Empty object - no local state needed
-     */
     data() {
-        return {};
+        return {
+            localSelectedFile: null,
+            localSelectedFolder: "/",
+        };
     },
 
-    /**
-     * Computed properties
-     */
-    computed: {},
+    computed: {
+        selectedFileSystemObject() {
+            if (this.isolateSelection) {
+                return this.localSelectedFile;
+            }
 
-    /**
-     * Component lifecycle - mounted
-     * No initialization needed for this component
-     */
+            return this.$page.props.selectedFileSystemObject ?? null;
+        },
+
+        selectedFolder() {
+            if (this.isolateSelection) {
+                return this.localSelectedFolder;
+            }
+
+            return this.$page.props.selectedFolder ?? "/";
+        },
+
+        submittedStudyIdSet() {
+            return new Set(
+                (this.submittedStudyIds ?? []).map((id) => Number(id))
+            );
+        },
+    },
+
     mounted() {},
 
     /**
@@ -670,12 +787,20 @@ export default {
                 return [];
             }
 
+            let items = children;
+
+            if (this.submittedStudyIdSet.size > 0) {
+                items = items.filter(
+                    (child) => !this.isSampleFolderSubmitted(child)
+                );
+            }
+
             const mode =
                 this.treeSortBy === "timestamp" ? "timestamp" : "alphabetical";
             const order = this.treeSortOrder === "desc" ? "desc" : "asc";
             const mult = order === "asc" ? 1 : -1;
 
-            return [...children].sort((a, b) => {
+            return [...items].sort((a, b) => {
                 if (mode === "alphabetical") {
                     const cmp = String(a.name || "").localeCompare(
                         String(b.name || ""),
@@ -715,8 +840,99 @@ export default {
          *
          * @param {Object} file - The folder object that was clicked
          */
+        isSampleFolder(file) {
+            return isDraftSampleFolder(file);
+        },
+
+        isSampleFolderSubmitted(file) {
+            return isStudyFolderSubmitted(file, this.submittedStudyIdSet);
+        },
+
+        isSampleFolderProcessing(file) {
+            if (this.isSampleFolderSubmitted(file)) {
+                return false;
+            }
+
+            return isStudyFolderProcessing(
+                file,
+                this.studies,
+                this.submittedStudyIdSet,
+                {
+                    studiesWorkspaceReady: this.studiesWorkspaceReady,
+                    draftProcessing: this.draftProcessing,
+                }
+            );
+        },
+
+        isSampleFolderPending(file) {
+            if (
+                this.isSampleFolderSubmitted(file) ||
+                this.isSampleFolderProcessing(file) ||
+                this.isSampleFolderReady(file)
+            ) {
+                return false;
+            }
+
+            const study = findStudyForFolder(file, this.studies);
+
+            return Boolean(
+                study &&
+                    study.internal_status !== "complete" &&
+                    !isStudyActivelyProcessing(study)
+            );
+        },
+
+        isSampleFolderReady(file) {
+            return isSampleFolderReadyToPublish(
+                file,
+                this.studies,
+                this.submittedStudyIdSet
+            );
+        },
+
+        sampleFolderStatusTitle(file) {
+            if (this.isSampleFolderSubmitted(file)) {
+                return "Submitted for publication — will be removed from this draft when processing finishes";
+            }
+
+            if (this.isSampleFolderProcessing(file)) {
+                return "Processing sample…";
+            }
+
+            if (this.isSampleFolderPending(file)) {
+                return "Waiting for spectral processing to finish";
+            }
+
+            if (this.isSampleFolderReady(file)) {
+                return "Ready to publish (NMRium and structure assigned)";
+            }
+
+            return "Sample needs NMRium and/or structure before publishing";
+        },
+
+        sampleFolderRowClasses(file) {
+            const processing = this.isSampleFolderProcessing(file);
+            const submitted = this.isSampleFolderSubmitted(file);
+
+            return [
+                file.status == "missing" ? "text-red-800" : "",
+                "inline-flex min-w-0 flex-1 items-center gap-1 truncate rounded-md py-0.5 pl-0.5",
+                processing
+                    ? "cursor-not-allowed opacity-50 text-gray-400"
+                    : submitted
+                    ? "cursor-default opacity-60 text-gray-500"
+                    : "cursor-pointer",
+            ];
+        },
+
         handleFolderClick(file) {
-            // Select the folder to show its contents in right panel
+            if (
+                this.isSampleFolderSubmitted(file) ||
+                this.isSampleFolderProcessing(file)
+            ) {
+                return;
+            }
+
             this.displaySelected(file);
         },
 
@@ -729,7 +945,11 @@ export default {
          * @param {Object} file - The folder object the user right-clicked
          */
         onSampleFolderContextMenu(event, file) {
-            if (!file || file.model_type !== "study") {
+            if (
+                !file ||
+                !this.isSampleFolder(file) ||
+                this.isSampleFolderProcessing(file)
+            ) {
                 return;
             }
 
@@ -805,53 +1025,61 @@ export default {
          * @param {Object} file - The file or folder object to select
          */
         displaySelected(file) {
-            // Set the selected file system object globally
-            this.$page.props.selectedFileSystemObject = file;
+            if (
+                this.isSampleFolderSubmitted(file) ||
+                this.isSampleFolderProcessing(file)
+            ) {
+                return;
+            }
 
             // Calculate the current folder path for breadcrumb navigation
             let sFolder = "/";
-            if (this.$page.props.selectedFileSystemObject.name == "/") {
+            if (file.name == "/") {
+                sFolder = "/";
+            } else if (file.type != "file") {
+                sFolder = file.relative_url;
+            } else if (file.parent_id == null) {
                 sFolder = "/";
             } else {
-                if (this.$page.props.selectedFileSystemObject.type != "file") {
-                    // For directories, use the full relative URL
-                    sFolder =
-                        this.$page.props.selectedFileSystemObject.relative_url;
-                } else {
-                    // For files, extract the parent directory path
-                    if (
-                        this.$page.props.selectedFileSystemObject.parent_id ==
-                        null
-                    ) {
-                        sFolder = "/";
-                    } else {
-                        // Remove filename from path to get parent directory
-                        sFolder =
-                            this.$page.props.selectedFileSystemObject.relative_url.replace(
-                                "/" +
-                                    this.$page.props.selectedFileSystemObject
-                                        .name,
-                                ""
-                            );
-                    }
-                }
+                sFolder = file.relative_url.replace("/" + file.name, "");
             }
 
-            // Update the selected folder for breadcrumb display
-            this.$page.props.selectedFolder = sFolder;
+            if (this.isolateSelection) {
+                this.localSelectedFile = file;
+                this.localSelectedFolder = sFolder;
+            } else {
+                this.$page.props.selectedFileSystemObject = file;
+                this.$page.props.selectedFolder = sFolder;
+                this.updateURLWithSelection(file.id);
+            }
 
-            // Update URL with selected folder ID for bookmarking/sharing
-            this.updateURLWithSelection(file.id);
-
-            // Lazy load folder contents if this is an unexpanded folder with children
-            if (file.has_children && file.level > 0 && !file.children) {
+            // Lazy load folder contents when children are not loaded yet
+            if (
+                file.has_children &&
+                file.id &&
+                (!file.children || file.children.length === 0) &&
+                !file.loading
+            ) {
                 file.loading = true;
                 axios
                     .get("/api/v1/files/children/" + file.id)
                     .then((response) => {
-                        file.children = response.data.files[0].children;
+                        if (response.data?.files?.[0]?.children) {
+                            file.children = response.data.files[0].children;
+                        } else {
+                            file.children = [];
+                        }
+                    })
+                    .catch(() => {
+                        file.children = [];
+                    })
+                    .finally(() => {
                         file.loading = false;
                     });
+            }
+
+            if (this.isSampleFolder(file)) {
+                this.$emit("sample-folder-selected", file);
             }
         },
 
@@ -876,8 +1104,12 @@ export default {
                 window.location.pathname
             }?${urlParams.toString()}`;
 
-            // Update browser history without triggering page reload
-            window.history.replaceState({}, "", newUrl);
+            const state =
+                window.history.state && typeof window.history.state === "object"
+                    ? window.history.state
+                    : {};
+
+            window.history.replaceState(state, "", newUrl);
         },
     },
 };
