@@ -104,6 +104,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, config('external-links.crossref_api'))
             ->add(Directive::CONNECT, config('doi.datacite.endpoint'))
             ->add(Directive::CONNECT, config('external-links.nmrkit_url'))
+            ->add(Directive::CONNECT, rtrim((string) config('scout.meilisearch.host'), '/'))
             ->add(Directive::CONNECT, config('services.pubchem.base_url'))
             ->add(Directive::CONNECT, config('services.cas.base_url'))
             ->add(Directive::CONNECT, config('services.chemistry_standardize.url'))
