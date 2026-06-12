@@ -5,14 +5,35 @@ namespace Tests\Feature\Console;
 use App\Models\Molecule;
 use App\Models\NMRium;
 use App\Models\Study;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use Mockery;
 use Tests\TestCase;
 
 class RepairMissingCompoundInfoCommandTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Fake the nested Artisan::call made by the repair command while letting
+     * the outer command (run via $this->artisan) execute for real. A proxy
+     * partial mock wraps the live kernel, so any call that does not match the
+     * expectation is forwarded to the actual implementation.
+     *
+     * @param  callable(string, array<string, mixed>): bool  $matcher
+     */
+    private function fakeNestedArtisanCall(callable $matcher): void
+    {
+        $kernel = Mockery::mock($this->app->make(Kernel::class))->makePartial();
+        $kernel->shouldReceive('call')
+            ->once()
+            ->withArgs($matcher)
+            ->andReturn(0);
+
+        Artisan::swap($kernel);
+    }
 
     public function test_exits_successfully_when_nothing_needs_repair(): void
     {
@@ -48,16 +69,13 @@ class RepairMissingCompoundInfoCommandTest extends TestCase
         Molecule::factory()->create([
             'standard_inchi' => 'InChI=1S/C6H6/c1-2-4-6-5-3-1/h1-6H',
             'iupac_name' => null,
-            'molecular_formula' => null,
+            'molecular_formula' => '',
             'molecular_weight' => null,
         ]);
 
-        Artisan::shouldReceive('call')
-            ->once()
-            ->withArgs(fn (string $command, array $parameters): bool => $command === 'nmrxiv:molecules-clean'
-                && ($parameters['--force'] ?? false) === true
-                && ($parameters['--limit'] ?? 0) === 1)
-            ->andReturn(0);
+        $this->fakeNestedArtisanCall(fn (string $command, array $parameters = []): bool => $command === 'nmrxiv:molecules-clean'
+            && ($parameters['--force'] ?? false) === true
+            && ($parameters['--limit'] ?? 0) === 1);
 
         $this->artisan('nmrxiv:repair-missing-compound-info', ['--molecules' => true])
             ->expectsOutputToContain('Found 1 molecule(s) with missing compound metadata')
@@ -89,11 +107,8 @@ class RepairMissingCompoundInfoCommandTest extends TestCase
             ],
         ]);
 
-        Artisan::shouldReceive('call')
-            ->once()
-            ->withArgs(fn (string $command, array $parameters): bool => $command === 'nmrxiv:refresh-nmrium-info'
-                && (int) ($parameters['--study'] ?? 0) === $study->id)
-            ->andReturn(0);
+        $this->fakeNestedArtisanCall(fn (string $command, array $parameters = []): bool => $command === 'nmrxiv:refresh-nmrium-info'
+            && (int) ($parameters['--study'] ?? 0) === $study->id);
 
         $this->artisan('nmrxiv:repair-missing-compound-info', ['--nmrium' => true])
             ->expectsOutputToContain('Found 1 study/studies with missing NMRium spectrum metadata')
