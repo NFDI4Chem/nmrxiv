@@ -1,15 +1,25 @@
 <template>
-    <div v-if="segments.length > 0" class="min-w-0">
-        <div
-            v-if="variant === 'simple'"
-            class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 dark:text-gray-400"
-            role="group"
-            aria-label="Publication and revision dates"
-        >
-            <CalendarDaysIcon
-                class="h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-gray-500"
-                aria-hidden="true"
-            />
+    <div
+        v-if="variant === 'simple' ? segments.length > 0 : hasDefaultContent"
+        :class="[
+            'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-600 dark:text-gray-400',
+            variant !== 'simple' &&
+                topDivider &&
+                'border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-3.5',
+        ]"
+        role="group"
+        :aria-label="
+            variant === 'simple'
+                ? 'Publication and revision dates'
+                : 'Project dates'
+        "
+    >
+        <CalendarDaysIcon
+            class="h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-gray-500"
+            aria-hidden="true"
+        />
+
+        <template v-if="variant === 'simple'">
             <div class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
                 <template v-for="(seg, idx) in segments" :key="seg.label">
                     <span
@@ -19,7 +29,7 @@
                         >&nbsp;·&nbsp;</span
                     >
                     <span
-                        class="inline-flex flex-wrap items-baseline gap-x-1.5"
+                        class="inline-flex max-w-full min-w-0 flex-wrap items-baseline gap-x-1.5"
                     >
                         <span
                             class="font-medium text-gray-500 dark:text-gray-500"
@@ -33,52 +43,70 @@
                     </span>
                 </template>
             </div>
-        </div>
+        </template>
 
-        <div
-            v-else
-            :class="[
-                'flex min-w-0 flex-col gap-2.5 text-xs text-gray-600 sm:flex-row sm:items-center sm:gap-3 dark:text-gray-400',
-                topDivider &&
-                    'border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-3.5',
-            ]"
-        >
-            <div
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gray-100 text-teal-600 ring-1 ring-inset ring-gray-200/60 dark:bg-gray-800 dark:text-teal-400 dark:ring-gray-700/80"
-                aria-hidden="true"
+        <template v-else>
+            <span
+                v-if="showPublishedDate"
+                class="inline-flex max-w-full min-w-0 flex-wrap items-baseline gap-x-1.5"
             >
-                <CalendarDaysIcon class="h-4 w-4" />
-            </div>
-            <div
-                class="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-2.5"
-                role="group"
-                aria-label="Publication and revision dates"
-            >
-                <div
-                    v-for="seg in segments"
-                    :key="seg.label"
-                    class="inline-flex max-w-full min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5 rounded-md border border-gray-200/80 bg-white px-2 py-1 shadow-sm dark:border-gray-700 dark:bg-gray-900/60"
+                <span class="font-medium text-gray-500 dark:text-gray-500"
+                    >Published</span
                 >
-                    <span
-                        class="shrink-0 text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-500"
-                        >{{ seg.label }}</span
-                    >
-                    <time
-                        class="min-w-0 break-words text-xs font-medium tabular-nums text-gray-900 dark:text-gray-100"
-                        :datetime="isoDatetime(seg.value)"
-                        >{{ formatRecordTimestamp(seg.value) }}</time
-                    >
-                </div>
+                <time
+                    class="tabular-nums text-gray-800 dark:text-gray-200"
+                    :datetime="isoDatetime(release_date)"
+                    >{{ formatRecordTimestamp(release_date) }}</time
+                >
+            </span>
+            <span
+                v-if="showPublishedDate && lastUpdatedValue"
+                class="select-none text-gray-300 dark:text-gray-600"
+                aria-hidden="true"
+                >&nbsp;·&nbsp;</span
+            >
+            <span
+                v-if="lastUpdatedValue"
+                class="inline-flex max-w-full min-w-0 flex-wrap items-baseline gap-x-1.5"
+            >
+                <span class="font-medium text-gray-500 dark:text-gray-500"
+                    >Last updated</span
+                >
+                <time
+                    class="tabular-nums text-gray-800 dark:text-gray-200"
+                    :datetime="isoDatetime(lastUpdatedValue)"
+                    >{{ formatRecordTimestamp(lastUpdatedValue) }}</time
+                >
+            </span>
+            <div v-if="showCreatedInfo" class="tooltip">
+                <button
+                    type="button"
+                    class="rounded-full p-0.5 text-gray-400 transition-colors hover:bg-gray-200/80 hover:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                    :aria-label="createdTooltipLabel"
+                    :title="createdTooltipLabel"
+                >
+                    <InformationCircleIcon
+                        class="h-3.5 w-3.5"
+                        aria-hidden="true"
+                    />
+                </button>
+                <span
+                    class="tooltiptextbottom z-10 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-center text-xs text-white shadow-lg dark:bg-gray-800"
+                    role="tooltip"
+                >
+                    {{ createdTooltipLabel }}
+                </span>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 
 <script>
 import { CalendarDaysIcon } from "@heroicons/vue/24/solid";
+import { InformationCircleIcon } from "@heroicons/vue/24/outline";
 
 export default {
-    components: { CalendarDaysIcon },
+    components: { CalendarDaysIcon, InformationCircleIcon },
     props: {
         release_date: {
             type: [String, Number, Date],
@@ -91,6 +119,10 @@ export default {
         updated_at: {
             type: [String, Number, Date],
             default: null,
+        },
+        is_published: {
+            type: Boolean,
+            default: false,
         },
         topDivider: {
             type: Boolean,
@@ -105,6 +137,32 @@ export default {
         },
     },
     computed: {
+        hasDefaultContent() {
+            return Boolean(this.showPublishedDate || this.lastUpdatedValue);
+        },
+        showPublishedDate() {
+            return Boolean(this.release_date && this.is_published);
+        },
+        lastUpdatedValue() {
+            return this.updated_at ?? this.created_at ?? null;
+        },
+        showCreatedInfo() {
+            if (!this.created_at || !this.updated_at) {
+                return false;
+            }
+
+            return (
+                this.formatRecordTimestamp(this.created_at) !==
+                this.formatRecordTimestamp(this.updated_at)
+            );
+        },
+        createdTooltipLabel() {
+            if (!this.created_at) {
+                return "";
+            }
+
+            return `Created ${this.formatRecordTimestamp(this.created_at)}`;
+        },
         segments() {
             const rows = [];
             if (this.release_date) {

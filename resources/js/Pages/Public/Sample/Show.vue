@@ -471,12 +471,9 @@
                         class="mt-10 min-w-0 lg:mt-0 lg:col-span-3"
                     >
                         <div
-                            class="flex min-w-0 flex-col gap-6 bg-white py-5 pl-0 pr-0 dark:bg-gray-900/80 lg:sticky lg:top-6"
+                            class="space-y-8 bg-white py-6 pl-0 pr-0 dark:bg-gray-900/80 lg:sticky lg:top-6"
                         >
-                            <div
-                                v-if="studyIdentifier"
-                                class="min-w-0 shrink-0"
-                            >
+                            <div v-if="studyIdentifier">
                                 <h3
                                     class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                 >
@@ -486,95 +483,27 @@
                                     <Tag :identifier="studyIdentifier" />
                                 </div>
                             </div>
-                            <div
-                                v-if="hasPublicationDates"
-                                :class="[
-                                    'min-w-0 shrink-0',
-                                    studyIdentifier
-                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
-                                        : '',
-                                ]"
-                            >
-                                <ShowProjectDates
-                                    variant="simple"
-                                    :release_date="study.data.release_date"
-                                    :created_at="study.data.created_at"
+
+                            <div v-if="showDoiCitation" class="w-full min-w-0">
+                                <Citation
+                                    :model="'sample'"
+                                    :doi="study.data.doi"
                                 />
                             </div>
-                            <div
-                                v-if="hasKeywords"
-                                :class="[
-                                    'min-w-0 shrink-0',
-                                    studyIdentifier || hasPublicationDates
-                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
-                                        : '',
-                                ]"
-                            >
-                                <h3
-                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
-                                >
-                                    Keywords
-                                </h3>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    <span
-                                        v-for="tag in study.data.tags"
-                                        :key="tag.id"
-                                        class="inline-flex items-center rounded-md bg-indigo-100 px-2.5 py-0.5 text-sm font-medium text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-200"
-                                    >
-                                        <svg
-                                            class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                            fill="currentColor"
-                                            viewBox="0 0 8 8"
-                                        >
-                                            <circle cx="4" cy="4" r="3" />
-                                        </svg>
-                                        {{ tag.name["en"] }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                v-if="hasMolecularCompositionSidebar"
-                                :class="[
-                                    'min-w-0 shrink-0',
-                                    studyIdentifier ||
-                                    hasPublicationDates ||
-                                    hasKeywords
-                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
-                                        : '',
-                                ]"
-                            >
-                                <h3
-                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
-                                >
-                                    Molecular info
-                                </h3>
-                                <MolecularInfoPanel
-                                    :molecules="compositionMolecules"
-                                />
-                            </div>
-                            <div
-                                v-if="hasLicense"
-                                class="w-full min-w-0 shrink-0"
-                                :class="
-                                    hasSidebarContentAboveCitation
-                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
-                                        : ''
-                                "
-                            >
+
+                            <div v-if="hasLicense">
                                 <h3
                                     class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                 >
                                     License
                                 </h3>
-                                <p
-                                    class="mt-2 text-sm text-gray-600 dark:text-gray-400"
-                                >
+                                <div class="mt-2 text-sm">
                                     <a
                                         v-if="study.data.license.url"
                                         :href="study.data.license.url"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="font-medium text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400"
+                                        class="font-medium text-gray-900 underline decoration-gray-400 underline-offset-2 hover:text-teal-700 dark:text-gray-200 dark:hover:text-teal-400"
                                     >
                                         {{ study.data.license.title }}
                                     </a>
@@ -584,7 +513,7 @@
                                     >
                                         {{ study.data.license.title }}
                                     </span>
-                                </p>
+                                </div>
                                 <p
                                     v-if="study.data.license.description"
                                     class="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400"
@@ -595,15 +524,63 @@
                                     "
                                 ></p>
                             </div>
-                            <div
-                                v-if="hasStudyCitations"
-                                class="w-full min-w-0 shrink-0"
-                                :class="
-                                    hasSidebarContentAboveStudyCitations
-                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
-                                        : ''
-                                "
-                            >
+
+                            <div v-if="study.data.release_date">
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Published
+                                </h3>
+                                <p
+                                    class="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200"
+                                >
+                                    {{ formatDate(study.data.release_date) }}
+                                </p>
+                            </div>
+
+                            <div v-if="study.data.created_at">
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Created
+                                </h3>
+                                <p
+                                    class="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200"
+                                >
+                                    {{ formatDate(study.data.created_at) }}
+                                </p>
+                            </div>
+
+                            <div v-if="hasKeywords">
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Tags
+                                </h3>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <a
+                                        v-for="tag in study.data.tags"
+                                        :key="tag.id"
+                                        :href="'/projects?tag=' + tag.name.en"
+                                        class="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-900 shadow-sm transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-950 dark:text-gray-100 dark:hover:bg-gray-800"
+                                    >
+                                        {{ tag.name.en }}
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div v-if="hasMolecularCompositionSidebar">
+                                <h3
+                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
+                                >
+                                    Molecular info
+                                </h3>
+                                <MolecularInfoPanel
+                                    :molecules="compositionMolecules"
+                                />
+                            </div>
+
+                            <div v-if="hasStudyCitations">
                                 <h3
                                     class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                 >
@@ -614,20 +591,6 @@
                                         :citations="study.data.citations"
                                     />
                                 </div>
-                            </div>
-                            <div
-                                v-if="showDoiCitation"
-                                class="w-full min-w-0 shrink-0"
-                                :class="
-                                    hasSidebarContentAboveDoiCitation
-                                        ? 'border-t border-gray-200 pt-8 dark:border-gray-700'
-                                        : ''
-                                "
-                            >
-                                <Citation
-                                    :model="'sample'"
-                                    :doi="study.data.doi"
-                                />
                             </div>
                         </div>
                     </aside>
@@ -650,7 +613,6 @@ import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import Tag from "@/Shared/Tag.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
-import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 export default {
@@ -668,7 +630,6 @@ export default {
         Tag,
         Head,
         Citation,
-        ShowProjectDates,
         AuthorCard,
         CitationCard,
     },
@@ -714,12 +675,6 @@ export default {
         hasKeywords() {
             return (this.study?.data?.tags?.length ?? 0) > 0;
         },
-        hasPublicationDates() {
-            return (
-                Boolean(this.study?.data?.release_date) ||
-                Boolean(this.study?.data?.created_at)
-            );
-        },
         hasLicense() {
             return Boolean(this.study?.data?.license);
         },
@@ -734,30 +689,14 @@ export default {
         showDoiCitation() {
             return this.study?.data?.is_public && this.study?.data?.doi != null;
         },
-        hasSidebarContentAboveCitation() {
-            return (
-                Boolean(this.studyIdentifier) ||
-                this.hasPublicationDates ||
-                this.hasKeywords ||
-                this.hasMolecularCompositionSidebar
-            );
-        },
-        hasSidebarContentAboveStudyCitations() {
-            return this.hasSidebarContentAboveCitation || this.hasLicense;
-        },
-        hasSidebarContentAboveDoiCitation() {
-            return (
-                this.hasSidebarContentAboveStudyCitations ||
-                this.hasStudyCitations
-            );
-        },
         hasInfoSidebar() {
             return (
                 Boolean(this.studyIdentifier) ||
                 this.showDoiCitation ||
                 this.hasMolecularCompositionSidebar ||
                 this.hasKeywords ||
-                this.hasPublicationDates ||
+                Boolean(this.study?.data?.release_date) ||
+                Boolean(this.study?.data?.created_at) ||
                 this.hasStudyCitations ||
                 this.hasLicense
             );

@@ -6,7 +6,7 @@
         :current-study="study"
     >
         <template #project-content>
-            <div class="pb-10 mb-10 py-6">
+            <div class="pb-10 mb-10 pt-4 pb-6">
                 <PublicDatasetBody
                     :study="study"
                     :dataset="dataset"

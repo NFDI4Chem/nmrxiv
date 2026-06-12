@@ -6,7 +6,9 @@ use App\Actions\License\GetLicense;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use App\Models\Dataset;
 use App\Models\Project;
+use App\Models\Study;
 use App\Support\ProjectWorkspace;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -24,12 +26,15 @@ class ApplicationController extends Controller
      */
     public function compounds(Request $request)
     {
-        $query = $request->get('query');
-        $limit = $request->get('limit') ? $request->get('limit') : 24;
-        $page = max(1, (int) $request->query('page', 1));
-        $tagType = $request->query('tagType') ? $request->query('tagType') : null;
-
-        return Inertia::render('Public/Compounds', compact(['query', 'limit', 'page', 'tagType']));
+        return redirect()->route('search', array_filter([
+            'scope' => 'compounds',
+            'query' => $request->query('query'),
+            'type' => $request->query('type'),
+            'sort' => $request->query('sort'),
+            'limit' => $request->query('limit'),
+            'page' => $request->query('page'),
+            'tagType' => $request->query('tagType'),
+        ], fn ($value) => $value !== null && $value !== ''));
     }
 
     /**
@@ -96,20 +101,20 @@ class ApplicationController extends Controller
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];
         if ($model) {
-            $tab = $request->get('tab');
-
             if ($namespace == 'Project') {
-                $project = $model;
-                if (! $project->is_public) {
-                    if (! Gate::forUser($request->user())->check('viewProject', $project)) {
-                        throw new AuthorizationException;
-                    }
-                }
+                return $this->renderProjectForRequest($request, $model, $getLicense);
             } elseif ($namespace == 'Study') {
                 $study = $model;
                 $study->load(['studyAuthors', 'linkedCitations']);
                 $project = $study->project;
-                $tab = 'study';
+
+                return $this->renderProjectForRequest(
+                    $request,
+                    $project,
+                    $getLicense,
+                    tabOverride: 'study',
+                    study: $study
+                );
             } elseif ($namespace == 'Dataset') {
                 $dataset = $model;
                 $dataset->loadMissing(['nmrium', 'study.sample']);
@@ -118,87 +123,128 @@ class ApplicationController extends Controller
                     abort(404, 'Page not found');
                 }
                 $project = $dataset->project ?? $study->project;
-                $tab = 'dataset';
+
+                return $this->renderProjectForRequest(
+                    $request,
+                    $project,
+                    $getLicense,
+                    tabOverride: 'dataset',
+                    study: $study,
+                    dataset: $dataset
+                );
             }
 
-            switch ($tab) {
-                case 'info':
+            abort(404, 'Page not found');
+        }
+
+        abort(404, 'Page not found');
+    }
+
+    /**
+     * Render the unified public project UI (same as /project/P{id}) for a project record.
+     * When {@see $reviewerPreview} is true, private projects are readable without login via obfuscation URL.
+     */
+    public function renderProjectForRequest(
+        Request $request,
+        Project $project,
+        GetLicense $getLicense,
+        bool $reviewerPreview = false,
+        ?string $tabOverride = null,
+        ?Study $study = null,
+        ?Dataset $dataset = null,
+    ): InertiaResponse {
+        if (! $reviewerPreview && ! $project->is_public) {
+            if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+                throw new AuthorizationException;
+            }
+        }
+
+        $project->loadMissing(['owner', 'tags', 'authors', 'citations', 'users', 'projectInvitations']);
+
+        $tab = $tabOverride ?? $request->get('tab', 'info');
+
+        switch ($tab) {
+            case 'info':
+                return $this->renderPublicProject(
+                    'Public/Project/Show',
+                    [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => $tab,
+                    ],
+                    $request,
+                    $project,
+                    $getLicense,
+                    $reviewerPreview
+                );
+            case 'samples':
+                return $this->renderPublicProject(
+                    'Public/Project/Samples',
+                    [
+                        'project' => (new ProjectResource($project))->lite(false, []),
+                        'tab' => $tab,
+                    ],
+                    $request,
+                    $project,
+                    $getLicense,
+                    $reviewerPreview
+                );
+            case 'files':
+                return $this->renderPublicProject(
+                    'Public/Project/Files',
+                    [
+                        'project' => (new ProjectResource($project))->lite(false, ['files']),
+                        'tab' => $tab,
+                    ],
+                    $request,
+                    $project,
+                    $getLicense,
+                    $reviewerPreview
+                );
+            case 'study':
+                $studyForView = $study ?? $this->resolveStudyForProjectTab($request, $project);
+
+                if ($project && $studyForView) {
                     return $this->renderPublicProject(
-                        'Public/Project/Show',
-                        [
-                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                            'tab' => $tab,
-                        ],
-                        $request,
-                        $project,
-                        $getLicense
-                    );
-                case 'samples':
-                    return $this->renderPublicProject(
-                        'Public/Project/Samples',
+                        'Public/Project/Study',
                         [
                             'project' => (new ProjectResource($project))->lite(false, []),
                             'tab' => $tab,
+                            'study' => (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'citations']),
                         ],
                         $request,
                         $project,
-                        $getLicense
+                        $getLicense,
+                        $reviewerPreview
                     );
-                case 'files':
-                    return $this->renderPublicProject(
-                        'Public/Project/Files',
-                        [
-                            'project' => (new ProjectResource($project))->lite(false, ['files']),
-                            'tab' => $tab,
-                        ],
-                        $request,
-                        $project,
-                        $getLicense
-                    );
-                case 'study':
-                    if ($project) {
-                        return $this->renderPublicProject(
-                            'Public/Project/Study',
-                            [
-                                'project' => (new ProjectResource($project))->lite(false, []),
-                                'tab' => $tab,
-                                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'citations']),
-                            ],
-                            $request,
-                            $project,
-                            $getLicense
-                        );
-                    }
+                }
 
+                if ($studyForView) {
                     return Inertia::render('Public/Sample/Show', [
                         'tab' => $tab,
-                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors', 'citations']),
+                        'study' => (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors', 'citations']),
                     ]);
-                case 'dataset':
-                    $studyResource = (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']);
-                    $datasetResource = (new DatasetResource($dataset))->lite(false, ['nmrium']);
+                }
 
-                    if ($project) {
-                        return $this->renderPublicProject(
-                            'Public/Project/Dataset',
-                            [
-                                'project' => (new ProjectResource($project))->lite(false, []),
-                                'tab' => $tab,
-                                'study' => $studyResource,
-                                'dataset' => $datasetResource,
-                            ],
-                            $request,
-                            $project,
-                            $getLicense
-                        );
-                    }
+                return $this->renderPublicProject(
+                    'Public/Project/Show',
+                    [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => 'info',
+                    ],
+                    $request,
+                    $project,
+                    $getLicense,
+                    $reviewerPreview
+                );
+            case 'dataset':
+                $studyForView = $study ?? $this->resolveStudyForProjectTab($request, $project);
+                $datasetForView = $dataset ?? (
+                    $studyForView
+                        ? $this->resolveDatasetForProjectTab($request, $studyForView)
+                        : null
+                );
 
-                    return Inertia::render('Public/Sample/Dataset', [
-                        'tab' => $tab,
-                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules', 'owner', 'license', 'authors', 'citations']),
-                        'dataset' => $datasetResource,
-                    ]);
-                default:
+                if (! $studyForView || ! $datasetForView || ! $project) {
                     return $this->renderPublicProject(
                         'Public/Project/Show',
                         [
@@ -207,23 +253,97 @@ class ApplicationController extends Controller
                         ],
                         $request,
                         $project,
-                        $getLicense
+                        $getLicense,
+                        $reviewerPreview
                     );
-            }
-        } else {
-            abort(404, 'Page not found');
+                }
+
+                $studyResource = (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'molecules']);
+                $datasetResource = (new DatasetResource($datasetForView))->lite(false, ['nmrium']);
+
+                if ($project) {
+                    return $this->renderPublicProject(
+                        'Public/Project/Dataset',
+                        [
+                            'project' => (new ProjectResource($project))->lite(false, []),
+                            'tab' => $tab,
+                            'study' => $studyResource,
+                            'dataset' => $datasetResource,
+                        ],
+                        $request,
+                        $project,
+                        $getLicense,
+                        $reviewerPreview
+                    );
+                }
+
+                return Inertia::render('Public/Sample/Dataset', [
+                    'tab' => $tab,
+                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules', 'owner', 'license', 'authors', 'citations']),
+                    'dataset' => $datasetResource,
+                ]);
+            default:
+                return $this->renderPublicProject(
+                    'Public/Project/Show',
+                    [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => 'info',
+                    ],
+                    $request,
+                    $project,
+                    $getLicense,
+                    $reviewerPreview
+                );
         }
+    }
+
+    protected function resolveStudyForProjectTab(Request $request, ?Project $project): ?Study
+    {
+        if ($project === null || ! $request->filled('study')) {
+            return null;
+        }
+
+        return Study::query()
+            ->where('project_id', $project->id)
+            ->whereKey($request->integer('study'))
+            ->first();
+    }
+
+    protected function resolveDatasetForProjectTab(Request $request, Study $study): ?Dataset
+    {
+        if (! $request->filled('dataset')) {
+            return null;
+        }
+
+        return Dataset::query()
+            ->where('study_id', $study->id)
+            ->whereKey($request->integer('dataset'))
+            ->first();
     }
 
     /**
      * @param  array<string, mixed>  $props
      */
-    private function renderPublicProject(string $component, array $props, Request $request, ?Project $project, GetLicense $getLicense): InertiaResponse
-    {
+    private function renderPublicProject(
+        string $component,
+        array $props,
+        Request $request,
+        ?Project $project,
+        GetLicense $getLicense,
+        bool $reviewerPreview = false,
+    ): InertiaResponse {
         $mergedProps = $props;
+
+        if ($reviewerPreview && $project) {
+            $mergedProps['reviewerPreview'] = [
+                'obfuscationcode' => $project->obfuscationcode,
+                'samples_count' => $project->studies()->count(),
+            ];
+        }
+
         if ($project) {
             $mergedProps = array_merge(
-                $props,
+                $mergedProps,
                 ProjectWorkspace::inertiaPropsForPublicProject($request, $project, $getLicense)
             );
         }
