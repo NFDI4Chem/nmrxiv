@@ -22,8 +22,4 @@ return [
     |
     */
 
-    'search_api' => env('ORCID_ID_SEARCH_API', 'https://pub.orcid.org/v3.0/search'),
-    'person_api' => env('ORCID_ID_PERSON_API', 'https://pub.orcid.org/v3.0'),
-    'employment_api' => env('ORCID_ID_EMPLOYMENT_API', 'https://pub.orcid.org/v3.0'),
-
 ];
