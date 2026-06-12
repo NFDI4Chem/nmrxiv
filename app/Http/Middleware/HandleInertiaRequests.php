@@ -90,10 +90,7 @@ class HandleInertiaRequests extends Middleware
                     : 'default';
             },
             'chemistryStandardizeUrl' => route('chemistry.standardize'),
-            'orcidSearchApi' => config('orcid.search_api'),
-            'orcidPersonApi' => config('orcid.person_api'),
             'michiStandardsUrl' => config('external-links.michi_standards_url'),
-            'orcidEmploymentApi' => config('orcid.employment_api'),
             'CM_API' => config('external-links.cm_api'),
             'CROSSREF_API' => config('external-links.crossref_api'),
             'DATACITE_API' => config('external-links.datacite_api'),
