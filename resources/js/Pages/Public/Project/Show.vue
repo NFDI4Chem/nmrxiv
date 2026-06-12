@@ -286,28 +286,6 @@
                                 </div>
                             </div>
 
-                            <div
-                                v-if="
-                                    (project.data && project.data.doi) ||
-                                    project.doi
-                                "
-                            >
-                                <h3
-                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
-                                >
-                                    DOI
-                                </h3>
-                                <div class="mt-2">
-                                    <DOIBadge
-                                        :doi="
-                                            (project.data &&
-                                                project.data.doi) ||
-                                            project.doi
-                                        "
-                                    />
-                                </div>
-                            </div>
-
                             <div v-if="showDoiCitation" class="w-full min-w-0">
                                 <Citation
                                     :model="'project'"
@@ -465,7 +443,6 @@ import ManageCitation from "@/Shared/ManageCitation.vue";
 import ProjectDetails from "@/Pages/Project/Partials/Details.vue";
 import Publish from "@/Shared/Publish.vue";
 import Citation from "@/Shared/Citation.vue";
-import DOIBadge from "@/Shared/DOIBadge.vue";
 import Tag from "@/Shared/Tag.vue";
 import "ontology-elements/dist/index.js";
 import { Head } from "@inertiajs/vue3";
@@ -479,7 +456,6 @@ export default {
         AuthorCard,
         CitationCard,
         Citation,
-        DOIBadge,
         Head,
         ManageAuthor,
         ManageCitation,
@@ -565,7 +541,6 @@ export default {
             const hasId = !!(
                 this.project?.data?.identifier || this.project?.identifier
             );
-            const hasDoi = !!(this.project?.data?.doi || this.project?.doi);
             const hasDates = !!(
                 this.project?.data?.release_date ||
                 this.project?.release_date ||
@@ -576,7 +551,6 @@ export default {
 
             return (
                 hasId ||
-                hasDoi ||
                 this.showDoiCitation ||
                 this.licenseTitle ||
                 hasDates ||

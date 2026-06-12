@@ -177,11 +177,12 @@ export default {
             this.$page.props.query = this.editor.getSmiles();
             this.$page.props.queryType = this.type;
 
-            window.location =
-                "/compounds/?query=" +
-                encodeURI(this.editor.getSmiles()) +
-                "&type=" +
-                this.type;
+            const params = new URLSearchParams({
+                scope: "compounds",
+                query: this.editor.getSmiles(),
+                type: this.type,
+            });
+            window.location = `/search?${params.toString()}`;
         },
     },
 };

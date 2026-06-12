@@ -14,6 +14,17 @@
 }
 @import 'vue3-tour/dist/vue3-tour.css';
 
+/* Deposit data CTA — solid brand fill (Tailwind classes applied via JS util) */
+.deposit-data-cta {
+    color: #fff !important;
+    background-color: #019dbb !important;
+    border-color: rgba(0, 136, 160, 0.45);
+}
+
+.deposit-data-cta:hover {
+    background-color: #02abc9 !important;
+}
+
 .tooltip {
   position: relative;
   display: inline-flex;

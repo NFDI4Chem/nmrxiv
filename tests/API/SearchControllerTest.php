@@ -60,7 +60,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_validation_rejects_invalid_parameters()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => str_repeat('a', 1001), // Over max 1000 characters
             'type' => 'invalid_type',
             'limit' => 101, // Over max 100
@@ -87,7 +87,7 @@ class SearchControllerTest extends TestCase
             'name' => 'Caffeine',
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'Aspirin',
             'type' => 'text',
         ]);
@@ -105,7 +105,7 @@ class SearchControllerTest extends TestCase
             'standard_inchi_key' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
             'type' => 'inchikey',
         ]);
@@ -122,7 +122,7 @@ class SearchControllerTest extends TestCase
             'standard_inchi' => 'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)',
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'InChI=1S/C9H8O4',
             'type' => 'inchi',
         ]);
@@ -135,7 +135,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_automatic_detection_of_inchikey()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
         ]);
 
@@ -148,7 +148,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_automatic_detection_of_inchi()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12',
         ]);
 
@@ -163,7 +163,7 @@ class SearchControllerTest extends TestCase
     {
         $this->createPublicCatalogMolecules(50);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'limit' => 10,
             'page' => 1,
         ]);
@@ -181,7 +181,7 @@ class SearchControllerTest extends TestCase
     {
         Molecule::factory()->count(5)->create();
 
-        $response = $this->postJson('/api/v1/search?sort=recent', [
+        $response = $this->postJson('/api/v1/search/compounds?sort=recent', [
             'query' => '',
         ]);
 
@@ -197,7 +197,7 @@ class SearchControllerTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -210,7 +210,7 @@ class SearchControllerTest extends TestCase
     {
         $this->createPublicCatalogMolecules(30);
 
-        $response = $this->postJson('/api/v1/search?limit=10&page=1&sort=recent', [
+        $response = $this->postJson('/api/v1/search/compounds?limit=10&page=1&sort=recent', [
             'query' => '',
         ]);
 
@@ -218,7 +218,8 @@ class SearchControllerTest extends TestCase
         $nextLink = collect($response->json('links'))->first(fn (array $link) => str_contains($link['label'], 'Next'));
 
         $this->assertNotNull($nextLink);
-        $this->assertStringContainsString('/compounds', $nextLink['url']);
+        $this->assertStringContainsString('/search', $nextLink['url']);
+        $this->assertStringContainsString('scope=compounds', $nextLink['url']);
         $this->assertStringContainsString('page=2', $nextLink['url']);
         $this->assertStringContainsString('sort=recent', $nextLink['url']);
     }
@@ -263,7 +264,7 @@ class SearchControllerTest extends TestCase
             'has_nmrium' => true,
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -308,7 +309,7 @@ class SearchControllerTest extends TestCase
             'has_nmrium' => true,
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -373,7 +374,7 @@ class SearchControllerTest extends TestCase
             'has_nmrium' => true,
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -411,7 +412,7 @@ class SearchControllerTest extends TestCase
             ],
         ]);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -427,7 +428,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_filters_type()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'mw:100..200',
             'type' => 'filters',
         ]);
@@ -446,7 +447,7 @@ class SearchControllerTest extends TestCase
 
         $molecule->attachTag('organic', 'chemical_class');
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'organic',
             'type' => 'tags',
             'tagType' => 'chemical_class',
@@ -462,7 +463,7 @@ class SearchControllerTest extends TestCase
     {
         $this->createPublicCatalogMolecules(3);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
 
@@ -475,7 +476,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_respects_max_limit()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
             'limit' => 200, // Over max
         ]);
@@ -489,7 +490,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_invalid_type()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'type' => 'invalid_search_type',
         ]);
@@ -503,7 +504,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_sanitizes_query_input()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => "test\x00query\x1Fwith\x7Fcontrol",
         ]);
 
@@ -518,7 +519,7 @@ class SearchControllerTest extends TestCase
     {
         $this->createPublicCatalogMolecules(30);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'page' => 2,
             'limit' => 10,
         ]);
@@ -536,7 +537,7 @@ class SearchControllerTest extends TestCase
     {
         Molecule::factory()->count(30)->create();
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
             'limit' => 10,
         ]);
@@ -558,7 +559,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_invalid_smiles_query_returns_empty_results()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'INVALID_SMILES_STRING_###',
             'type' => 'smiles',
         ]);
@@ -572,7 +573,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_invalid_exact_match_query_returns_empty_results()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'INVALID###STRUCTURE',
             'type' => 'exact',
         ]);
@@ -586,7 +587,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_invalid_similarity_query_returns_empty_results()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'INVALID_FINGERPRINT',
             'type' => 'similarity',
         ]);
@@ -600,7 +601,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_range()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'mw:100..500',
             'type' => 'filters',
         ]);
@@ -613,7 +614,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_boolean_value()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'cs:true',
             'type' => 'filters',
         ]);
@@ -626,7 +627,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_or_conditions()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'mw:100..200 OR mw:300..400',
             'type' => 'filters',
         ]);
@@ -639,7 +640,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_array_contains()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'ds:ChEBI+PubChem|true',
             'type' => 'filters',
         ]);
@@ -652,7 +653,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_with_text_search()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'class:Organic+compounds',
             'type' => 'filters',
         ]);
@@ -665,7 +666,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_filter_query_ignores_invalid_fields()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'invalid_field:value',
             'type' => 'filters',
         ]);
@@ -679,7 +680,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_tag_type_validation_with_invalid_characters()
     {
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'type' => 'tags',
             'tagType' => 'invalid-type-123',

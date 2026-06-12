@@ -23,6 +23,7 @@ use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\PublicSearchController;
 use App\Http\Controllers\RorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
@@ -448,6 +449,8 @@ Route::get('{id}', function ($id) {
 
 // Search / browse page
 Route::get('/compounds', [ApplicationController::class, 'compounds'])->name('compounds');
+
+Route::get('/search', [PublicSearchController::class, 'index'])->name('search');
 
 Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])
     ->name('badge.doi');

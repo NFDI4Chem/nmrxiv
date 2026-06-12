@@ -70,7 +70,6 @@
                             class="mt-1 flex-1 h-0 overflow-y-auto"
                         >
                             <div
-                                v-if="!isUploadPage"
                                 class="px-4 py-4 border-b border-gray-100 text-center"
                             >
                                 <create mode="button"></create>
@@ -124,7 +123,7 @@
 
                         <!-- Create Button & Help Section -->
                         <div
-                            v-if="editableTeamRole && !isUploadPage"
+                            v-if="editableTeamRole"
                             class="py-3 border-b border-gray-100 space-y-2"
                         >
                             <!-- Upload/Create Button -->
@@ -193,7 +192,7 @@
                 <div class="flex-grow flex flex-col">
                     <!-- Create Button Section -->
                     <div
-                        v-if="editableTeamRole && !isUploadPage"
+                        v-if="editableTeamRole"
                         class="px-4 py-4 border-b border-gray-100 text-center"
                     >
                         <create mode="button"></create>

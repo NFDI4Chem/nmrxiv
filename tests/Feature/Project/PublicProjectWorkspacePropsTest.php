@@ -53,7 +53,9 @@ class PublicProjectWorkspacePropsTest extends TestCase
         $this->assertArrayHasKey('workspace', $page['props']);
         $this->assertArrayHasKey('dashboardProject', $page['props']['workspace']);
         $this->assertArrayHasKey('projectPermissions', $page['props']['workspace']);
-        $this->assertSame('creator', $page['props']['workspace']['role']);
+        // The project owner always resolves to 'owner', even when also attached
+        // with a 'creator' membership role.
+        $this->assertSame('owner', $page['props']['workspace']['role']);
     }
 
     public function test_authenticated_non_member_receives_read_only_workspace_on_public_project(): void
