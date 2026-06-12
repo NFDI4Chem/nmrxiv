@@ -31,6 +31,9 @@
     <env name="SESSION_DRIVER" value="array"/>
     <env name="TELESCOPE_ENABLED" value="false"/>
     <env name="DEBUGBAR_ENABLED" value="false"/>
+    <!-- The cookie consent middleware rewrites response HTML via setContent(),
+         which discards the original View and breaks assertInertia(). -->
+    <env name="COOKIE_CONSENT_ENABLED" value="false"/>
     <env name="AWS_ACCESS_KEY_ID" value="test-key"/>
     <env name="AWS_SECRET_ACCESS_KEY" value="test-secret"/>
     <env name="AWS_DEFAULT_REGION" value="us-east-1"/>

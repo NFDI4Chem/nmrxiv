@@ -737,51 +737,10 @@ class ProjectModelTest extends TestCase
 
     public function test_user_project_role_returns_owner_when_user_is_owner(): void
     {
-        // Test lines 227-228: when user is project owner - create a scenario that tests the owner logic
         $owner = User::factory()->create(['email' => 'owner@example.com']);
         $project = Project::factory()->create(['owner_id' => $owner->id]);
 
-        // Create a partial mock to simulate the behavior we want to test
-        $projectMock = $this->getMockBuilder(Project::class)
-            ->onlyMethods(['userWithEmail'])
-            ->getMock();
-
-        // Set the owner_id to match our test
-        $projectMock->owner_id = $owner->id;
-
-        // Create a mock user that supports array access but has null projectMembership
-        $userMock = new class($owner->id) implements \ArrayAccess
-        {
-            public $id;
-
-            public function __construct($id)
-            {
-                $this->id = $id;
-            }
-
-            public function offsetExists($offset): bool
-            {
-                return $offset === 'projectMembership';
-            }
-
-            public function offsetGet($offset): mixed
-            {
-                return $offset === 'projectMembership' ? null : null;
-            }
-
-            public function offsetSet($offset, $value): void {}
-
-            public function offsetUnset($offset): void {}
-        };
-
-        $projectMock->expects($this->once())
-            ->method('userWithEmail')
-            ->with('owner@example.com')
-            ->willReturn($userMock);
-
-        $role = $projectMock->userProjectRole('owner@example.com');
-
-        $this->assertEquals('owner', $role);
+        $this->assertEquals('owner', $project->userProjectRole('owner@example.com'));
     }
 
     public function test_filter_scope_covers_final_else_branch(): void
