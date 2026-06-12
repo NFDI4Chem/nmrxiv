@@ -164,6 +164,14 @@ class CommunityContributionPublishTest extends TestCase
             'has_children' => false,
         ]);
 
+        // Creating filesystem objects fires FileSystemObjectObserver, which resets
+        // the study's cached readiness (has_nmrium / internal_status). Restore it
+        // so the study is publish-ready again.
+        $readyStudy->refresh()->forceFill([
+            'internal_status' => 'complete',
+            'has_nmrium' => true,
+        ])->saveQuietly();
+
         $this->actingAs($user)->postJson(
             route('community-contribution.publish-studies', ['draft' => $draft->id]),
             [

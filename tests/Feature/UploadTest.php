@@ -324,8 +324,8 @@ class UploadTest extends TestCase
         $response = $this->actingAs($this->user)
             ->get('/publish/'.$draft->id);
 
-        // Should return 403 because project is null and gate check fails
-        $response->assertStatus(403);
+        // Drafts without a project are sent back to the upload workspace.
+        $response->assertRedirect(route('upload', ['draft_id' => $draft->id]));
     }
 
     public function test_upload_works_without_any_parameters(): void
