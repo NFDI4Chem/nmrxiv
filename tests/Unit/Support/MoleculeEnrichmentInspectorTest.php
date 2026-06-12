@@ -74,7 +74,7 @@ class MoleculeEnrichmentInspectorTest extends TestCase
         Molecule::factory()->create([
             'standard_inchi' => 'InChI=1S/C2H6/c1-2/h1-2H3',
             'iupac_name' => null,
-            'molecular_formula' => null,
+            'molecular_formula' => '',
             'molecular_weight' => null,
         ]);
 

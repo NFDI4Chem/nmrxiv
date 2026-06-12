@@ -146,22 +146,26 @@ class ApplicationController extends Controller
      */
     public function renderProjectForRequest(
         Request $request,
-        Project $project,
+        ?Project $project,
         GetLicense $getLicense,
         bool $reviewerPreview = false,
         ?string $tabOverride = null,
         ?Study $study = null,
         ?Dataset $dataset = null,
     ): InertiaResponse {
-        if (! $reviewerPreview && ! $project->is_public) {
+        if ($project !== null && ! $reviewerPreview && ! $project->is_public) {
             if (! Gate::forUser($request->user())->check('viewProject', $project)) {
                 throw new AuthorizationException;
             }
         }
 
-        $project->loadMissing(['owner', 'tags', 'authors', 'citations', 'users', 'projectInvitations']);
+        $project?->loadMissing(['owner', 'tags', 'authors', 'citations', 'users', 'projectInvitations']);
 
         $tab = $tabOverride ?? $request->get('tab', 'info');
+
+        if ($project === null && ! in_array($tab, ['study', 'dataset'], true)) {
+            abort(404, 'Page not found');
+        }
 
         switch ($tab) {
             case 'info':
@@ -225,6 +229,10 @@ class ApplicationController extends Controller
                     ]);
                 }
 
+                if ($project === null) {
+                    abort(404, 'Page not found');
+                }
+
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
@@ -244,7 +252,11 @@ class ApplicationController extends Controller
                         : null
                 );
 
-                if (! $studyForView || ! $datasetForView || ! $project) {
+                if (! $studyForView || ! $datasetForView) {
+                    if ($project === null) {
+                        abort(404, 'Page not found');
+                    }
+
                     return $this->renderPublicProject(
                         'Public/Project/Show',
                         [
@@ -258,7 +270,6 @@ class ApplicationController extends Controller
                     );
                 }
 
-                $studyResource = (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'molecules']);
                 $datasetResource = (new DatasetResource($datasetForView))->lite(false, ['nmrium']);
 
                 if ($project) {
@@ -267,7 +278,7 @@ class ApplicationController extends Controller
                         [
                             'project' => (new ProjectResource($project))->lite(false, []),
                             'tab' => $tab,
-                            'study' => $studyResource,
+                            'study' => (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'molecules']),
                             'dataset' => $datasetResource,
                         ],
                         $request,
@@ -279,7 +290,7 @@ class ApplicationController extends Controller
 
                 return Inertia::render('Public/Sample/Dataset', [
                     'tab' => $tab,
-                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules', 'owner', 'license', 'authors', 'citations']),
+                    'study' => (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'molecules', 'owner', 'license', 'authors', 'citations']),
                     'dataset' => $datasetResource,
                 ]);
             default:
