@@ -49,6 +49,12 @@ class CreateDraft
             $draftData['release_date'] = $options['release_date'];
         }
 
+        if (isset($options['deposition_type'])) {
+            $draftData['settings'] = [
+                'deposition_type' => $options['deposition_type'],
+            ];
+        }
+
         return Draft::create($draftData);
     }
 
@@ -92,6 +98,10 @@ class CreateDraft
     {
         if (isset($options['eln'])) {
             return 'ELN Import ('.strtoupper($options['eln']).': '.explode('-', $id)[0].')';
+        }
+
+        if (($options['deposition_type'] ?? null) === Draft::DEPOSITION_COMMUNITY) {
+            return Draft::LEGACY_COMMUNITY_NAME_PREFIX.' '.explode('-', $id)[0].')';
         }
 
         return 'Untitled Project (Draft: '.explode('-', $id)[0].')';

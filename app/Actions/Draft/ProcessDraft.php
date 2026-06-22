@@ -81,7 +81,7 @@ class ProcessDraft
         $draftName = $request->get('name');
         $draft->name = $draftName ? $draftName : 'Untitled Project (draft)';
         $draft->description = $request->get('description');
-        $draft->syncTagsWithType($request->get('tags_array'), 'Draft');
+        $draft->syncTagsWithType($request->input('tags_array', []), 'Draft');
         $draft->save();
 
         $this->fileSystemController->processFolder($draftFolders);

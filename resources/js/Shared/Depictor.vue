@@ -46,6 +46,7 @@
                 :identifier="identifier"
                 :height="height"
                 :width="width"
+                @loading="(isLoading) => $emit('loading', isLoading)"
             ></Depictor2D>
         </div>
         <div v-if="selectedTab == '3D'">
@@ -82,6 +83,7 @@ export default {
         Depictor2D,
         Depictor3D,
     },
+
     props: {
         modelValue: String,
         width: {
@@ -106,6 +108,8 @@ export default {
         },
         identifier: String,
     },
+
+    emits: ["loading", "update:modelValue"],
     data() {
         return {
             selectedTab: "2D",
