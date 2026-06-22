@@ -63,7 +63,7 @@ return [
      * All violations against a policy will be reported to this url.
      * Set to null to disable violation reporting.
      */
-    'report_uri' => null,
+    'report_uri' => env('CSP_REPORT_URI'),
 
     /*
      * Headers will only be added if this setting is set to true.
