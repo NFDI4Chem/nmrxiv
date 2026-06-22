@@ -4,6 +4,7 @@ namespace Tests\Unit\Actions\Draft;
 
 use App\Actions\Draft\CreateDraft;
 use App\Actions\Draft\DraftFiles;
+use App\Actions\Draft\GetOrCreateCommunityDraft;
 use App\Actions\Draft\UserDrafts;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
@@ -108,7 +109,7 @@ class DraftActionsTest extends TestCase
 
     public function test_user_drafts_action_finds_default_draft(): void
     {
-        $userDrafts = new UserDrafts;
+        $userDrafts = app(UserDrafts::class);
         [$userId, $teamId] = $this->user->getUserTeamData();
 
         // Create a draft without files (should be considered default)
@@ -125,7 +126,7 @@ class DraftActionsTest extends TestCase
 
     public function test_user_drafts_action_creates_default_draft_if_none_exists(): void
     {
-        $userDrafts = new UserDrafts;
+        $userDrafts = app(UserDrafts::class);
 
         $defaultDraft = $userDrafts->getOrCreateDefaultDraft($this->user);
 
@@ -134,9 +135,40 @@ class DraftActionsTest extends TestCase
         $this->assertEquals($this->team->id, $defaultDraft->team_id);
     }
 
+    public function test_user_drafts_action_excludes_community_drafts_when_requested(): void
+    {
+        $userDrafts = app(UserDrafts::class);
+        [$userId, $teamId] = $this->user->getUserTeamData();
+
+        $publicationDraft = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+        ]);
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $publicationDraft->id,
+        ]);
+
+        $communityDraft = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+            'settings' => ['deposition_type' => 'community'],
+        ]);
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $communityDraft->id,
+        ]);
+
+        $allDrafts = $userDrafts->execute($this->user);
+        $publicationDrafts = $userDrafts->execute($this->user, true);
+
+        $this->assertCount(2, $allDrafts);
+        $this->assertCount(1, $publicationDrafts);
+        $this->assertEquals($publicationDraft->id, $publicationDrafts->first()->id);
+        $this->assertTrue($userDrafts->isCommunityDraft($communityDraft));
+    }
+
     public function test_user_drafts_action_excludes_deleted_drafts(): void
     {
-        $userDrafts = new UserDrafts;
+        $userDrafts = app(UserDrafts::class);
         [$userId, $teamId] = $this->user->getUserTeamData();
 
         // Create active and deleted drafts
@@ -184,6 +216,31 @@ class DraftActionsTest extends TestCase
         $this->assertArrayHasKey('children', $filesData['file']);
         $this->assertCount(3, $filesData['file']['children']);
         $this->assertIsInt($filesData['missing_files']);
+    }
+
+    public function test_draft_files_includes_root_folders_with_unassigned_study_id(): void
+    {
+        $draftFiles = new DraftFiles;
+        [$userId, $teamId] = $this->user->getUserTeamData();
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+        ]);
+
+        $folder = FileSystemObject::factory()->create([
+            'draft_id' => $draft->id,
+            'level' => 0,
+            'type' => 'directory',
+            'study_id' => 0,
+            'name' => 'sample-a',
+        ]);
+
+        $filesData = $draftFiles->files($draft);
+
+        $this->assertTrue($filesData['has_sample_folders']);
+        $this->assertCount(1, $filesData['file']['children']);
+        $this->assertSame($folder->id, $filesData['file']['children'][0]->id);
     }
 
     public function test_draft_files_action_counts_missing_files(): void
@@ -255,6 +312,41 @@ class DraftActionsTest extends TestCase
         $this->assertEquals(0, $filesData['missing_files']);
     }
 
+    public function test_draft_files_action_paginates_when_many_sample_folders(): void
+    {
+        $draftFiles = new DraftFiles;
+        [$userId, $teamId] = $this->user->getUserTeamData();
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+        ]);
+
+        $threshold = DraftFiles::SAMPLE_FOLDER_LAZY_THRESHOLD;
+
+        FileSystemObject::factory()->count($threshold + 3)->create([
+            'draft_id' => $draft->id,
+            'level' => 0,
+            'type' => 'directory',
+            'has_children' => true,
+        ]);
+
+        $filesData = $draftFiles->files($draft);
+
+        $this->assertArrayHasKey('sample_folders', $filesData);
+        $this->assertCount(
+            DraftFiles::SAMPLE_FOLDER_PAGE_SIZE,
+            $filesData['file']['children']
+        );
+        $this->assertEquals($threshold + 3, $filesData['sample_folders']['total']);
+        $this->assertTrue($filesData['sample_folders']['has_more']);
+
+        $pageTwo = $draftFiles->sampleFoldersPage($draft, 2);
+
+        $this->assertCount(3, $pageTwo['folders']);
+        $this->assertFalse($pageTwo['sample_folders']['has_more']);
+    }
+
     public function test_draft_path_generation_is_correct(): void
     {
         $createDraft = new CreateDraft;
@@ -292,5 +384,86 @@ class DraftActionsTest extends TestCase
 
         $this->assertStringContainsString('Untitled Project (Draft:', $draft->name);
         $this->assertStringContainsString(')', $draft->name);
+    }
+
+    public function test_create_draft_action_creates_community_draft(): void
+    {
+        $createDraft = new CreateDraft;
+
+        $draft = $createDraft->execute($this->user, [
+            'deposition_type' => 'community',
+        ]);
+
+        $this->assertStringContainsString('Community Contribution (Draft:', $draft->name);
+        $this->assertSame('community', $draft->settings['deposition_type']);
+    }
+
+    public function test_user_drafts_action_finds_community_draft(): void
+    {
+        $userDrafts = app(UserDrafts::class);
+        [$userId, $teamId] = $this->user->getUserTeamData();
+
+        $communityDraft = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+            'settings' => ['deposition_type' => 'community'],
+        ]);
+
+        $foundDraft = $userDrafts->findCommunityDraft($this->user);
+
+        $this->assertInstanceOf(Draft::class, $foundDraft);
+        $this->assertEquals($communityDraft->id, $foundDraft->id);
+    }
+
+    public function test_default_draft_lookup_excludes_community_drafts(): void
+    {
+        $userDrafts = app(UserDrafts::class);
+        [$userId, $teamId] = $this->user->getUserTeamData();
+
+        Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+            'settings' => ['deposition_type' => 'community'],
+        ]);
+
+        $this->assertNull($userDrafts->findDefaultDraft($this->user));
+    }
+
+    public function test_get_or_create_community_draft_reuses_existing_draft(): void
+    {
+        $action = app(GetOrCreateCommunityDraft::class);
+
+        $firstDraft = $action->execute($this->user);
+        $secondDraft = $action->execute($this->user);
+
+        $this->assertSame($firstDraft->id, $secondDraft->id);
+        $this->assertSame('community', $secondDraft->settings['deposition_type']);
+    }
+
+    public function test_find_community_draft_prefers_draft_with_files(): void
+    {
+        $userDrafts = app(UserDrafts::class);
+        [$userId, $teamId] = $this->user->getUserTeamData();
+
+        $emptyDraft = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+            'settings' => ['deposition_type' => 'community'],
+        ]);
+
+        $draftWithFiles = Draft::factory()->create([
+            'owner_id' => $userId,
+            'team_id' => $teamId,
+            'settings' => ['deposition_type' => 'community'],
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $draftWithFiles->id,
+        ]);
+
+        $foundDraft = $userDrafts->findCommunityDraft($this->user);
+
+        $this->assertEquals($draftWithFiles->id, $foundDraft->id);
+        $this->assertNotEquals($emptyDraft->id, $foundDraft->id);
     }
 }

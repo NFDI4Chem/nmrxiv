@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,10 @@ class Draft extends Model
 {
     use HasFactory;
     use HasTags;
+
+    public const DEPOSITION_COMMUNITY = 'community';
+
+    public const LEGACY_COMMUNITY_NAME_PREFIX = 'Community Contribution (Draft:';
 
     protected $fillable = [
         'name',
@@ -39,6 +44,8 @@ class Draft extends Model
     ];
 
     protected $casts = [
+        'info' => 'array',
+        'settings' => 'array',
         'processing_logs' => 'array',
         'release_date' => 'date',
     ];
@@ -70,5 +77,26 @@ class Draft extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'team_id');
+    }
+
+    public function isCommunityContribution(): bool
+    {
+        if (($this->settings['deposition_type'] ?? null) === self::DEPOSITION_COMMUNITY) {
+            return true;
+        }
+
+        return str_starts_with($this->name ?? '', self::LEGACY_COMMUNITY_NAME_PREFIX);
+    }
+
+    /**
+     * @param  Builder<Draft>  $query
+     * @return Builder<Draft>
+     */
+    public function scopeCommunityContribution(Builder $query): Builder
+    {
+        return $query->where(function (Builder $community): void {
+            $community->where('settings->deposition_type', self::DEPOSITION_COMMUNITY)
+                ->orWhere('name', 'like', self::LEGACY_COMMUNITY_NAME_PREFIX.'%');
+        });
     }
 }

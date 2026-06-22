@@ -6,6 +6,7 @@ use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\License;
+use App\Models\Molecule;
 use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Sample;
@@ -721,5 +722,55 @@ class StudyModelTest extends TestCase
         $this->assertEquals('array', $casts['citations']);
         $this->assertEquals('array', $casts['molecules']);
         $this->assertEquals('array', $casts['processing_logs']);
+    }
+
+    public function test_has_assigned_structure_when_sample_has_molecule_with_smiles(): void
+    {
+        $study = Study::factory()->create();
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+        $molecule = Molecule::factory()->create([
+            'canonical_smiles' => 'CCO',
+        ]);
+        $sample->molecules()->attach($molecule);
+
+        $this->assertTrue($study->fresh()->hasAssignedStructure());
+    }
+
+    public function test_has_assigned_structure_is_false_without_molecules(): void
+    {
+        $study = Study::factory()->create();
+        Sample::factory()->create(['study_id' => $study->id]);
+
+        $this->assertFalse($study->fresh()->hasAssignedStructure());
+    }
+
+    public function test_is_ready_for_community_publish_when_complete_with_nmrium_and_structure(): void
+    {
+        $study = Study::factory()->create([
+            'internal_status' => 'complete',
+            'has_nmrium' => true,
+        ]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+        $molecule = Molecule::factory()->create([
+            'canonical_smiles' => 'CCO',
+        ]);
+        $sample->molecules()->attach($molecule);
+
+        $this->assertTrue($study->fresh()->isReadyForCommunityPublish());
+    }
+
+    public function test_is_ready_for_community_publish_is_false_without_nmrium(): void
+    {
+        $study = Study::factory()->create([
+            'internal_status' => 'complete',
+            'has_nmrium' => false,
+        ]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+        $molecule = Molecule::factory()->create([
+            'canonical_smiles' => 'CCO',
+        ]);
+        $sample->molecules()->attach($molecule);
+
+        $this->assertFalse($study->fresh()->isReadyForCommunityPublish());
     }
 }

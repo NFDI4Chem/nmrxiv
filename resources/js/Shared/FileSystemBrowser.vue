@@ -13,7 +13,7 @@
 <template>
     <!-- Main dropzone container with responsive fullscreen support -->
     <div
-        id="fs-dropzone"
+        :id="dropzoneRootId"
         :class="[
             fullScreen
                 ? 'fixed inset-0 flex h-screen w-screen flex-col -ml-4 -mt-6 overflow-hidden sm:ml-0 md:-ml-0 md:w-auto'
@@ -179,7 +179,7 @@
                 >
                     <!-- Dropzone message container -->
                     <div
-                        id="fs-dropzone-message"
+                        :id="dropzoneMessageId"
                         :class="[
                             'text-center',
                             hasProjectFiles ? 'w-full' : 'w-full h-full',
@@ -243,7 +243,7 @@
                                         or
                                         <!-- Folder selection button -->
                                         <button
-                                            id="fs-dropzone-click-target"
+                                            :id="dropzoneClickTargetId"
                                             type="button"
                                             class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
                                         >
@@ -251,9 +251,7 @@
                                         </button>
                                         to upload
                                         <!-- Hidden input container for Dropzone.js -->
-                                        <div
-                                            id="fs-dropzone-hidden-input-container"
-                                        />
+                                        <div :id="dropzoneHiddenInputId" />
                                     </form>
 
                                     <!-- Help link to submission guides -->
@@ -365,8 +363,11 @@
                     ref="sidebarRef"
                     :class="[
                         'flex h-full min-h-0 flex-shrink-0 flex-col bg-white border-r border-gray-200',
+                        treeOnly ? 'w-full min-w-0 border-r-0' : '',
                     ]"
-                    :style="{ width: sidebarWidth + 'px' }"
+                    :style="
+                        treeOnly ? undefined : { width: sidebarWidth + 'px' }
+                    "
                 >
                     <!-- Sidebar header (same bar height as right panel headers) -->
                     <div
@@ -526,20 +527,52 @@
 
                     <!-- Scrollable file tree -->
                     <div
+                        ref="treeScrollContainer"
                         class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pt-2 pb-10"
                     >
                         <!-- Recursive file tree component -->
                         <children
                             :file="file"
+                            :studies="studies ?? []"
                             :expanded-folders="expandedFolders"
                             :tree-sort-by="treeSortBy"
                             :tree-sort-order="treeSortOrder"
+                            :isolate-selection="Boolean(treeOnly)"
+                            :submitted-study-ids="submittedStudyIds ?? []"
+                            :studies-workspace-ready="
+                                Boolean(studiesWorkspaceReady)
+                            "
+                            :draft-processing="Boolean(draftProcessing)"
                             @toggle-expansion="
                                 (fsoId, isExpanded) =>
                                     toggleFolderExpansion(fsoId, isExpanded)
                             "
                             @study-context-menu="onStudyContextMenu"
+                            @sample-folder-selected="
+                                (folder) =>
+                                    $emit('sample-folder-selected', folder)
+                            "
                         />
+                        <div
+                            v-if="sampleFoldersPagination?.has_more"
+                            ref="sampleFoldersSentinel"
+                            class="flex items-center justify-center gap-2 py-3 text-xs text-gray-500"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <ArrowPathIcon
+                                v-if="loadingMoreSampleFolders"
+                                class="h-4 w-4 animate-spin text-teal-600"
+                                aria-hidden="true"
+                            />
+                            <span>
+                                {{
+                                    loadingMoreSampleFolders
+                                        ? "Loading more samples…"
+                                        : "Scroll for more samples"
+                                }}
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Sidebar footer with logs -->
@@ -665,6 +698,7 @@
 
                 <!-- Resize handle -->
                 <div
+                    v-if="!treeOnly"
                     class="flex-shrink-0 w-1 cursor-col-resize bg-transparent hover:bg-teal-400 active:bg-teal-500 transition-colors group relative"
                     @mousedown="startResize"
                 >
@@ -675,6 +709,7 @@
 
                 <!-- Details panel -->
                 <section
+                    v-if="!treeOnly"
                     :class="[
                         'flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-white hidden md:flex',
                     ]"
@@ -1134,7 +1169,7 @@
                                                     class="text-sm text-gray-500"
                                                 >
                                                     {{
-                                                        formatDate(
+                                                        formatRecordTimestamp(
                                                             file.updated_at ||
                                                                 file.created_at
                                                         )
@@ -1499,8 +1534,8 @@
             </span>
         </button>
         <p class="px-3 pb-2 pt-1 text-[11px] leading-4 text-gray-400">
-            Clears the cached zip and NMRium info so the next "Proceed" run
-            reprocesses this sample folder.
+            Clears cached zip and NMRium data, then re-processes this sample
+            folder.
         </p>
     </div>
 </template>
@@ -1630,16 +1665,41 @@ export default {
      * @prop {Boolean} readonly - Whether the browser is in read-only mode
      * @prop {String} height - Tailwind height classes for the root #fs-dropzone (e.g. h-full min-h-0 when the parent establishes height via flex).
      * @prop {Object} project - Project object for public file access (optional)
+     * @prop {Boolean} treeOnly - Show only the folder tree (hide details panel)
      */
-    props: ["draft", "readonly", "height", "project"],
+    props: [
+        "draft",
+        "readonly",
+        "height",
+        "project",
+        "treeOnly",
+        "studies",
+        "submittedStudyIds",
+        "studiesWorkspaceReady",
+        "draftProcessing",
+    ],
 
-    emits: ["loading", "proceed", "show-processing-logs"],
+    emits: [
+        "loading",
+        "proceed",
+        "show-processing-logs",
+        "sample-folder-selected",
+        "sample-folder-reset",
+    ],
 
     /**
      * Component reactive data
      */
     data() {
+        const instanceId = `fsb-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 9)}`;
+
         return {
+            dropzoneRootId: `${instanceId}-dropzone`,
+            dropzoneMessageId: `${instanceId}-dropzone-message`,
+            dropzoneClickTargetId: `${instanceId}-dropzone-click-target`,
+            dropzoneHiddenInputId: `${instanceId}-dropzone-hidden-input`,
             // Upload status and progress
             status: "", // Current upload/processing status message
             dropzone: null, // Dropzone.js instance
@@ -1695,6 +1755,11 @@ export default {
 
             // Debounce: folder drag/drop adds files asynchronously; wait before checksums
             checksumScheduleTimer: null,
+
+            // Paginated root sample folders (drafts with many samples)
+            sampleFoldersPagination: null,
+            loadingMoreSampleFolders: false,
+            sampleFoldersObserver: null,
 
             // Right-click context menu for sample (study) folders
             studyContextMenu: {
@@ -1929,7 +1994,10 @@ export default {
         if (this.draft) {
             this.url =
                 this.baseURL + "/dashboard/drafts/" + this.draft.id + "/files";
-            this.loadDropZone();
+
+            if (!this.readonly) {
+                this.loadDropZone();
+            }
         }
 
         // Initialize current step and set up step change detection
@@ -1954,6 +2022,8 @@ export default {
     },
 
     beforeUnmount() {
+        this.teardownSampleFoldersInfiniteScroll();
+
         // Clear file tree state before component unmounts
         this.clearURLParameters();
 
@@ -1974,6 +2044,8 @@ export default {
             true
         );
         document.removeEventListener("keydown", this.handleStudyContextMenuKey);
+
+        this.destroyDropZone();
     },
     /**
      * Component methods
@@ -2207,6 +2279,31 @@ export default {
         },
 
         /**
+         * Keep file-tree selection off Inertia page props in tree-only mode so
+         * history.replaceState can clone state when navigating away.
+         */
+        syncSelectionToPageProps(file, folder = null) {
+            if (this.treeOnly || !file) {
+                return;
+            }
+
+            this.$page.props.selectedFileSystemObject = file;
+
+            if (folder !== null) {
+                this.$page.props.selectedFolder = folder;
+            }
+        },
+
+        replaceBrowserUrl(newUrl) {
+            const state =
+                window.history.state && typeof window.history.state === "object"
+                    ? window.history.state
+                    : {};
+
+            window.history.replaceState(state, "", newUrl);
+        },
+
+        /**
          * Clear file tree state when step changes
          */
         clearFileTreeState() {
@@ -2214,8 +2311,7 @@ export default {
 
             // Reset selection to root
             if (this.file) {
-                this.$page.props.selectedFileSystemObject = this.file;
-                this.$page.props.selectedFolder = "/";
+                this.syncSelectionToPageProps(this.file, "/");
             }
 
             // Remove expanded and selected parameters from URL
@@ -2227,7 +2323,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
 
             // Force UI refresh to reflect the cleared state
             this.$nextTick(() => {
@@ -2299,7 +2395,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
         },
 
         /**
@@ -2892,9 +2988,14 @@ export default {
                         target.id +
                         "/reset"
                 )
-                .then(() => {
+                .then((response) => {
                     this.studyContextMenu.busy = false;
                     this.closeStudyContextMenu();
+                    this.updateBusyStatus(false);
+                    this.$emit("sample-folder-reset", {
+                        folder: target,
+                        studyId: response.data?.study_id ?? null,
+                    });
                     this.loadFiles();
                 })
                 .catch((error) => {
@@ -2906,6 +3007,27 @@ export default {
                         error?.response?.data || error
                     );
                 });
+        },
+
+        filterSubmittedSampleFoldersFromTree(file) {
+            if (!file?.children?.length || !this.submittedStudyIds?.length) {
+                return file;
+            }
+
+            const submittedIds = new Set(
+                this.submittedStudyIds.map((id) => Number(id))
+            );
+
+            return {
+                ...file,
+                children: file.children.filter(
+                    (child) =>
+                        !(
+                            child?.study_id > 0 &&
+                            submittedIds.has(Number(child.study_id))
+                        )
+                ),
+            };
         },
 
         /**
@@ -2924,37 +3046,53 @@ export default {
          */
         loadFiles() {
             this.updateBusyStatus(true);
+            this.loading = true;
+            this.$emit("loading", true);
+
             if (this.draft) {
-                axios.get(this.url).then((response) => {
-                    this.file = response.data.file;
-                    this.file.has_children = true;
-                    this.updateBusyStatus(true);
-                    this.$emit("loading", false);
-                    this.loading = false;
-                    this.missing_files = response.data.missing_files;
+                axios
+                    .get(this.url)
+                    .then((response) => {
+                        this.file = this.filterSubmittedSampleFoldersFromTree(
+                            response.data.file
+                        );
+                        this.file.has_children = true;
+                        this.sampleFoldersPagination =
+                            response.data.sample_folders ?? null;
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+                        this.loading = false;
+                        this.missing_files = response.data.missing_files;
 
-                    // Apply expanded state and select last expanded folder
-                    this.$nextTick(async () => {
-                        this.applyExpandedState(this.file);
+                        // Apply expanded state and select last expanded folder
+                        this.$nextTick(async () => {
+                            this.applyExpandedState(this.file);
 
-                        // Fetch any missing folder contents for expanded folders
-                        await this.fetchMissingFolderContents();
+                            // Fetch any missing folder contents for expanded folders
+                            await this.fetchMissingFolderContents();
 
-                        // Now that all folder contents are loaded, select the target object
-                        if (this.expandedFolders.size > 0) {
-                            await this.selectLastExpandedFolder();
-                        } else {
-                            this.$page.props.selectedFileSystemObject =
-                                this.file;
-                            this.$page.props.selectedFolder = "/";
-                        }
+                            // Now that all folder contents are loaded, select the target object
+                            if (this.expandedFolders.size > 0) {
+                                await this.selectLastExpandedFolder();
+                            } else {
+                                this.syncSelectionToPageProps(this.file, "/");
+                            }
 
-                        // Force refresh to ensure UI updates
-                        this.forceRefreshExpandedState();
+                            // Force refresh to ensure UI updates
+                            this.forceRefreshExpandedState();
+                            this.setupSampleFoldersInfiniteScroll();
+                        });
+                    })
+                    .catch(() => {
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+                        this.loading = false;
                     });
-                });
             } else {
                 this.file = this.$page.props.selectedFileSystemObject;
+                this.updateBusyStatus(false);
+                this.$emit("loading", false);
+                this.loading = false;
             }
         },
 
@@ -3207,9 +3345,48 @@ export default {
          * - Sequential batch processing to prevent server overload
          * - Comprehensive upload logging and error tracking
          */
+        destroyDropZone() {
+            if (this.dropzone) {
+                this.dropzone.destroy();
+                this.dropzone = null;
+            }
+        },
+
         loadDropZone() {
+            if (this.readonly) {
+                return;
+            }
+
             this.$nextTick(() => {
                 const vm = this;
+
+                if (!vm.$el?.isConnected) {
+                    return;
+                }
+
+                const dropzoneElement = document.getElementById(
+                    vm.dropzoneRootId
+                );
+                const dropzoneMessageElement = document.getElementById(
+                    vm.dropzoneMessageId
+                );
+                const dropzoneClickTargetElement = document.getElementById(
+                    vm.dropzoneClickTargetId
+                );
+                const dropzoneHiddenInputElement = document.getElementById(
+                    vm.dropzoneHiddenInputId
+                );
+
+                if (
+                    !dropzoneElement ||
+                    !dropzoneMessageElement ||
+                    !dropzoneClickTargetElement ||
+                    !dropzoneHiddenInputElement
+                ) {
+                    return;
+                }
+
+                vm.destroyDropZone();
 
                 // Initialize upload counters and batch configuration
                 vm.totalFilesCount = 0;
@@ -3220,8 +3397,7 @@ export default {
                 vm.processedBatches = 0;
 
                 // Set initial file system state
-                vm.$page.props.selectedFileSystemObject = vm.file;
-                vm.$page.props.selectedFolder = "/";
+                vm.syncSelectionToPageProps(vm.file, "/");
 
                 vm.selectedFSO = [];
 
@@ -3243,18 +3419,16 @@ export default {
                     useFsAccessApi: false, // Disable File System Access API
                     autoQueue: false, // Manual queue management
                     maxFiles: 20000, // Support large numbers of files
-                    clickable: "#fs-dropzone-click-target", // Click target element
-                    hiddenInputContainer: "#fs-dropzone-hidden-input-container", // Hidden input container
-                    dictDefaultMessage: document.querySelector(
-                        "#fs-dropzone-message"
-                    ).innerHTML, // Default message
+                    clickable: `#${vm.dropzoneClickTargetId}`,
+                    hiddenInputContainer: `#${vm.dropzoneHiddenInputId}`,
+                    dictDefaultMessage: dropzoneMessageElement.innerHTML,
                     totaluploadprogress: function (progress) {
                         vm.progress = Math.ceil(progress);
                     },
                 };
 
                 // Initialize Dropzone instance
-                vm.dropzone = new Dropzone("#fs-dropzone", options);
+                vm.dropzone = new Dropzone(`#${vm.dropzoneRootId}`, options);
 
                 // Enable folder selection by setting webkitdirectory attribute
                 vm.dropzone.hiddenFileInput.setAttribute(
@@ -3346,6 +3520,10 @@ export default {
          * @param {Object} file - The file or folder object to display
          */
         async displaySelected(file) {
+            if (this.treeOnly) {
+                return;
+            }
+
             this.$page.props.selectedFileSystemObject = file;
             let sFolder = "/";
 
@@ -3442,6 +3620,33 @@ export default {
         },
 
         /**
+         * Find a folder node in the tree by id.
+         */
+        findFolderById(fileObject, targetId) {
+            if (!fileObject || targetId == null) {
+                return null;
+            }
+
+            if (fileObject.id === targetId) {
+                return fileObject;
+            }
+
+            if (!Array.isArray(fileObject.children)) {
+                return null;
+            }
+
+            for (const child of fileObject.children) {
+                const found = this.findFolderById(child, targetId);
+
+                if (found) {
+                    return found;
+                }
+            }
+
+            return null;
+        },
+
+        /**
          * Track when a folder is expanded/collapsed
          */
         toggleFolderExpansion(fsoId, isExpanded) {
@@ -3453,7 +3658,23 @@ export default {
                 }
             });
 
+            if (isExpanded && fsoId != null) {
+                const folder = this.findFolderById(this.file, fsoId);
+
+                if (
+                    folder?.has_children &&
+                    (!folder.children || folder.children.length === 0) &&
+                    !folder.loading
+                ) {
+                    this.fetchFolderChildren(folder);
+                }
+            }
+
             this.updateURLWithExpandedState();
+
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
         },
 
         /**
@@ -3485,7 +3706,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
         },
 
         /**
@@ -3596,6 +3817,100 @@ export default {
             }
         },
 
+        teardownSampleFoldersInfiniteScroll() {
+            if (this.sampleFoldersObserver) {
+                this.sampleFoldersObserver.disconnect();
+                this.sampleFoldersObserver = null;
+            }
+        },
+
+        setupSampleFoldersInfiniteScroll() {
+            this.teardownSampleFoldersInfiniteScroll();
+
+            if (!this.sampleFoldersPagination?.has_more) {
+                return;
+            }
+
+            const sentinel = this.$refs.sampleFoldersSentinel;
+            const root = this.$refs.treeScrollContainer;
+
+            if (
+                !sentinel ||
+                !root ||
+                typeof IntersectionObserver === "undefined"
+            ) {
+                return;
+            }
+
+            this.sampleFoldersObserver = new IntersectionObserver(
+                (entries) => {
+                    if (
+                        entries.some((entry) => entry.isIntersecting) &&
+                        !this.loadingMoreSampleFolders
+                    ) {
+                        this.loadMoreSampleFolders();
+                    }
+                },
+                { root, rootMargin: "120px", threshold: 0 }
+            );
+
+            this.sampleFoldersObserver.observe(sentinel);
+        },
+
+        async loadMoreSampleFolders() {
+            if (
+                !this.draft ||
+                !this.sampleFoldersPagination?.has_more ||
+                this.loadingMoreSampleFolders
+            ) {
+                return;
+            }
+
+            const nextPage =
+                (this.sampleFoldersPagination.current_page ?? 1) + 1;
+
+            this.loadingMoreSampleFolders = true;
+
+            try {
+                const response = await axios.get(
+                    `/dashboard/drafts/${this.draft.id}/sample-folders`,
+                    { params: { page: nextPage } }
+                );
+
+                const folders = this.filterSubmittedSampleFoldersFromTree({
+                    children: response.data.folders ?? [],
+                }).children;
+                const existingIds = new Set(
+                    (this.file?.children ?? []).map((child) => child.id)
+                );
+
+                const merged = [...(this.file?.children ?? [])];
+
+                folders.forEach((folder) => {
+                    if (!existingIds.has(folder.id)) {
+                        merged.push(folder);
+                        existingIds.add(folder.id);
+                    }
+                });
+
+                this.file.children = this.filterSubmittedSampleFoldersFromTree({
+                    ...this.file,
+                    children: merged,
+                }).children;
+                this.sampleFoldersPagination =
+                    response.data.sample_folders ??
+                    this.sampleFoldersPagination;
+
+                this.$nextTick(() => {
+                    this.setupSampleFoldersInfiniteScroll();
+                });
+            } catch (error) {
+                console.error("Failed to load more sample folders:", error);
+            } finally {
+                this.loadingMoreSampleFolders = false;
+            }
+        },
+
         /**
          * Fetch children for a specific folder
          */
@@ -3682,6 +3997,10 @@ export default {
          * Find and select the last expanded folder for right panel
          */
         async selectLastExpandedFolder() {
+            if (this.treeOnly) {
+                return;
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const selectedParam = urlParams.get("selected");
 
@@ -3926,7 +4245,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
 
             this.$nextTick(() => {
                 this.forceRefreshExpandedState();
@@ -3937,8 +4256,7 @@ export default {
          * Helper method to revert to root folder
          */
         revertToRoot() {
-            this.$page.props.selectedFileSystemObject = this.file;
-            this.$page.props.selectedFolder = "/";
+            this.syncSelectionToPageProps(this.file, "/");
 
             // Update URL to remove selection and update expanded state
             const urlParams = new URLSearchParams(window.location.search);
@@ -3956,7 +4274,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
         },
 
         /**
@@ -4042,28 +4360,6 @@ export default {
                 // Fallback to parsing original size string
                 return parseInt(file.size?.replace(/[^\d]/g, "") || 0);
             }
-        },
-
-        /**
-         * Format date for display
-         */
-        formatDate(dateString) {
-            if (!dateString) return "--";
-
-            const date = new Date(dateString);
-            const options = {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-            };
-
-            // Format like "18. Aug 2025 at 10:52"
-            return date
-                .toLocaleDateString("en-GB", options)
-                .replace(",", " at")
-                .replace(/(\d+)/, "$1.");
         },
 
         /**

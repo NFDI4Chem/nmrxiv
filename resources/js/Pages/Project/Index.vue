@@ -385,7 +385,7 @@
                                         class="tabular-nums text-amber-900 dark:text-amber-50"
                                     >
                                         {{
-                                            formatRecordTimestamp(
+                                            formatRecordTimestampUtc(
                                                 project.release_date
                                             )
                                         }}

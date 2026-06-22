@@ -150,6 +150,7 @@ class DashboardController extends Controller
             'starred' => [
                 Project::query()
                     ->where('is_deleted', false)
+                    ->excludingCommunityContributionStaging()
                     ->whereHasBookmark($user)
                     ->with($this->dashboardProjectEagerLoads())
                     ->get()
@@ -165,6 +166,7 @@ class DashboardController extends Controller
                 Project::query()
                     ->where('owner_id', $user->id)
                     ->where('is_deleted', true)
+                    ->excludingCommunityContributionStaging()
                     ->with($this->dashboardProjectEagerLoads())
                     ->get()
                     ->all(),
@@ -180,11 +182,17 @@ class DashboardController extends Controller
     protected function recentProjectsForUser(User $user): array
     {
         $eagerLoads = $this->dashboardProjectEagerLoads();
-        $projects = $user->activeProjects()->with($eagerLoads)->get();
+        $projects = $user->activeProjects()
+            ->excludingCommunityContributionStaging()
+            ->with($eagerLoads)
+            ->get();
 
         foreach ($user->allTeams() as $teamModel) {
             $projects = $projects->concat(
-                $teamModel->activeProjects()->with($eagerLoads)->get()
+                $teamModel->activeProjects()
+                    ->excludingCommunityContributionStaging()
+                    ->with($eagerLoads)
+                    ->get()
             );
         }
 
@@ -204,7 +212,7 @@ class DashboardController extends Controller
             $query->where('team_id', $team->id);
         }
 
-        return $query;
+        return $query->excludingCommunityContributionStaging();
     }
 
     /**
