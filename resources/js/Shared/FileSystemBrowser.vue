@@ -1169,7 +1169,7 @@
                                                     class="text-sm text-gray-500"
                                                 >
                                                     {{
-                                                        formatDate(
+                                                        formatRecordTimestamp(
                                                             file.updated_at ||
                                                                 file.created_at
                                                         )
@@ -4360,28 +4360,6 @@ export default {
                 // Fallback to parsing original size string
                 return parseInt(file.size?.replace(/[^\d]/g, "") || 0);
             }
-        },
-
-        /**
-         * Format date for display
-         */
-        formatDate(dateString) {
-            if (!dateString) return "--";
-
-            const date = new Date(dateString);
-            const options = {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-            };
-
-            // Format like "18. Aug 2025 at 10:52"
-            return date
-                .toLocaleDateString("en-GB", options)
-                .replace(",", " at")
-                .replace(/(\d+)/, "$1.");
         },
 
         /**

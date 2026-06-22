@@ -334,7 +334,7 @@
                                     class="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200"
                                 >
                                     {{
-                                        formatDate(
+                                        formatShortDate(
                                             (project.data &&
                                                 project.data.release_date) ||
                                                 project.release_date
@@ -358,7 +358,7 @@
                                     class="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200"
                                 >
                                     {{
-                                        formatDate(
+                                        formatShortDate(
                                             (project.data &&
                                                 project.data.created_at) ||
                                                 project.created_at
@@ -570,18 +570,6 @@ export default {
     },
 
     methods: {
-        formatDate(value) {
-            if (!value) {
-                return "";
-            }
-            const d = new Date(value);
-
-            return d.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-            });
-        },
         toggleDetails() {
             this.$refs.projectDetailsElement?.toggleDetails();
         },
