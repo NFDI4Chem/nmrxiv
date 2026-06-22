@@ -1,11 +1,17 @@
 <template>
     <div class="flex w-full min-w-0 items-center">
         <div
-            class="flex w-full min-w-0 rounded-lg bg-white shadow ring-1 ring-gray-200"
+            :class="[
+                'flex w-full min-w-0 bg-white shadow ring-1 ring-gray-200',
+                roundedFull ? 'rounded-full' : 'rounded-lg',
+            ]"
         >
             <input
                 :id="inputId || undefined"
-                class="relative w-full rounded-lg border-0 px-4 py-2.5 focus:shadow-outline sm:px-5 sm:py-3"
+                :class="[
+                    'relative w-full border-0 px-4 py-2.5 focus:shadow-outline sm:px-5 sm:py-3',
+                    roundedFull ? 'rounded-full' : 'rounded-lg',
+                ]"
                 autocomplete="off"
                 type="text"
                 :name="name"
@@ -57,6 +63,10 @@ export default {
         },
         /** When true (e.g. status filter active), show clear even if the input is empty. */
         filtersActive: {
+            type: Boolean,
+            default: false,
+        },
+        roundedFull: {
             type: Boolean,
             default: false,
         },

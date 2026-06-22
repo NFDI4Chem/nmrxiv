@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Dataset;
+use App\Models\Draft;
 use App\Models\Molecule;
 use App\Models\Project;
 use App\Models\Sample;
@@ -10,6 +11,7 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -32,6 +34,45 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertRedirect('/login');
+    }
+
+    public function test_dashboard_excludes_community_contribution_staging_project(): void
+    {
+        $publicationDraft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+
+        $publicationProject = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'status' => 'draft',
+            'draft_id' => $publicationDraft->id,
+        ]);
+
+        $communityDraft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'settings' => ['deposition_type' => 'community'],
+            'name' => 'Community Contribution (Draft: abc123)',
+        ]);
+
+        $communityProject = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'status' => 'draft',
+            'draft_id' => $communityDraft->id,
+        ]);
+
+        $response = $this->actingAs($this->user)->get('/dashboard');
+
+        $page = $this->assertInertiaPageComponent($response, 'Dashboard');
+        $projectIds = collect($page['props']['projects']['data'])->pluck('id');
+
+        $this->assertTrue($projectIds->contains($publicationProject->id));
+        $this->assertFalse($projectIds->contains($communityProject->id));
     }
 
     public function test_dashboard_renders_with_personal_team(): void
@@ -606,5 +647,63 @@ class DashboardTest extends TestCase
         $this->assertStringContainsString($provisionalDoi, (string) $projectPayload['provisional_doi_url']);
         $this->assertSame($obfuscation, $projectPayload['obfuscationcode']);
         $this->assertFalse($projectPayload['is_public']);
+    }
+
+    public function test_dashboard_project_payload_includes_sharing_fields_for_user_access_modal(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($this->user)->get('/dashboard');
+
+        $response->assertStatus(200);
+        $page = $this->assertInertiaPageComponent($response, 'Dashboard');
+        $projectPayload = collect($page['props']['projects']['data'])
+            ->firstWhere('id', $project->id);
+
+        $this->assertNotNull($projectPayload);
+        $this->assertArrayHasKey('viewer_role', $projectPayload);
+        $this->assertSame('owner', $projectPayload['viewer_role']);
+        $this->assertArrayHasKey('users', $projectPayload);
+        $this->assertArrayHasKey('project_invitations', $projectPayload);
+    }
+
+    public function test_dashboard_project_payload_lists_pending_invitations_after_member_invite(): void
+    {
+        Notification::fake();
+
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'status' => 'draft',
+        ]);
+
+        $project->users()->attach($this->user, ['role' => 'creator']);
+
+        $inviteeEmail = 'pending-invite-'.uniqid().'@example.com';
+
+        $this->actingAs($this->user)
+            ->from('/dashboard')
+            ->post("/dashboard/projects/{$project->id}/members", [
+                'email' => $inviteeEmail,
+                'role' => 'collaborator',
+            ])
+            ->assertRedirect('/dashboard');
+
+        $response = $this->actingAs($this->user)->get('/dashboard');
+        $page = $this->assertInertiaPageComponent($response, 'Dashboard');
+        $projectPayload = collect($page['props']['projects']['data'])
+            ->firstWhere('id', $project->id);
+
+        $this->assertNotNull($projectPayload);
+        $this->assertCount(
+            1,
+            collect($projectPayload['project_invitations'])->where('email', $inviteeEmail)
+        );
     }
 }

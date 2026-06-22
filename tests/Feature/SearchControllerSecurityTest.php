@@ -28,7 +28,7 @@ class SearchControllerSecurityTest extends TestCase
         ];
 
         foreach ($maliciousQueries as $maliciousQuery) {
-            $response = $this->postJson('/api/v1/search', [
+            $response = $this->postJson('/api/v1/search/compounds', [
                 'query' => $maliciousQuery,
                 'type' => 'text',
             ]);
@@ -57,7 +57,7 @@ class SearchControllerSecurityTest extends TestCase
         ];
 
         foreach ($maliciousFilters as $maliciousFilter) {
-            $response = $this->postJson('/api/v1/search', [
+            $response = $this->postJson('/api/v1/search/compounds', [
                 'query' => $maliciousFilter,
                 'type' => 'filters',
             ]);
@@ -78,7 +78,7 @@ class SearchControllerSecurityTest extends TestCase
     public function test_input_validation(): void
     {
         // Test invalid query type
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'type' => 'invalid_type',
         ]);
@@ -86,28 +86,28 @@ class SearchControllerSecurityTest extends TestCase
         $this->assertArrayHasKey('errors', $response->json());
 
         // Test invalid limit
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'limit' => 1000,
         ]);
         $this->assertEquals(400, $response->getStatusCode());
 
         // Test invalid page
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'page' => -1,
         ]);
         $this->assertEquals(400, $response->getStatusCode());
 
         // Test invalid sort
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'sort' => 'invalid_sort',
         ]);
         $this->assertEquals(400, $response->getStatusCode());
 
         // Test invalid tagType (should only allow alphanumeric and underscore)
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'tagType' => 'invalid-tag-type!',
         ]);
@@ -122,7 +122,7 @@ class SearchControllerSecurityTest extends TestCase
         // Test extremely long query (over 1000 characters)
         $longQuery = str_repeat('A', 1001);
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => $longQuery,
             'type' => 'text',
         ]);
@@ -137,7 +137,7 @@ class SearchControllerSecurityTest extends TestCase
     {
         $queryWithControlChars = "test\x00\x01\x02query";
 
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => $queryWithControlChars,
             'type' => 'text',
         ]);
@@ -158,7 +158,7 @@ class SearchControllerSecurityTest extends TestCase
         ];
 
         foreach ($maliciousSmiles as $maliciousSmiles) {
-            $response = $this->postJson('/api/v1/search', [
+            $response = $this->postJson('/api/v1/search/compounds', [
                 'query' => $maliciousSmiles,
                 'type' => 'smiles',
             ]);
@@ -180,7 +180,7 @@ class SearchControllerSecurityTest extends TestCase
         ];
 
         foreach ($maliciousInChI as $maliciousInChI) {
-            $response = $this->postJson('/api/v1/search', [
+            $response = $this->postJson('/api/v1/search/compounds', [
                 'query' => $maliciousInChI,
                 'type' => 'inchi',
             ]);
@@ -197,21 +197,21 @@ class SearchControllerSecurityTest extends TestCase
     public function test_legitimate_queries_still_work(): void
     {
         // Test basic text search
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'water',
             'type' => 'text',
         ]);
         $this->assertContains($response->getStatusCode(), [200, 404]);
 
         // Test empty query
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
             'type' => 'text',
         ]);
         $this->assertContains($response->getStatusCode(), [200, 404]);
 
         // Test valid limit and page
-        $response = $this->postJson('/api/v1/search', [
+        $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'test',
             'limit' => 10,
             'page' => 1,

@@ -31,7 +31,7 @@ class DraftFactory extends Factory
             'relative_url' => '/'.$this->faker->uuid(),
             'path' => $path,
             'key' => Str::uuid(),
-            'is_deleted' => $this->faker->boolean(),
+            'is_deleted' => false,
             'owner_id' => $user->id,
             'team_id' => Team::factory(),
             'info' => '{}',

@@ -70,7 +70,6 @@
                             class="mt-1 flex-1 h-0 overflow-y-auto"
                         >
                             <div
-                                v-if="!isUploadPage"
                                 class="px-4 py-4 border-b border-gray-100 text-center"
                             >
                                 <create mode="button"></create>
@@ -124,7 +123,7 @@
 
                         <!-- Create Button & Help Section -->
                         <div
-                            v-if="editableTeamRole && !isUploadPage"
+                            v-if="editableTeamRole"
                             class="py-3 border-b border-gray-100 space-y-2"
                         >
                             <!-- Upload/Create Button -->
@@ -193,7 +192,7 @@
                 <div class="flex-grow flex flex-col">
                     <!-- Create Button Section -->
                     <div
-                        v-if="editableTeamRole && !isUploadPage"
+                        v-if="editableTeamRole"
                         class="px-4 py-4 border-b border-gray-100 text-center"
                     >
                         <create mode="button"></create>
@@ -248,35 +247,39 @@
                     <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
-                    <div class="flex-1 flex"></div>
+                    <div class="flex min-w-0 flex-1 items-center">
+                        <slot name="navbar" />
+                    </div>
                     <flash-messages />
-                    <div class="ml-4 flex items-center md:ml-6">
+                    <div class="ml-4 flex items-center gap-1 md:ml-6">
                         <span
                             v-if="
                                 $page.props.auth.user &&
                                 $page.props.auth.user?.first_name != null
                             "
+                            class="inline-flex"
                         >
-                            <div class="ml-5 mt-2 tooltip">
+                            <div class="tooltip">
                                 <a
-                                    class="cursor-pointer"
+                                    class="relative flex items-center justify-center h-9 w-9 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors cursor-pointer"
                                     @click="openShowNotificationDialog"
                                 >
                                     <BellIcon
-                                        class="w-6 h-6 fill-current text-gray-600"
+                                        class="h-5 w-5"
+                                        aria-hidden="true"
                                     />
+                                    <span
+                                        v-if="hasUnreadNotification()"
+                                        class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[1.125rem] h-[1.125rem] px-1 text-[0.625rem] font-bold leading-none text-white bg-red-600 rounded-full ring-2 ring-white"
+                                    >
+                                        {{ countNotification() }}
+                                    </span>
                                 </a>
                                 <span
                                     class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                                     >View Notifications</span
                                 >
                             </div>
-                            <span
-                                v-if="hasUnreadNotification()"
-                                class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full"
-                            >
-                                {{ countNotification() }}</span
-                            >
                             <notification
                                 ref="notificationElement"
                                 :notification="
@@ -285,15 +288,16 @@
                             />
                         </span>
 
-                        <div class="ml-5 tooltip">
+                        <div class="tooltip">
                             <a
                                 id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
+                                class="flex items-center justify-center h-9 w-9 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
                                 ><svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
-                                    class="h-6 w-6"
+                                    class="h-5 w-5"
                                 >
                                     <path
                                         d="M12 21a2 2 0 0 1-1.41-.59l-.83-.82A2 2 0 0 0 8.34 19H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4a5 5 0 0 1 4 2v16z"
@@ -338,7 +342,7 @@
                         <Menu
                             v-if="$page.props.auth.user"
                             as="div"
-                            class="ml-3 relative"
+                            class="ml-2 relative"
                         >
                             <div
                                 v-if="
@@ -353,7 +357,7 @@
                                         !$page.props.jetstream
                                             .managesProfilePhotos
                                     "
-                                    class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
+                                    class="flex text-sm border-2 border-transparent rounded-full hover:border-gray-200 focus:outline-none focus:border-gray-300 transition"
                                 >
                                     <img
                                         class="h-8 w-8 rounded-full object-cover"
@@ -367,7 +371,7 @@
                                 <span v-else class="inline-flex rounded-md">
                                     <MenuButton
                                         type="button"
-                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
+                                        class="inline-flex items-center px-2 py-1.5 border border-transparent text-sm leading-4 font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-100 hover:text-gray-900 focus:outline-none transition"
                                     >
                                         <img
                                             class="h-8 w-8 rounded-full object-cover mr-2"
@@ -406,7 +410,7 @@
                                         $page.props.auth.user?.current_team
                                     "
                                     type="button"
-                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
+                                    class="inline-flex items-center px-2 py-1.5 border border-transparent text-sm leading-4 font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-100 hover:text-gray-900 focus:outline-none transition"
                                 >
                                     <img
                                         class="h-8 w-8 rounded-full object-cover mr-2"
@@ -654,12 +658,12 @@
                                 !$page.props.auth.user?.first_name
                             "
                             as="div"
-                            class="ml-3 relative"
+                            class="ml-2 relative"
                         >
-                            <div class="inline-flex items-center gap-4">
+                            <div class="inline-flex items-center gap-3">
                                 <Link
                                     href="/login"
-                                    class="whitespace-nowrap text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                                    class="whitespace-nowrap px-3 py-2 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
                                 >
                                     Login
                                 </Link>
@@ -787,7 +791,7 @@ const navigationSections = [
             {
                 auth: false,
                 name: "Spectra Library",
-                href: "/compounds",
+                href: "/search?scope=compounds",
                 icon: SwatchIcon,
             },
         ],

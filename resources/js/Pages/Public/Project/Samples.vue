@@ -113,6 +113,7 @@
                                     <study-card
                                         :project="project.data"
                                         :study="study"
+                                        :reviewer-preview="reviewerPreview"
                                     />
                                 </div>
                             </div>
@@ -244,11 +245,31 @@ export default {
         workspace() {
             return this.$page.props.workspace ?? null;
         },
+        reviewerPreview() {
+            return this.$page.props.reviewerPreview ?? null;
+        },
         showWorkspaceStudyManager() {
+            if (this.reviewerPreview) {
+                return false;
+            }
+
             return (
                 this.workspace &&
                 this.workspace.projectPermissions?.canUpdateProject
             );
+        },
+        studiesListingUrl() {
+            if (this.reviewerPreview?.obfuscationcode) {
+                return route("studies.preview", [
+                    this.reviewerPreview.obfuscationcode,
+                ]);
+            }
+
+            if (!this.project?.data?.id) {
+                return null;
+            }
+
+            return route("project.studies", this.project.data.id);
         },
     },
 
@@ -256,8 +277,9 @@ export default {
         if (this.showWorkspaceStudyManager) {
             return;
         }
-        if (this.project) {
-            this.fetchStudies(route("project.studies", this.project.data.id));
+        if (this.project && this.studiesListingUrl) {
+            this.loading = true;
+            this.fetchStudies(this.studiesListingUrl);
         }
     },
 
@@ -267,10 +289,19 @@ export default {
          * @param {string} url - API endpoint URL
          */
         fetchStudies(url) {
-            axios.get(url).then((response) => {
-                this.loading = false;
-                this.studies = response.data;
-            });
+            axios
+                .get(url, {
+                    headers: { Accept: "application/json" },
+                })
+                .then((response) => {
+                    this.studies = response.data;
+                })
+                .catch(() => {
+                    this.studies = { data: [] };
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
 
         /**
@@ -281,8 +312,7 @@ export default {
             // Create search link if query exists but no link provided
             if (!link && this.query != "") {
                 link = {};
-                link["url"] =
-                    route("project.studies", this.project.data.id) + "?page=1";
+                link["url"] = this.studiesListingUrl + "?page=1";
             }
 
             if (link.url) {
@@ -296,8 +326,7 @@ export default {
          */
         reset() {
             let link = {};
-            link["url"] =
-                route("project.studies", this.project.data.id) + "?page=1";
+            link["url"] = this.studiesListingUrl + "?page=1";
             this.query = "";
             this.loading = true;
             this.executeQuery(link);

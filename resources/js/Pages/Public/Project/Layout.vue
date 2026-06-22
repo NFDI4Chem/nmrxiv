@@ -23,6 +23,21 @@
                     container-class="h-36 sm:h-44 w-full"
                 />
                 <div
+                    v-if="showReviewerPreviewNotice"
+                    class="border-b border-emerald-200/80 bg-emerald-50 px-4 py-3 text-center text-emerald-900 dark:border-emerald-800/50 dark:bg-emerald-950/55 dark:text-emerald-100"
+                >
+                    <p
+                        class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                    >
+                        <span
+                            class="font-semibold text-emerald-950 dark:text-emerald-50"
+                            >Read-only preview.</span
+                        >
+                        You are viewing this project via a shared link. Samples
+                        and datasets open in read-only mode.
+                    </p>
+                </div>
+                <div
                     v-if="workspace && dashboardProject"
                     class="border-b border-gray-200 dark:border-gray-700"
                 >
@@ -43,12 +58,33 @@
                         </p>
                     </div>
                     <div
-                        v-else-if="
-                            !dashboardProject.is_public &&
-                            !dashboardProject.is_published &&
-                            dashboardProject.doi &&
-                            !workspace.preview
-                        "
+                        v-else-if="showFailedEmbargoNotice"
+                        class="border-b border-red-200/80 bg-red-50 px-4 py-3 text-center text-red-900 dark:border-red-800/50 dark:bg-red-950/55 dark:text-red-100"
+                    >
+                        <p
+                            class="mx-auto max-w-3xl text-sm leading-relaxed sm:text-base"
+                        >
+                            <span
+                                class="font-semibold text-red-950 dark:text-red-50"
+                                >Embargo notice:</span
+                            >
+                            This project could not be published due to missing
+                            information or a technical issue. Please complete
+                            the required fields and click Publish Now via the
+                            Edit Release Date option, or contact us at
+                            info.nmrxiv@uni-jena.de
+                        </p>
+                        <button
+                            v-if="showReleaseDateEditLink"
+                            type="button"
+                            class="whitespace-nowrap font-semibold text-teal-800 underline decoration-teal-600/45 underline-offset-2 hover:text-teal-950 dark:text-teal-200 dark:decoration-teal-300/50 dark:hover:text-white"
+                            @click="openReleaseDateModal"
+                        >
+                            Edit release date
+                        </button>
+                    </div>
+                    <div
+                        v-else-if="showEmbargoReleaseNotice"
                         class="border-b border-teal-200/80 bg-teal-50 px-4 py-3 text-center text-teal-900 dark:border-teal-800/50 dark:bg-teal-950/55 dark:text-teal-100"
                     >
                         <p
@@ -292,7 +328,7 @@
                                         </div>
                                         <div
                                             v-if="workspace"
-                                            class="mt-3 flex flex-wrap items-center gap-3"
+                                            class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2"
                                         >
                                             <access-dialogue
                                                 :available-roles="
@@ -320,6 +356,9 @@
                                             >
                                                 Project settings
                                             </Link>
+                                        </div>
+                                        <div v-if="projectDoi" class="mt-4">
+                                            <DOIBadge :doi="projectDoi" />
                                         </div>
                                     </div>
                                 </div>
@@ -360,8 +399,7 @@
                                 >
                                     <Link
                                         :href="
-                                            project.data.public_url +
-                                            '?tab=samples'
+                                            projectPageBaseUrl + '?tab=samples'
                                         "
                                         :class="[
                                             isTabActive(tab.name)
@@ -474,7 +512,9 @@
                                                                     >
                                                                         <Link
                                                                             :href="
-                                                                                sample.public_url
+                                                                                sampleNavUrl(
+                                                                                    sample
+                                                                                )
                                                                             "
                                                                             :class="[
                                                                                 'min-w-0 flex-1 px-4 py-2 text-sm outline-none ring-0 focus:outline-none focus:ring-0',
@@ -569,7 +609,8 @@
                                                                     <Link
                                                                         :href="
                                                                             datasetNavUrl(
-                                                                                dataset
+                                                                                dataset,
+                                                                                hoveredSampleForNav
                                                                             )
                                                                         "
                                                                         :class="[
@@ -610,9 +651,7 @@
                                 <Link
                                     v-else
                                     :href="
-                                        project.data.public_url +
-                                        '?tab=' +
-                                        tab.name
+                                        projectPageBaseUrl + '?tab=' + tab.name
                                     "
                                     :class="[
                                         isTabActive(tab.name)
@@ -889,6 +928,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import SeededCoverBackground from "@/Shared/SeededCoverBackground.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
+import DOIBadge from "@/Shared/DOIBadge.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
@@ -915,6 +955,7 @@ export default {
         AppLayout, // Main application layout wrapper
         SeededCoverBackground,
         AccessDialogue,
+        DOIBadge,
         JetDialogModal,
         JetConfirmationModal,
         JetSecondaryButton,
@@ -1038,10 +1079,36 @@ export default {
         workspace() {
             return this.$page.props.workspace ?? null;
         },
+        reviewerPreview() {
+            return this.$page.props.reviewerPreview ?? null;
+        },
+        showReviewerPreviewNotice() {
+            return Boolean(this.reviewerPreview) && !this.workspace;
+        },
+        projectPageBaseUrl() {
+            if (this.reviewerPreview?.obfuscationcode) {
+                return route("project.preview", [
+                    this.reviewerPreview.obfuscationcode,
+                ]);
+            }
+
+            return this.project?.data?.public_url ?? "";
+        },
         dashboardProject() {
             return this.workspace?.dashboardProject ?? null;
         },
+        projectDoi() {
+            return this.project?.data?.doi ?? this.project?.doi ?? null;
+        },
         samplesTabCount() {
+            const reviewerCount = this.reviewerPreview?.samples_count;
+            if (
+                typeof reviewerCount === "number" &&
+                Number.isFinite(reviewerCount)
+            ) {
+                return reviewerCount;
+            }
+
             const raw = this.project?.data?.samples_count;
 
             return typeof raw === "number" && Number.isFinite(raw) ? raw : null;
@@ -1063,6 +1130,10 @@ export default {
             return sample != null && this.sampleDatasets(sample).length > 0;
         },
         showReleaseDateEditLink() {
+            return this.showEmbargoReleaseNotice;
+        },
+
+        showEmbargoReleaseNotice() {
             const p = this.dashboardProject;
             const w = this.workspace;
             if (!p || !w || w.preview) {
@@ -1070,6 +1141,19 @@ export default {
             }
 
             return !p.is_public && !p.is_published && Boolean(p.doi);
+        },
+
+        showFailedEmbargoNotice() {
+            if (!this.showEmbargoReleaseNotice) {
+                return false;
+            }
+
+            const releaseDate = new Date(this.dashboardProject.release_date);
+
+            return (
+                !Number.isNaN(releaseDate.getTime()) &&
+                releaseDate.getTime() <= Date.now()
+            );
         },
 
         hasReleaseDateChanged() {
@@ -1166,6 +1250,12 @@ export default {
             );
         },
         projectStudiesFetchUrl() {
+            if (this.reviewerPreview?.obfuscationcode) {
+                return route("studies.preview", [
+                    this.reviewerPreview.obfuscationcode,
+                ]);
+            }
+
             const projectId = this.project?.data?.id;
             if (!projectId) {
                 return null;
@@ -1224,7 +1314,47 @@ export default {
 
             return Array.isArray(datasets) ? datasets : [];
         },
-        datasetNavUrl(dataset) {
+        reviewerStudyPageUrl(studyId) {
+            if (!this.reviewerPreview?.obfuscationcode || !studyId) {
+                return null;
+            }
+
+            return (
+                route("project.preview", [
+                    this.reviewerPreview.obfuscationcode,
+                ]) +
+                "?tab=study&study=" +
+                encodeURIComponent(studyId)
+            );
+        },
+        sampleNavUrl(sample) {
+            const reviewerUrl = this.reviewerStudyPageUrl(sample?.id);
+            if (reviewerUrl) {
+                return reviewerUrl;
+            }
+
+            if (sample?.public_url && sample?.identifier) {
+                return sample.public_url;
+            }
+
+            return "#";
+        },
+        datasetNavUrl(dataset, study) {
+            if (this.reviewerPreview?.obfuscationcode && dataset?.id) {
+                const studyId = study?.id ?? this.hoveredSampleForNav?.id;
+                if (studyId) {
+                    return (
+                        route("project.preview", [
+                            this.reviewerPreview.obfuscationcode,
+                        ]) +
+                        "?tab=dataset&study=" +
+                        encodeURIComponent(studyId) +
+                        "&dataset=" +
+                        encodeURIComponent(dataset.id)
+                    );
+                }
+            }
+
             if (dataset?.public_url) {
                 return dataset.public_url;
             }
@@ -1490,7 +1620,7 @@ export default {
          * @param {String} tabName - Name of the tab to navigate to
          */
         navigateToTab(tabName) {
-            router.visit(this.project.data.public_url + "?tab=" + tabName);
+            router.visit(this.projectPageBaseUrl + "?tab=" + tabName);
         },
 
         /**

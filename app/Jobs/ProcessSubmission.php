@@ -3,13 +3,16 @@
 namespace App\Jobs;
 
 use App\Actions\Citation\SyncCitationPivot;
+use App\Actions\Draft\DetachStudyFilesystemFromDraft;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
 use App\Events\StudyPublish;
+use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Models\Study;
 use App\Notifications\StudyPublishNotification;
 use App\Services\DOI\DOIService;
 use Carbon\Carbon;
@@ -19,6 +22,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -35,19 +39,46 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     public $project;
 
     /**
+     * When set, only these study IDs are published (samples mode). Used for partial community submissions.
+     *
+     * @var array<int, int>|null
+     */
+    public ?array $studyIds = null;
+
+    /**
+     * Keep the draft and staging project after publishing (community partial submit).
+     */
+    public bool $preserveDraft = false;
+
+    /**
      * Create a new job instance.
      *
-     * @return void
+     * @param  array<int, int>|null  $studyIds
      */
-    public function __construct(Project $project)
+    public function __construct(Project $project, ?array $studyIds = null, bool $preserveDraft = false)
     {
         $this->project = $project;
+        $this->studyIds = $studyIds;
+        $this->preserveDraft = $preserveDraft;
+    }
+
+    public function uniqueId(): string
+    {
+        return (string) $this->project->id;
+    }
+
+    /**
+     * Prevent a crashed worker from leaving a global unique lock that blocks every project.
+     */
+    public function uniqueFor(): int
+    {
+        return 14400;
     }
 
     /**
      * Execute the job.
      */
-    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher): void
+    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher, DetachStudyFilesystemFromDraft $detachStudyFilesystemFromDraft): void
     {
         $project = $this->project;
 
@@ -160,7 +191,9 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     $projectTagNames = $project->tags->pluck('name')->toArray();
                     $projectSpecies = $project->species;
 
-                    foreach ($_studies as $study) {
+                    $studiesToPublish = $this->filterStudiesForSubmission($_studies);
+
+                    foreach ($studiesToPublish as $study) {
                         // $study->users()->sync($project->user()->getDictionary());
                         $studyPath = preg_replace(
                             '~//+~',
@@ -178,6 +211,8 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         foreach ($studyFSObjects as $FSObject) {
                             $this->moveFolder($FSObject, $draft, $studyPath);
                         }
+
+                        $detachStudyFilesystemFromDraft->execute($draft, [(int) $study->id]);
 
                         $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
 
@@ -213,7 +248,19 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $study->save();
                     }
                 }
-                $assigner->assign($_studies);
+
+                $studiesToPublish = $this->filterStudiesForSubmission($_studies);
+
+                if ($studiesToPublish->isEmpty()) {
+                    Log::warning('embargo_publish_trace', [
+                        'stage' => 'process_submission_samples_mode_no_studies_to_publish',
+                        'project_id' => $project->id,
+                    ]);
+
+                    return;
+                }
+
+                $assigner->assign($studiesToPublish);
 
                 $releaseDate = Carbon::parse($project->release_date);
 
@@ -223,11 +270,11 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'release_date' => filled($project->release_date)
                         ? Carbon::parse($project->release_date)->toIso8601String()
                         : null,
-                    'studies_count' => $_studies->count(),
+                    'studies_count' => $studiesToPublish->count(),
                 ]);
 
                 if ($releaseDate->lessThanOrEqualTo(now())) {
-                    foreach ($_studies as $study) {
+                    foreach ($studiesToPublish as $study) {
                         Log::info('embargo_publish_trace', [
                             'stage' => 'process_submission_samples_mode_publish_study',
                             'project_id' => $project->id,
@@ -236,23 +283,30 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $studyPublisher->publish($study);
                     }
                 }
-                $updater->update($_studies);
+                $updater->update($studiesToPublish);
                 // Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_study_publish_event',
                     'project_id' => $project->id,
                 ]);
-                event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                event(new StudyPublish($studiesToPublish, $this->prepareSendList($project)));
                 $project->load('citations');
-                foreach ($_studies as $study) {
+                foreach ($studiesToPublish as $study) {
                     app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
                 }
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_delete_project_draft',
                     'project_id' => $project->id,
+                    'preserve_draft' => $this->preserveDraft,
                 ]);
-                $project->delete();
-                $draft->delete();
+
+                if ($this->preserveDraft) {
+                    $project->status = 'draft';
+                    $project->save();
+                } else {
+                    $project->delete();
+                    $draft->delete();
+                }
 
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_complete',
@@ -261,6 +315,21 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
             }
         }
+    }
+
+    /**
+     * @param  Collection<int, Study>|\Illuminate\Database\Eloquent\Collection<int, Study>  $studies
+     * @return Collection<int, Study>|\Illuminate\Database\Eloquent\Collection<int, Study>
+     */
+    private function filterStudiesForSubmission($studies)
+    {
+        if ($this->studyIds === null) {
+            return $studies;
+        }
+
+        $allowed = array_map('intval', $this->studyIds);
+
+        return $studies->whereIn('id', $allowed)->values();
     }
 
     /**
@@ -411,6 +480,9 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         });
     }
 
+    /**
+     * Remove published sample folders from the community draft workspace tree.
+     */
     private function relocateFolderTreeDuringPublish($fsObject, $draft, $path): void
     {
         $newPath = str_replace($draft->path, $path, $fsObject->path);

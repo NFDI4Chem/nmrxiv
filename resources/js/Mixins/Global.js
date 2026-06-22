@@ -169,16 +169,18 @@ export default {
             }).format(date);
         },
         /**
-         * Unified date+time display for record metadata (Published / Created / Updated rows).
+         * Unified date display for record metadata (Published / Created / Updated rows).
          */
         formatRecordTimestamp(timestamp) {
             if (!timestamp) {
                 return "";
             }
             const date = new Date(timestamp);
+            if (Number.isNaN(date.getTime())) {
+                return "";
+            }
             return new Intl.DateTimeFormat(undefined, {
                 dateStyle: "medium",
-                timeStyle: "short",
             }).format(date);
         },
 

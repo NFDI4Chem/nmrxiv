@@ -27,3 +27,7 @@ if (App::environment('production')) {
     Schedule::command('nmrxiv:backup-postgres-dump')->daily();
 }
 Schedule::command('nmrxiv:backup-cleanup')->monthly()->onOneServer();
+Schedule::command('nmrxiv:repair-missing-compound-info')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->onOneServer();

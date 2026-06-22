@@ -440,6 +440,8 @@ class ProjectModelTest extends TestCase
         $project = Project::factory()->create(['owner_id' => $owner->id]);
         $project->users()->attach($member->id, ['role' => 'editor']);
 
+        $this->assertSame('owner', $project->userProjectRole('owner@example.com'));
+
         $memberRole = $project->userProjectRole('member@example.com');
         $this->assertEquals('editor', $memberRole);
 
@@ -536,15 +538,16 @@ class ProjectModelTest extends TestCase
         $this->assertEquals($validation->id, $project->validation->id);
     }
 
-    public function test_is_published_with_release_date_logic(): void
+    public function test_is_published_requires_project_to_be_public(): void
     {
-        // Test with release date in past and DOI
+        // A crossed embargo release date does not mean the project was successfully published.
         $pastProject = Project::factory()->create([
             'is_public' => false,
+            'status' => 'embargo',
             'release_date' => Carbon::yesterday(),
             'doi' => '10.1234/example.doi',
         ]);
-        $this->assertTrue($pastProject->is_published);
+        $this->assertFalse($pastProject->is_published);
 
         // Test with release date in future and DOI
         $futureProject = Project::factory()->create([
@@ -734,51 +737,10 @@ class ProjectModelTest extends TestCase
 
     public function test_user_project_role_returns_owner_when_user_is_owner(): void
     {
-        // Test lines 227-228: when user is project owner - create a scenario that tests the owner logic
         $owner = User::factory()->create(['email' => 'owner@example.com']);
         $project = Project::factory()->create(['owner_id' => $owner->id]);
 
-        // Create a partial mock to simulate the behavior we want to test
-        $projectMock = $this->getMockBuilder(Project::class)
-            ->onlyMethods(['userWithEmail'])
-            ->getMock();
-
-        // Set the owner_id to match our test
-        $projectMock->owner_id = $owner->id;
-
-        // Create a mock user that supports array access but has null projectMembership
-        $userMock = new class($owner->id) implements \ArrayAccess
-        {
-            public $id;
-
-            public function __construct($id)
-            {
-                $this->id = $id;
-            }
-
-            public function offsetExists($offset): bool
-            {
-                return $offset === 'projectMembership';
-            }
-
-            public function offsetGet($offset): mixed
-            {
-                return $offset === 'projectMembership' ? null : null;
-            }
-
-            public function offsetSet($offset, $value): void {}
-
-            public function offsetUnset($offset): void {}
-        };
-
-        $projectMock->expects($this->once())
-            ->method('userWithEmail')
-            ->with('owner@example.com')
-            ->willReturn($userMock);
-
-        $role = $projectMock->userProjectRole('owner@example.com');
-
-        $this->assertEquals('owner', $role);
+        $this->assertEquals('owner', $project->userProjectRole('owner@example.com'));
     }
 
     public function test_filter_scope_covers_final_else_branch(): void

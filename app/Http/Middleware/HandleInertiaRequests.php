@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
+use Laravel\Jetstream\Jetstream;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -68,6 +69,7 @@ class HandleInertiaRequests extends Middleware
             'nmriumURL' => config('external-links.nmrium_url'),
             'spectraParserUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/spectra/parse/url',
             'team' => $user ? $user->currentTeam : null,
+            'availableRoles' => fn () => $user ? array_values(Jetstream::$roles) : [],
             'environment' => config('app.env'),
             'MEILISEARCH_HOST' => config('scout.meilisearch.host'),
             'MEILISEARCH_PUBLICKEY' => config('scout.meilisearch.public_key'),
@@ -88,10 +90,7 @@ class HandleInertiaRequests extends Middleware
                     : 'default';
             },
             'chemistryStandardizeUrl' => route('chemistry.standardize'),
-            'orcidSearchApi' => config('orcid.search_api'),
-            'orcidPersonApi' => config('orcid.person_api'),
             'michiStandardsUrl' => config('external-links.michi_standards_url'),
-            'orcidEmploymentApi' => config('orcid.employment_api'),
             'CM_API' => config('external-links.cm_api'),
             'CROSSREF_API' => config('external-links.crossref_api'),
             'DATACITE_API' => config('external-links.datacite_api'),

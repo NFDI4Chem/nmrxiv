@@ -9,7 +9,7 @@ use App\Notifications\ProjectDeletionFailureNotification;
 use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -106,17 +106,7 @@ class Project extends Model implements Auditable
 
     public function getIsPublishedAttribute()
     {
-        if ($this->is_public) {
-            return true;
-        } else {
-            if ($this->release_date && $this->doi) {
-                return Carbon::now()->startOfDay()->gte($this->release_date);
-            } else {
-                return false;
-            }
-        }
-
-        return false;
+        return (bool) $this->is_public;
     }
 
     /**
@@ -184,6 +174,17 @@ class Project extends Model implements Auditable
     public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    /**
+     * Hide staging projects for the community contribution workspace from the dashboard.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeExcludingCommunityContributionStaging(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('draft', fn (Builder $draft) => $draft->communityContribution());
     }
 
     public function likesCount()
@@ -262,14 +263,16 @@ class Project extends Model implements Auditable
      */
     public function userProjectRole(string $email)
     {
+        $owner = $this->relationLoaded('owner') ? $this->owner : $this->owner()->first();
+
+        if ($owner && $owner->email === $email) {
+            return 'owner';
+        }
+
         $user = $this->userWithEmail($email);
 
-        if ($user) {
-            if ($user['projectMembership']) {
-                return $user['projectMembership']['role'];
-            } elseif ($this->owner_id == $user->id) {
-                return 'owner';
-            }
+        if ($user?->projectMembership) {
+            return $user->projectMembership->role;
         }
     }
 

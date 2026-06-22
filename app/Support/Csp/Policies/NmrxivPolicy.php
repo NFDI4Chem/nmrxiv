@@ -93,7 +93,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::IMG, 'https://nmriumdev.nmrxiv.org')
             ->add(Directive::IMG, 'https://upload.wikimedia.org')
             ->add(Directive::IMG, 'https://pbs.twimg.com')
-            ->add(Directive::IMG, 'https://api.cheminf.studio')
+            ->add(Directive::IMG, 'https://*.naturalproducts.net')
             ->add(Directive::IMG, 'https://api.naturalproducts.net')
             ->add(Directive::IMG, 'https://dev.api.naturalproducts.net')
             ->add(Directive::IMG, 'https://placehold.co');
@@ -114,7 +114,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, 'https://service.tib.eu')
             ->add(Directive::CONNECT, 'https://nmrium.nmrxiv.org')
             ->add(Directive::CONNECT, 'https://nmriumdev.nmrxiv.org')
-            ->add(Directive::CONNECT, 'https://api.cheminf.studio')
+            ->add(Directive::CONNECT, 'https://*.naturalproducts.net')
             ->add(Directive::CONNECT, 'https://api.naturalproducts.net')
             ->add(Directive::CONNECT, 'https://dev.api.naturalproducts.net');
 
@@ -127,7 +127,7 @@ class NmrxivPolicy implements Preset
         // Frame sources
         $policy
             ->add(Directive::FRAME, Keyword::SELF)
-            ->add(Directive::FRAME, 'https://api.cheminf.studio')
+            ->add(Directive::FRAME, 'https://*.naturalproducts.net')
             ->add(Directive::FRAME, 'https://api.naturalproducts.net')
             ->add(Directive::FRAME, 'https://dev.api.naturalproducts.net')
             ->add(Directive::FRAME, 'https://nmrium.nmrxiv.org')

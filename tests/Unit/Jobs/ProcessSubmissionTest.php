@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Jobs;
 
+use App\Actions\Draft\DetachStudyFilesystemFromDraft;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
@@ -61,6 +62,20 @@ class ProcessSubmissionTest extends TestCase
         $this->assertInstanceOf(ShouldBeUnique::class, $job);
     }
 
+    public function test_unique_id_is_scoped_to_the_project(): void
+    {
+        $job = new ProcessSubmission($this->project);
+
+        $this->assertSame((string) $this->project->id, $job->uniqueId());
+    }
+
+    public function test_unique_for_limits_orphaned_lock_duration(): void
+    {
+        $job = new ProcessSubmission($this->project);
+
+        $this->assertSame(14400, $job->uniqueFor());
+    }
+
     public function test_it_implements_should_queue_interface(): void
     {
         $job = new ProcessSubmission($this->project);
@@ -117,7 +132,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->never();
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
 
         $this->project->refresh();
         $this->assertSame('published', $this->project->status);
@@ -168,7 +183,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
 
         $this->assertNull(Project::find($projectId));
         $this->assertNull(Draft::find($draftId));
@@ -217,7 +232,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->once();
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
 
         $this->assertNull(Project::find($this->project->id));
         $this->assertNull(Draft::find($this->draft->id));
@@ -269,7 +284,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
 
         $dataset->refresh();
         $this->assertNull($dataset->draft_id);
@@ -391,7 +406,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->twice()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
 
         foreach ([$studyOne->id, $studyTwo->id] as $studyId) {
             $study = Study::with('studyAuthors')->find($studyId);
@@ -454,7 +469,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher = Mockery::mock(PublishStudy::class);
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
 
         Bus::assertDispatched(ArchiveProject::class, fn ($dispatched) => $dispatched->project->id === $this->project->id);
         Bus::assertDispatched(ArchiveStudy::class, fn ($dispatched) => $dispatched->project->id === $this->project->id);
