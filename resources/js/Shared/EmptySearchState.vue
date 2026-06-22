@@ -1,6 +1,7 @@
 <template>
     <div :class="rootClasses" role="status" aria-live="polite">
         <div
+            v-if="layout !== 'embedded'"
             class="pointer-events-none absolute inset-0 opacity-60 dark:opacity-40"
             aria-hidden="true"
         >
@@ -150,12 +151,17 @@ export default {
         layout: {
             type: String,
             default: "default",
-            validator: (value) => ["default", "public"].includes(value),
+            validator: (value) =>
+                ["default", "public", "embedded"].includes(value),
         },
     },
     emits: ["clear-search"],
     computed: {
         rootClasses() {
+            if (this.layout === "embedded") {
+                return "relative w-full px-6 py-12 text-center";
+            }
+
             const base =
                 "relative min-w-0 overflow-hidden rounded-2xl border border-gray-200/80 bg-gradient-to-b from-white via-white to-gray-50/90 px-6 py-16 text-center shadow-sm dark:border-gray-800 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950/80";
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CASController;
 use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
+use App\Http\Controllers\CommunityContributionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
@@ -193,6 +194,11 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::get('upload', [UploadController::class, 'upload'])->name('upload');
+    Route::get('community-contribution', [CommunityContributionController::class, 'show'])
+        ->name('community-contribution');
+    Route::post('community-contribution/drafts/{draft}/publish-studies', [CommunityContributionController::class, 'publishStudies'])
+        ->middleware('throttle:10,1')
+        ->name('community-contribution.publish-studies');
     Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
 
     // CAS Common Chemistry API Proxy
@@ -335,6 +341,8 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.provisional-doi.destroy');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/sample-folders', [DraftController::class, 'sampleFolders'])
+            ->name('dashboard.draft.sample-folders');
         Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
             ->name('dashboard.draft.missing-files');
         Route::put('drafts/{draft}', [DraftController::class, 'update'])

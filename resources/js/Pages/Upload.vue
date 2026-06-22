@@ -494,7 +494,9 @@
                         class="px-12"
                     >
                         <div class="my-8 mx-12 mx-auto max-w-none">
-                            <div class="bg-white border rounded-lg shadow-md">
+                            <div
+                                class="overflow-hidden bg-white border rounded-lg shadow-md"
+                            >
                                 <div
                                     class="border-b rounded-t-lg bg-gray-50 border-gray-200 px-4 py-5 sm:px-6"
                                 >
@@ -511,7 +513,8 @@
                                                 class="mt-1 text-sm text-gray-500"
                                             >
                                                 Please select one of the drafts
-                                                below to continue
+                                                below to continue or start a new
+                                                submission
                                             </p>
                                         </div>
                                         <div
@@ -547,6 +550,7 @@
                                                         v-model="
                                                             searchDraftQuery
                                                         "
+                                                        rounded-full
                                                         name="draft-search"
                                                         placeholder="Search drafts..."
                                                         @reset="
@@ -555,6 +559,12 @@
                                                         "
                                                     />
                                                 </div>
+                                                <button
+                                                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
+                                                    @click="createNewDraft()"
+                                                >
+                                                    + Create New
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -574,6 +584,7 @@
                                     >
                                         <EmptySearchState
                                             entity-type="drafts"
+                                            layout="embedded"
                                             :search-query="searchDraftQuery"
                                             @clear-search="
                                                 searchDraftQuery = ''
@@ -689,7 +700,7 @@
                                 </div>
 
                                 <div
-                                    class="flex items-center justify-between px-6 py-3 border-t bg-white"
+                                    class="flex items-center justify-between rounded-b-lg px-6 py-3 border-t bg-white"
                                 >
                                     <div class="text-sm text-gray-600">
                                         Page {{ currentDraftsPage }} of
@@ -3624,7 +3635,7 @@ export default {
         ArrowsPointingInIcon,
     },
     mixins: [Global],
-    props: ["draft_id"],
+    props: ["draft_id", "deposition"],
     setup() {
         return {};
     },
@@ -3855,11 +3866,17 @@ export default {
             return eligible.every((s) => Boolean(this.expandedStudyIds[s.id]));
         },
         filteredDrafts() {
+            let drafts = this.drafts;
+
+            if (this.deposition === "publication") {
+                drafts = drafts.filter((d) => !this.isCommunityDraft(d));
+            }
+
             if (!this.searchDraftQuery) {
-                return this.drafts;
+                return drafts;
             }
             const q = this.searchDraftQuery.toLowerCase().trim();
-            return this.drafts.filter((d) => {
+            return drafts.filter((d) => {
                 const name = (d.name || "").toLowerCase();
                 const desc = (d.description || "").toLowerCase();
                 const idText = String(d.id || "").toLowerCase();
@@ -4470,7 +4487,20 @@ export default {
         },
         fetchDrafts() {
             this.loading = true;
-            return axios.get("/dashboard/drafts");
+
+            const params = {};
+
+            if (this.deposition) {
+                params.deposition = this.deposition;
+            }
+
+            return axios.get("/dashboard/drafts", { params });
+        },
+        isCommunityDraft(draft) {
+            return (
+                draft?.settings?.deposition_type === "community" ||
+                (draft?.name || "").startsWith("Community Contribution (Draft:")
+            );
         },
         fetchDraftById(draftId) {
             return axios.get("/dashboard/drafts/" + draftId + "/show");
@@ -4565,6 +4595,13 @@ export default {
             }
         },
         selectDraft(draft) {
+            if (
+                this.deposition === "publication" &&
+                this.isCommunityDraft(draft)
+            ) {
+                return;
+            }
+
             this.needsReservedDoi = false;
             this.doiCopySucceeded = false;
             this.provisionalDoiError = null;

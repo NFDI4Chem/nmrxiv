@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Dataset;
+use App\Models\Draft;
 use App\Models\Molecule;
 use App\Models\Project;
 use App\Models\Sample;
@@ -33,6 +34,45 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertRedirect('/login');
+    }
+
+    public function test_dashboard_excludes_community_contribution_staging_project(): void
+    {
+        $publicationDraft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+
+        $publicationProject = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'status' => 'draft',
+            'draft_id' => $publicationDraft->id,
+        ]);
+
+        $communityDraft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'settings' => ['deposition_type' => 'community'],
+            'name' => 'Community Contribution (Draft: abc123)',
+        ]);
+
+        $communityProject = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'is_deleted' => false,
+            'status' => 'draft',
+            'draft_id' => $communityDraft->id,
+        ]);
+
+        $response = $this->actingAs($this->user)->get('/dashboard');
+
+        $page = $this->assertInertiaPageComponent($response, 'Dashboard');
+        $projectIds = collect($page['props']['projects']['data'])->pluck('id');
+
+        $this->assertTrue($projectIds->contains($publicationProject->id));
+        $this->assertFalse($projectIds->contains($communityProject->id));
     }
 
     public function test_dashboard_renders_with_personal_team(): void

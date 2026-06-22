@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CacheClear;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -298,6 +299,49 @@ class Study extends Model implements Auditable
     public function sample(): HasOne
     {
         return $this->hasOne(Sample::class, 'study_id');
+    }
+
+    /**
+     * Whether the study sample has at least one assignable chemical structure.
+     */
+    public function hasAssignedStructure(): bool
+    {
+        $this->loadMissing('sample.molecules');
+
+        if (! $this->sample) {
+            return false;
+        }
+
+        return $this->sample->molecules->contains(
+            fn (Molecule $molecule) => filled($molecule->canonical_smiles)
+                || filled($molecule->smiles)
+                || filled($molecule->absolute_smiles)
+                || filled($molecule->sdf)
+        );
+    }
+
+    public function isReadyForCommunityPublish(): bool
+    {
+        return $this->internal_status === 'complete'
+            && $this->has_nmrium
+            && $this->hasAssignedStructure();
+    }
+
+    /**
+     * Studies still visible in a draft workspace (excludes submitted samples).
+     *
+     * @param  Builder<Study>  $query
+     * @return Builder<Study>
+     */
+    public function scopeOnDraftWorkspace(Builder $query, Draft $draft): Builder
+    {
+        return $query->where('is_public', false)
+            ->where(function (Builder $workspaceQuery) use ($draft): void {
+                $workspaceQuery->where('draft_id', $draft->id)
+                    ->orWhereHas('datasets', function (Builder $datasetQuery) use ($draft): void {
+                        $datasetQuery->where('draft_id', $draft->id);
+                    });
+            });
     }
 
     public function molecules()
