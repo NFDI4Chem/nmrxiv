@@ -70,7 +70,6 @@
                             class="mt-1 flex-1 h-0 overflow-y-auto"
                         >
                             <div
-                                v-if="!isUploadPage"
                                 class="px-4 py-4 border-b border-gray-100 text-center"
                             >
                                 <create mode="button"></create>
@@ -124,7 +123,7 @@
 
                         <!-- Create Button & Help Section -->
                         <div
-                            v-if="editableTeamRole && !isUploadPage"
+                            v-if="editableTeamRole"
                             class="py-3 border-b border-gray-100 space-y-2"
                         >
                             <!-- Upload/Create Button -->
@@ -193,7 +192,7 @@
                 <div class="flex-grow flex flex-col">
                     <!-- Create Button Section -->
                     <div
-                        v-if="editableTeamRole && !isUploadPage"
+                        v-if="editableTeamRole"
                         class="px-4 py-4 border-b border-gray-100 text-center"
                     >
                         <create mode="button"></create>
@@ -248,7 +247,9 @@
                     <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
-                    <div class="flex-1 flex"></div>
+                    <div class="flex min-w-0 flex-1 items-center">
+                        <slot name="navbar" />
+                    </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center gap-1 md:ml-6">
                         <span
@@ -790,7 +791,7 @@ const navigationSections = [
             {
                 auth: false,
                 name: "Spectra Library",
-                href: "/compounds",
+                href: "/search?scope=compounds",
                 icon: SwatchIcon,
             },
         ],

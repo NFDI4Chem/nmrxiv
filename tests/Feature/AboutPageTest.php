@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-use Inertia\Testing\AssertableInertia as Assert;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AboutPageTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_about_page_can_be_rendered(): void
     {
-        $this->get('/about-us')
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->component('About')
-                ->has('projects')
-                ->has('compounds'));
+        $page = $this->assertInertiaPageComponent($this->get('/about-us'), 'About');
+
+        $this->assertArrayHasKey('projects', $page['props']);
+        $this->assertArrayHasKey('compounds', $page['props']);
     }
 }

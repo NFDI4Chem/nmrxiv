@@ -190,14 +190,11 @@ class DraftFeatureTest extends TestCase
     {
         $otherUser = User::factory()->withPersonalTeam()->create();
 
-        // Since there's no explicit authorization policy, this test checks
-        // that the draft is only returned for the owner or team members
+        // Unauthorized users must not access another user's draft files
         $response = $this->actingAs($otherUser)
             ->get("/dashboard/drafts/{$this->draft->id}/files");
 
-        // The application may return 200 but with empty/restricted data
-        // or 403/404 depending on implementation
-        $this->assertTrue(in_array($response->status(), [200, 403, 404]));
+        $response->assertForbidden();
     }
 
     public function test_draft_with_eln_fields_can_be_accessed(): void

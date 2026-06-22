@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Http\Controllers\StudyController;
 use App\Models\Study;
 use App\Support\Nmr\JcampDatasetClassifier;
+use App\Support\Nmr\NmriumSpectraInfoInspector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -75,7 +76,7 @@ class RefreshNmriumInfo extends Command
             }
 
             $jcampBackfilled = $this->backfillUnparsedJcampDatasets($study);
-            if (! $this->needsRefresh($spectra)) {
+            if (! NmriumSpectraInfoInspector::needsRefresh($spectra)) {
                 if ($jcampBackfilled > 0) {
                     $this->info(sprintf('study %d %s — info OK; classified %d JCAMP-only file(s)', $study->id, $study->name, $jcampBackfilled));
                     $touched++;
@@ -235,32 +236,6 @@ class RefreshNmriumInfo extends Command
         }
 
         return null;
-    }
-
-    /**
-     * Heuristically decide whether at least one spectrum in the stored
-     * payload is missing real metadata. We treat `info` as "needs refresh"
-     * when it is empty, missing the `experiment` key, or has been corrupted
-     * with raw `{im, re}` payloads from the legacy SpectraEditor bug.
-     *
-     * @param  array<int, array<string, mixed>>  $spectra
-     */
-    protected function needsRefresh(array $spectra): bool
-    {
-        foreach ($spectra as $spec) {
-            $info = $spec['info'] ?? null;
-            if (! is_array($info) || empty($info)) {
-                return true;
-            }
-            if (isset($info['im']) || isset($info['re'])) {
-                return true;
-            }
-            if (! array_key_exists('experiment', $info) && ! array_key_exists('nucleus', $info)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

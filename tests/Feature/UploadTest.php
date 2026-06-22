@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Draft;
+use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Validation;
@@ -57,6 +58,44 @@ class UploadTest extends TestCase
             ->get('/upload?step=2');
 
         $response->assertStatus(200);
+    }
+
+    public function test_upload_accepts_deposition_parameter(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->get('/upload?deposition=publication');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_drafts_api_excludes_community_draft_for_publication_deposition(): void
+    {
+        $publicationDraft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $publicationDraft->id,
+        ]);
+
+        $communityDraft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'settings' => ['deposition_type' => 'community'],
+        ]);
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $communityDraft->id,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson('/dashboard/drafts?deposition=publication');
+
+        $response->assertOk();
+
+        $draftIds = collect($response->json('drafts'))->pluck('id');
+
+        $this->assertTrue($draftIds->contains($publicationDraft->id));
+        $this->assertFalse($draftIds->contains($communityDraft->id));
     }
 
     public function test_upload_accepts_both_draft_id_and_step_parameters(): void
@@ -285,8 +324,8 @@ class UploadTest extends TestCase
         $response = $this->actingAs($this->user)
             ->get('/publish/'.$draft->id);
 
-        // Should return 403 because project is null and gate check fails
-        $response->assertStatus(403);
+        // Drafts without a project are sent back to the upload workspace.
+        $response->assertRedirect(route('upload', ['draft_id' => $draft->id]));
     }
 
     public function test_upload_works_without_any_parameters(): void

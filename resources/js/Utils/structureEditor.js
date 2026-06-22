@@ -1,3 +1,5 @@
+import { moleculeFromMolfileOrText } from "@/Utils/molfileNormalize";
+
 /** @type {import("openchemlib").default | null} */
 let oclModule = null;
 
@@ -342,11 +344,16 @@ function createStructureEditorWithOcl(OCL, target, options = {}) {
         },
 
         setMolFile(molfile) {
-            const molecule =
-                molfile && molfile.trim() !== ""
-                    ? OCL.Molecule.fromMolfile(molfile)
-                    : emptyMolecule();
-            setDecorated(molecule);
+            if (!molfile || molfile.trim() === "") {
+                setDecorated(emptyMolecule());
+                return;
+            }
+
+            const { molecule } = moleculeFromMolfileOrText(molfile, OCL);
+
+            setDecorated(
+                molecule && molecule.getAtoms() > 0 ? molecule : emptyMolecule()
+            );
         },
 
         getMolFile() {
