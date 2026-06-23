@@ -84,6 +84,111 @@ services:
     - app_storage:/var/www/html/storage
     - ../.env:/var/www/html/.env
 
+  nmrkit:
+    image: nfdi4chem/nmrkit:latest
+    pull_policy: always
+    depends_on:
+    - nmrkit_pgsql
+    - nmrkit_redis
+    env_file:
+    - ../.env
+    environment:
+    - DB_HOST=nmrkit_pgsql
+    - DB_PORT=5432
+    - POSTGRES_DB=${NMRKIT_DB_DATABASE:-nmrkit}
+    - POSTGRES_USER=${NMRKIT_DB_USERNAME:-nmrkit}
+    - POSTGRES_PASSWORD=${NMRKIT_DB_PASSWORD:-password}
+    - REDIS_HOST=nmrkit_redis
+    - REDIS_PORT=6379
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.nmrkit.rule=Host(`nmrkit.nmrxiv.org`)
+    - traefik.http.routers.nmrkit.entrypoints=websecure
+    - traefik.http.routers.nmrkit.tls=true
+    - traefik.http.services.nmrkit.loadbalancer.server.port=80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/latest/registration/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    networks:
+    - nmrxiv_net
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: unless-stopped
+
+  nmr-load-save:
+    image: nfdi4chem/nmr-cli:latest
+    container_name: nmr-converter
+    entrypoint: /bin/sh
+    stdin_open: true
+    tty: true
+    networks:
+    - nmrxiv_net
+    volumes:
+    - shared_data:/shared
+
+  nmr-respredict:
+    image: nfdi4chem/nmr-respredict:latest
+    container_name: nmr-respredict
+    entrypoint: /bin/sh
+    stdin_open: true
+    tty: true
+    networks:
+    - nmrxiv_net
+    volumes:
+    - shared_data:/shared
+
+  nmrkit_pgsql:
+    image: informaticsmatters/rdkit-cartridge-debian:latest
+    env_file:
+    - ../.env
+    environment:
+    - PG_VERSION=${NMRKIT_DB_VERSION:-15.4}
+    - POSTGRES_DB=${NMRKIT_DB_DATABASE:-nmrkit}
+    - POSTGRES_USER=${NMRKIT_DB_USERNAME:-nmrkit}
+    - POSTGRES_PASSWORD=${NMRKIT_DB_PASSWORD:-password}
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - pg_isready
+      - -q
+      - -d
+      - ${NMRKIT_DB_DATABASE:-nmrkit}
+      - -U
+      - ${NMRKIT_DB_USERNAME:-nmrkit}
+      timeout: 10s
+    networks:
+    - nmrxiv_net
+    ports:
+    - ${NMRKIT_DB_PORT:-5433}:5432
+    restart: unless-stopped
+    volumes:
+    - nmrkit_pgsql_data:/var/lib/postgresql/data
+
+  nmrkit_redis:
+    image: redis:alpine
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      timeout: 10s
+    networks:
+    - nmrxiv_net
+    ports:
+    - ${NMRKIT_REDIS_PORT:-6380}:6379
+    restart: unless-stopped
+    volumes:
+    - nmrkit_redis_data:/data
+
   meilisearch:
     image: getmeili/meilisearch:latest
     env_file:
@@ -168,6 +273,12 @@ volumes:
   pgsql_data:
     driver: local
   redis_data:
+    driver: local
+  nmrkit_pgsql_data:
+    driver: local
+  nmrkit_redis_data:
+    driver: local
+  shared_data:
     driver: local
 
 networks:
