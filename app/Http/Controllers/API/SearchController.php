@@ -7,6 +7,7 @@ use App\Http\Requests\TextSearchRequest;
 use App\Models\Molecule;
 use App\Services\PublicTextSearchService;
 use App\Support\Public\PublicMoleculeAggregates;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -113,20 +114,6 @@ class SearchController extends Controller
 
     /**
      * @deprecated Use GET /api/v1/search/catalog
-     *
-     * @OA\Get(
-     *     path="/api/v1/text-search",
-     *     operationId="searchCatalogTextSearchLegacy",
-     *     tags={"Search"},
-     *     summary="[Deprecated] Catalog search (legacy path)",
-     *     deprecated=true,
-     *     description="Deprecated alias of GET /api/v1/search/catalog.",
-     *
-     *     @OA\Parameter(name="q", in="query", required=true, @OA\Schema(type="string")),
-     *
-     *     @OA\Response(response=200, description="Grouped catalog search results"),
-     *     @OA\Response(response=422, description="Validation error")
-     * )
      */
     public function catalogTextSearchLegacy(TextSearchRequest $request): JsonResponse
     {
@@ -135,21 +122,6 @@ class SearchController extends Controller
 
     /**
      * @deprecated Use GET /api/v1/search/catalog
-     *
-     * @OA\Get(
-     *     path="/api/v1/search",
-     *     operationId="searchCatalogLegacy",
-     *     tags={"Search"},
-     *     summary="[Deprecated] Catalog search via legacy URL",
-     *     deprecated=true,
-     *     description="Deprecated. Use GET /api/v1/search/catalog instead.",
-     *
-     *     @OA\Parameter(name="q", in="query", required=true, @OA\Schema(type="string")),
-     *     @OA\Parameter(name="scope", in="query", @OA\Schema(type="string", enum={"catalog"})),
-     *
-     *     @OA\Response(response=200, description="Same payload as GET /api/v1/search/catalog"),
-     *     @OA\Response(response=405, description="Compound search is not supported on this route")
-     * )
      */
     public function catalogLegacy(Request $request): JsonResponse
     {
@@ -223,15 +195,6 @@ class SearchController extends Controller
      *         description="Tag type for tag-based searches",
      *
      *         @OA\Schema(type="string", example="chemical_class")
-     *     ),
-     *
-     *     @OA\Parameter(
-     *         name="smiles",
-     *         in="path",
-     *         required=false,
-     *         description="Optional SMILES string in the URL path (legacy). Prefer sending the query in the request body.",
-     *
-     *         @OA\Schema(type="string", example="CC(=O)OC1=CC=CC=C1C(=O)O")
      *     ),
      *
      *     @OA\Response(
@@ -382,22 +345,6 @@ class SearchController extends Controller
      * - **Exact**: Exact structure matching
      * - **Tags**: Classification-based search
      * - **Filters**: Property-based filtering
-     *
-     * @deprecated Use POST /api/v1/search/compounds
-     *
-     * @OA\Post(
-     *     path="/api/v1/search/{smiles}",
-     *     operationId="searchCompoundsLegacy",
-     *     tags={"Search"},
-     *     summary="[Deprecated] Compound search (legacy path)",
-     *     deprecated=true,
-     *     description="Deprecated alias of POST /api/v1/search/compounds. The optional {smiles} path segment is merged into the request body query.",
-     *
-     *     @OA\Parameter(name="smiles", in="path", required=false, @OA\Schema(type="string")),
-     *
-     *     @OA\Response(response=200, description="Paginated compound results"),
-     *     @OA\Response(response=400, description="Invalid input parameters")
-     * )
      */
     public function searchLegacy(Request $request, ?string $smiles = null): JsonResponse|LengthAwarePaginator
     {
@@ -528,7 +475,12 @@ class SearchController extends Controller
 
             $statement = null;
 
-            if ($queryType == 'smiles' || $queryType == 'substructure') {
+            if ($queryType == 'smiles') {
+                $hits = DB::select(
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (smiles LIKE ? OR absolute_smiles LIKE ? OR canonical_smiles LIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
+                    ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                );
+            } elseif ($queryType == 'substructure') {
                 try {
                     $hits = DB::select(
                         "SELECT mols.id, COUNT(*) OVER () as count FROM mols
@@ -544,13 +496,13 @@ class SearchController extends Controller
                 }
             } elseif ($queryType == 'inchi') {
                 $hits = DB::select(
-                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi LIKE ?{$publicSpectraFilter} LIMIT ? OFFSET ?",
-                    ['%'.$query.'%', $limit, $offset]
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (inchi LIKE ? OR standard_inchi LIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
+                    ['%'.$query.'%', '%'.$query.'%', $limit, $offset]
                 );
             } elseif ($queryType == 'inchikey') {
                 $hits = DB::select(
-                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi_key LIKE ?{$publicSpectraFilter} LIMIT ? OFFSET ?",
-                    ['%'.$query.'%', $limit, $offset]
+                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (inchi_key LIKE ? OR standard_inchi_key LIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
+                    ['%'.$query.'%', '%'.$query.'%', $limit, $offset]
                 );
             } elseif ($queryType == 'exact') {
                 try {
@@ -579,18 +531,24 @@ class SearchController extends Controller
                     $hits = [];
                 }
             } elseif ($queryType == 'tags') {
-                $tagQuery = PublicMoleculeAggregates::scopePublicCatalog(
-                    Molecule::withAnyTags([$query], $tagType)
-                );
+                $tagQuery = $this->buildTaggedMoleculeQuery($query, $tagType);
+
+                if (! $tagQuery->exists() && filled($tagType)) {
+                    $tagQuery = $this->buildTaggedMoleculeQuery($query, null);
+                }
+
                 if ($sort === 'recent') {
                     $tagQuery->orderByDesc('created_at');
                 }
-                $results = PublicMoleculeAggregates::enrich(
-                    $tagQuery->paginate($limit)->items()
+
+                $tagPaginator = $tagQuery->paginate($limit, ['*'], 'page', $page);
+
+                $results = $this->formatTaggedMoleculeResults(
+                    $tagPaginator->getCollection()->all(),
+                    $query,
+                    $tagType
                 );
-                $count = PublicMoleculeAggregates::scopePublicCatalog(
-                    Molecule::withAnyTags([$query], $tagType)
-                )->count();
+                $count = $tagPaginator->total();
             } elseif ($queryType == 'filters') {
                 $result = $this->buildSecureFilterQuery($query, $filterMap, $limit, $offset);
                 $hits = $result['hits'];
@@ -649,6 +607,12 @@ class SearchController extends Controller
                 $results = PublicMoleculeAggregates::enrich($results);
             }
 
+            if (filled($query) && $count === 0) {
+                return response()->json([
+                    'message' => 'No compounds found matching your search criteria.',
+                ], 404);
+            }
+
             $pagination = new LengthAwarePaginator(
                 $results,
                 $count,
@@ -696,6 +660,77 @@ class SearchController extends Controller
         $query = substr($query, 0, 1000);
 
         return $query;
+    }
+
+    /**
+     * @param  array<int, Molecule>  $results
+     * @return array<int, Molecule>
+     */
+    private function formatTaggedMoleculeResults(array $results, string $query, ?string $tagType = null): array
+    {
+        foreach ($results as $molecule) {
+            $molecule->loadMissing(['samples.study.tags']);
+
+            $studies = $molecule->samples
+                ->pluck('study')
+                ->filter()
+                ->unique('id')
+                ->values();
+
+            $studyNames = $studies
+                ->pluck('name')
+                ->filter(fn ($studyName) => filled($studyName))
+                ->map(fn ($studyName) => trim((string) $studyName))
+                ->filter()
+                ->values();
+
+            $contextParts = [];
+
+            if (filled($query)) {
+                $contextParts[] = 'Tag: '.$query;
+            }
+
+            if ($studyNames->isNotEmpty()) {
+                $visibleStudyNames = $studyNames->take(2)->implode(', ');
+
+                if ($studyNames->count() > 2) {
+                    $visibleStudyNames .= ' +'.($studyNames->count() - 2).' more';
+                }
+
+                $contextParts[] = 'Studies: '.$visibleStudyNames;
+            }
+
+            if ($contextParts !== []) {
+                $molecule->setAttribute('search_context', implode(' · ', $contextParts));
+            }
+        }
+
+        return $results;
+    }
+
+    private function buildTaggedMoleculeQuery(string $query, ?string $tagType = null): Builder
+    {
+        return PublicMoleculeAggregates::scopePublicCatalog(
+            Molecule::query()->whereHas('samples.study', function (Builder $studyQuery) use ($query, $tagType): void {
+                $studyQuery->where('is_public', true)
+                    ->where('is_archived', false)
+                    ->where(function (Builder $scopeQuery) use ($query, $tagType): void {
+                        $scopeQuery->whereHas('tags', function (Builder $tagQuery) use ($query, $tagType): void {
+                            $tagQuery->where('name->en', $query);
+
+                            if (filled($tagType)) {
+                                $tagQuery->where('type', $tagType);
+                            }
+                        })->orWhereHas('project.tags', function (Builder $tagQuery) use ($query, $tagType): void {
+                            $tagQuery->where('name->en', $query);
+
+                            if (filled($tagType)) {
+                                $tagQuery->where('type', $tagType);
+                            }
+                        });
+                    });
+            })
+        );
     }
 
     /**

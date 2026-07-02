@@ -5,9 +5,13 @@ namespace Tests\API;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\NMRium;
+use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class SearchControllerTest extends TestCase
@@ -24,13 +28,20 @@ class SearchControllerTest extends TestCase
     /**
      * @param  array<string, mixed>  $attributes
      */
-    private function createMoleculeInPublicCatalog(array $attributes = []): Molecule
+    private function createMoleculeInPublicCatalog(array $attributes = [], ?\Closure $configureStudy = null): Molecule
     {
+        $project = Project::factory()->create();
+
         $study = Study::factory()->create([
+            'project_id' => $project->id,
             'is_public' => true,
             'is_archived' => false,
             'is_deleted' => false,
         ]);
+
+        if ($configureStudy !== null) {
+            $configureStudy($study);
+        }
 
         $molecule = Molecule::factory()->create($attributes);
 
@@ -101,7 +112,25 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_inchikey_type()
     {
-        Molecule::factory()->create([
+        $molecule = $this->createMoleculeInPublicCatalog([
+            'inchi_key' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
+            'standard_inchi_key' => null,
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
+            'type' => 'inchikey',
+        ]);
+
+        $response->assertOk();
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame($molecule->id, $response->json('data.0.id'));
+    }
+
+    public function test_search_with_inchikey_type_checks_standard_inchi_key()
+    {
+        $molecule = $this->createMoleculeInPublicCatalog([
+            'inchi_key' => null,
             'standard_inchi_key' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
         ]);
 
@@ -110,7 +139,9 @@ class SearchControllerTest extends TestCase
             'type' => 'inchikey',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertOk();
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame($molecule->id, $response->json('data.0.id'));
     }
 
     /**
@@ -127,7 +158,25 @@ class SearchControllerTest extends TestCase
             'type' => 'inchi',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
+    }
+
+    public function test_search_with_smiles_type_checks_canonical_smiles()
+    {
+        $molecule = $this->createMoleculeInPublicCatalog([
+            'smiles' => null,
+            'absolute_smiles' => null,
+            'canonical_smiles' => 'CC(C)[C@@H]1CCCCC1',
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => 'CC(C)[C@@H]1CCCCC1',
+            'type' => 'smiles',
+        ]);
+
+        $response->assertOk();
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame($molecule->id, $response->json('data.0.id'));
     }
 
     /**
@@ -139,8 +188,10 @@ class SearchControllerTest extends TestCase
             'query' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N',
         ]);
 
-        $response->assertStatus(200);
-        // Should auto-detect as inchikey based on format
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
@@ -152,8 +203,10 @@ class SearchControllerTest extends TestCase
             'query' => 'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12',
         ]);
 
-        $response->assertStatus(200);
-        // Should auto-detect as inchi
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
@@ -433,19 +486,50 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     /**
      * Test search with tags type
      */
-    public function test_search_with_tags_type()
+    public function test_search_with_tags_type_falls_back_when_tag_type_does_not_match_stored_tag_type()
     {
-        $this->markTestSkipped('Tagging functionality not implemented on Molecule model');
+        $studyName = 'Tagged study for compounds';
+        $projectName = 'Tagged project for compounds';
+        $molecule = $this->createMoleculeInPublicCatalog([
+            'name' => 'Tag-linked molecule',
+        ], function (Study $study) use ($studyName, $projectName): void {
+            $study->name = $studyName;
+            $study->save();
+            $project = $study->project;
+            $project->name = $projectName;
+            $project->save();
+            $project->syncTagsWithType(['nmr'], 'Project');
+        });
 
-        $molecule = Molecule::factory()->create();
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => 'nmr',
+            'type' => 'tags',
+            'tagType' => 'chemical_class',
+        ]);
 
-        $molecule->attachTag('organic', 'chemical_class');
+        $response->assertOk();
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame($molecule->id, $response->json('data.0.id'));
+        $this->assertStringContainsString('Tag: nmr', (string) $response->json('data.0.search_context'));
+        $this->assertStringContainsString($studyName, (string) $response->json('data.0.search_context'));
+    }
+
+    public function test_search_with_tags_type_returns_molecules_from_tagged_studies(): void
+    {
+        $studyName = 'Tagged study for compounds';
+        $molecule = $this->createMoleculeInPublicCatalog([
+            'name' => 'Tag-linked molecule',
+        ], function (Study $study) use ($studyName): void {
+            $study->name = $studyName;
+            $study->save();
+            $study->syncTagsWithType(['organic'], 'chemical_class');
+        });
 
         $response = $this->postJson('/api/v1/search/compounds', [
             'query' => 'organic',
@@ -453,7 +537,35 @@ class SearchControllerTest extends TestCase
             'tagType' => 'chemical_class',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertOk();
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame($molecule->id, $response->json('data.0.id'));
+        $this->assertStringContainsString('Tag: organic', (string) $response->json('data.0.search_context'));
+        $this->assertStringContainsString($studyName, (string) $response->json('data.0.search_context'));
+    }
+
+    public function test_search_with_tags_type_checks_properties_classification_fields()
+    {
+        Schema::create('properties', function (Blueprint $table) {
+            $table->unsignedBigInteger('molecule_id');
+            $table->string('chemical_class')->nullable();
+        });
+
+        $molecule = $this->createMoleculeInPublicCatalog();
+
+        DB::table('properties')->insert([
+            'molecule_id' => $molecule->id,
+            'chemical_class' => 'organic natural products',
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => 'class:organic',
+            'type' => 'filters',
+        ]);
+
+        $response->assertOk();
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame($molecule->id, $response->json('data.0.id'));
     }
 
     /**
@@ -508,8 +620,10 @@ class SearchControllerTest extends TestCase
             'query' => "test\x00query\x1Fwith\x7Fcontrol",
         ]);
 
-        $response->assertStatus(200);
-        // Should sanitize control characters
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
@@ -525,8 +639,6 @@ class SearchControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        // Paginator should return page 2 data
-        // For now just check it returns successfully with page param
         $this->assertNotEmpty($response->json('data'));
     }
 
@@ -564,8 +676,10 @@ class SearchControllerTest extends TestCase
             'type' => 'smiles',
         ]);
 
-        $response->assertStatus(200);
-        $this->assertEquals(0, $response->json('total'));
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
@@ -578,8 +692,10 @@ class SearchControllerTest extends TestCase
             'type' => 'exact',
         ]);
 
-        $response->assertStatus(200);
-        $this->assertEquals(0, $response->json('total'));
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
@@ -592,8 +708,10 @@ class SearchControllerTest extends TestCase
             'type' => 'similarity',
         ]);
 
-        $response->assertStatus(200);
-        $this->assertEquals(0, $response->json('total'));
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
@@ -606,7 +724,7 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     /**
@@ -619,7 +737,7 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     /**
@@ -632,7 +750,7 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     /**
@@ -645,7 +763,7 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     /**
@@ -658,7 +776,7 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     /**
@@ -671,8 +789,10 @@ class SearchControllerTest extends TestCase
             'type' => 'filters',
         ]);
 
-        $response->assertStatus(200);
-        $this->assertEquals(0, $response->json('total'));
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No compounds found matching your search criteria.',
+        ]);
     }
 
     /**
