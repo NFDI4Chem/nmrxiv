@@ -109,7 +109,19 @@ class SearchController extends Controller
      */
     public function catalog(TextSearchRequest $request): JsonResponse
     {
-        return response()->json($this->catalogSearch->searchFromRequest($request));
+        $results = $this->catalogSearch->searchFromRequest($request);
+
+        if (
+            $results['projects']['meta']['total'] === 0
+            && $results['studies']['meta']['total'] === 0
+            && $results['datasets']['meta']['total'] === 0
+        ) {
+            return response()->json([
+                'message' => 'No results found matching your search criteria.',
+            ], 404);
+        }
+
+        return response()->json($results);
     }
 
     /**

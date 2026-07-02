@@ -157,6 +157,16 @@ class TextSearchControllerTest extends TestCase
         $response->assertJsonPath('projects.data.0.name', 'Public caffeine archive');
     }
 
+    public function test_text_search_returns_404_when_no_catalog_results_are_found(): void
+    {
+        $response = $this->getJson('/api/v1/search/catalog?q=xyz');
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No catalog results found matching your search criteria.',
+        ]);
+    }
+
     public function test_text_search_rejects_empty_query(): void
     {
         $response = $this->getJson('/api/v1/search/catalog?q=');
