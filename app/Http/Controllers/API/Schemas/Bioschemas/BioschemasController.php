@@ -11,7 +11,6 @@ use App\Models\Schemas\Bioschemas;
 use App\Models\Study;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -496,7 +495,7 @@ class BioschemasController extends Controller
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];
 
-        if ($model->is_public) {
+        if ($model && $model->is_public) {
             if ($namespace == 'Project') {
                 $projectSchema = $this->project($model);
 
@@ -512,7 +511,10 @@ class BioschemasController extends Controller
                 return $datasetSchema;
             }
         } else {
-            throw new AuthorizationException;
+            return response()->json([
+                'message' => 'No result found. Either the identifier is invalid or this data entry is not publicly available.',
+                'identifier' => $identifier,
+            ], 404);
         }
     }
 

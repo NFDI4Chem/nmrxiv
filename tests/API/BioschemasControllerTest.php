@@ -45,7 +45,7 @@ class BioschemasControllerTest extends TestCase
 
         $response = $this->getJson('/api/v1/schemas/bioschemas/P12345');
 
-        $response->assertStatus(403);
+        $response->assertStatus(404);
     }
 
     /**
@@ -206,7 +206,7 @@ class BioschemasControllerTest extends TestCase
 
         $response = $this->getJson('/api/v1/schemas/bioschemas/S67890');
 
-        $response->assertStatus(403);
+        $response->assertStatus(404);
     }
 
     /**
@@ -237,7 +237,7 @@ class BioschemasControllerTest extends TestCase
 
         $response = $this->getJson('/api/v1/schemas/bioschemas/D22222');
 
-        $response->assertStatus(403);
+        $response->assertStatus(404);
     }
 
     /**

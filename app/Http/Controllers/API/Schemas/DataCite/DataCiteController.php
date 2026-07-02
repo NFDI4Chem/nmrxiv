@@ -628,8 +628,15 @@ class DataCiteController extends Controller
         $resolvedModel = resolveIdentifier($identifier);
         $model = $resolvedModel['model'];
 
-        $modelDatacite = $model->datacite_schema;
+        if ($model && $model->datacite_schema) {
+            $modelDatacite = $model->datacite_schema;
 
-        return $modelDatacite;
+            return $modelDatacite;
+        } else {
+            return response()->json([
+                'message' => 'No result found. Either the identifier is invalid or this data entry is not publicly available.',
+                'identifier' => $identifier,
+            ], 404);
+        }
     }
 }
