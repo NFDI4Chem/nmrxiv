@@ -54,20 +54,98 @@
                             :message="editAnnouncementForm.errors.message"
                             class="mt-2"
                         />
-                        <div class="py-2">
-                            <label
-                                class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
-                            >
-                                Status
-                            </label>
+                    </div>
+                    <div
+                        class="sm:col-span-6 rounded-md border border-gray-200 bg-gray-50 p-4"
+                    >
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    What's New notification
+                                </label>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Send this release note to every user's
+                                    notification bell.
+                                </p>
+                            </div>
                             <toggle-button
-                                v-model:enabled="editAnnouncementForm.enabled"
+                                v-model:enabled="
+                                    editAnnouncementForm.send_whats_new_notification
+                                "
                             />
+                        </div>
+                        <div
+                            v-if="
+                                editAnnouncementForm.send_whats_new_notification
+                            "
+                            class="mt-4 grid grid-cols-1 gap-4"
+                        >
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Release Version
+                                </label>
+                                <input
+                                    v-model="
+                                        editAnnouncementForm.release_version
+                                    "
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="e.g. v1.2.3"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <jet-input-error
+                                    :message="
+                                        editAnnouncementForm.errors
+                                            .release_version
+                                    "
+                                    class="mt-2"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Release Note Details
+                                </label>
+                                <textarea
+                                    v-model="editAnnouncementForm.release_notes"
+                                    rows="8"
+                                    placeholder="Markdown is supported. Use headings, bullets, links, and bold text."
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <jet-input-error
+                                    :message="
+                                        editAnnouncementForm.errors
+                                            .release_notes
+                                    "
+                                    class="mt-2"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div
+                    v-if="!editAnnouncementForm.send_whats_new_notification"
+                    class="py-2"
+                >
+                    <label
+                        class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                    >
+                        Status
+                    </label>
+                    <toggle-button
+                        v-model:enabled="editAnnouncementForm.enabled"
+                    />
+                </div>
 
-                <div class="sm grid grid-cols-2 gap-4 pt-4">
+                <div
+                    v-if="!editAnnouncementForm.send_whats_new_notification"
+                    class="sm grid grid-cols-2 gap-4 pt-4"
+                >
                     <div>
                         <label class="block text-sm font-medium text-gray-700">
                             Start Time
@@ -147,6 +225,9 @@ export default {
                 id: "",
                 title: "",
                 message: "",
+                send_whats_new_notification: false,
+                release_version: "",
+                release_notes: "",
                 enabled: null,
                 error_message: null,
                 creator_id: null,
@@ -176,10 +257,21 @@ export default {
             );
         },
         toggleEditAnnouncementDialog(announcement) {
+            const title = announcement.title || "";
+            const isWhatsNew =
+                announcement.type === "whats_new" ||
+                ["whats new", "what's new"].includes(title.toLowerCase());
+
             this.selectedAnnouncement = announcement;
             this.editAnnouncementForm.id = announcement.id;
             this.editAnnouncementForm.title = announcement.title;
             this.editAnnouncementForm.message = announcement.message;
+            this.editAnnouncementForm.send_whats_new_notification = isWhatsNew;
+            this.editAnnouncementForm.release_version =
+                announcement.release_version ||
+                (isWhatsNew ? announcement.message : "");
+            this.editAnnouncementForm.release_notes =
+                announcement.release_notes || announcement.message;
             if (
                 announcement.status == "active" ||
                 announcement.status == "Active"

@@ -53,8 +53,85 @@
                             class="mt-2"
                         />
                     </div>
+                    <div
+                        class="sm:col-span-6 rounded-md border border-gray-200 bg-gray-50 p-4"
+                    >
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    What's New notification
+                                </label>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Send this release note to every user's
+                                    notification bell.
+                                </p>
+                            </div>
+                            <toggle-button
+                                v-model:enabled="
+                                    createAnnouncementForm.send_whats_new_notification
+                                "
+                            />
+                        </div>
+                        <div
+                            v-if="
+                                createAnnouncementForm.send_whats_new_notification
+                            "
+                            class="mt-4 grid grid-cols-1 gap-4"
+                        >
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Release Version
+                                </label>
+                                <input
+                                    v-model="
+                                        createAnnouncementForm.release_version
+                                    "
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="e.g. v1.2.3"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <jet-input-error
+                                    :message="
+                                        createAnnouncementForm.errors
+                                            .release_version
+                                    "
+                                    class="mt-2"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Release Note Details
+                                </label>
+                                <textarea
+                                    v-model="
+                                        createAnnouncementForm.release_notes
+                                    "
+                                    rows="8"
+                                    placeholder="Markdown is supported. Use headings, bullets, links, and bold text."
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <jet-input-error
+                                    :message="
+                                        createAnnouncementForm.errors
+                                            .release_notes
+                                    "
+                                    class="mt-2"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="py-2">
+                <div
+                    v-if="!createAnnouncementForm.send_whats_new_notification"
+                    class="py-2"
+                >
                     <label
                         class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                     >
@@ -65,7 +142,10 @@
                     />
                 </div>
 
-                <div class="sm grid grid-cols-2 gap-4 pt-1">
+                <div
+                    v-if="!createAnnouncementForm.send_whats_new_notification"
+                    class="sm grid grid-cols-2 gap-4 pt-1"
+                >
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -148,6 +228,9 @@ export default {
                 _method: "POST",
                 title: "",
                 message: "",
+                send_whats_new_notification: false,
+                release_version: "",
+                release_notes: "",
                 enabled: true,
                 error_message: null,
                 creator_id: null,

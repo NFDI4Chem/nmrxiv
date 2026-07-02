@@ -26,6 +26,9 @@ class AnnouncementModelTest extends TestCase
         $fillable = [
             'title',
             'message',
+            'type',
+            'release_version',
+            'release_notes',
             'status',
             'start_time',
             'end_time',
@@ -72,6 +75,24 @@ class AnnouncementModelTest extends TestCase
 
         $this->assertCount(1, $activeAnnouncements);
         $this->assertEquals($activeAnnouncement->id, $activeAnnouncements->first()->id);
+    }
+
+    public function test_active_announcements_excludes_whats_new_release_notes(): void
+    {
+        $now = Carbon::now();
+
+        Announcement::factory()->create([
+            'type' => 'whats_new',
+            'status' => 'active',
+            'start_time' => $now->copy()->subDay(),
+            'end_time' => $now->copy()->addDay(),
+            'release_version' => 'v2.0.0',
+            'release_notes' => '## New features',
+        ]);
+
+        $activeAnnouncements = Announcement::active();
+
+        $this->assertCount(0, $activeAnnouncements);
     }
 
     public function test_active_announcements_must_have_active_status(): void
