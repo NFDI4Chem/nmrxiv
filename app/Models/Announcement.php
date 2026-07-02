@@ -14,6 +14,9 @@ class Announcement extends Model
     protected $fillable = [
         'title',
         'message',
+        'type',
+        'release_version',
+        'release_notes',
         'status',
         'start_time',
         'end_time',
@@ -37,9 +40,11 @@ class Announcement extends Model
     {
         $now = Carbon::now();
 
-        return (new static)::where('status', 'active')->where(function ($q) use ($now) {
-            $q->where('start_time', '<=', $now);
-            $q->where('end_time', '>=', $now);
-        })->get();
+        return (new static)::where('status', 'active')
+            ->where('type', 'announcement')
+            ->where(function ($q) use ($now) {
+                $q->where('start_time', '<=', $now);
+                $q->where('end_time', '>=', $now);
+            })->get();
     }
 }
