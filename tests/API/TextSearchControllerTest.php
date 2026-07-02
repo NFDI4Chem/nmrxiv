@@ -163,7 +163,7 @@ class TextSearchControllerTest extends TestCase
 
         $response->assertStatus(404);
         $response->assertJson([
-            'message' => 'No catalog results found matching your search criteria.',
+            'message' => 'No results found matching your search criteria.',
         ]);
     }
 

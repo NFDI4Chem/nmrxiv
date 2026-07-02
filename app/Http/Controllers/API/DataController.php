@@ -9,9 +9,12 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class DataController extends Controller
@@ -58,7 +61,7 @@ class DataController extends Controller
      *         in="query",
      *         description="Sort field with optional direction prefix (-created_at for descending)",
      *
-     *         @OA\Schema(type="string", enum={"created_at", "-created_at", "identifier", "-identifier"}, default="-created_at")
+     *         @OA\Schema(type="string", enum={"created_at", "identifier"}, default="created_at")
      *     ),
      *
      *     @OA\Parameter(
@@ -250,39 +253,129 @@ class DataController extends Controller
      */
     public function all(Request $request, $model)
     {
-        $per_page = \Request::get('per_page') ?: 100;
+        $perPage = (int) ($request->get('per_page') ?: 100);
 
-        $defaultSort = '-created_at';
         $allowedSorts = ['created_at', 'identifier'];
-        $allowedFilters = ['name', 'created_at', 'identifier', 'doi'];
+        $identifierPrefix = match ($model) {
+            'projects' => 'P',
+            'samples' => 'S',
+            'datasets' => 'D',
+            default => null,
+        };
+
+        $allowedFilters = [
+            AllowedFilter::partial('name'),
+            AllowedFilter::callback('identifier', function (Builder $query, mixed $value) use ($identifierPrefix): void {
+                if (! is_string($value)) {
+                    return;
+                }
+
+                $normalizedValue = strtoupper(trim($value));
+                $normalizedValue = str_starts_with($normalizedValue, 'NMRXIV:')
+                    ? substr($normalizedValue, 7)
+                    : $normalizedValue;
+
+                if ($identifierPrefix !== null && str_starts_with($normalizedValue, $identifierPrefix)) {
+                    $normalizedValue = substr($normalizedValue, 1);
+                }
+
+                if (! preg_match('/^\d+$/', $normalizedValue)) {
+                    $query->whereRaw('1 = 0');
+
+                    return;
+                }
+
+                $query->where('identifier', (int) $normalizedValue);
+            }),
+            AllowedFilter::exact('doi'),
+            AllowedFilter::callback('created_at', function (): void {}),
+        ];
+
         if ($model === 'projects') {
+            $query = QueryBuilder::for(Project::class)
+                ->where('is_public', true)
+                ->allowedSorts($allowedSorts)
+                ->allowedFilters($allowedFilters);
+
+            $this->applyCreatedAtFilter($query, data_get($request->query('filter', []), 'created_at'));
+
+            $paginator = $query->paginate($perPage)->appends(request()->query());
+
+            if ($paginator->total() === 0) {
+                return response()->json([
+                    'message' => 'No public data available for the specified criteria, adjust your filter and try again.',
+                ], 404);
+            }
+
             return ProjectResource::collection(
-                QueryBuilder::for(Project::class)
-                    ->where('is_public', true)
-                    ->allowedSorts($allowedSorts)
-                    ->allowedFilters($allowedFilters)
-                    ->paginate($per_page)
-                    ->appends(request()->query())
+                $paginator
             );
         } elseif ($model === 'samples') {
+            $query = QueryBuilder::for(Study::class)
+                ->where('is_public', true)
+                ->allowedSorts($allowedSorts)
+                ->allowedFilters($allowedFilters);
+
+            $this->applyCreatedAtFilter($query, data_get($request->query('filter', []), 'created_at'));
+
+            $paginator = $query->paginate($perPage)->appends(request()->query());
+
+            if ($paginator->total() === 0) {
+                return response()->json([
+                    'message' => 'No public data available for the specified criteria, adjust your filter and try again.',
+                ], 404);
+            }
+
             return StudyResource::collection(
-                QueryBuilder::for(Study::class)
-                    ->where('is_public', true)
-                    ->allowedSorts($allowedSorts)
-                    ->allowedFilters($allowedFilters)
-                    ->paginate($per_page)
-                    ->appends(request()->query())
+                $paginator
             );
         } elseif ($model === 'datasets') {
+            $query = QueryBuilder::for(Dataset::class)
+                ->where('is_public', true)
+                ->allowedSorts($allowedSorts)
+                ->allowedFilters($allowedFilters);
+
+            $this->applyCreatedAtFilter($query, data_get($request->query('filter', []), 'created_at'));
+
+            $paginator = $query->paginate($perPage)->appends(request()->query());
+
+            if ($paginator->total() === 0) {
+                return response()->json([
+                    'message' => 'No public data available for the specified criteria, adjust your filter and try again.',
+                ], 404);
+            }
+
             return DatasetResource::collection(
-                QueryBuilder::for(Dataset::class)
-                    ->where('is_public', true)
-                    ->allowedSorts($allowedSorts)
-                    ->allowedFilters($allowedFilters)
-                    ->paginate($per_page)
-                    ->appends(request()->query())
+                $paginator
             );
         }
+    }
+
+    private function applyCreatedAtFilter(mixed $query, mixed $value): void
+    {
+        if (! is_string($value) || $value === '') {
+            return;
+        }
+
+        $parts = array_values(array_filter(array_map('trim', explode(',', $value))));
+
+        if ($parts === []) {
+            return;
+        }
+
+        if (count($parts) === 2) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($parts[0])->startOfDay(),
+                Carbon::parse($parts[1])->endOfDay(),
+            ]);
+
+            return;
+        }
+
+        $query->whereBetween('created_at', [
+            Carbon::parse($parts[0])->startOfDay(),
+            Carbon::parse($parts[0])->endOfDay(),
+        ]);
     }
 
     /**
@@ -486,7 +579,7 @@ class DataController extends Controller
             $namespace = $resolvedModel['namespace'];
             $model = $resolvedModel['model'];
 
-            if ($model->is_public) {
+            if ($model && $model->is_public) {
                 if ($namespace == 'Project') {
                     return (new ProjectResource(
                         $model
@@ -501,7 +594,9 @@ class DataController extends Controller
                     ))->lite(false);
                 }
             } else {
-                throw new AuthorizationException;
+                return response()->json([
+                    'message' => 'No result found. Either the identifier is invalid or this data entry is not publicly available.',
+                ], 404);
             }
 
         } catch (QueryException $e) {

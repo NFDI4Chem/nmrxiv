@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class DataControllerTest extends TestCase
@@ -183,6 +184,55 @@ class DataControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(1, $response->json('data'));
         $this->assertStringContainsString('NMR', $response->json('data.0.name'));
+    }
+
+    public function test_can_filter_projects_by_identifier(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+            'is_public' => true,
+            'identifier' => 792,
+        ]);
+
+        Project::factory()->create([
+            'owner_id' => $user->id,
+            'is_public' => true,
+            'identifier' => 793,
+        ]);
+
+        $response = $this->getJson('/api/v1/list/projects?filter[identifier]=P792');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json('data'));
+        $this->assertSame($project->id, $response->json('data.0.id'));
+        $this->assertSame('NMRXIV:P792', $response->json('data.0.identifier'));
+    }
+
+    public function test_can_filter_projects_by_created_at_date_range(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $matchingProject = Project::factory()->create([
+            'owner_id' => $user->id,
+            'is_public' => true,
+            'created_at' => Carbon::parse('2024-01-15 10:00:00'),
+            'updated_at' => Carbon::parse('2024-01-15 10:00:00'),
+        ]);
+
+        Project::factory()->create([
+            'owner_id' => $user->id,
+            'is_public' => true,
+            'created_at' => Carbon::parse('2024-03-01 10:00:00'),
+            'updated_at' => Carbon::parse('2024-03-01 10:00:00'),
+        ]);
+
+        $response = $this->getJson('/api/v1/list/projects?filter[created_at]=2024-01-01,2024-01-31');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json('data'));
+        $this->assertSame($matchingProject->id, $response->json('data.0.id'));
     }
 
     /**
@@ -371,7 +421,7 @@ class DataControllerTest extends TestCase
         $response = $this->getJson('/api/v1/P99999');
 
         // Should return 403 Forbidden or 422 if identifier resolution fails
-        $this->assertContains($response->status(), [403, 422, 500]);
+        $this->assertContains($response->status(), [403, 422, 500, 404]);
     }
 
     /**
@@ -395,7 +445,7 @@ class DataControllerTest extends TestCase
         $response = $this->getJson('/api/v1/S99999');
 
         // Should return 403 Forbidden or 422/500 if identifier resolution fails
-        $this->assertContains($response->status(), [403, 422, 500]);
+        $this->assertContains($response->status(), [403, 422, 500, 404]);
     }
 
     /**
@@ -424,7 +474,7 @@ class DataControllerTest extends TestCase
         $response = $this->getJson('/api/v1/D99999');
 
         // Should return 403 Forbidden or 422/500 if identifier resolution fails
-        $this->assertContains($response->status(), [403, 422, 500]);
+        $this->assertContains($response->status(), [403, 422, 500, 404]);
     }
 
     /**
@@ -466,8 +516,10 @@ class DataControllerTest extends TestCase
     {
         $response = $this->getJson('/api/v1/list/projects');
 
-        $response->assertStatus(200);
-        $this->assertEmpty($response->json('data'));
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'No public data available for the specified criteria, adjust your filter and try again.',
+        ]);
     }
 
     /**

@@ -1036,12 +1036,10 @@
                         "description": "Sort field with optional direction prefix (-created_at for descending)",
                         "schema": {
                             "type": "string",
-                            "default": "-created_at",
+                            "default": "created_at",
                             "enum": [
                                 "created_at",
-                                "-created_at",
-                                "identifier",
-                                "-identifier"
+                                "identifier"
                             ]
                         }
                     },

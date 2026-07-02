@@ -29,7 +29,7 @@ class DataCiteControllerTest extends TestCase
 
         $response = $this->getJson('/api/v1/schemas/datacite/P12345');
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
         // The controller returns raw null, not JSON-encoded null
         $this->assertEmpty($response->getContent());
     }
