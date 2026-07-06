@@ -80,7 +80,28 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
      */
     public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher, DetachStudyFilesystemFromDraft $detachStudyFilesystemFromDraft): void
     {
-        $project = $this->project;
+        $project = $this->project->fresh();
+
+        $draft = $project->draft;
+
+        if (! $draft) {
+            if (is_null($project->draft_id) && in_array($project->status, ['complete', 'published'], true)) {
+                return;
+            }
+
+            Log::warning('ProcessSubmission skipped: project has no associated draft', [
+                'project_id' => $project->id,
+                'draft_id' => $project->draft_id,
+                'status' => $project->status,
+            ]);
+
+            if ($project->status === 'processing') {
+                $project->status = 'queued';
+                $project->save();
+            }
+
+            return;
+        }
 
         Log::info('embargo_publish_trace', [
             'stage' => 'process_submission_start',
