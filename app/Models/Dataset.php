@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ResolvesNmrxivRouteBinding;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class Dataset extends Model implements Auditable
     use HasDOI;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use ResolvesNmrxivRouteBinding;
 
     protected $fillable = [
         'name',
@@ -232,5 +234,15 @@ class Dataset extends Model implements Auditable
                 $query->orderByDesc('created_at');
             }
         });
+    }
+
+    protected static function nmrxivRouteBindingNamespace(): string
+    {
+        return 'Dataset';
+    }
+
+    protected static function nmrxivRouteBindingPrefix(): string
+    {
+        return 'D';
     }
 }
