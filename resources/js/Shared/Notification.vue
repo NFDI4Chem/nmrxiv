@@ -96,7 +96,7 @@
                                         </div>
                                         <div
                                             v-for="notification in notifications"
-                                            :key="notification.title"
+                                            :key="notification.id"
                                         >
                                             <div
                                                 class="relative rounded-lg border border-gray-300 bg-gray-50 px-6 py-5 shadow-sm items-top m-1 shadow-md transition-all"
@@ -122,17 +122,35 @@
                                                 <div
                                                     class="flex justify-between mt-2"
                                                 >
-                                                    <button
-                                                        type="button"
-                                                        class="rounded-md text-sm font-medium text-teal-600 hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                        @click="
-                                                            markNotificationAsRead(
-                                                                notification
-                                                            )
-                                                        "
-                                                    >
-                                                        Mark As Read
-                                                    </button>
+                                                    <div class="flex gap-3">
+                                                        <button
+                                                            v-if="
+                                                                isWhatsNewNotification(
+                                                                    notification
+                                                                )
+                                                            "
+                                                            type="button"
+                                                            class="rounded-md text-sm font-medium text-teal-600 hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                            @click="
+                                                                openWhatsNewNotification(
+                                                                    notification
+                                                                )
+                                                            "
+                                                        >
+                                                            View
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            class="rounded-md text-sm font-medium text-teal-600 hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                            @click="
+                                                                markNotificationAsRead(
+                                                                    notification
+                                                                )
+                                                            "
+                                                        >
+                                                            Mark As Read
+                                                        </button>
+                                                    </div>
                                                     <div
                                                         class="text-sm text-gray-400 justify-end italic"
                                                     >
@@ -175,12 +193,122 @@
             </div>
         </Dialog>
     </TransitionRoot>
+    <TransitionRoot as="template" :show="whatsNewOpen">
+        <Dialog as="div" class="fixed inset-0 z-[60]" @close="closeWhatsNew">
+            <TransitionChild
+                as="template"
+                enter="ease-out duration-200"
+                enter-from="opacity-0"
+                enter-to="opacity-100"
+                leave="ease-in duration-150"
+                leave-from="opacity-100"
+                leave-to="opacity-0"
+            >
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-60" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-y-auto">
+                <div
+                    class="flex min-h-full items-center justify-center p-4 text-center"
+                >
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-200"
+                        enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        enter-to="opacity-100 translate-y-0 sm:scale-100"
+                        leave="ease-in duration-150"
+                        leave-from="opacity-100 translate-y-0 sm:scale-100"
+                        leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                        <DialogPanel
+                            class="w-full max-w-3xl transform overflow-hidden rounded-lg bg-white text-left align-middle shadow-xl transition-all"
+                        >
+                            <div
+                                class="flex items-start justify-between border-b border-gray-200 px-6 py-5"
+                            >
+                                <div>
+                                    <DialogTitle
+                                        as="h2"
+                                        class="text-2xl font-bold text-gray-900"
+                                    >
+                                        What's New
+                                    </DialogTitle>
+                                    <p
+                                        v-if="
+                                            selectedWhatsNew?.data
+                                                ?.release_version
+                                        "
+                                        class="mt-1 text-sm font-medium text-teal-700"
+                                    >
+                                        {{
+                                            selectedWhatsNew.data
+                                                .release_version
+                                        }}
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="rounded-md text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    @click="closeWhatsNew"
+                                >
+                                    <span class="sr-only">Close</span>
+                                    <XMarkIcon
+                                        class="h-6 w-6"
+                                        aria-hidden="true"
+                                    />
+                                </button>
+                            </div>
+                            <div class="max-h-[65vh] overflow-y-auto px-6 py-5">
+                                <h3
+                                    class="text-lg font-semibold text-gray-900"
+                                    v-html="
+                                        sanitizeHtml(
+                                            selectedWhatsNew?.data?.title
+                                        )
+                                    "
+                                ></h3>
+                                <div
+                                    class="prose prose-sm mt-4 max-w-none text-gray-700"
+                                    v-html="
+                                        md(
+                                            selectedWhatsNew?.data
+                                                ?.release_notes ||
+                                                selectedWhatsNew?.data?.message
+                                        )
+                                    "
+                                ></div>
+                            </div>
+                            <div
+                                class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4"
+                            >
+                                <jet-secondary-button
+                                    type="button"
+                                    @click="closeWhatsNew"
+                                >
+                                    Remind Me Later
+                                </jet-secondary-button>
+                                <jet-button
+                                    type="button"
+                                    @click="
+                                        markNotificationAsRead(selectedWhatsNew)
+                                    "
+                                >
+                                    Mark As Read
+                                </jet-button>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
 </template>
 
 <script>
 import {
     Dialog,
     DialogPanel,
+    DialogTitle,
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
@@ -191,6 +319,7 @@ export default {
     components: {
         Dialog,
         DialogPanel,
+        DialogTitle,
         TransitionChild,
         TransitionRoot,
         XMarkIcon,
@@ -201,6 +330,8 @@ export default {
     data() {
         return {
             open: false,
+            whatsNewOpen: false,
+            selectedWhatsNew: null,
             info: {},
             notifications: this.$page.props.auth.user?.notifications,
             notificationForm: this.$inertia.form({
@@ -222,6 +353,9 @@ export default {
             this.open = !this.open;
         },
         markNotificationAsRead(notification) {
+            if (!notification) {
+                return;
+            }
             this.notificationForm.user_id = notification.notifiable_id;
             this.notificationForm.id = notification.id;
             this.notificationForm.title = notification.data["title"];
@@ -237,10 +371,24 @@ export default {
                         this.notificationForm.reset();
                         this.notifications =
                             this.$page.props.auth.user?.notifications;
+                        if (this.selectedWhatsNew?.id === notification.id) {
+                            this.closeWhatsNew();
+                        }
                     },
                     onError: (err) => console.error(err),
                 }
             );
+        },
+        isWhatsNewNotification(notification) {
+            return notification?.data?.kind === "whats_new";
+        },
+        openWhatsNewNotification(notification) {
+            this.selectedWhatsNew = notification;
+            this.whatsNewOpen = true;
+        },
+        closeWhatsNew() {
+            this.whatsNewOpen = false;
+            this.selectedWhatsNew = null;
         },
         markAllNotificationAsRead() {
             this.markAllAsReadForm.post(

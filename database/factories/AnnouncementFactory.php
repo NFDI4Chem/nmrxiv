@@ -20,6 +20,9 @@ class AnnouncementFactory extends Factory
     {
         return [
             'title' => Str::random(20),
+            'type' => 'announcement',
+            'release_version' => null,
+            'release_notes' => null,
             'status' => $this->faker->randomElement(['active', 'inactive']),
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addDays(30),

@@ -4,8 +4,10 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Announcement;
 use App\Models\User;
+use App\Notifications\WhatsNewNotification;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -295,6 +297,41 @@ class AnnouncementTest extends TestCase
         // Controller returns non-standard JSON format
     }
 
+    public function test_create_whats_new_notification_creates_inactive_release_note_and_notifies_users(): void
+    {
+        Notification::fake();
+
+        $startTime = Carbon::now();
+        $endTime = Carbon::now()->addDays(7);
+
+        $response = $this->actingAs($this->adminUser)
+            ->post('/admin/announcements', [
+                'title' => "What's New",
+                'message' => 'New update: v2.0.0',
+                'enabled' => true,
+                'send_whats_new_notification' => true,
+                'release_version' => 'v2.0.0',
+                'release_notes' => "## New Features\n\n- Markdown release notes",
+                'start_time' => $startTime->toDateTimeString(),
+                'end_time' => $endTime->toDateTimeString(),
+            ]);
+
+        $response->assertRedirect('/admin/announcements');
+        $response->assertSessionHas('success', 'Announcement created successfully');
+
+        $announcement = Announcement::where('title', "What's New")->first();
+
+        $this->assertNotNull($announcement);
+        $this->assertSame('whats_new', $announcement->type);
+        $this->assertSame('inactive', $announcement->status);
+        $this->assertSame('v2.0.0', $announcement->release_version);
+        $this->assertSame("## New Features\n\n- Markdown release notes", $announcement->release_notes);
+        $this->assertFalse(Announcement::active()->contains('id', $announcement->id));
+
+        Notification::assertSentTo($this->adminUser, WhatsNewNotification::class);
+        Notification::assertSentTo($this->user, WhatsNewNotification::class);
+    }
+
     public function test_update_requires_authentication(): void
     {
         $announcement = Announcement::factory()->create([
@@ -402,6 +439,46 @@ class AnnouncementTest extends TestCase
             'id' => $announcement->id,
             'status' => 'inactive',
         ]);
+    }
+
+    public function test_update_can_convert_announcement_to_whats_new_notification(): void
+    {
+        Notification::fake();
+
+        $announcement = Announcement::factory()->create([
+            'user_id' => $this->adminUser->id,
+            'title' => 'Original Announcement',
+            'message' => 'Original Message',
+            'status' => 'active',
+            'type' => 'announcement',
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->put('/admin/announcements/'.$announcement->id, [
+                'id' => $announcement->id,
+                'title' => "What's New",
+                'message' => 'New update: v2.1.0',
+                'enabled' => true,
+                'send_whats_new_notification' => true,
+                'release_version' => 'v2.1.0',
+                'release_notes' => "## Fixes\n\n- Improved release notes",
+                'start_time' => Carbon::now()->toDateTimeString(),
+                'end_time' => Carbon::now()->addDays(7)->toDateTimeString(),
+            ]);
+
+        $response->assertRedirect('/admin/announcements');
+        $response->assertSessionHas('success', 'Announcement updated successfully');
+
+        $announcement->refresh();
+
+        $this->assertSame('whats_new', $announcement->type);
+        $this->assertSame('inactive', $announcement->status);
+        $this->assertSame('v2.1.0', $announcement->release_version);
+        $this->assertSame("## Fixes\n\n- Improved release notes", $announcement->release_notes);
+        $this->assertFalse(Announcement::active()->contains('id', $announcement->id));
+
+        Notification::assertSentTo($this->adminUser, WhatsNewNotification::class);
+        Notification::assertSentTo($this->user, WhatsNewNotification::class);
     }
 
     public function test_update_returns_json_response_when_requested(): void
