@@ -26,6 +26,8 @@ What is considered a dataset in **[nmrXiv](https://nmrxiv.org/)** depends on the
 
 - Bruker: The dataset is the entire Bruker **folder**. Many NMR experiments (1H, 13C, etc.) will lead to many Bruker **folders**, with each being a dataset.
 
+- Magritek: The dataset is the entire Magritek Spinsolve **folder** (e.g. containing `acqu.par`, `data.1d`, and `processing.script`). Many NMR experiments (1H, 13C, etc.) will lead to many Magritek **folders**, with each being a dataset.
+
 - JCAMP-DX: The dataset is one jcamp-dx **file**. Many NMR experiments (1H, 13C, etc.) will lead to many jcamp-dx **files**, with each being a dataset.
 
 - JEOL: The dataset is one jeol **file**. Many NMR experiments (1H, 13C, etc.) will lead to many jeol **files**, with each being a dataset.
@@ -38,7 +40,7 @@ What is considered a dataset in **[nmrXiv](https://nmrxiv.org/)** depends on the
 
 ### Group Datasets per Studies
 
-All experiments (datasets) belonging to one sample should go to one folder. It means one study can contain several Bruker folders. Alternatively, one study can contain several JCAMP files and so. In the below image, you can see two studies (Bruker study and JCMAP study). Bruker study has two datasets, while the JCAMP study has five datasets (the mol file isn't a dataset).
+All experiments (datasets) belonging to one sample should go to one folder. It means one study can contain several Bruker folders or several Magritek folders. Alternatively, one study can contain several JCAMP files and so. In the below image, you can see two studies (Bruker study and JCMAP study). Bruker study has two datasets, while the JCAMP study has five datasets (the mol file isn't a dataset).
 
 <p align="center">
 
