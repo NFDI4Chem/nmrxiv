@@ -968,19 +968,21 @@ export default {
          * Execute delete request to backend API
          */
         deleteCitation() {
-            this.citationsForm.delete(
-                route("citation.delete", this.project.id),
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                    onSuccess: () => {
-                        router.reload({ only: ["project"] });
-                        this.loadInitial();
-                        this.closeDeleteConfirm();
+            axios
+                .delete(route("citation.delete", this.project.id), {
+                    data: {
+                        citations: this.citationsForm.citations,
                     },
-                    onError: (err) => console.error(err),
-                }
-            );
+                    headers: {
+                        Accept: "application/json",
+                    },
+                })
+                .then(() => {
+                    router.reload({ only: ["project"] });
+                    this.loadInitial();
+                    this.closeDeleteConfirm();
+                })
+                .catch((err) => console.error(err));
         },
 
         // =============================================================================

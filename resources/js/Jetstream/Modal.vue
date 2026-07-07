@@ -48,6 +48,50 @@
 <script>
 import { onMounted, onUnmounted } from "vue";
 
+let openModalCount = 0;
+let originalBodyOverflow = "";
+let originalBodyPaddingRight = "";
+
+const lockBodyScroll = () => {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    if (openModalCount === 0) {
+        originalBodyOverflow = document.body.style.overflow;
+        originalBodyPaddingRight = document.body.style.paddingRight;
+
+        const scrollbarWidth =
+            window.innerWidth - document.documentElement.clientWidth;
+        const bodyPaddingRight =
+            parseFloat(window.getComputedStyle(document.body).paddingRight) ||
+            0;
+
+        document.body.style.overflow = "hidden";
+
+        if (scrollbarWidth > 0) {
+            document.body.style.paddingRight = `${
+                bodyPaddingRight + scrollbarWidth
+            }px`;
+        }
+    }
+
+    openModalCount += 1;
+};
+
+const unlockBodyScroll = () => {
+    if (typeof window === "undefined" || openModalCount === 0) {
+        return;
+    }
+
+    openModalCount -= 1;
+
+    if (openModalCount === 0) {
+        document.body.style.overflow = originalBodyOverflow;
+        document.body.style.paddingRight = originalBodyPaddingRight;
+    }
+};
+
 export default {
     props: {
         show: {
@@ -78,11 +122,16 @@ export default {
         onMounted(() => document.addEventListener("keydown", closeOnEscape));
         onUnmounted(() => {
             document.removeEventListener("keydown", closeOnEscape);
-            document.body.style.overflow = null;
         });
 
         return {
             close,
+        };
+    },
+
+    data() {
+        return {
+            bodyScrollLocked: false,
         };
     },
 
@@ -107,13 +156,22 @@ export default {
         show: {
             immediate: true,
             handler: function (show) {
-                if (show) {
-                    document.body.style.overflow = "hidden";
-                } else {
-                    document.body.style.overflow = null;
+                if (show && !this.bodyScrollLocked) {
+                    lockBodyScroll();
+                    this.bodyScrollLocked = true;
+                } else if (!show && this.bodyScrollLocked) {
+                    unlockBodyScroll();
+                    this.bodyScrollLocked = false;
                 }
             },
         },
+    },
+
+    unmounted() {
+        if (this.bodyScrollLocked) {
+            unlockBodyScroll();
+            this.bodyScrollLocked = false;
+        }
     },
 };
 </script>
