@@ -89,6 +89,17 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 return;
             }
 
+            if ($project->studies()->exists()) {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_submission_missing_draft_republish_path',
+                    'project_id' => $project->id,
+                ]);
+
+                $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater);
+
+                return;
+            }
+
             Log::warning('ProcessSubmission skipped: project has no associated draft', [
                 'project_id' => $project->id,
                 'draft_id' => $project->draft_id,

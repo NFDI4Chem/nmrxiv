@@ -11,6 +11,7 @@ use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
 use App\Jobs\ProcessSubmission;
 use App\Models\Project;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mockery;
 use Tests\TestCase;
 
@@ -25,6 +26,10 @@ class ProcessSubmissionTest extends TestCase
         $project->setRelation('draft', null);
 
         $project->shouldReceive('fresh')->once()->andReturn($project);
+
+        $studiesRelation = Mockery::mock(HasMany::class);
+        $studiesRelation->shouldReceive('exists')->once()->andReturn(false);
+        $project->shouldReceive('studies')->once()->andReturn($studiesRelation);
 
         $assigner = Mockery::mock(AssignIdentifier::class);
         $assigner->shouldNotReceive('assign');
