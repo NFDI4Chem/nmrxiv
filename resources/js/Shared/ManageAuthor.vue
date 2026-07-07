@@ -1474,17 +1474,22 @@ export default {
          * Handles success/error states and UI updates
          */
         deleteAuthor() {
-            this.authorsForm.delete(route("author.delete", this.project.id), {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: () => {
+            axios
+                .delete(route("author.delete", this.project.id), {
+                    data: {
+                        authors: this.authorsForm.authors,
+                    },
+                    headers: {
+                        Accept: "application/json",
+                    },
+                })
+                .then(() => {
                     router.reload({ only: ["project"] });
                     this.loadInitial();
                     this.authorsForm.reset();
                     this.closeDeleteConfirm();
-                },
-                onError: (err) => console.error(err),
-            });
+                })
+                .catch((err) => console.error(err));
         },
 
         /**
