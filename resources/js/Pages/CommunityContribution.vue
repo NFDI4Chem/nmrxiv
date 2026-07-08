@@ -14,8 +14,7 @@
                     <span
                         class="hidden min-w-0 truncate text-xs text-gray-500 md:inline"
                     >
-                        Contribute raw or processed reference spectra to the
-                        open community.
+                        Contribute raw or processed spectra for open science.
                     </span>
                 </div>
             </div>

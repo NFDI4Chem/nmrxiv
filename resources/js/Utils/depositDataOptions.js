@@ -2,13 +2,13 @@ export const depositDataOptions = [
     {
         id: "publication",
         title: "Publication Deposition",
-        description: "Link spectra to a manuscript, preprint, or thesis.",
+        description:
+            "Deposit spectra linked to a manuscript, preprint, or thesis.",
     },
     {
         id: "community",
         title: "Community Contribution",
-        description:
-            "Contribute raw or processed reference spectra to the open community.",
+        description: "Contribute raw or processed spectra for open science.",
     },
 ];
 
