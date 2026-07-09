@@ -1,4 +1,4 @@
-name: Close issues linked to merged PRs (base: main)
+name: Close issues linked to merged PRs
 
 on:
   workflow_dispatch:
