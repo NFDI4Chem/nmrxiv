@@ -36,7 +36,8 @@ class DeleteCitations implements ShouldQueue
     public function handle(): void
     {
         foreach ($this->citations as $citation) {
-            if (! DB::table('citation_project')->where('citation_id', $citation->id)->exists()) {
+            if (! DB::table('citation_project')->where('citation_id', $citation->id)->exists()
+                && ! DB::table('citation_study')->where('citation_id', $citation->id)->exists()) {
                 $citation->delete();
             }
         }

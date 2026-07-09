@@ -35,6 +35,12 @@ return [
             'serve' => true,
             'throw' => false,
             'report' => false,
+            // AWS S3 config keys for testing (when StorageSignedUrlService is used)
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'endpoint' => env('AWS_URL'),
         ],
 
         'ceph' => [

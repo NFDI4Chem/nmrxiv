@@ -2,7 +2,7 @@ import * as marked from "marked";
 import DOMPurify from "dompurify";
 import { copyText } from "vue3-clipboard";
 import pluralize from "pluralize";
-import OCL from "openchemlib/full";
+import OCL from "openchemlib";
 
 export default {
     methods: {
@@ -150,16 +150,89 @@ export default {
             }
         },
         formatDate(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
             const date = new Date(timestamp);
             return new Intl.DateTimeFormat("default", {
                 dateStyle: "long",
             }).format(date);
         },
         formatDateTime(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
             const date = new Date(timestamp);
             return new Intl.DateTimeFormat("en", {
                 dateStyle: "full",
                 timeStyle: "short",
+            }).format(date);
+        },
+        /**
+         * Unified date display for record metadata (Published / Created / Updated rows).
+         */
+        formatRecordTimestamp(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+            const date = new Date(timestamp);
+            if (Number.isNaN(date.getTime())) {
+                return "";
+            }
+            return new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+            }).format(date);
+        },
+
+        /**
+         * Date-only formatting in UTC (prevents off-by-one day shifts for Zulu timestamps).
+         */
+        formatUtcDate(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+
+            const date = new Date(timestamp);
+
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                timeZone: "UTC",
+            });
+        },
+
+        /**
+         * Short, date-only formatting (used in compact cards/sidebars).
+         */
+        formatShortDate(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+
+            const date = new Date(timestamp);
+
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+        },
+
+        /**
+         * UTC variant of formatRecordTimestamp (keeps date+time style but fixes timezone shifts).
+         */
+        formatRecordTimestampUtc(timestamp) {
+            if (!timestamp) {
+                return "";
+            }
+
+            const date = new Date(timestamp);
+
+            return new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+                timeZone: "UTC",
             }).format(date);
         },
         md(data) {
@@ -419,6 +492,16 @@ export default {
             const hours = String(date.getHours()).padStart(2, "0");
             const minutes = String(date.getMinutes()).padStart(2, "0");
             return `${day}/${month}/${year}, ${hours}:${minutes}`;
+        },
+
+        /**
+         * Removes all HTML tags from a string
+         * @param {string} str - The string containing HTML tags
+         * @returns {string} - The string with HTML tags removed
+         */
+        stripHtmlTags(str) {
+            if (!str) return "";
+            return str.replace(/<[^>]*>/g, "");
         },
     },
 

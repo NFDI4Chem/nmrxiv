@@ -8,53 +8,53 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
-        "aws/aws-sdk-php": "^3.208",
-        "darkaonline/l5-swagger": "^8.5",
+        "php": "^8.4",
+        "aws/aws-sdk-php": "^3.368",
+        "darkaonline/l5-swagger": "^11.1",
+        "doctrine/annotations": "^2.0",
         "doctrine/dbal": "^3.5",
         "guzzlehttp/guzzle": "^7.8",
         "http-interop/http-factory-guzzle": "^1.2",
         "inertiajs/inertia-laravel": "^2.0",
         "lab404/laravel-impersonate": "^1.7",
-        "larabug/larabug": "^3.3",
-        "laravel/framework": "^12.1",
+        "laravel/framework": "^13.0",
         "laravel/horizon": "^5.30",
         "laravel/jetstream": "^5.3",
         "laravel/octane": "^2.9",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.12",
-        "laravel/tinker": "^2.10.1",
+        "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.0",
         "maennchen/zipstream-php": "^3.1",
-        "maize-tech/laravel-markable": "^2.3",
+        "maize-tech/laravel-markable": "^3.0",
         "meilisearch/meilisearch-php": "^1.14",
         "mpociot/versionable": "^4.4",
         "owen-it/laravel-auditing": "^14.0",
-        "phpunit/php-code-coverage": "^11.0.9",
         "predis/predis": "^2.2",
-        "socialiteproviders/orcid": "^5.1",
         "socialiteproviders/manager": "^4.7",
-        "spatie/laravel-backup": "^9.2",
+        "spatie/laravel-backup": "^10.0",
         "spatie/laravel-cookie-consent": "^3.3",
+        "spatie/laravel-csp": "^3.18",
         "spatie/laravel-permission": "^6.12",
         "spatie/laravel-query-builder": "^6.3",
         "spatie/laravel-support-bubble": "^1.8",
         "spatie/laravel-tags": "^4.9",
         "spatie/laravel-welcome-notification": "^2.4",
         "spatie/schema-org": "^3.11",
-        "tightenco/ziggy": "^2.5"
+        "tightenco/ziggy": "^2.5",
+        "whikloj/bagittools": "^6.0"
     },
     "require-dev": {
-        "brianium/paratest": "^7.8",
+        "brianium/paratest": "^7.20",
         "fakerphp/faker": "^1.23",
-        "laravel/boost": "^1.0",
+        "laravel/boost": "^2.0",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.12"
+        "phpunit/phpunit": "^12.0"
     },
     "autoload": {
         "files": [
@@ -101,9 +101,6 @@
         "sort-packages": true,
         "allow-plugins": {
             "php-http/discovery": true
-        },
-        "platform": {
-            "php": "8.3.28"
         },
         "audit": {
             "abandoned": "ignore"

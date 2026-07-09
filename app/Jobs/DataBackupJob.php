@@ -8,47 +8,57 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\StorageAttributes;
 
 class DataBackupJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * Create a new job instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
      * Execute the job.
      */
     public function handle(): void
     {
-        Artisan::call('backup:run --only-db');
+        Artisan::call('backup:run', ['--only-db' => true]);
 
-        // Define the bucket name and prefix.
-        $bucket = env('AWS_BUCKET');
-        $prefix = env('APP_ENV').'/database';
-        $disk = Storage::disk(env('FILESYSTEM_DRIVER'));
+        $backupDisk = $this->backupDiskName();
+        $prefix = config('backup.backup.name');
+        $disk = Storage::disk($backupDisk);
 
-        // Get the contents of the bucket with the specified prefix.
-        $contents = $disk->listContents($prefix, false);
+        $latestFile = collect($disk->listContents($prefix, false))
+            ->filter(fn (StorageAttributes $item): bool => $item instanceof FileAttributes)
+            ->sortByDesc(fn (FileAttributes $file): int => $file->lastModified() ?? 0)
+            ->first();
 
-        // Sort the contents by last modified time.
-        if ($contents) {
-            $sortedContents = collect($contents)->sortByDesc('last_modified');
+        if (! $latestFile instanceof FileAttributes) {
+            Log::warning('Data backup completed but no backup archive was found on storage.', [
+                'disk' => $backupDisk,
+                'prefix' => $prefix,
+            ]);
 
-            // Get the latest file.
-            $latestFile = $sortedContents->first();
-
-            // Set the visibility to public
-            $disk->setVisibility($latestFile['path'], 'public');
+            return;
         }
 
-        // Print the URL of the latest file.
-        echo 'Download the file from URL '.$latestFile['path'];
+        $path = $latestFile->path();
+
+        $disk->setVisibility($path, 'public');
+
+        Log::info('Latest database backup marked public.', [
+            'disk' => $backupDisk,
+            'path' => $path,
+        ]);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function backupDiskName(): string
+    {
+        $disks = config('backup.backup.destination.disks', ['ceph']);
+
+        return $disks[0] ?? 'ceph';
     }
 }

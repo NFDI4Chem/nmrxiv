@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" cacheDirectory=".phpunit.cache">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" cacheDirectory=".phpunit.cache">
   <testsuites>
     <testsuite name="Unit">
       <directory suffix="Test.php">./tests/Unit</directory>
@@ -7,20 +7,49 @@
     <testsuite name="Feature">
       <directory suffix="Test.php">./tests/Feature</directory>
     </testsuite>
+    <testsuite name="API">
+      <directory suffix="Test.php">./tests/API</directory>
+    </testsuite>
   </testsuites>
-  <coverage/>
+  <coverage>
+    <report>
+      <clover outputFile="coverage.xml"/>
+      <html outputDirectory="coverage-report" lowUpperBound="50" highLowerBound="80"/>
+      <text outputFile="php://stdout" showUncoveredFiles="false"/>
+    </report>
+  </coverage>
   <php>
+    <ini name="memory_limit" value="512M"/>
     <env name="APP_ENV" value="testing"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_STORE" value="array"/>
-    <env name="DB_DATABASE" value="nmrxiv"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="DB_DATABASE" value="nmrxiv_test"/>
+    <env name="FILESYSTEM_DRIVER" value="local"/>
+    <env name="FILESYSTEM_DRIVER_PUBLIC" value="local"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
+    <env name="SCOUT_DRIVER" value="null"/>
     <env name="SESSION_DRIVER" value="array"/>
+    <env name="TELESCOPE_ENABLED" value="false"/>
+    <env name="DEBUGBAR_ENABLED" value="false"/>
+    <!-- The cookie consent middleware rewrites response HTML via setContent(),
+         which discards the original View and breaks assertInertia(). -->
+    <env name="COOKIE_CONSENT_ENABLED" value="false"/>
+    <env name="AWS_ACCESS_KEY_ID" value="test-key"/>
+    <env name="AWS_SECRET_ACCESS_KEY" value="test-secret"/>
+    <env name="AWS_DEFAULT_REGION" value="us-east-1"/>
+    <env name="AWS_BUCKET" value="test-bucket"/>
+    <env name="AWS_BUCKET_PUBLIC" value="test-bucket-public"/>
+    <env name="AWS_URL" value="http://localhost:9000"/>
   </php>
   <source>
     <include>
       <directory suffix=".php">./app</directory>
     </include>
+    <exclude>
+      <directory suffix=".php">./app/Console</directory>
+      <file>./app/Helper.php</file>
+    </exclude>
   </source>
 </phpunit>

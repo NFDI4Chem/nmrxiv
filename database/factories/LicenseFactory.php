@@ -12,20 +12,27 @@ use Illuminate\Support\Str;
 class LicenseFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = License::class;
+
+    /**
      * Define the model's default state.
      */
     public function definition(): array
     {
-        $title = $this->faker->sentence($nbWords = 4);
+        $title = fake()->sentence(4);
         $slug = Str::slug($title, '-');
 
         return [
             'title' => $title,
             'slug' => $slug,
             'spdx_id' => Str::random(),
-            'url' => $this->faker->url(),
-            'description' => $this->faker->text(),
-            'body' => $this->faker->text(),
+            'url' => fake()->url(),
+            'description' => fake()->text(),
+            'body' => fake()->text(),
             'category' => Str::random(40),
         ];
     }

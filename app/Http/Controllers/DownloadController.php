@@ -66,7 +66,7 @@ class DownloadController extends Controller
             $fsObj = new FileSystemObject;
             $fsObj->type = 'directory';
             $fsObj->name = $project->slug;
-            $environment = env('APP_ENV', 'local');
+            $environment = config('app.env', 'local');
             $fsObj->path = $environment.'/'.$project->uuid;
             $fsObj->key = $project->uuid;
             $fsObj->relative_url = '/'.$project->uuid;
@@ -92,12 +92,12 @@ class DownloadController extends Controller
 
             $s3Client = $this->storageClient();
 
-            $bucket = $request->input('bucket') ?: config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
+            $bucket = $request->input('bucket') ?: config('filesystems.disks.'.config('filesystems.default').'.bucket');
 
             $s3keys = [];
 
             if ($fsObj->type == 'file') {
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
                 if (Storage::has($path)) {
                     array_push($s3keys, substr($fsObj->path, 1));
                 }
@@ -168,15 +168,16 @@ class DownloadController extends Controller
      */
     protected function storageClient()
     {
+        $diskName = config('filesystems.default');
         $config = [
-            'region' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.region'),
+            'region' => config('filesystems.disks.'.$diskName.'.region'),
             'version' => 'latest',
             'use_path_style_endpoint' => true,
-            'url' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
-            'endpoint' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
+            'url' => config('filesystems.disks.'.$diskName.'.endpoint'),
+            'endpoint' => config('filesystems.disks.'.$diskName.'.endpoint'),
             'credentials' => [
-                'key' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.key'),
-                'secret' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.secret'),
+                'key' => config('filesystems.disks.'.$diskName.'.key'),
+                'secret' => config('filesystems.disks.'.$diskName.'.secret'),
             ],
         ];
 

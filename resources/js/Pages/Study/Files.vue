@@ -419,7 +419,9 @@
                                                     <a
                                                         v-if="
                                                             file.type !==
-                                                            'directory'
+                                                                'directory' &&
+                                                            project?.owner &&
+                                                            project?.slug
                                                         "
                                                         :href="
                                                             url +
@@ -495,7 +497,7 @@
                                                             class="text-sm text-gray-500"
                                                         >
                                                             {{
-                                                                formatDate(
+                                                                formatRecordTimestamp(
                                                                     file.updated_at ||
                                                                         file.created_at
                                                                 )
@@ -540,7 +542,9 @@
                                                         <a
                                                             v-if="
                                                                 file.type !==
-                                                                'directory'
+                                                                    'directory' &&
+                                                                project?.owner &&
+                                                                project?.slug
                                                             "
                                                             :href="
                                                                 url +
@@ -635,7 +639,7 @@ import { router } from "@inertiajs/vue3";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
 import axiosRetry from "axios-retry";
-import OCL from "openchemlib/minimal";
+import OCL from "openchemlib";
 
 import {
     FolderIcon,
@@ -697,17 +701,20 @@ export default {
                 : "//nmriumdev.nmrxiv.org";
         },
         downloadURL() {
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/download/" +
-                this.project.slug +
-                "?key=" +
-                this.$page.props.selectedFileSystemObject.key +
-                "&uuid=" +
-                this.$page.props.selectedFileSystemObject.uuid
-            );
+            if (this.project?.owner?.username && this.project?.slug) {
+                return (
+                    this.url +
+                    "/" +
+                    this.project.owner.username +
+                    "/download/" +
+                    this.project.slug +
+                    "?key=" +
+                    this.$page.props.selectedFileSystemObject.key +
+                    "&uuid=" +
+                    this.$page.props.selectedFileSystemObject.uuid
+                );
+            }
+            return null;
         },
         canUpdateFiles() {
             return this.studyPermissions
@@ -914,25 +921,7 @@ export default {
             this.viewMode = mode;
             localStorage.setItem("nmrxiv-files-view-mode", mode);
         },
-        formatDate(dateString) {
-            if (!dateString) return "--";
 
-            const date = new Date(dateString);
-
-            const options = {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-            };
-
-            // Format like "18. Aug 2025 at 10:52"
-            return date
-                .toLocaleDateString("en-GB", options)
-                .replace(",", " at")
-                .replace(/(\d+)/, "$1.");
-        },
         sortFiles(column) {
             if (this.sortBy === column) {
                 // Toggle sort order if clicking the same column
@@ -981,17 +970,20 @@ export default {
             console.log("getFileDownloadURL called for:", file.name);
             if (file.type === "directory") return "#";
 
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/download/" +
-                this.project.slug +
-                "?key=" +
-                file.key +
-                "&uuid=" +
-                file.uuid
-            );
+            if (this.project?.owner?.username && this.project?.slug) {
+                return (
+                    this.url +
+                    "/" +
+                    this.project.owner.username +
+                    "/download/" +
+                    this.project.slug +
+                    "?key=" +
+                    file.key +
+                    "&uuid=" +
+                    file.uuid
+                );
+            }
+            return "#";
         },
     },
 };

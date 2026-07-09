@@ -11,14 +11,15 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.3.22
+- php - 8.4
 - inertiajs/inertia-laravel (INERTIA) - v2
-- laravel/framework (LARAVEL) - v12
+- laravel/framework (LARAVEL) - v13
 - laravel/octane (OCTANE) - v2
 - laravel/prompts (PROMPTS) - v0
 - laravel/scout (SCOUT) - v10
 - tightenco/ziggy (ZIGGY) - v2
 - laravel/pint (PINT) - v1
+- laravel/boost (BOOST) - v2
 - @inertiajs/vue3 (INERTIA) - v1
 - tailwindcss (TAILWINDCSS) - v3
 - vue (VUE) - v3

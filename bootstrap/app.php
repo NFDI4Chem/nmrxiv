@@ -7,12 +7,16 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException;
 use L5Swagger\L5SwaggerServiceProvider;
 use Lab404\Impersonate\ImpersonateServiceProvider;
 use Laravel\Jetstream\Http\Middleware\AuthenticateSession;
 use OwenIt\Auditing\AuditingServiceProvider;
 use SocialiteProviders\Manager\ServiceProvider;
 use Spatie\CookieConsent\CookieConsentMiddleware;
+use Spatie\Csp\AddCspHeaders;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
@@ -46,9 +50,13 @@ return Application::configure(basePath: dirname(__DIR__))
             AuthenticateSession::class,
             HandleInertiaRequests::class,
             XFrameOptions::class,
+            AddCspHeaders::class,
         ]);
 
-        $middleware->throttleApi();
+        // Disable API throttling in testing environment to allow test suite to run
+        if (env('APP_ENV') !== 'testing') {
+            $middleware->throttleApi();
+        }
 
         $middleware->replace(TrustProxies::class, App\Http\Middleware\TrustProxies::class);
 
@@ -59,5 +67,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if (! $request->isMethod('POST') || ! $request->is('login')) {
+                return null;
+            }
+
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            return redirect()->route('login')
+                ->withInput(Arr::except($request->input(), [
+                    'current_password',
+                    'password',
+                    'password_confirmation',
+                ]))
+                ->withErrors($e->errors(), $request->input('_error_bag', $e->errorBag));
+        });
     })->create();

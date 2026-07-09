@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Actions\Draft\DetachStudyFilesystemFromDraft;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
 use App\Jobs\ProcessSubmission;
 use App\Models\Project;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mockery;
 use Tests\TestCase;
 
@@ -25,6 +27,10 @@ class ProcessSubmissionTest extends TestCase
 
         $project->shouldReceive('fresh')->once()->andReturn($project);
 
+        $studiesRelation = Mockery::mock(HasMany::class);
+        $studiesRelation->shouldReceive('exists')->once()->andReturn(false);
+        $project->shouldReceive('studies')->once()->andReturn($studiesRelation);
+
         $assigner = Mockery::mock(AssignIdentifier::class);
         $assigner->shouldNotReceive('assign');
 
@@ -37,8 +43,11 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher = Mockery::mock(PublishStudy::class);
         $studyPublisher->shouldNotReceive('publish');
 
+        $detachStudyFilesystemFromDraft = Mockery::mock(DetachStudyFilesystemFromDraft::class);
+        $detachStudyFilesystemFromDraft->shouldNotReceive('detach');
+
         $job = new ProcessSubmission($project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, $detachStudyFilesystemFromDraft);
 
         $this->assertSame('queued', $project->status);
     }
@@ -59,8 +68,11 @@ class ProcessSubmissionTest extends TestCase
         $projectPublisher = Mockery::mock(PublishProject::class);
         $studyPublisher = Mockery::mock(PublishStudy::class);
 
+        $detachStudyFilesystemFromDraft = Mockery::mock(DetachStudyFilesystemFromDraft::class);
+        $detachStudyFilesystemFromDraft->shouldNotReceive('detach');
+
         $job = new ProcessSubmission($project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, $detachStudyFilesystemFromDraft);
 
         $this->assertSame('complete', $project->status);
     }

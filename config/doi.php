@@ -16,6 +16,47 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | DOI Host
+    |--------------------------------------------------------------------------
+    |
+    | The DOI host URL used for resolving DOI identifiers.
+    |
+    */
+
+    'host' => env('DOI_HOST', 'https://doi.org'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Publisher (DataCite 4.4)
+    |--------------------------------------------------------------------------
+    |
+    | DataCite Schema 4.4 supports `publisher` as an object that can carry a
+    | persistent identifier (ROR) for the repository itself, making the host
+    | repository citable in the DataCite graph. When `publisher_ror` is null,
+    | the identifier subkeys are dropped at serialization time.
+    |
+    */
+
+    'publisher_name' => env('DOI_PUBLISHER_NAME', 'nmrXiv'),
+    'publisher_ror' => env('DOI_PUBLISHER_ROR'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Related software DOI
+    |--------------------------------------------------------------------------
+    |
+    | When set, every dataset whose spectra were imported via this software
+    | gets an `IsCompiledBy` related-identifier entry pointing at the
+    | software's DOI. Defaults to NMRium's published DOI on Zenodo.
+    |
+    */
+
+    'related_software' => [
+        'nmrium' => env('DOI_NMRIUM_DOI', '10.5281/zenodo.10209593'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | DataCite Options
     |--------------------------------------------------------------------------
     |

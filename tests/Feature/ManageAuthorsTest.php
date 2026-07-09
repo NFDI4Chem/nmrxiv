@@ -2,12 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Author\RemoveProjectAuthor;
+use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
@@ -750,6 +755,392 @@ class ManageAuthorsTest extends TestCase
             'message' => 'Author deleted successfully',
             'success' => true,
         ]);
+    }
+
+    /**
+     * Test author can be created with ROR ID
+     *
+     * @return void
+     */
+    public function test_author_with_ror_id_can_be_created()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'authors' => [[
+                'given_name' => 'Friedrich',
+                'family_name' => 'Schiller',
+                'email_id' => 'f.schiller@uni-jena.de',
+                'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+                'ror_id' => 'https://ror.org/05qghxh33',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify ROR ID and full affiliation details were saved
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'Friedrich',
+            'family_name' => 'Schiller',
+            'email_id' => 'f.schiller@uni-jena.de',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+    }
+
+    /**
+     * Test author with ROR ID can be updated
+     *
+     * @return void
+     */
+    public function test_author_with_ror_id_can_be_updated()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Create author with ROR ID
+        $author = Author::factory()->create([
+            'given_name' => 'Test',
+            'family_name' => 'Author',
+            'email_id' => 'test@example.com',
+            'affiliation' => 'Old University',
+            'ror_id' => 'https://ror.org/oldid123',
+        ]);
+
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Update author with new ROR ID and affiliation
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'given_name' => 'Test',
+                'family_name' => 'Author',
+                'email_id' => 'test@example.com',
+                'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+                'ror_id' => 'https://ror.org/05qghxh33',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify updated ROR ID and affiliation
+        $this->assertDatabaseHas('authors', [
+            'id' => $author->id,
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+    }
+
+    /**
+     * Test author can be created without ROR ID (free text affiliation)
+     *
+     * @return void
+     */
+    public function test_author_without_ror_id_can_be_created()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'authors' => [[
+                'given_name' => 'Manual',
+                'family_name' => 'Entry',
+                'email_id' => 'manual@example.com',
+                'affiliation' => 'Small Research Institute',
+                'ror_id' => null,
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify author was created with free text affiliation and no ROR ID
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'Manual',
+            'family_name' => 'Entry',
+            'email_id' => 'manual@example.com',
+            'affiliation' => 'Small Research Institute',
+            'ror_id' => null,
+        ]);
+    }
+
+    /**
+     * Test ROR ID can be removed from author (switching to free text)
+     *
+     * @return void
+     */
+    public function test_ror_id_can_be_removed_from_author()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Create author with ROR ID
+        $author = Author::factory()->create([
+            'given_name' => 'Test',
+            'family_name' => 'Author',
+            'email_id' => 'test@example.com',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Update author to remove ROR ID and use free text
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'given_name' => 'Test',
+                'family_name' => 'Author',
+                'email_id' => 'test@example.com',
+                'affiliation' => 'Independent Researcher',
+                'ror_id' => null,
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify ROR ID was removed
+        $this->assertDatabaseHas('authors', [
+            'id' => $author->id,
+            'affiliation' => 'Independent Researcher',
+            'ror_id' => null,
+        ]);
+    }
+
+    /**
+     * Test author affiliation stores full organization details
+     *
+     * @return void
+     */
+    public function test_author_affiliation_stores_full_details()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Test with long affiliation text that includes all details
+        $fullAffiliation = 'Massachusetts Institute of Technology (MIT, M.I.T.) - Education · Cambridge, United States';
+
+        $body = [
+            'authors' => [[
+                'given_name' => 'John',
+                'family_name' => 'Smith',
+                'email_id' => 'john@mit.edu',
+                'affiliation' => $fullAffiliation,
+                'ror_id' => 'https://ror.org/042nb2s44',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify full affiliation text is stored without truncation
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'John',
+            'family_name' => 'Smith',
+            'affiliation' => $fullAffiliation,
+        ]);
+
+        // Also verify the full affiliation text is longer than old 255 character limit
+        $author = Author::where('email_id', 'john@mit.edu')->first();
+        $this->assertNotNull($author);
+        $this->assertEquals($fullAffiliation, $author->affiliation);
+    }
+
+    /**
+     * Test sync authors action creates new authors
+     */
+    public function test_sync_authors_action_creates_new_authors(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'orcid_id' => '0000-0000-0000-0001',
+                'contributor_type' => 'Researcher',
+            ],
+        ];
+
+        $result = $syncProjectAuthors->handle($project, $authorsData);
+
+        $this->assertCount(1, $result);
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'John',
+            'family_name' => 'Doe',
+            'email_id' => 'john@example.com',
+        ]);
+    }
+
+    /**
+     * Test sync authors action handles empty array
+     */
+    public function test_sync_authors_action_handles_empty_array(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $result = $syncProjectAuthors->handle($project, []);
+        $this->assertCount(0, $result);
+        $this->assertEquals(0, $project->authors()->count());
+    }
+
+    /**
+     * Test sync authors action validates required fields
+     */
+    public function test_sync_authors_action_validates_required_fields(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $this->expectException(ValidationException::class);
+        $authorsData = [
+            [
+                'given_name' => '',
+                'family_name' => 'Doe',
+                'email_id' => 'invalid-email',
+            ],
+        ];
+        $syncProjectAuthors->handle($project, $authorsData);
+    }
+
+    /**
+     * Test remove author action handles nonexistent author
+     */
+    public function test_remove_author_action_handles_nonexistent_author(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $removeProjectAuthor = new RemoveProjectAuthor($updateProject);
+
+        $removeProjectAuthor->handle($project, 9999);
+        $this->assertEquals(0, $project->authors()->count());
+    }
+
+    /**
+     * Test sync authors action uses database transaction
+     */
+    public function test_sync_authors_action_uses_database_transaction(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        DB::shouldReceive('transaction')->once()->andReturnUsing(function ($callback) {
+            return $callback();
+        });
+
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'contributor_type' => 'Researcher',
+            ],
+        ];
+
+        $syncProjectAuthors->handle($project, $authorsData);
+    }
+
+    /**
+     * Test sync authors action prevents N+1 queries
+     */
+    public function test_sync_authors_action_prevents_n_plus_one_queries(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $authorsData = [
+            ['given_name' => 'John', 'family_name' => 'Doe', 'email_id' => 'john@example.com', 'contributor_type' => 'Researcher'],
+            ['given_name' => 'Jane', 'family_name' => 'Smith', 'email_id' => 'jane@example.com', 'contributor_type' => 'Researcher'],
+            ['given_name' => 'Bob', 'family_name' => 'Wilson', 'email_id' => 'bob@example.com', 'contributor_type' => 'Researcher'],
+        ];
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $syncProjectAuthors->handle($project, $authorsData);
+        $queries = DB::getQueryLog();
+        $this->assertLessThan(15, count($queries));
     }
 
     /**

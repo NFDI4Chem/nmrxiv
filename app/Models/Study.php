@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CacheClear;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +40,7 @@ class Study extends Model implements Auditable
         'starred',
         'location',
         'is_public',
+        'is_archived',
         'obfuscationcode',
         'description',
         'type',
@@ -61,6 +63,13 @@ class Study extends Model implements Auditable
         'external_url',
         'processing_logs',
         'tracking_item_name',
+        'doi',
+        'identifier',
+        'validation_id',
+        'metadata_bagit_generation_status',
+        'metadata_bagit_generation_logs',
+        'has_nmrium',
+        'has_nmredata',
     ];
 
     /**
@@ -69,10 +78,13 @@ class Study extends Model implements Auditable
     protected function casts(): array
     {
         return [
-            'authors' => 'array',
             'citations' => 'array',
             'molecules' => 'array',
             'processing_logs' => 'array',
+            'metadata_bagit_generation_logs' => 'array',
+            'starred' => 'boolean',
+            'is_public' => 'boolean',
+            'is_archived' => 'boolean',
         ];
     }
 
@@ -132,7 +144,7 @@ class Study extends Model implements Auditable
     public function getStudyPhotoUrlAttribute()
     {
         return $this->study_photo_path
-                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->study_photo_path)
+                    ? Storage::disk(config('filesystems.default_public'))->url($this->study_photo_path)
                     : '';
     }
 
@@ -174,12 +186,12 @@ class Study extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
-        return env('APP_URL', null).'/sample/S'.$this->getRawOriginal('identifier');
+        return config('app.url').'/sample/S'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/studies/'.urlencode($this->url);
+        return config('app.url').'/studies/'.urlencode($this->url);
     }
 
     public function draft(): BelongsTo
@@ -289,6 +301,49 @@ class Study extends Model implements Auditable
         return $this->hasOne(Sample::class, 'study_id');
     }
 
+    /**
+     * Whether the study sample has at least one assignable chemical structure.
+     */
+    public function hasAssignedStructure(): bool
+    {
+        $this->loadMissing('sample.molecules');
+
+        if (! $this->sample) {
+            return false;
+        }
+
+        return $this->sample->molecules->contains(
+            fn (Molecule $molecule) => filled($molecule->canonical_smiles)
+                || filled($molecule->smiles)
+                || filled($molecule->absolute_smiles)
+                || filled($molecule->sdf)
+        );
+    }
+
+    public function isReadyForCommunityPublish(): bool
+    {
+        return $this->internal_status === 'complete'
+            && $this->has_nmrium
+            && $this->hasAssignedStructure();
+    }
+
+    /**
+     * Studies still visible in a draft workspace (excludes submitted samples).
+     *
+     * @param  Builder<Study>  $query
+     * @return Builder<Study>
+     */
+    public function scopeOnDraftWorkspace(Builder $query, Draft $draft): Builder
+    {
+        return $query->where('is_public', false)
+            ->where(function (Builder $workspaceQuery) use ($draft): void {
+                $workspaceQuery->where('draft_id', $draft->id)
+                    ->orWhereHas('datasets', function (Builder $datasetQuery) use ($draft): void {
+                        $datasetQuery->where('draft_id', $draft->id);
+                    });
+            });
+    }
+
     public function molecules()
     {
         return $this->sample()->molecules();
@@ -312,9 +367,7 @@ class Study extends Model implements Auditable
      */
     public function shouldBeSearchable()
     {
-        if ($this->is_public && ! $this->is_archived) {
-            return true;
-        }
+        return $this->is_public && ! $this->is_archived;
     }
 
     /**
@@ -334,6 +387,33 @@ class Study extends Model implements Auditable
     public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
+    }
+
+    /**
+     * Get all of the authors that belong to the study.
+     */
+    public function studyAuthors(): BelongsToMany
+    {
+        return $this->belongsToMany(Author::class)
+            ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Normalized citations (pivot `citation_study`). Named `linkedCitations` to avoid clashing with the JSON `citations` attribute.
+     */
+    public function linkedCitations(): BelongsToMany
+    {
+        return $this->belongsToMany(Citation::class)->withTimestamps();
+    }
+
+    /**
+     * Accessor for authors attribute (alias for studyAuthors relationship).
+     */
+    protected function authors(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->studyAuthors,
+        );
     }
 
     public function scopeFilter($query, array $filters)

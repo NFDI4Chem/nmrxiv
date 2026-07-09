@@ -10,19 +10,26 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CASController;
+use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
+use App\Http\Controllers\CommunityContributionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\OEmbedController;
+use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\PublicSearchController;
+use App\Http\Controllers\RorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
+use App\Http\Controllers\SupportBubbleController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UploadController;
 use App\Models\Dataset;
@@ -42,6 +49,13 @@ Route::prefix('auth')->group(function () {
     Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);
     Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
         ->name('auth.checkPassword');
+});
+
+// ORCID Routes with rate limiting
+Route::middleware(['throttle:60,1'])->prefix('orcid')->group(function () {
+    Route::get('/search', [OrcidController::class, 'search']);
+    Route::get('/{orcidId}/person', [OrcidController::class, 'person']);
+    Route::get('/{orcidId}/employment', [OrcidController::class, 'employment']);
 });
 
 Route::get('/', function () {
@@ -79,7 +93,18 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
-Route::supportBubble();
+Route::get('/faqs', function () {
+    return Inertia::render('FAQs');
+})->name('faqs');
+
+Route::get('/predict', function () {
+    return Inertia::render('Predict');
+})->name('predict');
+
+// Custom support bubble route with rate limiting and enhanced security
+Route::post('support-bubble', [SupportBubbleController::class, 'submit'])
+    ->middleware(['throttle:support-bubble'])
+    ->name('supportBubble.submit');
 
 Route::impersonate();
 
@@ -113,6 +138,11 @@ Route::middleware('web', WelcomesNewUsers::class)->group(function () {
     Route::post('welcome/{user}', [MyWelcomeController::class, 'savePassword'])->name('password.set');
 });
 
+// ROR API - publicly accessible with rate limiting
+Route::get('ror/search', [RorController::class, 'search'])
+    ->middleware('throttle:60,1')
+    ->name('ror.search');
+
 Route::middleware('auth', 'verified')->group(function () {
     // License
     Route::get('licenses', [LicenseController::class, 'index'])
@@ -137,6 +167,12 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
         ->name('citation.delete');
 
+    Route::post('citations/study/{study}', [CitationController::class, 'saveStudy'])
+        ->name('citation.study.save');
+
+    Route::delete('citations/study/{study}/delete', [CitationController::class, 'destroyStudy'])
+        ->name('citation.study.delete');
+
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
         ->name('onboarding.complete');
 
@@ -158,19 +194,36 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::get('upload', [UploadController::class, 'upload'])->name('upload');
+    Route::get('community-contribution', [CommunityContributionController::class, 'show'])
+        ->name('community-contribution');
+    Route::post('community-contribution/drafts/{draft}/publish-studies', [CommunityContributionController::class, 'publishStudies'])
+        ->middleware('throttle:10,1')
+        ->name('community-contribution.publish-studies');
     Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
+
+    // CAS Common Chemistry API Proxy
+    Route::get('/cas/detail', [CASController::class, 'fetchCasData'])->name('cas.detail');
+
+    // Chemistry standardize API proxy (avoids browser CORS to external chem services)
+    Route::post('/chemistry/standardize', [ChemistryStandardizeController::class, 'standardize'])
+        ->middleware('throttle:60,1')
+        ->name('chemistry.standardize');
 
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
             ->name('submission');
-        Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
-            ->name('shared-with-me');
-        Route::get('starred', [DashboardController::class, 'starred'])
-            ->name('starred');
-        Route::get('trashed', [DashboardController::class, 'trashed'])
-            ->name('trashed');
-        Route::get('recent', [DashboardController::class, 'recent'])
-            ->name('recent');
+        Route::get('shared-with-me', function () {
+            return redirect()->route('dashboard', ['workspace' => 'shared']);
+        })->name('shared-with-me');
+        Route::get('starred', function () {
+            return redirect()->route('dashboard', ['workspace' => 'starred']);
+        })->name('starred');
+        Route::get('trashed', function () {
+            return redirect()->route('dashboard', ['workspace' => 'trashed']);
+        })->name('trashed');
+        Route::get('recent', function () {
+            return redirect()->route('dashboard', ['workspace' => 'recent']);
+        })->name('recent');
 
         Route::post('/storage/signed-draft-storage-url', [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url', [FileSystemController::class, 'signedStorageURL']);
@@ -199,6 +252,9 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.project.validation');
         Route::put('projects/{project}/updateReleaseDate', [ProjectController::class, 'updateReleaseDate'])
             ->name('dashboard.project.updateReleaseDate');
+
+        Route::put('projects/{project}/releaseNow', [ProjectController::class, 'publishEmbargoProject'])
+            ->name('dashboard.project.publishEmbargoProject');
 
         Route::put('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');
@@ -270,17 +326,31 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.datasets.nmriumInfo');
         Route::post('datasets/{dataset}/snapshot', [DatasetController::class, 'snapshot'])
             ->name('dashboard.dataset.snapshot');
+        Route::put('datasets/{dataset}/assignments', [DatasetController::class, 'updateAssignments'])
+            ->name('dashboard.datasets.assignments.update');
 
+        Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
+            ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');
+        Route::get('drafts/{draft}/status', [DraftController::class, 'status'])
+            ->name('dashboard.draft.status');
+        Route::post('drafts/{draft}/provisional-doi', [DraftController::class, 'storeProvisionalDoi'])
+            ->name('dashboard.draft.provisional-doi.store');
+        Route::delete('drafts/{draft}/provisional-doi', [DraftController::class, 'destroyProvisionalDoi'])
+            ->name('dashboard.draft.provisional-doi.destroy');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/sample-folders', [DraftController::class, 'sampleFolders'])
+            ->name('dashboard.draft.sample-folders');
         Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
             ->name('dashboard.draft.missing-files');
         Route::put('drafts/{draft}', [DraftController::class, 'update'])
             ->name('dashboard.draft.update');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [FileSystemController::class, 'deleteFSO'])
             ->name('dashboard.draft.files.delete');
+        Route::post('drafts/{draft}/sample-folders/{filesystemobject}/reset', [DraftController::class, 'resetSampleFolder'])
+            ->name('dashboard.draft.sample-folder.reset');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
@@ -351,19 +421,19 @@ Route::prefix('admin')->group(function () {
             Route::get('snapshots', [CurationController::class, 'snapshots'])
                 ->name('console.spectra.snapshots');
         });
+
     });
 });
 
-// Redirect old compound URLs to new structure
+// Legacy /spectra URLs
 Route::get('/spectra', function (Request $request) {
     $compound = $request->query('compound');
     if ($compound) {
         return redirect()->route('public.compound', ['id' => 'M'.$compound], 301);
     }
 
-    // If no compound parameter, show the spectra page as before
-    return app(StudyController::class)->publicStudiesView($request);
-})->name('public.spectra');
+    return redirect()->route('public.projects', [], 301);
+});
 
 // Keep the old generic resolver for backward compatibility but redirect to new URLs
 Route::get('{id}', function ($id) {
@@ -387,6 +457,8 @@ Route::get('{id}', function ($id) {
 
 // Search / browse page
 Route::get('/compounds', [ApplicationController::class, 'compounds'])->name('compounds');
+
+Route::get('/search', [PublicSearchController::class, 'index'])->name('search');
 
 Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])
     ->name('badge.doi');
@@ -427,11 +499,8 @@ Route::get('projects', [ProjectController::class, 'publicProjectsView'])
 Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
     ->name('public.datasets.nmrium');
 
-Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
+Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
-
-Route::get('spectra', [StudyController::class, 'publicStudiesView'])
-    ->name('public.spectra');
 
 // oEmbed service endpoint - returns oEmbed JSON response for external embedding
 // Supports oEmbed 1.0 specification for rich content embedding

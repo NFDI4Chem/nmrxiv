@@ -8,6 +8,7 @@ use App\Actions\Project\UpdateDOI;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Notifications\DraftProcessedNotification;
+use App\Services\DOI\DOIService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -15,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
@@ -41,12 +43,29 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
         $this->project = $project;
     }
 
+    public function uniqueId(): string
+    {
+        return (string) $this->project->id;
+    }
+
+    public function uniqueFor(): int
+    {
+        return 14400;
+    }
+
     /**
      * Execute the job.
      */
     public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $publisher): void
     {
         $project = $this->project;
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_project_start',
+            'project_id' => $project->id,
+            'status' => $project->status,
+            'release_date' => filled($project->release_date) ? Carbon::parse($project->release_date)->toIso8601String() : null,
+        ]);
 
         $project->status = 'processing';
 
@@ -58,7 +77,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
             $draft = $project->draft;
 
             if ($draft) {
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
 
                 $projectPath = preg_replace(
                     '~//+~',
@@ -101,20 +120,89 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
 
             $project->save();
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_files_moved',
+                'project_id' => $project->id,
+                'had_draft' => $draft !== null,
+            ]);
+
             $assigner->assign($project->fresh());
 
             $release_date = Carbon::parse($project->release_date);
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_release_check',
+                'project_id' => $project->id,
+                'release_is_past' => $release_date->isPast(),
+            ]);
+
             if ($release_date->isPast()) {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_project_immediate_publish',
+                    'project_id' => $project->id,
+                ]);
                 $publisher->publish($project);
+            } else {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'process_project_skip_publish_future_release',
+                    'project_id' => $project->id,
+                ]);
             }
             $updater->update($project->fresh());
 
-            Notification::send($project->owner, new DraftProcessedNotification($project));
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_after_update_doi',
+                'project_id' => $project->id,
+            ]);
+
+            $this->linkProvisionalDoiSafely($project->fresh());
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_before_owner_notification',
+                'project_id' => $project->id,
+            ]);
+
+            Notification::send($project->owner, new DraftProcessedNotification($project->fresh()));
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'process_project_complete',
+                'project_id' => $project->id,
+            ]);
         }
     }
 
-    public function moveFolder($fsObject, $draft, $path)
+    /**
+     * @see ProcessSubmission::linkProvisionalDoiSafely
+     */
+    private function linkProvisionalDoiSafely(Project $project): void
+    {
+        if (empty($project->provisional_doi) || empty($project->doi)) {
+            return;
+        }
+
+        try {
+            $project->linkProvisionalDoi(app(DOIService::class));
+        } catch (\Throwable $e) {
+            Log::warning('ProcessProject: linkProvisionalDoi failed; canonical DOI is still valid', [
+                'project_id' => $project->id,
+                'doi' => $project->doi,
+                'provisional_doi' => $project->provisional_doi,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * @see ProcessSubmission::moveFolder()
+     */
+    public function moveFolder($fsObject, $draft, $path): void
+    {
+        FileSystemObject::withoutEvents(function () use ($fsObject, $draft, $path): void {
+            $this->relocateFolderTreeDuringPublish($fsObject, $draft, $path);
+        });
+    }
+
+    private function relocateFolderTreeDuringPublish($fsObject, $draft, $path): void
     {
         $newPath = str_replace($draft->path, $path, $fsObject->path);
         $fsObject->path = $newPath;
@@ -128,11 +216,11 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
                     $path,
                     $fsObjectChild->path
                 );
-                Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newPath);
+                Storage::disk(config('filesystems.default'))->move($fsObjectChild->path, $newPath);
                 $fsObjectChild->path = $newPath;
                 $fsObjectChild->save();
             } else {
-                $this->moveFolder($fsObjectChild, $draft, $path);
+                $this->relocateFolderTreeDuringPublish($fsObjectChild, $draft, $path);
             }
         }
     }

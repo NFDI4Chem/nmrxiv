@@ -1,14 +1,16 @@
 <?php
 
 use L5Swagger\Generator;
-use OpenApi\scan;
+use OpenApi\Analysers\AttributeAnnotationFactory;
+use OpenApi\Analysers\DocBlockAnnotationFactory;
+use OpenApi\Analysers\ReflectionAnalyser;
 
 return [
     'default' => 'default',
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'nmrXiv - Swagger UI',
+                'title' => 'nmrXiv API Reference',
             ],
 
             'routes' => [
@@ -107,11 +109,22 @@ return [
 
         'scanOptions' => [
             /**
-             * analyser: defaults to \OpenApi\StaticAnalyser .
-             *
-             * @see scan
+             * Optional CustomGeneratorInterface implementation that creates an OpenApi\Generator instance.
              */
-            'analyser' => null,
+            'generator_factory' => null,
+
+            /**
+             * Configuration for default processors.
+             */
+            'default_processors_configuration' => [],
+
+            /**
+             * Supports PHP 8 attributes and legacy @OA\ docblock annotations.
+             */
+            'analyser' => new ReflectionAnalyser([
+                new AttributeAnnotationFactory,
+                new DocBlockAnnotationFactory,
+            ]),
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .

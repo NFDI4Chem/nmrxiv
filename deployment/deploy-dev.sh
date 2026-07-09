@@ -5,6 +5,9 @@ set -e
 COMPOSE_FILE="/mnt/docker/nmrxiv/deployment/docker-compose.dev.yml"
 APP_IMAGE="nfdi4chem/nmrxiv:app-dev-latest"
 WORKER_IMAGE="nfdi4chem/nmrxiv:worker-dev-latest"
+NMRKIT_IMAGE="nfdi4chem/nmrkit:dev-latest"
+NMR_CLI_IMAGE="nfdi4chem/nmr-cli:dev-latest"
+NMR_RESPREDICT_IMAGE="nfdi4chem/nmr-respredict:dev-latest"
 NEW_CONTAINER_ID=""
 BACKUP_DIR="./backups"
 BUILD=false
@@ -126,7 +129,7 @@ cleanup() {
     log_message "Cleanup completed"
 }
 
-deploy_service() {
+deploy_nmrxiv_service() {
     log_message "Starting zero-downtime deployment..."
     local service=$1
     local image=$2
@@ -150,19 +153,26 @@ deploy_service() {
         remove_old_containers "$service"
         run_migration_and_clear_cache
         log_message "✅ Deployment of $service done successfully.."
-        log_message "Application is available at: https://dev.nmrxiv.org"
+        log_message "nmrXiv application is available at: https://dev.nmrxiv.org"
 
-        # Skipping health check for dev because we want the service to be down if there is an error in the container
-        # if wait_for_health; then
-        #     remove_old_containers "$service"
-        #     log_message "✅ Deployment of $service done successfully.."
-        #     run_migration_and_clear_cache
-        #     log_message "Application is available at: https://dev.nmrxiv.org"
-        # else
-        #     log_message "❌ Deployment aborted: new $service container is unhealthy."
-        #     docker stop "$NEW_CONTAINER_ID"
-        #     docker rm "$NEW_CONTAINER_ID"
-        # fi
+    else
+        log_message "✅ No update for $service Skipping deployment."
+    fi
+}
+
+deploy_nmrkit_service() {
+    local service=$1
+    local image=$2
+
+    log_message "Checking for new image: $image"
+
+    if [ "$(docker pull "$image" | grep -c "Status: Image is up to date")" -eq 0 ]; then
+        log_message "📦 New ${service^^} image available."
+
+        docker compose -f "$COMPOSE_FILE" up -d "$service" --no-deps
+
+        log_message "✅ Deployment of $service done successfully.."
+        log_message "nmrKit application is available at: https://dev.nmrkit.nmrxiv.org/"
     else
         log_message "✅ No update for $service Skipping deployment."
     fi
@@ -257,7 +267,8 @@ build_or_restart_services() {
 
     cleanup
     log_message "Services restarted successfully!"
-    log_message "Application is available at: https://dev.nmrxiv.org/"
+    log_message "nmrXiv application is available at: https://dev.nmrxiv.org/"
+    log_message "nmrKit application is available at: https://dev.nmrkit.nmrxiv.org/"
 }
 
 # === Display Help ===
@@ -292,8 +303,11 @@ case true in
         build_multi_platform
         ;;
     "$DEPLOY")
-        deploy_service app "$APP_IMAGE" true
-        deploy_service worker "$WORKER_IMAGE" true
+        deploy_nmrxiv_service app "$APP_IMAGE" true
+        deploy_nmrxiv_service worker "$WORKER_IMAGE" true
+        deploy_nmrkit_service nmrkit "$NMRKIT_IMAGE"
+        deploy_nmrkit_service nmr-load-save "$NMR_CLI_IMAGE"
+        deploy_nmrkit_service nmr-respredict "$NMR_RESPREDICT_IMAGE"
         ;;
     "$BUILD")
         build_or_restart_services

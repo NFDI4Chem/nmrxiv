@@ -46,6 +46,7 @@
                 :identifier="identifier"
                 :height="height"
                 :width="width"
+                @loading="(isLoading) => $emit('loading', isLoading)"
             ></Depictor2D>
         </div>
         <div v-if="selectedTab == '3D'">
@@ -75,13 +76,14 @@
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import Depictor3D from "@/Shared/Depictor3D.vue";
-import OCL from "openchemlib/full";
+import { createStructureEditor } from "@/Utils/structureEditor";
 
 export default {
     components: {
         Depictor2D,
         Depictor3D,
     },
+
     props: {
         modelValue: String,
         width: {
@@ -106,6 +108,8 @@ export default {
         },
         identifier: String,
     },
+
+    emits: ["loading", "update:modelValue"],
     data() {
         return {
             selectedTab: "2D",
@@ -119,8 +123,8 @@ export default {
     methods: {
         loadStructureEditor(id) {
             this.edit = true;
-            this.$nextTick(() => {
-                this.editor = OCL.StructureEditor.createSVGEditor(id, 1);
+            this.$nextTick(async () => {
+                this.editor = await createStructureEditor(id);
                 if (this.modelValue) {
                     this.editor.setSmiles(this.modelValue);
                 }

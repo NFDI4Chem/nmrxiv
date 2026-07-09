@@ -40,9 +40,9 @@ class DeleteProjects implements ShouldQueue
         $project = $this->project;
         $deletedOn = $project->deleted_on;
         $diffInDays = null;
-        $coolOffPeriod = (int) env('COOL_OFF_PERIOD', '30');
+        $coolOffPeriod = config('nmrxiv.cool_off_period');
         if ($deletedOn) {
-            $diffInDays = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
+            $diffInDays = (int) Carbon::parse($deletedOn)->diffInDays(Carbon::now());
             // Sending reminder to user 1 week and 1 day before.
             if ($diffInDays == ($coolOffPeriod - 7) || $diffInDays == ($coolOffPeriod - 1)) {
                 $project->sendNotification('deletionReminder', $this->prepareSendList($project));
@@ -61,15 +61,19 @@ class DeleteProjects implements ShouldQueue
      */
     public function prepareSendList($project)
     {
-        $sendTo = [];
-        foreach ($project->allUsers() as $member) {
-            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
-                array_push($sendTo, $member);
-            } else {
-                array_push($sendTo, $project->owner);
+        $sendTo = collect();
+
+        if ($project->owner) {
+            $sendTo->push($project->owner);
+        }
+
+        foreach ($project->users as $member) {
+            $role = $member->projectMembership?->role;
+            if ($role === 'creator' || $role === 'owner') {
+                $sendTo->push($member);
             }
         }
 
-        return $sendTo;
+        return $sendTo->unique('id')->values()->all();
     }
 }

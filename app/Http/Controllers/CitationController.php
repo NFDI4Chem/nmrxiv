@@ -6,6 +6,7 @@ use App\Actions\Citation\RemoveCitation as RemoveCitationAction;
 use App\Actions\Citation\SyncCitations as SyncCitationsAction;
 use App\Http\Resources\CitationResource;
 use App\Models\Project;
+use App\Models\Study;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -75,6 +76,66 @@ class CitationController extends Controller
 
             if (count($citations) > 0) {
                 $this->removeCitation->remove($project, $citations[0]['id']);
+            }
+
+            return $this->successResponse($request, 'Citation deleted successfully');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($request, $e);
+        } catch (\Exception $e) {
+            return $this->errorResponse($request, 'An error occurred while deleting the citation.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Save and sync updated citation details for a study.
+     */
+    public function saveStudy(Request $request, Study $study): JsonResponse|RedirectResponse
+    {
+        if (! Gate::forUser($request->user())->check('updateStudy', $study)) {
+            return $this->unauthorizedResponse($request, 'You are not authorized to update citations for this study.');
+        }
+
+        try {
+            $request->validate([
+                'citations' => ['required', 'array', 'max:100'],
+                'citations.*' => ['required', 'array'],
+            ]);
+
+            $citations = $request->get('citations', []);
+
+            if (count($citations) > 0) {
+                $processedCitations = $this->syncCitations->sync($study, $citations, $request->user());
+
+                return $this->successResponse($request, 'Citation updated successfully', $processedCitations);
+            }
+
+            return $this->successResponse($request, 'No citations to process');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($request, $e);
+        } catch (\Exception $e) {
+            return $this->errorResponse($request, 'An error occurred while updating citations.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Delete citation for a study.
+     */
+    public function destroyStudy(Request $request, Study $study): JsonResponse|RedirectResponse
+    {
+        if (! Gate::forUser($request->user())->check('updateStudy', $study)) {
+            return $this->unauthorizedResponse($request, 'You are not authorized to remove citations from this study.');
+        }
+
+        try {
+            $request->validate([
+                'citations' => ['required', 'array', 'min:1'],
+                'citations.*.id' => ['required', 'integer', 'min:1'],
+            ]);
+
+            $citations = $request->get('citations');
+
+            if (count($citations) > 0) {
+                $this->removeCitation->remove($study, $citations[0]['id']);
             }
 
             return $this->successResponse($request, 'Citation deleted successfully');

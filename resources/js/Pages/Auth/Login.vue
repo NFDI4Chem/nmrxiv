@@ -2,14 +2,18 @@
     <Head title="Log in" />
     <announcement-banner />
 
-    <jet-authentication-card class="index_beams">
+    <jet-authentication-card>
         <template #logo>
             <jet-authentication-card-logo />
         </template>
         <jet-validation-errors class="mb-4" />
 
-        <div v-if="$page.props.flash.message" class="alert">
-            {{ $page.props.flash.message }}
+        <div
+            v-if="$page.props.flash.message || $page.props.flash.error"
+            class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+        >
+            {{ $page.props.flash.message || $page.props.flash.error }}
         </div>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
@@ -23,20 +27,34 @@
                     class="pb-4"
                 >
                     <div
-                        class="border border-teal-500 rounded px-4 py-3 mt-3 max-w-2xl text-sm text-gray-700 font-bold"
+                        class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mt-3 text-sm text-amber-800"
                     >
-                        <p>
-                            <span style="color: red">Warning:</span> This site
-                            is for demonstration purpose only. You can test most
-                            of the nmrXiv features but DO NOT use the current
-                            site for your work. All the data stored here can be
-                            reset anytime. For real data please visit
-                            <a
-                                href="https://nmrxiv.org"
-                                target="_blank"
-                                style="color: teal"
-                                >nmrxiv.org.</a
+                        <p class="flex items-start gap-2">
+                            <svg
+                                class="w-5 h-5 flex-shrink-0 mt-0.5 text-amber-600"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
                             >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                            <span>
+                                <strong class="font-semibold"
+                                    >Demo Environment:</strong
+                                >
+                                This site is for demonstration purposes only.
+                                Please visit
+                                <a
+                                    href="https://nmrxiv.org"
+                                    target="_blank"
+                                    class="font-medium underline hover:text-amber-900 transition-colors"
+                                    >nmrxiv.org</a
+                                >
+                                for production use.
+                            </span>
                         </p>
                     </div>
                 </div>
@@ -89,7 +107,7 @@
 
             <div class="mt-4">
                 <jet-button
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
@@ -161,6 +179,11 @@ export default {
                 }))
                 .post(this.route("login"), {
                     onFinish: () => this.form.reset("password"),
+                    onError: () => {
+                        this.$nextTick(() => {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                        });
+                    },
                 });
         },
     },

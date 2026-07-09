@@ -11,7 +11,6 @@ use App\Models\Schemas\Bioschemas;
 use App\Models\Study;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -399,7 +398,7 @@ class BioschemasController extends Controller
      *                             @OA\Property(property="name", type="string", example="magnetic field strength"),
      *                             @OA\Property(property="value", type="number", example=14.1),
      *                             @OA\Property(property="unitText", type="string", example="Tesla"),
-     *                             @OA\Property(property="propertyID", type="string", example="MR:1400253")
+     *                             @OA\Property(property="propertyID", type="string", example="NMR:1400253")
      *                         )
      *                     ),
      *                     @OA\Property(
@@ -496,7 +495,7 @@ class BioschemasController extends Controller
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];
 
-        if ($model->is_public) {
+        if ($model && $model->is_public) {
             if ($namespace == 'Project') {
                 $projectSchema = $this->project($model);
 
@@ -512,7 +511,10 @@ class BioschemasController extends Controller
                 return $datasetSchema;
             }
         } else {
-            throw new AuthorizationException;
+            return response()->json([
+                'message' => 'No result found. Either the identifier is invalid or this data entry is not publicly available.',
+                'identifier' => $identifier,
+            ], 404);
         }
     }
 
@@ -578,7 +580,7 @@ class BioschemasController extends Controller
         $sampleSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02']);
         $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
-        $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
+        $sampleSchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $sampleSchema->hasBioChemEntityPart($this->prepareMoleculesSchemas($sample));
 
         return $sampleSchema;
@@ -708,7 +710,7 @@ class BioschemasController extends Controller
             // $experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
             $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'http://purl.obolibrary.org/obo/UO_0000012');
             $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
-            $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
+            $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'NMR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
             $numberOfScansProperty = BioschemasHelper::preparePropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
             $pulseSequenceProperty = BioschemasHelper::preparePropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
             $spectralWidthProperty = BioschemasHelper::preparePropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, 'http://purl.obolibrary.org/obo/UO_0000169');
@@ -792,7 +794,7 @@ class BioschemasController extends Controller
             $datasetSchema->description($dataset->description);
             $datasetSchema->keywords($nmriumInfo[0]);
             $datasetSchema->license($dataset->study->license->url);
-            $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
+            $datasetSchema->url(config('app.url').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
             $datasetSchema->dateCreated($dataset->created_at ? $dataset->created_at->toISOString() : null);
             $datasetSchema->dateModified($dataset->updated_at ? $dataset->updated_at->toISOString() : null);
             $datasetSchema->datePublished($dataset->release_date ? Carbon::parse($dataset->release_date)->toISOString() : null);
@@ -847,7 +849,7 @@ class BioschemasController extends Controller
         $studySchema->description($study->description);
         $studySchema->keywords(BioschemasHelper::getTags($study));
         $studySchema->license($study->license->url);
-        $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
+        $studySchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->dateCreated($study->created_at ? $study->created_at->toISOString() : null);
         $studySchema->dateModified($study->updated_at ? $study->updated_at->toISOString() : null);
         $studySchema->datePublished($study->release_date ? Carbon::parse($study->release_date)->toISOString() : null);
@@ -895,7 +897,7 @@ class BioschemasController extends Controller
         $projectSchema->keywords(BioschemasHelper::getTags($project));
         $projectSchema->license($project->license->url);
         $projectSchema->publisher(BioschemasHelper::preparePublisher());
-        $projectSchema->url(env('APP_URL').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
+        $projectSchema->url(config('app.url').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
         $projectSchema->dateCreated($project->created_at ? $project->created_at->toISOString() : null);
         $projectSchema->dateModified($project->updated_at ? $project->updated_at->toISOString() : null);
         $projectSchema->datePublished($project->release_date ? Carbon::parse($project->release_date)->toISOString() : null);

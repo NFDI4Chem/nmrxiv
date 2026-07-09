@@ -81,7 +81,7 @@ class ProcessDraft
         $draftName = $request->get('name');
         $draft->name = $draftName ? $draftName : 'Untitled Project (draft)';
         $draft->description = $request->get('description');
-        $draft->syncTagsWithType($request->get('tags_array'), 'Draft');
+        $draft->syncTagsWithType($request->input('tags_array', []), 'Draft');
         $draft->save();
 
         $this->fileSystemController->processFolder($draftFolders);
@@ -167,6 +167,8 @@ class ProcessDraft
      */
     public function cleanupOrphanedData(Project $project): void
     {
+        $project->loadMissing(['studies.fsObject', 'studies.datasets.fsObject']);
+
         foreach ($project->studies as $study) {
             $fsObject = $study->fsObject;
             if (! $fsObject || $fsObject->status == 'missing') {
@@ -364,7 +366,7 @@ class ProcessDraft
     {
         $draft->save();
 
-        $studies = json_decode($project->studies()->orderBy('name')->get()->load(['datasets', 'sample.molecules', 'tags']));
+        $studies = $project->studies()->orderBy('name')->get()->load(['datasets', 'sample.molecules', 'tags']);
 
         if (count($studies) == 0) {
             return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);
@@ -372,6 +374,12 @@ class ProcessDraft
 
         Log::info('Finalizing processing for draft '.$draft->id);
         Log::info('Studies count: '.count($studies));
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'process_draft_finalize_dispatch_archive_study',
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+        ]);
 
         ArchiveStudy::dispatch($project);
 
@@ -381,6 +389,62 @@ class ProcessDraft
         return response()->json([
             'project' => $project->load(['owner', 'citations', 'authors']),
             'studies' => $studies,
+            'warnings' => $this->detectNestedStudyFolders($project),
         ]);
+    }
+
+    /**
+     * Detect sample folders that are nested inside another sample folder.
+     *
+     * A "sample folder" is any FileSystemObject that nmrXiv promotes to a
+     * Study (because its descendants contain raw or processed instrument
+     * data). Nesting one sample folder inside another breaks the one-sample
+     * = one-folder contract that ArchiveStudy and the NMRium importer rely
+     * on, so we surface a non-blocking warning to the user.
+     *
+     * @return array<int, string>
+     */
+    public function detectNestedStudyFolders(Project $project): array
+    {
+        $studies = $project->studies()->with('fsObject')->get();
+
+        $studyFsById = [];
+        foreach ($studies as $study) {
+            if ($study->fsObject) {
+                $studyFsById[$study->fsObject->id] = $study;
+            }
+        }
+
+        if (count($studyFsById) < 2) {
+            return [];
+        }
+
+        $message = 'Please make sure you have datasets associated with one sample in one folder.';
+        $reportedPairs = [];
+        $warnings = [];
+
+        foreach ($studyFsById as $fsId => $study) {
+            $fs = $study->fsObject;
+            $cursor = $fs->parent;
+            while ($cursor) {
+                if (isset($studyFsById[$cursor->id]) && $cursor->id !== $fs->id) {
+                    $ancestor = $studyFsById[$cursor->id];
+                    $pairKey = $ancestor->fsObject->id.':'.$fs->id;
+                    if (! isset($reportedPairs[$pairKey])) {
+                        $reportedPairs[$pairKey] = true;
+                        $warnings[] = sprintf(
+                            'Sample folder "%s" is nested inside sample folder "%s". %s',
+                            $fs->name,
+                            $ancestor->fsObject->name,
+                            $message
+                        );
+                    }
+                    break;
+                }
+                $cursor = $cursor->parent;
+            }
+        }
+
+        return $warnings;
     }
 }

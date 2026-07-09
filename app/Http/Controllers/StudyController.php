@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\License\GetLicense;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
+use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
 use App\Http\Resources\StudyResource;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
@@ -13,12 +14,13 @@ use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
+use App\Support\Nmr\JcampDatasetClassifier;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -65,6 +67,8 @@ class StudyController extends Controller
 
     public function update(Request $request, UpdateStudy $updater, Study $study)
     {
+        Gate::authorize('updateStudy', $study);
+
         $updater->update($study, $request->all());
 
         $study = $study->fresh();
@@ -78,12 +82,10 @@ class StudyController extends Controller
 
     public function show(Request $request, Study $study, GetLicense $getLicense)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project->nonPersonalTeam;
+        $team = $project?->nonPersonalTeam;
         $license = null;
         if ($study->license_id) {
             $license = $getLicense->getLicensebyId($study->license_id);
@@ -102,12 +104,10 @@ class StudyController extends Controller
 
     public function datasets(Request $request, Study $study)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project->team;
+        $team = $project?->team;
 
         return $this->renderTabView('Datasets', $study, $team, $project, null, null, false);
     }
@@ -117,7 +117,7 @@ class StudyController extends Controller
         switch ($model) {
             case 'study':
                 $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-                $team = $project->nonPersonalTeam;
+                $team = $project?->nonPersonalTeam;
                 $license = null;
                 if ($study->license_id) {
                     $license = $getLicense->getLicensebyId($study->license_id);
@@ -128,7 +128,7 @@ class StudyController extends Controller
                 break;
             case 'files':
                 $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-                $team = $project->nonPersonalTeam;
+                $team = $project?->nonPersonalTeam;
                 $studyFSObject = $study->fsObject;
 
                 return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, true);
@@ -136,7 +136,7 @@ class StudyController extends Controller
                 break;
             case 'datasets':
                 $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
-                $team = $project->nonPersonalTeam;
+                $team = $project?->nonPersonalTeam;
 
                 return $this->renderTabView('Datasets', $study, $team, $project, null, null, true);
 
@@ -149,9 +149,9 @@ class StudyController extends Controller
         switch ($tab) {
             case 'About':
                 return Inertia::render('Study/About', [
-                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
+                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules', 'studyAuthors'),
                     'team' => $team ? $team->load('users', 'owner') : null,
-                    'project' => $project ? $project->load('users', 'owner') : null,
+                    'project' => $project ? $project->load('users', 'owner', 'authors') : null,
                     'members' => $study->allUsers(),
                     'preview' => $preview,
                     'availableRoles' => array_values(Jetstream::$roles),
@@ -208,13 +208,15 @@ class StudyController extends Controller
 
     public function moleculeStore(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         $sample = $study->sample;
         if (! $sample) {
             $sample = Sample::create([
                 'name' => $study->name.'_sample',
                 'slug' => Str::slug($study->name.'_sample', '-'),
                 'study_id' => $study->id,
-                'project_id' => $study->project->id,
+                'project_id' => $study->project ? $study->project->id : null,
             ]);
             $study->sample()->save($sample);
         }
@@ -226,7 +228,9 @@ class StudyController extends Controller
             ], [
                 'molecular_formula' => $request->get('formula') ? $request->get('formula') : '',
                 'inchi_key' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
-                'sdf' => $request->get('mol') ? $request->get('mol') : '',
+                'sdf' => $request->get('mol')
+                    ? Sample::ensureMolfileHeader((string) $request->get('mol'), (string) $request->get('iupac_name', ''))
+                    : '',
                 'canonical_smiles' => $request->get('canonical_smiles') ? $request->get('canonical_smiles') : '',
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
@@ -245,7 +249,20 @@ class StudyController extends Controller
                 if (is_string($nmriumInfo)) {
                     $nmriumInfo = json_decode($nmriumInfo, true);
                 }
-                $nmriumInfo['data']['molecules'] = [];
+                if (! is_array($nmriumInfo)) {
+                    $nmriumInfo = [];
+                }
+                if (! isset($nmriumInfo['data']) || ! is_array($nmriumInfo['data'])) {
+                    $nmriumInfo['data'] = [];
+                }
+                if (! isset($nmriumInfo['data']['molecules']) || ! is_array($nmriumInfo['data']['molecules'])) {
+                    $nmriumInfo['data']['molecules'] = [];
+                }
+
+                if ($study->sample) {
+                    $nmriumInfo['data']['molecules'] = $study->sample
+                        ->mergeNmriumMolecules($nmriumInfo['data']['molecules']);
+                }
 
                 return $nmriumInfo;
             } else {
@@ -277,14 +294,13 @@ class StudyController extends Controller
 
     public function nmriumInfo(Request $request, Study $study)
     {
-        // $version = $request->get('version');
-        // $spectra = $request->get('spectra');
-        // $molecules = $nmriumInfo['data']['molecules'];
-        // $molecularInfo = $molecules;
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         if ($study) {
             $user = Auth::user();
             $data = $request->all();
             $nmriumInfo = sanitizeUnicodeInNMRiumData($data);
+            $nmriumInfo = $this->normalizeNmriumMoleculeHeaders($nmriumInfo);
             $draft = $study->draft;
             $nmrium = $study->nmrium;
             if ($nmrium) {
@@ -299,60 +315,43 @@ class StudyController extends Controller
                 $study->has_nmrium = true;
             }
             $study->save();
-            $_nmriumJSON = $nmriumInfo;
             foreach ($study->datasets as $dataset) {
-                $fsObject = $dataset->fsObject;
-
                 $studyFSObject = $study->fsObject;
                 $datasetFSObject = $dataset->fsObject;
 
-                if ($draft && $draft->eln == 'chemotion') {
-                    $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->parent->name.'/'.$datasetFSObject->name;
-                } else {
-                    $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+                if (! $studyFSObject || ! $datasetFSObject) {
+                    Log::warning('nmriumInfo: skipping dataset with missing fsObject', [
+                        'study_id' => $study->id,
+                        'dataset_id' => $dataset->id,
+                        'study_fs_present' => (bool) $studyFSObject,
+                        'dataset_fs_present' => (bool) $datasetFSObject,
+                    ]);
+
+                    continue;
                 }
 
-                $fType = $studyFSObject->type;
-                $pathsMatch = false;
-                $spectrum = [];
-                $type = [];
-                foreach ($nmriumInfo['data']['spectra'] as $spectra) {
-                    unset($_nmriumJSON['data']['spectra']);
-                    $files = $spectra['sourceSelector']['files'];
-                    if ($files) {
-                        foreach ($files as $file) {
-                            if (str_contains($file, $fType == 'file' ? $path : $path.'/')) {
-                                $pathsMatch = true;
-                            }
-                        }
-                    }
-                    if ($pathsMatch) {
-                        array_push($spectrum, $spectra);
-                        $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
-                        if ($experimentDetailsExists) {
-                            $experiment = $spectra['info']['experiment'];
-                            $nucleus = $spectra['info']['nucleus'];
-                            if (is_array($nucleus)) {
-                                $nucleus = implode('-', $nucleus);
-                            }
-                            array_push($type, $experiment.' - '.$nucleus);
-                        }
-                        $pathsMatch = false;
-                    }
+                $isChemotion = $draft && $draft->eln === 'chemotion';
+                $parentName = $isChemotion ? optional($datasetFSObject->parent)->name : null;
+                if ($isChemotion && $parentName === null) {
+                    Log::warning('nmriumInfo: chemotion dataset without parent fsObject', [
+                        'study_id' => $study->id,
+                        'dataset_id' => $dataset->id,
+                    ]);
+
+                    continue;
                 }
-                if (count($spectrum) > 0) {
-                    $_nmriumJSON['data']['spectra'] = $spectrum;
-                    $_nmrium = $dataset->nmrium;
-                    if ($_nmrium) {
-                        $_nmrium->nmrium_info = $_nmriumJSON;
-                        $dataset->has_nmrium = true;
-                        $_nmrium->save();
-                    } else {
-                        $_nmrium = NMRium::create([
-                            'nmrium_info' => $_nmriumJSON,
-                        ]);
-                        $dataset->nmrium()->save($_nmrium);
-                        $dataset->has_nmrium = true;
+
+                $mergedPayload = json_decode(json_encode($nmriumInfo), true);
+                if (! is_array($mergedPayload)) {
+                    continue;
+                }
+
+                $spectrum = BioschemasHelper::syncDatasetNmriumFromStudyPayload($dataset, $mergedPayload);
+                $type = [];
+                foreach ($spectrum as $spectra) {
+                    $label = $this->spectrumTypeLabel($spectra);
+                    if ($label !== null) {
+                        array_push($type, $label);
                     }
                 }
                 $uType = array_unique($type);
@@ -361,6 +360,20 @@ class StudyController extends Controller
                 }
                 $dataset->save();
 
+            }
+
+            // NMRium silently skips JCAMP-DX files that have no `XYDATA`
+            // block (e.g. MestReNova LINK files containing only a peak-
+            // assignment table or a chemical-structure block). Read those
+            // files' raw JCAMP headers so the upload sidebar still shows a
+            // sensible nucleus/data-type label instead of an empty card.
+            try {
+                (new JcampDatasetClassifier)->classifyStudy($study->fresh());
+            } catch (\Throwable $e) {
+                Log::warning('JcampDatasetClassifier failed', [
+                    'study_id' => $study->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             return $study->fresh();
@@ -380,12 +393,10 @@ class StudyController extends Controller
 
     public function files(Request $request, Study $study)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project->nonPersonalTeam;
+        $team = $project?->nonPersonalTeam;
         $studyFSObject = $study->fsObject;
 
         return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, false);
@@ -393,8 +404,10 @@ class StudyController extends Controller
 
     public function annotations(Request $request, Study $study)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
+
+        if (! $study->fsObject) {
+            return collect();
         }
 
         $studyFSObject = FileSystemObject::with('children')
@@ -404,6 +417,10 @@ class StudyController extends Controller
             ])
             ->orderBy('type')
             ->first();
+
+        if (! $studyFSObject) {
+            return collect();
+        }
 
         return $studyFSObject->children->filter(function ($child) {
             return $child->instrument_type == 'nmredata' || $child->instrument_type == 'mol' || $child->instrument_type == 'sdf';
@@ -439,7 +456,7 @@ class StudyController extends Controller
 
         } else {
             if ($file) {
-                $environment = env('APP_ENV', 'local');
+                $environment = config('app.env', 'local');
                 $path = preg_replace(
                     '~//+~',
                     '/',
@@ -497,6 +514,8 @@ class StudyController extends Controller
 
     public function settings(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
+
         return Inertia::render('Study/Settings', [
             'study' => $study,
             'project' => $study->project,
@@ -508,6 +527,8 @@ class StudyController extends Controller
         StatefulGuard $guard,
         Study $study
     ) {
+        Gate::forUser($request->user())->authorize('deleteStudy', $study);
+
         $confirmed = app(ConfirmPassword::class)(
             $guard,
             $request->user(),
@@ -545,12 +566,174 @@ class StudyController extends Controller
 
     public function snapshot(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         $content = $request->get('img');
         if ($content) {
             $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';
-            Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+            Storage::disk(config('filesystems.default_public'))->put($path, $content, 'public');
             $study->study_photo_path = $path;
             $study->save();
         }
+    }
+
+    /**
+     * Ensure each entry in `data.molecules[*].molfile` keeps a valid 3-line
+     * MOL header (title, generator, comment) before the V2000/V3000 counts
+     * line. NMRium and the chemistry standardize endpoint occasionally emit
+     * molfiles without the title line, which silently breaks parsers on
+     * subsequent reload. We never strip or escape the line; we only prepend
+     * blank lines (or the molecule's label as the title) when the header has
+     * been collapsed below 3 lines. See `Sample::ensureMolfileHeader` for
+     * details.
+     *
+     * @param  array<string, mixed>  $nmriumInfo
+     * @return array<string, mixed>
+     */
+    protected function normalizeNmriumMoleculeHeaders(array $nmriumInfo): array
+    {
+        $molecules = $nmriumInfo['data']['molecules'] ?? null;
+        if (! is_array($molecules)) {
+            return $nmriumInfo;
+        }
+
+        foreach ($molecules as $idx => $entry) {
+            if (! is_array($entry)) {
+                continue;
+            }
+            $molfile = $entry['molfile'] ?? null;
+            if (! is_string($molfile) || $molfile === '') {
+                continue;
+            }
+            $label = isset($entry['label']) ? (string) $entry['label'] : '';
+            $molecules[$idx]['molfile'] = Sample::ensureMolfileHeader($molfile, $label);
+        }
+
+        $nmriumInfo['data']['molecules'] = $molecules;
+
+        return $nmriumInfo;
+    }
+
+    /**
+     * Build a human-readable spectrum type label such as `1H NMR - 1D` from
+     * an NMRium spectrum payload, falling back to a path-based dimensionality
+     * guess when the parser-derived `info` block is missing or has been
+     * corrupted by a legacy save (older builds dropped `experiment`/`nucleus`).
+     *
+     * @param  array<string, mixed>  $spectrum
+     */
+    protected function spectrumTypeLabel(array $spectrum): ?string
+    {
+        $info = is_array($spectrum['info'] ?? null) ? $spectrum['info'] : [];
+
+        $experiment = isset($info['experiment']) && is_string($info['experiment']) && $info['experiment'] !== ''
+            ? $this->formatExperimentName($info['experiment'])
+            : null;
+
+        $nucleus = $info['nucleus'] ?? null;
+        if (is_array($nucleus)) {
+            $nucleus = implode('-', array_filter(array_map('strval', $nucleus), fn ($v) => $v !== ''));
+        } elseif (! is_string($nucleus)) {
+            $nucleus = null;
+        }
+        if ($nucleus === '') {
+            $nucleus = null;
+        }
+
+        $dimension = null;
+        if (isset($info['dimension']) && is_numeric($info['dimension'])) {
+            $dimension = (int) $info['dimension'];
+        } else {
+            $dimension = $this->guessSpectrumDimension($spectrum);
+        }
+
+        if ($experiment === null && $dimension === null && $nucleus === null) {
+            return null;
+        }
+
+        if ($experiment === null && $dimension !== null) {
+            $experiment = $dimension.'D';
+        }
+
+        if ($nucleus !== null && $experiment !== null) {
+            return $nucleus.' NMR - '.$experiment;
+        }
+
+        if ($nucleus !== null) {
+            return $nucleus.' NMR';
+        }
+
+        return ($experiment ?? '').' NMR';
+    }
+
+    /**
+     * Render NMRium's lowercase experiment tokens (`hsqc`, `cosy`, `1d`, …)
+     * in their conventional uppercase form for display. Unknown values are
+     * passed through unchanged.
+     */
+    protected function formatExperimentName(string $experiment): string
+    {
+        $trimmed = trim($experiment);
+        if ($trimmed === '') {
+            return $experiment;
+        }
+
+        $lower = strtolower($trimmed);
+
+        if (preg_match('/^(\d+)d$/', $lower, $m)) {
+            return $m[1].'D';
+        }
+
+        $known = [
+            'cosy', 'noesy', 'roesy', 'tocsy', 'hsqc', 'hmbc', 'hmqc',
+            'dept', 'dept45', 'dept90', 'dept135', 'jres', 'inadequate',
+            'apt', 'edited-hsqc', 'hsqc-tocsy',
+        ];
+        if (in_array($lower, $known, true)) {
+            return strtoupper($lower);
+        }
+
+        return $trimmed;
+    }
+
+    /**
+     * Heuristically infer 1D vs 2D from an NMRium spectrum's source selector
+     * file paths (Bruker conventions: `acqu2s` / `pdata/.../2[ri]+` => 2D,
+     * `acqus` / `pdata/.../1[ri]` / `fid` => 1D).
+     *
+     * @param  array<string, mixed>  $spectrum
+     */
+    protected function guessSpectrumDimension(array $spectrum): ?int
+    {
+        $selector = $spectrum['sourceSelector'] ?? $spectrum['selector'] ?? [];
+        $files = is_array($selector['files'] ?? null) ? $selector['files'] : [];
+        if (empty($files)) {
+            return null;
+        }
+
+        foreach ($files as $file) {
+            if (! is_string($file)) {
+                continue;
+            }
+            $base = strtolower(basename($file));
+            if (in_array($base, ['acqu2s', 'acqu3s', '2rr', '2ri', '2ir', '2ii', '3rrr'], true)) {
+                return $base === '3rrr' ? 3 : 2;
+            }
+            if (preg_match('#/pdata/\d+/2[ri]+$#i', $file)) {
+                return 2;
+            }
+        }
+
+        foreach ($files as $file) {
+            if (! is_string($file)) {
+                continue;
+            }
+            $base = strtolower(basename($file));
+            if (in_array($base, ['acqus', '1r', '1i', 'fid'], true)) {
+                return 1;
+            }
+        }
+
+        return null;
     }
 }

@@ -65,31 +65,30 @@
         </template>
         <div class="px-12 py-8 mx-auto max-w-4xl">
             <team-projects :mode="'listing'" :projects="projects">
-                <template #emptyText
-                    ><div class="text-center py-12">
+                <template #emptyText>
+                    <div class="text-center py-16">
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="mx-auto h-24 w-24 text-gray-400"
+                            class="mx-auto h-16 w-16 text-gray-300"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            stroke-width="2"
+                            stroke-width="1.5"
                         >
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                                d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
                             />
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">
-                            No Starred Projects.
+                        <h3 class="mt-4 text-base font-semibold text-gray-900">
+                            No starred items
                         </h3>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Add stars to projects or datasets to find it easily
-                            later.
+                        <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                            Star your important projects and datasets to find
+                            them quickly.
                         </p>
-                    </div></template
-                >
+                    </div>
+                </template>
             </team-projects>
         </div>
         <div

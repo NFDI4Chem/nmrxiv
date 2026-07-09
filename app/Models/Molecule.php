@@ -34,6 +34,13 @@ class Molecule extends Model
      */
     protected $appends = ['public_url'];
 
+    protected function casts(): array
+    {
+        return [
+            'workspace_experiment_type_counts' => 'array',
+        ];
+    }
+
     /**
      * Get the molecule identifier
      */
@@ -46,7 +53,7 @@ class Molecule extends Model
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/compound/M'.$this->getRawOriginal('identifier');
+        return config('app.url').'/compound/M'.$this->getRawOriginal('identifier');
     }
 
     public function samples(): BelongsToMany

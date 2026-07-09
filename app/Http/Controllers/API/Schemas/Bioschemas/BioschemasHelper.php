@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
+use App\Models\Dataset;
+use App\Models\NMRium;
+use Illuminate\Support\Facades\DB;
 use Spatie\SchemaOrg\Schema;
 
 class BioschemasHelper
@@ -146,7 +149,7 @@ class BioschemasHelper
      */
     public static function prepareDataDownload($dataset)
     {
-        $url = env('APP_URL');
+        $url = config('app.url');
         $user = $dataset->owner->username;
         if (property_exists($dataset, 'project')) {
             $slug = $dataset->project->slug;
@@ -175,8 +178,8 @@ class BioschemasHelper
     public static function preparePublisher()
     {
         $publisherSchema = Schema::Organization();
-        $publisherSchema->name(env('APP_NAME'));
-        $publisherSchema->url(env('APP_URL'));
+        $publisherSchema->name(config('app.name'));
+        $publisherSchema->url(config('app.url'));
 
         return $publisherSchema;
     }
@@ -192,50 +195,228 @@ class BioschemasHelper
     public static function prepareDataCatalogLite()
     {
         $dataCatalogSchema = Schema::DataCatalog();
-        $dataCatalogSchema->name(env('APP_NAME'));
-        $dataCatalogSchema->url(env('APP_URL'));
+        $dataCatalogSchema->name(config('app.name'));
+        $dataCatalogSchema->url(config('app.url'));
 
         return $dataCatalogSchema;
     }
 
     /**
-     * Get NMRium info from a dataset.
+     * Get NMRium spectrum `info` for a dataset (read-only).
      *
-     * @param  App\Models\Dataset  $dataset
-     * @return object $info
+     * Uses the dataset's own `nmrium` row when present. Otherwise returns the
+     * first matching spectrum's `info` from the parent study's stored NMRium
+     * JSON without persisting — persistence happens only when the study
+     * payload is saved via {@see self::syncDatasetNmriumFromStudyPayload()}.
      */
-    public static function getNMRiumInfo($dataset)
+    public static function getNMRiumInfo(Dataset $dataset): ?object
     {
-        $info = null;
-        $nmrium = $dataset->nmrium;
-        if (! $nmrium) {
-            $study = $dataset->study;
-            if ($study->nmrium) {
-                $NMRiumInfo = (object) json_decode(json_encode($study->nmrium->nmrium_info));
-                foreach ($NMRiumInfo->data->spectra as $spectra) {
-                    $fileSource = $spectra->sourceSelector->files[0];
-                    $fileName = pathinfo($fileSource);
-                    if ($fileName['basename'] == $dataset->fsObject->name) {
-                        $info = $spectra->info;
-                    }
-                }
-            }
-        } else {
-            $NMRiumInfo = (object) json_decode(json_encode($nmrium->nmrium_info));
-            // check if data key exists
-            if (isset($NMRiumInfo->data)) {
-                $nmriumData = $NMRiumInfo->data;
-                if ($nmriumData) {
-                    $spectraData = $nmriumData->spectra[0];
-                    $info = $spectraData->info;
-                } else {
-                    $spectraData = json_decode($NMRiumInfo->scalar)->data->spectra[0];
-                    $info = $NMRiumInfo->data;
-                }
+        $dataset->loadMissing([
+            'nmrium',
+            'study.nmrium',
+            'study.sample',
+            'study.draft',
+            'fsObject',
+            'study.fsObject',
+        ]);
+
+        if ($dataset->nmrium) {
+            $rawInfo = self::extractPrimaryInfoFromNmriumInfo($dataset->nmrium->nmrium_info);
+            $normalized = self::normalizeSpectrumInfo($rawInfo);
+            if ($normalized !== null) {
+                return $normalized;
             }
         }
 
-        return $info;
+        $matched = self::collectStudySpectraMatchingDataset($dataset);
+        if ($matched === []) {
+            return null;
+        }
+
+        $first = $matched[0];
+        $info = is_array($first) ? ($first['info'] ?? null) : null;
+
+        return self::normalizeSpectrumInfo($info);
+    }
+
+    /**
+     * Collect spectra from a study-level NMRium JSON payload that belong to
+     * this dataset (robust path match on `FileSystemObject::relative_url`).
+     *
+     * @param  array<string, mixed>  $nmriumInfo
+     * @return list<array<string, mixed>>
+     */
+    public static function collectStudySpectraMatchingDatasetFromPayload(Dataset $dataset, array $nmriumInfo): array
+    {
+        $study = $dataset->study;
+        if (! $study) {
+            return [];
+        }
+
+        if (! isset($nmriumInfo['data']['spectra']) || ! is_array($nmriumInfo['data']['spectra'])) {
+            return [];
+        }
+
+        $studyFSObject = $study->fsObject;
+        $datasetFSObject = $dataset->fsObject;
+        if (! $studyFSObject || ! $datasetFSObject) {
+            return [];
+        }
+
+        $draft = $study->relationLoaded('draft') ? $study->draft : $study->draft()->first();
+        $isChemotion = $draft && ($draft->eln === 'chemotion');
+        $parentName = $isChemotion ? optional($datasetFSObject->parent)->name : null;
+        if ($isChemotion && $parentName === null) {
+            return [];
+        }
+
+        $datasetRelativeUrl = $datasetFSObject->relative_url;
+        if (! is_string($datasetRelativeUrl) || $datasetRelativeUrl === '') {
+            $datasetRelativeUrl = $isChemotion
+                ? '/'.$studyFSObject->name.'/'.$parentName.'/'.$datasetFSObject->name
+                : '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+        }
+        $path = rtrim($datasetRelativeUrl, '/');
+        $isDatasetFile = $datasetFSObject->type === 'file';
+        $needle = $isDatasetFile ? $path : $path.'/';
+
+        $matchedSpectra = [];
+        foreach ($nmriumInfo['data']['spectra'] as $spectra) {
+            if (! is_array($spectra)) {
+                continue;
+            }
+            $selector = $spectra['sourceSelector'] ?? $spectra['selector'] ?? [];
+            $files = $selector['files'] ?? [];
+            if (! is_array($files)) {
+                continue;
+            }
+            $hit = false;
+            foreach ($files as $file) {
+                if (! is_string($file)) {
+                    continue;
+                }
+                $pathsMatch = $isDatasetFile
+                    ? str_ends_with($file, $needle)
+                    : str_contains($file, $needle);
+                if ($pathsMatch) {
+                    $hit = true;
+                    break;
+                }
+            }
+            if ($hit) {
+                $matchedSpectra[] = $spectra;
+            }
+        }
+
+        return $matchedSpectra;
+    }
+
+    /**
+     * Collect spectra entries from the parent study's stored NMRium JSON.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function collectStudySpectraMatchingDataset(Dataset $dataset): array
+    {
+        $study = $dataset->study;
+        if (! $study || ! $study->nmrium) {
+            return [];
+        }
+
+        $nmriumInfo = $study->nmrium->nmrium_info;
+        if (! is_array($nmriumInfo)) {
+            return [];
+        }
+
+        return self::collectStudySpectraMatchingDatasetFromPayload($dataset, $nmriumInfo);
+    }
+
+    /**
+     * Persist matched study spectra onto the dataset. Intended for the study
+     * NMRium save path only — pass the merged study JSON (e.g. request payload
+     * after sample/molecule merge) so matching uses the same data being stored.
+     *
+     * @param  array<string, mixed>  $mergedStudyNmriumInfo
+     * @return list<array<string, mixed>> Matched spectrum entries (empty if none)
+     */
+    public static function syncDatasetNmriumFromStudyPayload(Dataset $dataset, array $mergedStudyNmriumInfo): array
+    {
+        $dataset->loadMissing([
+            'nmrium',
+            'study',
+            'fsObject',
+            'study.fsObject',
+            'study.draft',
+        ]);
+
+        $matched = self::collectStudySpectraMatchingDatasetFromPayload($dataset, $mergedStudyNmriumInfo);
+        if ($matched === []) {
+            return [];
+        }
+
+        $base = json_decode(json_encode($mergedStudyNmriumInfo), true);
+        if (! is_array($base)) {
+            return [];
+        }
+
+        $base['data']['spectra'] = $matched;
+
+        DB::transaction(function () use ($dataset, $base) {
+            $dataset->refresh();
+            $dataset->load('nmrium');
+
+            if ($dataset->nmrium) {
+                $dataset->nmrium->nmrium_info = $base;
+                $dataset->nmrium->save();
+            } else {
+                $nmrium = NMRium::create([
+                    'nmrium_info' => $base,
+                ]);
+                $dataset->nmrium()->save($nmrium);
+            }
+
+            $dataset->forceFill(['has_nmrium' => true])->save();
+        });
+
+        return $matched;
+    }
+
+    /**
+     * @param  mixed  $nmriumInfo
+     */
+    private static function extractPrimaryInfoFromNmriumInfo($nmriumInfo): mixed
+    {
+        if ($nmriumInfo === null) {
+            return null;
+        }
+        $decoded = is_array($nmriumInfo)
+            ? $nmriumInfo
+            : json_decode(json_encode($nmriumInfo), true);
+        if (! is_array($decoded)) {
+            return null;
+        }
+        if (isset($decoded['data']['spectra'][0]['info'])) {
+            return $decoded['data']['spectra'][0]['info'];
+        }
+
+        return null;
+    }
+
+    private static function normalizeSpectrumInfo(mixed $info): ?object
+    {
+        if ($info === null) {
+            return null;
+        }
+        if (is_object($info)) {
+            return $info;
+        }
+        if (is_array($info)) {
+            $obj = json_decode(json_encode($info), false);
+
+            return is_object($obj) ? $obj : null;
+        }
+
+        return null;
     }
 
     /**

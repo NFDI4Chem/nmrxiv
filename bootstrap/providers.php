@@ -1,6 +1,7 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use App\Providers\CASServiceProvider;
 use App\Providers\CephStorageServiceProvider;
 use App\Providers\DOIServiceProvider;
 use App\Providers\EventServiceProvider;
@@ -12,6 +13,7 @@ use App\Providers\RouteServiceProvider;
 
 return [
     AppServiceProvider::class,
+    CASServiceProvider::class,
     CephStorageServiceProvider::class,
     DOIServiceProvider::class,
     EventServiceProvider::class,

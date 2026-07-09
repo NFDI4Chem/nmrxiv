@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -81,10 +82,13 @@ class Validation extends Model
         return $this->hasOne(Project::class);
     }
 
-    public function process()
+    public function process(bool $forceSamplesMode = false): void
     {
-        $project = $this->project;
-        $project->load('tags', 'authors', 'citations');
+        if (! $project = $this->project) {
+            return;
+        }
+
+        $project->load('tags', 'authors', 'citations', 'draft');
 
         $report = $this->report;
 
@@ -92,164 +96,253 @@ class Validation extends Model
         $warnings = [];
         $errors = [];
 
+        $samplesMode = $forceSamplesMode
+            || ($project->draft && $project->draft->project_enabled === false);
+
         $schema_version = $project->schema_version ? $project->schema_version : config('validations.default');
 
         $project->schema_version = $schema_version;
 
         $rules = config('validations.'.$schema_version);
 
-        if ($project) {
-            $values = [
-                'title' => $project->name,
-                'description' => $project->description,
-                'keywords' => $project->tags->pluck('id')->toArray(),
-                'citations' => $project->citations->pluck('id')->toArray(),
-                'authors' => $project->authors->pluck('id')->toArray(),
-                'license' => $project->license,
-                'image' => $project->project_photo_path,
-            ];
+        $values = [
+            'title' => $project->name,
+            'description' => $project->description,
+            'keywords' => $project->tags->pluck('id')->toArray(),
+            'citations' => $project->citations->pluck('id')->toArray(),
+            'authors' => $project->authors->pluck('id')->toArray(),
+            'license' => $project->license,
+            'image' => $project->project_photo_path,
+        ];
 
-            $project_rules = $rules['project'];
+        $project_rules = $rules['project'];
 
-            $validator = Validator::make($values, $project_rules);
+        $validator = Validator::make($values, $project_rules);
 
-            if ($validator->fails()) {
-                $errors = $validator->errors()->getMessages();
-                foreach ($project_rules as $key => $value) {
-                    if (array_key_exists($key, $errors)) {
-                        $report['project'][$key] = 'false|'.$project_rules[$key];
-                        if (strpos($project_rules[$key], 'required') !== false) {
-                            $status = false;
-                        }
-                    } else {
-                        $report['project'][$key] = 'true|'.$project_rules[$key];
+        if ($validator->fails()) {
+            $errors = $validator->errors()->getMessages();
+            foreach ($project_rules as $key => $value) {
+                if (array_key_exists($key, $errors)) {
+                    $report['project'][$key] = $samplesMode
+                        ? 'true|skipped-samples-mode'
+                        : 'false|'.$project_rules[$key];
+                    if (! $samplesMode && strpos($project_rules[$key], 'required') !== false) {
+                        $status = false;
                     }
-                }
-            } else {
-                foreach ($project_rules as $key => $value) {
+                } else {
                     $report['project'][$key] = 'true|'.$project_rules[$key];
                 }
             }
+        } else {
+            foreach ($project_rules as $key => $value) {
+                $report['project'][$key] = 'true|'.$project_rules[$key];
+            }
+        }
 
-            $studies = $project->studies;
+        $studies = $project->studies;
 
-            $studiesValidation = [];
+        $studiesValidation = [];
 
-            foreach ($studies as $study) {
-                $sstatus = true;
-                $study->load(['datasets', 'sample.molecules', 'tags']);
-                $studyReport = [
-                    'name' => $study->name,
-                    'id' => $study->id,
+        foreach ($studies as $study) {
+            $sstatus = true;
+            $study->load(['datasets', 'sample.molecules', 'tags']);
+            $studyReport = [
+                'name' => $study->name,
+                'id' => $study->id,
+            ];
+
+            $values = [
+                'title' => $study->name,
+                'description' => $study->description,
+                'keywords' => $study->tags->pluck('id')->toArray(),
+                'composition' => $study->sample->molecules->pluck('id')->toArray(),
+                'nmrium_info' => $study->has_nmrium ? $study->has_nmrium : null,
+                'sample' => $study->sample,
+                'molecules' => $study->sample->molecules->pluck('id')->toArray(),
+            ];
+
+            $study_rules = $rules['study'];
+
+            $validator = Validator::make($values, $study_rules);
+
+            if ($validator->fails()) {
+                $errors = $validator->errors()->getMessages();
+                foreach ($study_rules as $key => $value) {
+                    if (array_key_exists($key, $errors)) {
+                        $studyReport[$key] = 'false|'.$study_rules[$key];
+                        if (strpos($study_rules[$key], 'required') !== false) {
+                            $sstatus = false;
+                            $status = false;
+                        }
+                    } else {
+                        $studyReport[$key] = 'true|'.$study_rules[$key];
+                    }
+                }
+            } else {
+                foreach ($study_rules as $key => $value) {
+                    $studyReport[$key] = 'true|'.$study_rules[$key];
+                }
+            }
+
+            $datasets = $study->datasets;
+
+            $datasetsValidation = [];
+            foreach ($datasets as $dataset) {
+                $dstatus = true;
+                $datasetReport = [
+                    'name' => $dataset->name,
+                    'id' => $dataset->id,
                 ];
+
+                $instrumentType = $dataset->fsObject ? $dataset->fsObject->instrument_type : null;
+
+                if (! $instrumentType) {
+                    // check if children have instrument_type
+                    $children = $dataset->fsObject ? $dataset->fsObject->children : null;
+                    if ($children) {
+                        foreach ($children as $child) {
+                            $instrumentType = $child->instrument_type;
+                            if ($instrumentType) {
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 $values = [
-                    'title' => $study->name,
-                    'description' => $study->description,
-                    'keywords' => $study->tags->pluck('id')->toArray(),
-                    'composition' => $study->sample->molecules->pluck('id')->toArray(),
-                    'nmrium_info' => $study->has_nmrium ? $study->has_nmrium : null,
-                    'sample' => $study->sample,
-                    'molecules' => $study->sample->molecules->pluck('id')->toArray(),
+                    'files' => $instrumentType ? $instrumentType : null,
+                    'nmrium_info' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
+                    'assay' => $dataset->assay,
+                    // The validator rule for `assignments` is `array|min:1`,
+                    // so we only pass the actual saved entries (atom_peaks)
+                    // when present, plus an `acs` token when the user pasted
+                    // a free-form ACS string. Falling back to `has_nmrium`
+                    // here would have been a lie - it lets unfilled samples
+                    // pass validation just because spectra were imported.
+                    'assignments' => $this->assignmentsValueFor($dataset),
                 ];
 
-                $study_rules = $rules['study'];
+                $dataset_rules = $rules['dataset'];
 
-                $validator = Validator::make($values, $study_rules);
+                $validator = Validator::make($values, $dataset_rules);
 
                 if ($validator->fails()) {
                     $errors = $validator->errors()->getMessages();
-                    foreach ($study_rules as $key => $value) {
+                    foreach ($dataset_rules as $key => $value) {
                         if (array_key_exists($key, $errors)) {
-                            $studyReport[$key] = 'false|'.$study_rules[$key];
-                            if (strpos($study_rules[$key], 'required') !== false) {
+                            $datasetReport[$key] = 'false|'.$dataset_rules[$key];
+                            if (strpos($dataset_rules[$key], 'required') !== false) {
+                                $dstatus = false;
                                 $sstatus = false;
                                 $status = false;
                             }
                         } else {
-                            $studyReport[$key] = 'true|'.$study_rules[$key];
-                        }
-                    }
-                } else {
-                    foreach ($study_rules as $key => $value) {
-                        $studyReport[$key] = 'true|'.$study_rules[$key];
-                    }
-                }
-
-                $datasets = $study->datasets;
-
-                $datasetsValidation = [];
-                foreach ($datasets as $dataset) {
-                    $dstatus = true;
-                    $datasetReport = [
-                        'name' => $dataset->name,
-                        'id' => $dataset->id,
-                    ];
-
-                    $instrumentType = $dataset->fsObject ? $dataset->fsObject->instrument_type : null;
-
-                    if (! $instrumentType) {
-                        // check if children have instrument_type
-                        $children = $dataset->fsObject ? $dataset->fsObject->children : null;
-                        if ($children) {
-                            foreach ($children as $child) {
-                                $instrumentType = $child->instrument_type;
-                                if ($instrumentType) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    $values = [
-                        'files' => $instrumentType ? $instrumentType : null,
-                        'nmrium_info' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
-                        'assay' => $dataset->assay,
-                        'assignments' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
-                    ];
-
-                    $dataset_rules = $rules['dataset'];
-
-                    $validator = Validator::make($values, $dataset_rules);
-
-                    if ($validator->fails()) {
-                        $errors = $validator->errors()->getMessages();
-                        foreach ($dataset_rules as $key => $value) {
-                            if (array_key_exists($key, $errors)) {
-                                $datasetReport[$key] = 'false|'.$dataset_rules[$key];
-                                if (strpos($dataset_rules[$key], 'required') !== false) {
-                                    $dstatus = false;
-                                    $sstatus = false;
-                                    $status = false;
-                                }
-                            } else {
-                                $datasetReport[$key] = 'true|'.$dataset_rules[$key];
-                            }
-                        }
-                    } else {
-                        foreach ($dataset_rules as $key => $value) {
                             $datasetReport[$key] = 'true|'.$dataset_rules[$key];
                         }
                     }
-
-                    $datasetReport['status'] = $dstatus;
-
-                    array_push($datasetsValidation, $datasetReport);
+                } else {
+                    foreach ($dataset_rules as $key => $value) {
+                        $datasetReport[$key] = 'true|'.$dataset_rules[$key];
+                    }
                 }
-                $studyReport['status'] = $sstatus;
-                $studyReport['datasets'] = $datasetsValidation;
 
-                array_push($studiesValidation, $studyReport);
+                $datasetReport['status'] = $dstatus;
+
+                array_push($datasetsValidation, $datasetReport);
             }
+            $studyReport['status'] = $sstatus;
+            $studyReport['datasets'] = $datasetsValidation;
 
-            $report['project']['studies'] = $studiesValidation;
-            $report['project']['status'] = $status;
-            $project->validation_status = $status;
-            $project->save();
-
-            $this->report = $this->sanitizeUnicodeInReport($report);
-            $this->save();
+            array_push($studiesValidation, $studyReport);
         }
+
+        // Validate citations
+        $citations = $project->citations;
+        $citationsValidation = [];
+        $citationsStatus = $citations && $citations->isNotEmpty();
+        $shouldValidateCitationDoi = ! $samplesMode;
+
+        if ($shouldValidateCitationDoi && $project->release_date) {
+            $shouldValidateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
+        }
+
+        if ($citations && $citations->isNotEmpty()) {
+            foreach ($citations as $citation) {
+                $citationReport = [
+                    'name' => $citation->title ?? 'Untitled',
+                    'id' => $citation->id,
+                ];
+
+                if ($shouldValidateCitationDoi) {
+                    // Check if DOI is present only for current/past release date projects.
+                    $hasDoi = is_string($citation->doi) && trim($citation->doi) !== '';
+
+                    if ($hasDoi) {
+                        $citationReport['doi'] = 'true|required';
+                    } else {
+                        $citationReport['doi'] = 'false|required';
+                        $citationsStatus = false; // Citation validation failed
+                    }
+
+                    $citationReport['status'] = $hasDoi;
+                } else {
+                    $citationReport['doi'] = $samplesMode
+                        ? 'true|skipped-samples-mode'
+                        : 'true|skipped-future-release';
+                    $citationReport['status'] = true;
+                }
+
+                $citationsValidation[] = $citationReport;
+            }
+        }
+
+        // In samples mode, citations are optional and DOIs are not enforced.
+        if ($samplesMode) {
+            $report['project']['citations'] = 'true|optional';
+        } elseif ($citationsStatus) {
+            $report['project']['citations'] = 'true|required';
+        } else {
+            $report['project']['citations'] = 'false|required';
+            $status = false; // Propagate to project status
+        }
+
+        // Store detailed citations validation data separately
+        $report['project']['citations_detail'] = $citationsValidation;
+
+        $report['project']['studies'] = $studiesValidation;
+
+        if ($samplesMode) {
+            $status = self::samplesModePublishPasses($report);
+        }
+
+        $report['project']['status'] = $status;
+        $project->validation_status = $status;
+        $project->save();
+
+        $this->report = $this->sanitizeUnicodeInReport($report);
+        $this->save();
+    }
+
+    /**
+     * Whether a validation report allows publishing individual samples (studies only).
+     *
+     * @param  array<string, mixed>  $report
+     */
+    public static function samplesModePublishPasses(array $report): bool
+    {
+        $studies = $report['project']['studies'] ?? [];
+
+        if ($studies === []) {
+            return false;
+        }
+
+        foreach ($studies as $study) {
+            if (! ($study['status'] ?? false)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -301,5 +394,31 @@ class Validation extends Model
         }
 
         return $data;
+    }
+
+    /**
+     * Build the value passed to the dataset's `assignments` validation rule
+     * (`array|min:1`). We satisfy `min:1` whenever the user has either
+     * pasted a non-empty ACS string OR added at least one atom_peaks row.
+     * Returns null when nothing is set so the rule fails cleanly and the
+     * UI sees `assignments: false|array|min:1` in the report.
+     */
+    protected function assignmentsValueFor(Dataset $dataset): ?array
+    {
+        $a = $dataset->assignments;
+        if (! is_array($a)) {
+            return null;
+        }
+        $entries = [];
+        if (! empty($a['acs']) && trim((string) $a['acs']) !== '') {
+            $entries[] = ['type' => 'acs'];
+        }
+        if (! empty($a['atom_peaks']) && is_array($a['atom_peaks'])) {
+            foreach ($a['atom_peaks'] as $row) {
+                $entries[] = $row;
+            }
+        }
+
+        return $entries === [] ? null : $entries;
     }
 }

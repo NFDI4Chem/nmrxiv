@@ -261,6 +261,7 @@
                                                         ref="photo"
                                                         type="file"
                                                         class="hidden"
+                                                        accept="image/jpeg,image/png,image/gif,image/webp"
                                                         @change="
                                                             updatePhotoPreview
                                                         "
@@ -978,6 +979,7 @@ export default defineComponent({
                 tags: [],
                 doi: this.project.doi,
                 tags_array: [],
+                project_tags_updated: true,
                 photo: null,
             }),
             open: false,

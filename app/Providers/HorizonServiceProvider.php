@@ -45,10 +45,10 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      * Access is restricted to users with 'super-admin' or 'developer' roles
      * to ensure only authorized personnel can monitor and manage job queues.
      */
-    protected function gate(): void
+    protected function gate()
     {
         Gate::define('viewHorizon', function ($user) {
-            return $user->hasAnyRole(['super-admin', 'developer']);
+            return $user !== null && $user->hasAnyRole(['super-admin', 'developer']);
         });
     }
 }

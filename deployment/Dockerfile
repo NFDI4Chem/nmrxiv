@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.7.0-alpine
+FROM dunglas/frankenphp:1-php8.4-alpine
 
 # Setup proxy settings using build arguments
 ARG HTTP_PROXY
@@ -44,7 +44,7 @@ COPY deployment/php.production.ini /usr/local/etc/php/conf.d/production.ini
 COPY composer.json composer.lock package*.json ./
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
+RUN composer install --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 # Install Node dependencies  
 RUN npm ci --production=false
@@ -76,6 +76,10 @@ COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/Caddyfile /etc/caddy/Caddyfile
 
 RUN php artisan l5-swagger:generate
+
+# Add healthcheck - use Laravel health endpoint for broader compatibility
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost/up || exit 1
 
 # Expose port
 EXPOSE 80 443

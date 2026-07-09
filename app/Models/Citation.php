@@ -13,6 +13,7 @@ class Citation extends Model
     protected $fillable = [
         'doi',
         'title',
+        'title_slug',
         'authors',
         'citation_text',
     ];
@@ -34,5 +35,13 @@ class Citation extends Model
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class);
+    }
+
+    /**
+     * Studies linked to this citation (normalized pivot; distinct from JSON `studies.citations`).
+     */
+    public function studies(): BelongsToMany
+    {
+        return $this->belongsToMany(Study::class);
     }
 }

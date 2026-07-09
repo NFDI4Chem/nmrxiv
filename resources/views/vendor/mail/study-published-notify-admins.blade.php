@@ -2,20 +2,12 @@
 
 Dear admin,
 
-@if($releasedToday)
-New samples has been published. Please find the details below.
+New samples have been published and are now publicly available on nmrXiv.
 
 @foreach ($samples as $sample)
-    Sample Name- {{ $sample->name }} , DOI- {{ $sample->doi }}
+- **Sample Name:** {{ $sample->name }}
+- **DOI:** {{ $sample->doi }}
 @endforeach
-
-@else
-New samples has been published as Embargo. Please find the details below.
-
-@foreach ($samples as $sample)
-    Sample Name- {{ $sample->name }} , DOI- {{ $sample->doi }}
-@endforeach
-@endif
 
 Regards,
 
@@ -26,7 +18,7 @@ View Samples
 @endcomponent
 
 @component('mail::subcopy')
-You are recieving this mail because you are part of the admin list in nmrXiv.
+You are receiving this email because you are on the nmrXiv admin list.
 @endcomponent
 
 @endcomponent

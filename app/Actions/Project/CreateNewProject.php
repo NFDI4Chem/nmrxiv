@@ -19,7 +19,7 @@ class CreateNewProject
      */
     public function create(array $input)
     {
-        $license = $input['license'];
+        $license = $input['license'] ?? null;
         $errorMessages = [
             'license.required_if' => 'The license field is required when the project is made public.',
         ];

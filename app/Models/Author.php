@@ -22,10 +22,16 @@ class Author extends Model
         'family_name',
         'email_id',
         'affiliation',
+        'ror_id',
     ];
 
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class);
+    }
+
+    public function studies(): BelongsToMany
+    {
+        return $this->belongsToMany(Study::class, 'author_study');
     }
 }

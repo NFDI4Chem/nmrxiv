@@ -28,15 +28,15 @@
                                         "description": "User's registered email address",
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255,
-                                        "example": "scientist@example.com"
+                                        "example": "scientist@example.com",
+                                        "maxLength": 255
                                     },
                                     "password": {
                                         "description": "User's password (minimum 8 characters)",
                                         "type": "string",
                                         "format": "password",
-                                        "minLength": 8,
-                                        "example": "SecurePassword123!"
+                                        "example": "SecurePassword123!",
+                                        "minLength": 8
                                     }
                                 },
                                 "type": "object"
@@ -83,23 +83,6 @@
                                             "description": "Error message indicating authentication failure",
                                             "type": "string",
                                             "example": "Invalid login details"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Account not verified - Email verification required",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "description": "Error message indicating account verification status",
-                                            "type": "string",
-                                            "example": "Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you."
                                         }
                                     },
                                     "type": "object"
@@ -284,37 +267,37 @@
                                     "first_name": {
                                         "description": "User's first name",
                                         "type": "string",
+                                        "example": "Dr. Sarah",
                                         "maxLength": 255,
-                                        "minLength": 1,
-                                        "example": "Dr. Sarah"
+                                        "minLength": 1
                                     },
                                     "last_name": {
                                         "description": "User's last name",
                                         "type": "string",
+                                        "example": "Johnson",
                                         "maxLength": 255,
-                                        "minLength": 1,
-                                        "example": "Johnson"
+                                        "minLength": 1
                                     },
                                     "email": {
                                         "description": "User's email address (must be unique)",
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255,
-                                        "example": "sarah.johnson@university.edu"
+                                        "example": "sarah.johnson@university.edu",
+                                        "maxLength": 255
                                     },
                                     "username": {
                                         "description": "Unique username for the account",
                                         "type": "string",
+                                        "example": "sarah_johnson_chem",
                                         "maxLength": 255,
-                                        "minLength": 1,
-                                        "example": "sarah_johnson_chem"
+                                        "minLength": 1
                                     },
                                     "password": {
                                         "description": "Password for the account (minimum 8 characters)",
                                         "type": "string",
                                         "format": "password",
-                                        "minLength": 8,
-                                        "example": "SecurePassword123!"
+                                        "example": "SecurePassword123!",
+                                        "minLength": 8
                                     },
                                     "orcid_id": {
                                         "description": "Optional ORCID identifier for academic users",
@@ -326,9 +309,9 @@
                                     "affiliation": {
                                         "description": "Optional institutional affiliation",
                                         "type": "string",
-                                        "maxLength": 500,
                                         "example": "University of Chemistry, Department of Organic Chemistry",
-                                        "nullable": true
+                                        "nullable": true,
+                                        "maxLength": 500
                                     }
                                 },
                                 "type": "object"
@@ -1018,12 +1001,12 @@
                         "required": true,
                         "schema": {
                             "type": "string",
+                            "example": "projects",
                             "enum": [
                                 "projects",
                                 "samples",
                                 "datasets"
-                            ],
-                            "example": "projects"
+                            ]
                         }
                     },
                     {
@@ -1053,14 +1036,10 @@
                         "description": "Sort field with optional direction prefix (-created_at for descending)",
                         "schema": {
                             "type": "string",
-                            "default": "-created_at",
+                            "default": "created_at",
                             "enum": [
                                 "created_at",
-                                "-created_at",
-                                "identifier",
-                                "-identifier",
-                                "owner.email",
-                                "-owner.email"
+                                "identifier"
                             ]
                         }
                     },
@@ -1080,16 +1059,6 @@
                         "schema": {
                             "type": "string",
                             "example": "P123"
-                        }
-                    },
-                    {
-                        "name": "filter[owner.email]",
-                        "in": "query",
-                        "description": "Filter by data owner email",
-                        "schema": {
-                            "type": "string",
-                            "format": "email",
-                            "example": "researcher@university.edu"
                         }
                     },
                     {
@@ -1938,7 +1907,7 @@
                     "ELN Submission"
                 ],
                 "summary": "Upload and process data from Electronic Lab Notebook (ELN) systems",
-                "description": "Creates or updates a draft with data from external ELN systems. Currently supports Chemotion. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
+                "description": "Creates or updates a draft with data from external ELN systems. Currently supports Chemotion and NoBs. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
                 "operationId": "uploadELNData",
                 "parameters": [
                     {
@@ -1948,10 +1917,11 @@
                         "required": true,
                         "schema": {
                             "type": "string",
+                            "example": "chemotion",
                             "enum": [
-                                "chemotion"
-                            ],
-                            "example": "chemotion"
+                                "chemotion",
+                                "nobs"
+                            ]
                         }
                     }
                 ],
@@ -2076,7 +2046,8 @@
                                                 "type": "string"
                                             },
                                             "example": [
-                                                "chemotion"
+                                                "chemotion",
+                                                "nobs"
                                             ]
                                         }
                                     },
@@ -2141,10 +2112,11 @@
                         "required": true,
                         "schema": {
                             "type": "string",
+                            "example": "chemotion",
                             "enum": [
-                                "chemotion"
-                            ],
-                            "example": "chemotion"
+                                "chemotion",
+                                "nobs"
+                            ]
                         }
                     },
                     {
@@ -2271,7 +2243,8 @@
                                                 "type": "string"
                                             },
                                             "example": [
-                                                "chemotion"
+                                                "chemotion",
+                                                "nobs"
                                             ]
                                         }
                                     },
@@ -2614,7 +2587,7 @@
                                                             },
                                                             "propertyID": {
                                                                 "type": "string",
-                                                                "example": "MR:1400253"
+                                                                "example": "NMR:1400253"
                                                             }
                                                         },
                                                         "type": "object"
@@ -3482,14 +3455,161 @@
                 }
             }
         },
-        "/api/v1/search": {
+        "/api/v1/search/catalog": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search public projects, samples, and spectra",
+                "description": "Free-text search across published projects, studies (samples), and datasets (spectra) by name and description. Matching is case- and whitespace-insensitive; multi-word queries require every token to appear (AND semantics).",
+                "operationId": "searchCatalog",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Free-text search query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "caffeine nmr",
+                            "maxLength": 1000
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per entity group (default: 12, max: 24)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 12,
+                            "maximum": 24,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "projects_page",
+                        "in": "query",
+                        "description": "Page number for project results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "studies_page",
+                        "in": "query",
+                        "description": "Page number for sample (study) results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "datasets_page",
+                        "in": "query",
+                        "description": "Page number for spectra (dataset) results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grouped catalog search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "query": {
+                                            "type": "string",
+                                            "example": "caffeine"
+                                        },
+                                        "tokens": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "caffeine"
+                                            ]
+                                        },
+                                        "projects": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "studies": {
+                                            "type": "object"
+                                        },
+                                        "datasets": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/search/compounds": {
             "post": {
                 "tags": [
-                    "Chemical Search"
+                    "Search"
                 ],
                 "summary": "Search chemical compounds by structure and properties",
                 "description": "Advanced chemical search supporting multiple query types including SMILES, InChI, InChiKey, substructure matching, similarity search, and text-based name searches. Supports filtering by molecular properties and chemical classifications. Returns paginated results with comprehensive molecular data including calculated properties, classifications, and database references.",
-                "operationId": "searchMolecules",
+                "operationId": "searchCompounds",
                 "parameters": [
                     {
                         "name": "limit",
@@ -3553,6 +3673,7 @@
                                     "type": {
                                         "description": "Search query type - auto-detected if not specified",
                                         "type": "string",
+                                        "example": "inchikey",
                                         "enum": [
                                             "text",
                                             "smiles",
@@ -3563,8 +3684,7 @@
                                             "similarity",
                                             "tags",
                                             "filters"
-                                        ],
-                                        "example": "inchikey"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -3968,8 +4088,8 @@
             "description": "Scientific Metadata Schemas"
         },
         {
-            "name": "Chemical Search",
-            "description": "Chemical Search"
+            "name": "Search",
+            "description": "Search"
         }
     ]
 }

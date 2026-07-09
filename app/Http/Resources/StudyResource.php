@@ -10,7 +10,7 @@ class StudyResource extends JsonResource
 {
     private bool $lite = true;
 
-    private array $properties = ['sample', 'users', 'license'];
+    private array $properties = ['sample', 'users', 'license', 'authors'];
 
     public function lite(bool $lite, ?array $properties = []): self
     {
@@ -35,7 +35,7 @@ class StudyResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'molecules' => $this->sample->molecules,
+            'molecules' => $this->sample ? $this->sample->molecules : [],
             'team' => $this->when(! ($this->team && $this->team->personal_team), $this->team),
             'photo_url' => $this->study_photo_url,
             'tags' => $this->tags,
@@ -109,6 +109,32 @@ class StudyResource extends JsonResource
                         function () {
                             return [
                                 'license' => new LicenseResource($this->license),
+                            ];
+                        }
+                    ),
+                ];
+            }),
+            $this->mergeWhen(! $this->lite, function () {
+                return [
+                    $this->mergeWhen(
+                        in_array('authors', $this->properties),
+                        function () {
+                            return [
+                                'authors' => $this->studyAuthors ? AuthorResource::collection($this->studyAuthors) : [],
+                            ];
+                        }
+                    ),
+                ];
+            }),
+            $this->mergeWhen(! $this->lite, function () {
+                return [
+                    $this->mergeWhen(
+                        in_array('citations', $this->properties),
+                        function () {
+                            return [
+                                'citations' => CitationResource::collection(
+                                    $this->relationLoaded('linkedCitations') ? $this->linkedCitations : collect()
+                                ),
                             ];
                         }
                     ),

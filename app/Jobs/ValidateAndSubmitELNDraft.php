@@ -26,10 +26,21 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
         if (! $draft) {
             Log::error("Draft not found for finalizer: {$this->draftId}");
 
+            Log::info('embargo_publish_trace', [
+                'stage' => 'validate_and_submit_eln_draft_aborted',
+                'reason' => 'draft_not_found',
+                'draft_id' => $this->draftId,
+            ]);
+
             return;
         }
 
         try {
+            Log::info('embargo_publish_trace', [
+                'stage' => 'validate_and_submit_eln_draft_start',
+                'draft_id' => $draft->id,
+            ]);
+
             Log::info('Starting final processing after ProcessELNSpectra', [
                 'draft_id' => $draft->id,
             ]);
@@ -37,6 +48,12 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             $project = $draft->project;
             if (! $project) {
                 Log::error('No project found for draft in finalizer', ['draft_id' => $draft->id]);
+
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'validate_and_submit_eln_draft_aborted',
+                    'reason' => 'project_not_found',
+                    'draft_id' => $draft->id,
+                ]);
 
                 return;
             }
@@ -78,6 +95,12 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
 
             // Dispatch ProcessSubmission if validation passes
             if ($status) {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'validate_and_submit_eln_draft_validation_passed',
+                    'project_id' => $project->id,
+                    'draft_id' => $draft->id,
+                ]);
+
                 Log::info('Validation passed for project, dispatching ProcessSubmission', [
                     'project_id' => $project->id,
                     'draft_id' => $draft->id,
@@ -87,7 +110,19 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                 $this->trackSubmissionValidated($draft, $project, $project->owner);
 
                 ProcessSubmission::dispatch($project);
+
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'validate_and_submit_eln_draft_process_submission_dispatched',
+                    'project_id' => $project->id,
+                    'draft_id' => $draft->id,
+                ]);
             } else {
+                Log::info('embargo_publish_trace', [
+                    'stage' => 'validate_and_submit_eln_draft_validation_failed',
+                    'project_id' => $project->id,
+                    'draft_id' => $draft->id,
+                ]);
+
                 Log::error('Validation failed for project', [
                     'project_id' => $project->id,
                     'draft_id' => $draft->id,
@@ -103,6 +138,13 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
+            Log::info('embargo_publish_trace', [
+                'stage' => 'validate_and_submit_eln_draft_exception',
+                'draft_id' => $draft->id,
+                'error' => $e->getMessage(),
+            ]);
+
             throw $e;
         }
     }

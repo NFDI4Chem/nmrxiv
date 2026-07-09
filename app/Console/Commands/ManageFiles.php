@@ -45,7 +45,7 @@ class ManageFiles extends Command
 
     public function processFiles($path)
     {
-        $listing = Storage::disk(env('FILESYSTEM_DRIVER'))->listContents($path, true);
+        $listing = Storage::disk(config('filesystems.default'))->listContents($path, true);
         foreach ($listing as $item) {
             $path = $item->path();
             if ($item instanceof FileAttributes) {

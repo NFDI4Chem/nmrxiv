@@ -22,6 +22,7 @@ class ELNController extends Controller
      */
     const SUPPORTED_ELNS = [
         'chemotion',
+        'nobs',
     ];
 
     /**
@@ -30,7 +31,7 @@ class ELNController extends Controller
      *     operationId="uploadELNData",
      *     tags={"ELN Submission"},
      *     summary="Upload and process data from Electronic Lab Notebook (ELN) systems",
-     *     description="Creates or updates a draft with data from external ELN systems. Currently supports Chemotion. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
+     *     description="Creates or updates a draft with data from external ELN systems. Currently supports Chemotion and NoBs. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
      *     security={{"sanctum": {}}},
      *
      *     @OA\Parameter(
@@ -41,7 +42,7 @@ class ELNController extends Controller
      *
      *         @OA\Schema(
      *             type="string",
-     *             enum={"chemotion"},
+     *             enum={"chemotion", "nobs"},
      *             example="chemotion"
      *         )
      *     ),
@@ -171,7 +172,7 @@ class ELNController extends Controller
      *                 type="array",
      *
      *                 @OA\Items(type="string"),
-     *                 example={"chemotion"}
+     *                 example={"chemotion", "nobs"}
      *             )
      *         )
      *     ),
@@ -356,7 +357,7 @@ class ELNController extends Controller
      *
      *         @OA\Schema(
      *             type="string",
-     *             enum={"chemotion"},
+     *             enum={"chemotion", "nobs"},
      *             example="chemotion"
      *         )
      *     ),
@@ -498,7 +499,7 @@ class ELNController extends Controller
      *                 type="array",
      *
      *                 @OA\Items(type="string"),
-     *                 example={"chemotion"}
+     *                 example={"chemotion", "nobs"}
      *             )
      *         )
      *     ),

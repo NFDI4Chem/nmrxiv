@@ -1,6 +1,8 @@
 import "./bootstrap";
 import "../css/app.css";
 
+import { installBlockingDiagnostics } from "./Utils/blockingDiagnostics";
+
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 
@@ -14,6 +16,8 @@ import mitt from "mitt";
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "Laravel";
 const emitter = mitt();
+
+installBlockingDiagnostics();
 
 createInertiaApp({
     progress: {

@@ -13,61 +13,93 @@
 <template>
     <!-- Main dropzone container with responsive fullscreen support -->
     <div
-        id="fs-dropzone"
+        :id="dropzoneRootId"
         :class="[
             fullScreen
-                ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
-                : 'h-screen',
+                ? 'fixed inset-0 flex h-screen w-screen flex-col -ml-4 -mt-6 overflow-hidden sm:ml-0 md:-ml-0 md:w-auto'
+                : height
+                ? `flex flex-col min-h-0 ${height} overflow-hidden`
+                : 'flex h-screen min-h-0 flex-col overflow-hidden',
             'bg-white rounded-lg',
         ]"
     >
-        <div>
+        <div class="flex min-h-0 flex-1 flex-col">
             <!-- Header section with help links and missing files indicator -->
-            <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
+            <div :class="[fullScreen ? 'px-6 py-2' : '', 'flex flex-shrink-0']">
                 <div class="w-full px-5">
                     <!-- Help and documentation section (only shown in edit mode) -->
                     <div
                         v-if="!readonly"
-                        class="text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
+                        class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 pr-2 sm:pr-5"
                     >
                         <!-- Documentation link with tooltip -->
-                        <i>
-                            <a
-                                href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
-                                target="_blank"
-                                class="mb-4"
+                        <div class="min-w-0 flex-1 text-sm text-gray-700">
+                            <div
+                                class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3"
                             >
                                 <ToolTip
-                                    class="w-3.5 h-3.5"
+                                    class="text-blue-600"
                                     text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
                                 />
-                                <span class="ml-4">
+                                <a
+                                    class="text-blue-600 underline decoration-blue-300/70 underline-offset-2 transition hover:text-blue-800 hover:decoration-blue-500"
+                                    href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     Learn more about folder structuring
-                                </span>
-                            </a>
-                        </i>
+                                </a>
+                            </div>
+                        </div>
 
-                        <!-- Missing files warning (shown when files are missing) -->
-                        <a
-                            v-if="missing_files > 0"
-                            class="text-red-900 text-strong float-right"
-                            @click="showMissingFilesDetailsModal()"
+                        <div
+                            class="flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-1"
                         >
-                            <!-- Warning triangle icon -->
-                            <svg
-                                class="h-5 w-5 text-red-400 inline"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
+                            <div
+                                v-if="draft && draft.key"
+                                class="flex flex-wrap items-center gap-x-3 gap-y-1"
                             >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
-                            {{ missing_files }} files missing
-                        </a>
+                                <span
+                                    class="cursor-default select-all text-xs font-medium tabular-nums text-gray-500"
+                                    title="Draft reference"
+                                >
+                                    Draft ID:
+                                    <span class="font-mono text-gray-700">{{
+                                        draft.key
+                                    }}</span>
+                                </span>
+                                <button
+                                    v-if="draftHasProcessingLogs"
+                                    type="button"
+                                    class="text-xs font-semibold text-teal-700 underline decoration-teal-700/40 underline-offset-2 transition hover:text-teal-900 hover:decoration-teal-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                    @click="$emit('show-processing-logs')"
+                                >
+                                    Logs
+                                </button>
+                            </div>
+
+                            <!-- Missing files warning (shown when files are missing) -->
+                            <a
+                                v-if="missing_files > 0"
+                                class="cursor-pointer text-sm font-semibold text-red-900"
+                                @click="showMissingFilesDetailsModal()"
+                            >
+                                <!-- Warning triangle icon -->
+                                <svg
+                                    class="inline h-5 w-5 text-red-400"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                                {{ missing_files }} files missing
+                            </a>
+                        </div>
                     </div>
                     <!-- <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">
@@ -130,81 +162,111 @@
             <!-- File upload dropzone section (only shown in edit mode) -->
             <div
                 v-if="!readonly"
-                :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
+                :class="[
+                    hasProjectFiles
+                        ? fullScreen
+                            ? 'px-6 py-2 flex-shrink-0'
+                            : 'px-5 flex-shrink-0'
+                        : 'h-full flex flex-col flex-1 min-h-0 p-5',
+                ]"
             >
-                <div class="py-2 mb-3">
+                <div
+                    :class="[
+                        hasProjectFiles
+                            ? 'py-1 mb-2'
+                            : 'h-full overflow-hidden flex-1 flex items-center justify-center',
+                    ]"
+                >
                     <!-- Dropzone message container -->
-                    <div id="fs-dropzone-message" class="text-center">
+                    <div
+                        :id="dropzoneMessageId"
+                        :class="[
+                            'text-center',
+                            hasProjectFiles ? 'w-full' : 'w-full h-full',
+                        ]"
+                    >
                         <!-- Main dropzone area with dashed border -->
                         <div
                             type="button"
-                            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-4 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                            :class="[
+                                'relative block w-full border-2 border-gray-300 border-dashed rounded-lg text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500',
+                                hasProjectFiles
+                                    ? 'p-4'
+                                    : 'h-full flex flex-col items-center justify-center p-8',
+                            ]"
                         >
-                            <!-- Database/storage icon for dropzone -->
-                            <svg
-                                class="mx-auto h-12 w-12 text-gray-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 48 48"
-                                aria-hidden="true"
+                            <div
+                                :class="[
+                                    hasProjectFiles
+                                        ? ''
+                                        : 'h-full w-full flex flex-col items-center justify-center',
+                                ]"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
-                                />
-                            </svg>
-
-                            <!-- Dropzone instructions and controls -->
-                            <span
-                                class="mt-2 block text-lg font-bold text-blue-600"
-                            >
-                                Drop Files or Folders
-                                <!-- Dynamic destination folder indicator -->
-                                <span
-                                    v-if="
-                                        $page.props.selectedFolder &&
-                                        $page.props.selectedFolder != '/'
-                                    "
+                                <!-- Database/storage icon for dropzone -->
+                                <svg
+                                    class="mx-auto h-12 w-12 text-gray-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    viewBox="0 0 48 48"
+                                    aria-hidden="true"
                                 >
-                                    to "{{ $page.props.selectedFolder }}" folder
-                                </span>
-
-                                <!-- File selection form -->
-                                <form
-                                    class="inline"
-                                    enctype="multipart/form-data"
-                                >
-                                    or
-                                    <!-- Folder selection button -->
-                                    <button
-                                        id="fs-dropzone-click-target"
-                                        type="button"
-                                        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
-                                    >
-                                        Select folders
-                                    </button>
-                                    to upload
-                                    <!-- Hidden input container for Dropzone.js -->
-                                    <div
-                                        id="fs-dropzone-hidden-input-container"
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
                                     />
-                                </form>
+                                </svg>
 
-                                <!-- Help link to submission guides -->
-                                <div class="text-sm text-gray-400">
-                                    Need help? Check out our
-                                    <a
-                                        class="text-blue-800 hover:underline"
-                                        href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
-                                        target="_blank"
+                                <!-- Dropzone instructions and controls -->
+                                <span
+                                    class="mt-2 block text-lg font-bold text-blue-600"
+                                >
+                                    Drop Files or Folders
+                                    <!-- Dynamic destination folder indicator -->
+                                    <span
+                                        v-if="
+                                            $page.props.selectedFolder &&
+                                            $page.props.selectedFolder != '/'
+                                        "
                                     >
-                                        submission guides
-                                    </a>
-                                </div>
-                            </span>
+                                        to "{{ $page.props.selectedFolder }}"
+                                        folder
+                                    </span>
+
+                                    <!-- File selection form -->
+                                    <form
+                                        class="inline"
+                                        enctype="multipart/form-data"
+                                    >
+                                        or
+                                        <!-- Folder selection button -->
+                                        <button
+                                            :id="dropzoneClickTargetId"
+                                            type="button"
+                                            class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
+                                        >
+                                            Select folders
+                                        </button>
+                                        to upload
+                                        <!-- Hidden input container for Dropzone.js -->
+                                        <div :id="dropzoneHiddenInputId" />
+                                    </form>
+
+                                    <!-- Help link to submission guides -->
+                                    <div class="text-sm text-gray-400">
+                                        Need help? Check out our
+                                        <a
+                                            class="text-blue-800 hover:underline"
+                                            href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
+                                            target="_blank"
+                                        >
+                                            submission guides
+                                        </a>
+                                    </div>
+                                </span>
+                            </div>
 
                             <!-- Upload progress section (shown during upload) -->
                             <div v-if="dropzone" class="relative mt-5">
@@ -290,41 +352,241 @@
 
             <!-- Main content area with file tree and details panel -->
             <div
-                v-else
+                v-else-if="hasProjectFiles"
                 :class="[
-                    fullScreen
-                        ? 'overflow-scroll h-full relative px-6'
-                        : 'px-1',
-                    'min-w-0 flex-1 lg:flex max-xs-full',
+                    fullScreen ? 'overflow-hidden h-full relative px-6' : '',
+                    'flex min-h-0 min-w-0 flex-1',
                 ]"
             >
                 <!-- Left sidebar with file tree -->
                 <aside
+                    ref="sidebarRef"
                     :class="[
-                        height ? height : '',
-                        'py-2 lg:inset-y-0 lg:z-50 lg:flex md:w-96 lg:flex-col h-screen overflow-y-scroll overflow-x-scroll md:border-r md:border-gray-200 p-2',
+                        'flex h-full min-h-0 flex-shrink-0 flex-col bg-white border-r border-gray-200',
+                        treeOnly ? 'w-full min-w-0 border-r-0' : '',
                     ]"
+                    :style="
+                        treeOnly ? undefined : { width: sidebarWidth + 'px' }
+                    "
                 >
-                    <!-- Recursive file tree component -->
-                    <children
-                        :file="file"
-                        :expanded-folders="expandedFolders"
-                        @toggle-expansion="
-                            (fsoId, isExpanded) =>
-                                toggleFolderExpansion(fsoId, isExpanded)
-                        "
-                    />
+                    <!-- Sidebar header (same bar height as right panel headers) -->
+                    <div
+                        class="flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 border-y border-gray-100 bg-gray-50 px-5"
+                    >
+                        <span
+                            class="shrink-0 text-sm font-semibold text-gray-900"
+                            >Folders</span
+                        >
+                        <div
+                            class="flex shrink-0 items-center gap-1 sm:gap-2"
+                            role="toolbar"
+                            aria-label="Folder tree"
+                        >
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-gray-500 transition hover:bg-gray-100/80 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40"
+                                :disabled="!hasProjectFiles || loading"
+                                title="Expand all folders"
+                                aria-label="Expand all folders"
+                                @click="expandAllFoldersInTree"
+                            >
+                                <ArrowsPointingOutIcon
+                                    class="h-4 w-4"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-gray-500 transition hover:bg-gray-100/80 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40"
+                                :disabled="
+                                    !hasProjectFiles ||
+                                    loading ||
+                                    expandedFolders.size === 0
+                                "
+                                title="Collapse all folders"
+                                aria-label="Collapse all folders"
+                                @click="collapseAllFoldersInTree"
+                            >
+                                <ArrowsPointingInIcon
+                                    class="h-4 w-4"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                            <span
+                                class="mx-0.5 hidden h-5 w-px shrink-0 bg-gray-200 sm:block"
+                                aria-hidden="true"
+                            ></span>
+                            <HeadlessMenu
+                                as="div"
+                                class="relative z-40 inline-flex"
+                            >
+                                <MenuButton
+                                    type="button"
+                                    class="inline-flex items-center rounded p-0 text-gray-600 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
+                                    aria-label="Sort folders by"
+                                    aria-haspopup="true"
+                                >
+                                    <Squares2X2OutlineIcon
+                                        class="h-3.5 w-3.5"
+                                        aria-hidden="true"
+                                    />
+                                </MenuButton>
+                                <transition
+                                    enter-active-class="transition ease-out duration-100"
+                                    enter-from-class="transform opacity-0 scale-95"
+                                    enter-to-class="transform opacity-100 scale-100"
+                                    leave-active-class="transition ease-in duration-75"
+                                    leave-from-class="transform opacity-100 scale-100"
+                                    leave-to-class="transform opacity-0 scale-95"
+                                >
+                                    <MenuItems
+                                        class="absolute left-full top-0 z-[100] ml-1.5 w-52 origin-top-left overflow-hidden rounded-lg bg-white p-0 shadow-lg ring-1 ring-black/5 focus:outline-none"
+                                    >
+                                        <MenuItem v-slot="{ active }">
+                                            <button
+                                                type="button"
+                                                :class="[
+                                                    treeSortBy ===
+                                                    'alphabetical'
+                                                        ? 'bg-gray-900 text-white'
+                                                        : active
+                                                        ? 'bg-gray-100 text-gray-900'
+                                                        : 'bg-white text-gray-700',
+                                                    'flex w-full items-center gap-2 rounded-t-lg px-3 py-2 text-left text-sm',
+                                                ]"
+                                                @click="
+                                                    setTreeSortBy(
+                                                        'alphabetical'
+                                                    )
+                                                "
+                                            >
+                                                <QueueListIconOutline
+                                                    class="h-4 w-4 shrink-0 opacity-90"
+                                                    aria-hidden="true"
+                                                />
+                                                <span>Name</span>
+                                            </button>
+                                        </MenuItem>
+                                        <MenuItem v-slot="{ active }">
+                                            <button
+                                                type="button"
+                                                :class="[
+                                                    treeSortBy === 'timestamp'
+                                                        ? 'bg-gray-900 text-white'
+                                                        : active
+                                                        ? 'bg-gray-100 text-gray-900'
+                                                        : 'bg-white text-gray-700',
+                                                    'flex w-full items-center gap-2 rounded-b-lg px-3 py-2 text-left text-sm',
+                                                ]"
+                                                @click="
+                                                    setTreeSortBy('timestamp')
+                                                "
+                                            >
+                                                <ClockIconOutline
+                                                    class="h-4 w-4 shrink-0 opacity-90"
+                                                    aria-hidden="true"
+                                                />
+                                                <span>Date modified</span>
+                                            </button>
+                                        </MenuItem>
+                                    </MenuItems>
+                                </transition>
+                            </HeadlessMenu>
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-gray-400 transition hover:bg-gray-100/80 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
+                                :title="
+                                    treeSortOrder === 'asc'
+                                        ? treeSortBy === 'timestamp'
+                                            ? 'Oldest first — click to show newest first'
+                                            : 'A to Z — click for Z to A'
+                                        : treeSortBy === 'timestamp'
+                                        ? 'Newest first — click to show oldest first'
+                                        : 'Z to A — click for A to Z'
+                                "
+                                :aria-label="
+                                    treeSortOrder === 'asc'
+                                        ? 'Switch to descending order'
+                                        : 'Switch to ascending order'
+                                "
+                                @click="toggleTreeSortOrder"
+                            >
+                                <ChevronUpOutlineIcon
+                                    v-if="treeSortOrder === 'asc'"
+                                    class="h-3 w-3 stroke-[1.5]"
+                                    aria-hidden="true"
+                                />
+                                <ChevronDownOutlineIcon
+                                    v-else
+                                    class="h-3 w-3 stroke-[1.5]"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable file tree -->
+                    <div
+                        ref="treeScrollContainer"
+                        class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pt-2 pb-10"
+                    >
+                        <!-- Recursive file tree component -->
+                        <children
+                            :file="file"
+                            :studies="studies ?? []"
+                            :expanded-folders="expandedFolders"
+                            :tree-sort-by="treeSortBy"
+                            :tree-sort-order="treeSortOrder"
+                            :isolate-selection="Boolean(treeOnly)"
+                            :submitted-study-ids="submittedStudyIds ?? []"
+                            :studies-workspace-ready="
+                                Boolean(studiesWorkspaceReady)
+                            "
+                            :draft-processing="Boolean(draftProcessing)"
+                            @toggle-expansion="
+                                (fsoId, isExpanded) =>
+                                    toggleFolderExpansion(fsoId, isExpanded)
+                            "
+                            @study-context-menu="onStudyContextMenu"
+                            @sample-folder-selected="
+                                (folder) =>
+                                    $emit('sample-folder-selected', folder)
+                            "
+                        />
+                        <div
+                            v-if="sampleFoldersPagination?.has_more"
+                            ref="sampleFoldersSentinel"
+                            class="flex items-center justify-center gap-2 py-3 text-xs text-gray-500"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <ArrowPathIcon
+                                v-if="loadingMoreSampleFolders"
+                                class="h-4 w-4 animate-spin text-teal-600"
+                                aria-hidden="true"
+                            />
+                            <span>
+                                {{
+                                    loadingMoreSampleFolders
+                                        ? "Loading more samples…"
+                                        : "Scroll for more samples"
+                                }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar footer with logs -->
                     <div
                         v-if="
                             Object.keys(logs).length > 0 &&
                             !readonly &&
                             !isDeletingFiles
                         "
-                        class="mt-4 text-sm cursor-pointer text-gray-400"
+                        class="flex-shrink-0 px-3 py-2 border-t border-gray-100 bg-gray-50 text-sm cursor-pointer text-gray-500 hover:text-gray-700 transition-colors"
                         @click="showLogsDialog = true"
                     >
                         <InformationCircleIcon
-                            class="h-5 w-5 inline text-gray-400 flex-shrink-0 mx-auto"
+                            class="h-4 w-4 inline mr-1"
                             aria-hidden="true"
                         />
                         View logs
@@ -355,7 +617,7 @@
 
                         <template #content>
                             <div
-                                class="relative h-[74vh] overflow-x-scroll z-0 mt-1 rounded-lg cursor-pointer"
+                                class="relative h-[74vh] overflow-x-auto z-0 mt-1 rounded-lg"
                             >
                                 <ul
                                     v-if="Object.keys(filteredLogs).length > 0"
@@ -367,7 +629,7 @@
                                             filteredLogs
                                         )"
                                         :key="file"
-                                        class="py-4 flex"
+                                        class="py-4 flex items-start"
                                     >
                                         <CheckIcon
                                             v-if="
@@ -433,10 +695,23 @@
                         </template>
                     </jet-dialog-modal>
                 </aside>
+
+                <!-- Resize handle -->
+                <div
+                    v-if="!treeOnly"
+                    class="flex-shrink-0 w-1 cursor-col-resize bg-transparent hover:bg-teal-400 active:bg-teal-500 transition-colors group relative"
+                    @mousedown="startResize"
+                >
+                    <div
+                        class="absolute inset-y-0 -left-1 -right-1 group-hover:bg-teal-400/10"
+                    ></div>
+                </div>
+
+                <!-- Details panel -->
                 <section
+                    v-if="!treeOnly"
                     :class="[
-                        height ? height : '',
-                        'h-screen p-6 flex-1 flex flex-col lg:order-last overflow-y-scroll hidden md:flex',
+                        'flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-white hidden md:flex',
                     ]"
                 >
                     <div
@@ -444,67 +719,115 @@
                             $page.props.selectedFileSystemObject &&
                             $page.props.selectedFileSystemObject.has_children
                         "
-                        class="mb-3"
+                        class="flex min-h-0 flex-1 flex-col overflow-hidden"
                     >
-                        <div class="py-2 mb-2 block border-b pb-4">
-                            <div class="flex justify-between items-center">
-                                <p
-                                    class="font-bold text-xl"
-                                    :title="
-                                        $page.props.selectedFileSystemObject
-                                            .relative_url
-                                    "
+                        <!-- Panel header -->
+                        <div
+                            class="flex min-h-12 shrink-0 items-center border-y border-gray-100 bg-gray-50 px-5"
+                        >
+                            <div
+                                class="flex w-full justify-between items-center gap-3"
+                            >
+                                <nav
+                                    class="flex min-w-0 flex-1 flex-wrap items-center gap-x-0.5 gap-y-1 text-sm"
+                                    aria-label="Folder path"
                                 >
-                                    {{
-                                        truncateMiddle(
-                                            $page.props.selectedFileSystemObject
-                                                .relative_url,
-                                            50
-                                        )
-                                    }}
-                                </p>
-                                <div class="flex items-center space-x-3">
+                                    <button
+                                        type="button"
+                                        class="inline-flex shrink-0 items-center rounded p-0.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                        :class="
+                                            pathBreadcrumbSegments.length === 0
+                                                ? 'text-gray-900'
+                                                : ''
+                                        "
+                                        title="Project root"
+                                        aria-label="Go to project root"
+                                        @click="breadcrumbGoToRoot"
+                                    >
+                                        <HomeIcon
+                                            class="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
+                                    <template
+                                        v-for="(
+                                            seg, idx
+                                        ) in pathBreadcrumbSegments"
+                                        :key="seg.path + '-' + idx"
+                                    >
+                                        <ChevronRightIcon
+                                            class="mx-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <button
+                                            v-if="!seg.isLast"
+                                            type="button"
+                                            class="min-w-0 max-w-[12rem] truncate text-left font-medium text-gray-700 transition hover:text-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            @click="
+                                                breadcrumbNavigateToPath(
+                                                    seg.path
+                                                )
+                                            "
+                                        >
+                                            {{ seg.label }}
+                                        </button>
+                                        <span
+                                            v-else
+                                            class="min-w-0 max-w-[12rem] truncate font-semibold text-gray-900 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            aria-current="page"
+                                        >
+                                            {{ seg.label }}
+                                        </span>
+                                    </template>
+                                </nav>
+                                <div
+                                    class="flex items-center space-x-2 flex-shrink-0"
+                                >
                                     <!-- View Toggle -->
-                                    <div class="flex space-x-1">
+                                    <div
+                                        class="flex rounded-md border border-gray-200 overflow-hidden"
+                                    >
                                         <button
                                             :class="[
                                                 viewMode === 'grid'
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-400 hover:text-gray-600',
-                                                'p-1',
+                                                    ? 'bg-gray-100 text-gray-900'
+                                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50',
+                                                'p-1.5 transition-colors',
                                             ]"
                                             title="Grid View"
                                             @click="setViewMode('grid')"
                                         >
-                                            <Squares2X2Icon class="h-5 w-5" />
+                                            <Squares2X2Icon class="h-4 w-4" />
                                         </button>
                                         <button
                                             :class="[
                                                 viewMode === 'list'
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-400 hover:text-gray-600',
-                                                'p-1',
+                                                    ? 'bg-gray-100 text-gray-900'
+                                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50',
+                                                'p-1.5 transition-colors border-l border-gray-200',
                                             ]"
                                             title="List View"
                                             @click="setViewMode('list')"
                                         >
-                                            <ListBulletIcon class="h-5 w-5" />
+                                            <ListBulletIcon class="h-4 w-4" />
                                         </button>
                                     </div>
-                                    <a
+                                    <button
                                         v-if="
                                             $page.props.selectedFileSystemObject
                                                 .id && !readonly
                                         "
-                                        class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
                                         @click="confirmFSODeletion"
                                     >
                                         <TrashIcon
-                                            class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
+                                            class="h-3.5 w-3.5 mr-1.5"
                                             aria-hidden="true"
                                         />
                                         Delete
-                                    </a>
+                                    </button>
                                     <a
                                         v-if="
                                             $page.props.selectedFileSystemObject
@@ -513,360 +836,507 @@
                                             downloadURL
                                         "
                                         :href="downloadURL"
-                                        class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                                     >
                                         Download
                                     </a>
                                 </div>
                             </div>
                         </div>
-                        <!-- List View Table Header -->
-                        <div v-if="viewMode === 'list'" class="mt-6">
-                            <div
-                                class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
-                            >
+
+                        <!-- Scrollable content area -->
+                        <div
+                            class="min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-12"
+                        >
+                            <!-- List View Table Header -->
+                            <div v-if="viewMode === 'list'" class="mt-2">
                                 <div
-                                    class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
                                 >
-                                    <div class="col-span-4">
-                                        <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                            @click="sortFiles('name')"
-                                        >
-                                            <span>Name</span>
-                                            <ChevronUpIcon
-                                                v-if="
-                                                    sortBy === 'name' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                            <ChevronDownIcon
-                                                v-else-if="
-                                                    sortBy === 'name' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-3">
-                                        <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                            @click="sortFiles('date')"
-                                        >
-                                            <span>Date Modified</span>
-                                            <ChevronUpIcon
-                                                v-if="
-                                                    sortBy === 'date' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                            <ChevronDownIcon
-                                                v-else-if="
-                                                    sortBy === 'date' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                            @click="sortFiles('size')"
-                                        >
-                                            <span>Size</span>
-                                            <ChevronUpIcon
-                                                v-if="
-                                                    sortBy === 'size' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                            <ChevronDownIcon
-                                                v-else-if="
-                                                    sortBy === 'size' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <button
-                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                            @click="sortFiles('kind')"
-                                        >
-                                            <span>Kind</span>
-                                            <ChevronUpIcon
-                                                v-if="
-                                                    sortBy === 'kind' &&
-                                                    sortOrder === 'asc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                            <ChevronDownIcon
-                                                v-else-if="
-                                                    sortBy === 'kind' &&
-                                                    sortOrder === 'desc'
-                                                "
-                                                class="h-3 w-3"
-                                            />
-                                        </button>
-                                    </div>
-                                    <div class="col-span-1">
-                                        <!-- Download column - no header text -->
+                                    <div
+                                        class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-600"
+                                    >
+                                        <div class="col-span-4">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by name"
+                                                aria-label="Sort by name"
+                                                @click="sortFiles('name')"
+                                            >
+                                                <QueueListIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'name'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'name' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'name' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-3">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by date modified"
+                                                aria-label="Sort by date modified"
+                                                @click="sortFiles('date')"
+                                            >
+                                                <ClockIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'date'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'date' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'date' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by size"
+                                                aria-label="Sort by size"
+                                                @click="sortFiles('size')"
+                                            >
+                                                <ScaleIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'size'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'size' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'size' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center gap-px rounded text-gray-700 transition hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                                title="Sort by kind"
+                                                aria-label="Sort by kind"
+                                                @click="sortFiles('kind')"
+                                            >
+                                                <TagIconOutline
+                                                    class="h-4 w-4 shrink-0"
+                                                    :class="
+                                                        sortBy === 'kind'
+                                                            ? 'text-gray-900'
+                                                            : 'text-gray-600'
+                                                    "
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronUpOutlineIcon
+                                                    v-if="
+                                                        sortBy === 'kind' &&
+                                                        sortOrder === 'asc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                                <ChevronDownOutlineIcon
+                                                    v-else-if="
+                                                        sortBy === 'kind' &&
+                                                        sortOrder === 'desc'
+                                                    "
+                                                    class="h-2.5 w-2.5 shrink-0 text-gray-900 stroke-[1.75]"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-span-1">
+                                            <!-- Download column - no header text -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <ul
-                            role="list"
-                            :class="[
-                                'mb-3',
-                                viewMode === 'grid'
-                                    ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
-                                    : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md',
-                            ]"
-                        >
-                            <li
-                                v-for="file in sortedFiles"
-                                :key="file.key"
+                            <ul
+                                role="list"
                                 :class="[
+                                    'mb-3',
                                     viewMode === 'grid'
-                                        ? 'relative shadow rounded-lg'
-                                        : 'hover:bg-gray-50',
+                                        ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
+                                        : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md',
                                 ]"
                             >
-                                <!-- Grid View Layout -->
-                                <template v-if="viewMode === 'grid'">
-                                    <div
-                                        style="user-select: none"
-                                        class="hover:cursor-pointer"
-                                        @dblclick.stop="displaySelected(file)"
-                                    >
+                                <li
+                                    v-for="file in sortedFiles"
+                                    :key="file.key"
+                                    :class="[
+                                        viewMode === 'grid'
+                                            ? 'relative shadow rounded-lg'
+                                            : 'hover:bg-gray-50',
+                                    ]"
+                                >
+                                    <!-- Grid View Layout -->
+                                    <template v-if="viewMode === 'grid'">
                                         <div
-                                            class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                            style="user-select: none"
+                                            class="hover:cursor-pointer"
+                                            @dblclick.stop="
+                                                displaySelected(file)
+                                            "
                                         >
-                                            <span
-                                                v-if="file.type == 'directory'"
+                                            <div
+                                                class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
                                             >
-                                                <FolderIcon
-                                                    class="cursor-pointer h-28 w-28 text-teal-600 flex-shrink-0 mx-auto"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                            <span v-else>
-                                                <DocumentTextIcon
-                                                    class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                            <span
-                                                v-if="file.status == 'missing'"
-                                                class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
-                                            >
-                                                <div
-                                                    class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-                                                >
-                                                    <svg
-                                                        class="h-6 w-6 text-red-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke-width="1.5"
-                                                        stroke="currentColor"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
-                                            </span>
-                                        </div>
-                                        <p
-                                            class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
-                                        >
-                                            <span
-                                                class="float-left"
-                                                :title="file.name"
-                                            >
-                                                {{
-                                                    truncateMiddle(
-                                                        file.name,
-                                                        25
-                                                    )
-                                                }}
-                                            </span>
-                                        </p>
-                                        <div
-                                            class="flex items-center justify-between px-2 pb-1"
-                                        >
-                                            <p
-                                                class="text-sm font-medium text-gray-500"
-                                            >
-                                                {{ formatFileSize(file) }}
-                                            </p>
-                                            <a
-                                                v-if="
-                                                    file.type !== 'directory' &&
-                                                    readonly
-                                                "
-                                                :href="getFileDownloadURL(file)"
-                                                class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
-                                                title="Download file"
-                                                @click.stop
-                                            >
-                                                <ArrowDownTrayIcon
-                                                    class="h-4 w-4"
-                                                />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- List View Layout -->
-                                <template v-else>
-                                    <div
-                                        class="px-3 py-3 grid grid-cols-12 gap-4 items-center"
-                                    >
-                                        <!-- Name Column -->
-                                        <div
-                                            class="col-span-4 flex items-center"
-                                        >
-                                            <div class="flex-shrink-0 mr-3">
-                                                <FolderIcon
+                                                <span
                                                     v-if="
                                                         file.type == 'directory'
                                                     "
-                                                    class="cursor-pointer h-5 w-5 text-teal-600"
-                                                    aria-hidden="true"
-                                                    @dblclick.stop="
-                                                        displaySelected(file)
+                                                >
+                                                    <FolderIcon
+                                                        class="cursor-pointer h-28 w-28 text-teal-600 flex-shrink-0 mx-auto"
+                                                        aria-hidden="true"
+                                                    />
+                                                </span>
+                                                <span v-else>
+                                                    <DocumentTextIcon
+                                                        class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                        aria-hidden="true"
+                                                    />
+                                                </span>
+                                                <span
+                                                    v-if="
+                                                        file.status == 'missing'
                                                     "
-                                                />
-                                                <DocumentTextIcon
-                                                    v-else
-                                                    class="h-5 w-5 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
+                                                    class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
+                                                >
+                                                    <div
+                                                        class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                                                    >
+                                                        <svg
+                                                            class="h-6 w-6 text-red-600"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke-width="1.5"
+                                                            stroke="currentColor"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </span>
                                             </div>
-                                            <div class="min-w-0 flex-1">
-                                                <p
-                                                    class="text-sm font-medium text-gray-900 truncate"
+                                            <p
+                                                class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
+                                            >
+                                                <span
+                                                    class="float-left"
                                                     :title="file.name"
                                                 >
-                                                    {{ file.name }}
+                                                    {{
+                                                        truncateMiddle(
+                                                            file.name,
+                                                            25
+                                                        )
+                                                    }}
+                                                </span>
+                                            </p>
+                                            <div
+                                                class="flex items-center justify-between px-2 pb-1"
+                                            >
+                                                <p
+                                                    v-if="
+                                                        file.type !==
+                                                        'directory'
+                                                    "
+                                                    class="text-sm font-medium text-gray-500"
+                                                >
+                                                    {{ formatFileSize(file) }}
                                                 </p>
+                                                <span v-else></span>
+                                                <a
+                                                    v-if="
+                                                        file.type !==
+                                                            'directory' &&
+                                                        readonly
+                                                    "
+                                                    :href="
+                                                        getFileDownloadURL(file)
+                                                    "
+                                                    class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
+                                                    title="Download file"
+                                                    @click.stop
+                                                >
+                                                    <ArrowDownTrayIcon
+                                                        class="h-4 w-4"
+                                                    />
+                                                </a>
                                             </div>
                                         </div>
+                                    </template>
 
-                                        <!-- Date Modified Column -->
-                                        <div class="col-span-3">
-                                            <p class="text-sm text-gray-500">
-                                                {{
-                                                    formatDate(
-                                                        file.updated_at ||
-                                                            file.created_at
-                                                    )
-                                                }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Size Column -->
-                                        <div class="col-span-2">
-                                            <p class="text-sm text-gray-500">
-                                                {{
-                                                    file.type === "directory"
-                                                        ? "--"
-                                                        : formatFileSize(file)
-                                                }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Kind Column -->
-                                        <div class="col-span-2">
-                                            <p class="text-sm text-gray-500">
-                                                {{
-                                                    file.type === "directory"
-                                                        ? "Folder"
-                                                        : "Document"
-                                                }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Download Column -->
+                                    <!-- List View Layout -->
+                                    <template v-else>
                                         <div
-                                            class="col-span-1 flex justify-center"
+                                            class="px-3 py-3 grid grid-cols-12 gap-4 items-center"
                                         >
-                                            <a
-                                                v-if="
-                                                    file.type !== 'directory' &&
-                                                    readonly
-                                                "
-                                                :href="getFileDownloadURL(file)"
-                                                class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
-                                                title="Download file"
+                                            <!-- Name Column -->
+                                            <div
+                                                class="col-span-4 flex items-center"
                                             >
-                                                <ArrowDownTrayIcon
-                                                    class="h-5 w-5"
-                                                />
-                                            </a>
-                                            <!-- No download icon for folders -->
+                                                <div class="flex-shrink-0 mr-3">
+                                                    <FolderIcon
+                                                        v-if="
+                                                            file.type ==
+                                                            'directory'
+                                                        "
+                                                        class="cursor-pointer h-5 w-5 text-teal-600"
+                                                        aria-hidden="true"
+                                                        @dblclick.stop="
+                                                            displaySelected(
+                                                                file
+                                                            )
+                                                        "
+                                                    />
+                                                    <DocumentTextIcon
+                                                        v-else
+                                                        class="h-5 w-5 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <p
+                                                        class="text-sm font-medium text-gray-900 truncate"
+                                                        :title="file.name"
+                                                    >
+                                                        {{ file.name }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Date Modified Column -->
+                                            <div class="col-span-3">
+                                                <p
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    {{
+                                                        formatRecordTimestamp(
+                                                            file.updated_at ||
+                                                                file.created_at
+                                                        )
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Size Column -->
+                                            <div class="col-span-2">
+                                                <p
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    {{
+                                                        file.type ===
+                                                        "directory"
+                                                            ? "--"
+                                                            : formatFileSize(
+                                                                  file
+                                                              )
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Kind Column -->
+                                            <div class="col-span-2">
+                                                <p
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    {{
+                                                        file.type ===
+                                                        "directory"
+                                                            ? "Folder"
+                                                            : "Document"
+                                                    }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Download Column -->
+                                            <div
+                                                class="col-span-1 flex justify-center"
+                                            >
+                                                <a
+                                                    v-if="
+                                                        file.type !==
+                                                            'directory' &&
+                                                        readonly
+                                                    "
+                                                    :href="
+                                                        getFileDownloadURL(file)
+                                                    "
+                                                    class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
+                                                    title="Download file"
+                                                >
+                                                    <ArrowDownTrayIcon
+                                                        class="h-5 w-5"
+                                                    />
+                                                </a>
+                                                <!-- No download icon for folders -->
+                                            </div>
                                         </div>
-                                    </div>
-                                </template>
-                            </li>
-                        </ul>
+                                    </template>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div v-else>
-                        <p
+                    <div
+                        v-else
+                        class="flex min-h-0 flex-1 flex-col overflow-hidden"
+                    >
+                        <!-- File detail header -->
+                        <div
                             v-if="$page.props.selectedFileSystemObject"
-                            class="font-bold text-xl"
-                            :title="
-                                $page.props.selectedFileSystemObject
-                                    .relative_url
-                            "
+                            class="flex min-h-12 shrink-0 items-center border-y border-gray-100 bg-gray-50 px-5"
                         >
-                            {{
-                                truncateMiddle(
-                                    $page.props.selectedFileSystemObject
-                                        .relative_url,
-                                    50
-                                )
-                            }}
-                            <a
-                                v-if="
-                                    $page.props.selectedFileSystemObject.id &&
-                                    !readonly
-                                "
-                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                @click="confirmFSODeletion"
+                            <div
+                                class="flex w-full items-center justify-between gap-3"
                             >
-                                <TrashIcon
-                                    class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
-                                    aria-hidden="true"
-                                />
-                                Delete
-                            </a>
-                            <a
-                                v-if="
-                                    $page.props.selectedFileSystemObject.id &&
-                                    readonly &&
-                                    downloadURL
-                                "
-                                :href="downloadURL"
-                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                            >
-                                Download
-                            </a>
-                        </p>
-                        <div class="pt-5">
+                                <nav
+                                    class="flex min-w-0 flex-1 flex-wrap items-center gap-x-0.5 gap-y-1 text-sm"
+                                    aria-label="File path"
+                                >
+                                    <button
+                                        type="button"
+                                        class="inline-flex shrink-0 items-center rounded p-0.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+                                        :class="
+                                            pathBreadcrumbSegments.length === 0
+                                                ? 'text-gray-900'
+                                                : ''
+                                        "
+                                        title="Project root"
+                                        aria-label="Go to project root"
+                                        @click="breadcrumbGoToRoot"
+                                    >
+                                        <HomeIcon
+                                            class="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
+                                    <template
+                                        v-for="(
+                                            seg, idx
+                                        ) in pathBreadcrumbSegments"
+                                        :key="seg.path + '-' + idx"
+                                    >
+                                        <ChevronRightIcon
+                                            class="mx-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <button
+                                            v-if="!seg.isLast"
+                                            type="button"
+                                            class="min-w-0 max-w-[12rem] truncate text-left font-medium text-gray-700 transition hover:text-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            @click="
+                                                breadcrumbNavigateToPath(
+                                                    seg.path
+                                                )
+                                            "
+                                        >
+                                            {{ seg.label }}
+                                        </button>
+                                        <span
+                                            v-else
+                                            class="min-w-0 max-w-[12rem] truncate font-semibold text-gray-900 sm:max-w-xs md:max-w-md"
+                                            :title="seg.label"
+                                            aria-current="page"
+                                        >
+                                            {{ seg.label }}
+                                        </span>
+                                    </template>
+                                </nav>
+                                <div
+                                    class="flex items-center space-x-2 flex-shrink-0"
+                                >
+                                    <button
+                                        v-if="
+                                            $page.props.selectedFileSystemObject
+                                                .id && !readonly
+                                        "
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                                        @click="confirmFSODeletion"
+                                    >
+                                        <TrashIcon
+                                            class="h-3.5 w-3.5 mr-1.5"
+                                            aria-hidden="true"
+                                        />
+                                        Delete
+                                    </button>
+                                    <a
+                                        v-if="
+                                            $page.props.selectedFileSystemObject
+                                                .id &&
+                                            readonly &&
+                                            downloadURL
+                                        "
+                                        :href="downloadURL"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- File details content -->
+                        <div
+                            class="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-12"
+                        >
                             <span
                                 v-if="
                                     $page.props.selectedFileSystemObject &&
@@ -1029,6 +1499,45 @@
             </jet-secondary-button>
         </template>
     </jet-confirmation-modal>
+
+    <!-- Right-click context menu for sample folders. Rendered as fixed-
+         position so it floats over the file tree at the cursor. -->
+    <div
+        v-if="studyContextMenu.visible"
+        class="fixed z-50 min-w-[200px] rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+        :style="{
+            top: studyContextMenu.y + 'px',
+            left: studyContextMenu.x + 'px',
+        }"
+        @click.stop
+        @contextmenu.prevent
+    >
+        <button
+            type="button"
+            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="studyContextMenu.busy"
+            @click="resetSelectedSampleFolder"
+        >
+            <ArrowPathIcon
+                :class="[
+                    'h-4 w-4 text-gray-500',
+                    studyContextMenu.busy ? 'animate-spin' : '',
+                ]"
+                aria-hidden="true"
+            />
+            <span class="flex-1">
+                {{
+                    studyContextMenu.busy
+                        ? "Resetting…"
+                        : "Refresh & re-process"
+                }}
+            </span>
+        </button>
+        <p class="px-3 pb-2 pt-1 text-[11px] leading-4 text-gray-400">
+            Clears cached zip and NMRium data, then re-processes this sample
+            folder.
+        </p>
+    </div>
 </template>
 
 <script>
@@ -1075,15 +1584,35 @@ import {
     InformationCircleIcon,
     EllipsisVerticalIcon,
     ArrowUpTrayIcon,
+    ArrowPathIcon,
     CheckIcon,
     ExclamationCircleIcon,
     TrashIcon,
     ArrowDownTrayIcon,
     Squares2X2Icon,
     ListBulletIcon,
-    ChevronUpIcon,
-    ChevronDownIcon,
 } from "@heroicons/vue/24/solid";
+
+import {
+    QueueListIcon as QueueListIconOutline,
+    ClockIcon as ClockIconOutline,
+    ScaleIcon as ScaleIconOutline,
+    TagIcon as TagIconOutline,
+    ChevronUpIcon as ChevronUpOutlineIcon,
+    ChevronDownIcon as ChevronDownOutlineIcon,
+    Squares2X2Icon as Squares2X2OutlineIcon,
+    HomeIcon,
+    ChevronRightIcon,
+    ArrowsPointingOutIcon,
+    ArrowsPointingInIcon,
+} from "@heroicons/vue/24/outline";
+
+import {
+    Menu as HeadlessMenu,
+    MenuButton,
+    MenuItems,
+    MenuItem,
+} from "@headlessui/vue";
 
 // Utility imports
 import ChecksumCalculator from "@/Utils/ChecksumCalculator.js";
@@ -1112,29 +1641,65 @@ export default {
         JetDangerButton, // Danger button component
         Squares2X2Icon, // Grid view icon
         ListBulletIcon, // List view icon
-        ChevronUpIcon, // Sort ascending icon
-        ChevronDownIcon, // Sort descending icon
+        QueueListIconOutline,
+        ClockIconOutline,
+        ScaleIconOutline,
+        TagIconOutline,
+        ChevronUpOutlineIcon,
+        ChevronDownOutlineIcon,
+        Squares2X2OutlineIcon,
+        ArrowPathIcon,
+        HeadlessMenu,
+        MenuButton,
+        MenuItems,
+        MenuItem,
+        HomeIcon,
+        ChevronRightIcon,
+        ArrowsPointingOutIcon,
+        ArrowsPointingInIcon,
     },
 
     /**
      * Component props
      * @prop {Object} draft - Draft object for file uploads (optional)
      * @prop {Boolean} readonly - Whether the browser is in read-only mode
-     * @prop {String} height - Custom height class for the component (optional)
+     * @prop {String} height - Tailwind height classes for the root #fs-dropzone (e.g. h-full min-h-0 when the parent establishes height via flex).
      * @prop {Object} project - Project object for public file access (optional)
+     * @prop {Boolean} treeOnly - Show only the folder tree (hide details panel)
      */
-    props: ["draft", "readonly", "height", "project"],
+    props: [
+        "draft",
+        "readonly",
+        "height",
+        "project",
+        "treeOnly",
+        "studies",
+        "submittedStudyIds",
+        "studiesWorkspaceReady",
+        "draftProcessing",
+    ],
 
-    /**
-     * Events emitted by this component
-     */
-    emits: ["loading", "proceed"],
+    emits: [
+        "loading",
+        "proceed",
+        "show-processing-logs",
+        "sample-folder-selected",
+        "sample-folder-reset",
+    ],
 
     /**
      * Component reactive data
      */
     data() {
+        const instanceId = `fsb-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 9)}`;
+
         return {
+            dropzoneRootId: `${instanceId}-dropzone`,
+            dropzoneMessageId: `${instanceId}-dropzone-message`,
+            dropzoneClickTargetId: `${instanceId}-dropzone-click-target`,
+            dropzoneHiddenInputId: `${instanceId}-dropzone-hidden-input`,
             // Upload status and progress
             status: "", // Current upload/processing status message
             dropzone: null, // Dropzone.js instance
@@ -1179,6 +1744,31 @@ export default {
             viewMode: "grid", // 'grid' or 'list'
             sortBy: "name", // 'name', 'date', 'size', 'kind'
             sortOrder: "asc", // 'asc' or 'desc'
+
+            // Sidebar tree sorting (Children.vue)
+            treeSortBy: "alphabetical", // 'alphabetical' | 'timestamp'
+            treeSortOrder: "asc", // 'asc' | 'desc'
+
+            // Resizable sidebar
+            sidebarWidth: 320, // Default sidebar width in pixels
+            isResizing: false, // Whether sidebar is being resized
+
+            // Debounce: folder drag/drop adds files asynchronously; wait before checksums
+            checksumScheduleTimer: null,
+
+            // Paginated root sample folders (drafts with many samples)
+            sampleFoldersPagination: null,
+            loadingMoreSampleFolders: false,
+            sampleFoldersObserver: null,
+
+            // Right-click context menu for sample (study) folders
+            studyContextMenu: {
+                visible: false,
+                x: 0,
+                y: 0,
+                file: null,
+                busy: false,
+            },
         };
     },
     /**
@@ -1208,6 +1798,26 @@ export default {
                     delete logsClone[key];
             });
             return logsClone;
+        },
+        hasProjectFiles() {
+            return Boolean(
+                this.file &&
+                    Array.isArray(this.file.children) &&
+                    this.file.children.length > 0
+            );
+        },
+
+        /**
+         * Whether the draft has server-side processing log entries to show.
+         *
+         * @returns {boolean}
+         */
+        draftHasProcessingLogs() {
+            return (
+                Boolean(this.draft) &&
+                Array.isArray(this.draft.processing_logs) &&
+                this.draft.processing_logs.length > 0
+            );
         },
 
         /**
@@ -1322,6 +1932,20 @@ export default {
                 return 0;
             });
         },
+
+        /**
+         * Path segments for breadcrumb navigation (labels + cumulative paths).
+         *
+         * @returns {Array<{ label: string, path: string, isLast: boolean }>}
+         */
+        pathBreadcrumbSegments() {
+            const fso = this.$page.props.selectedFileSystemObject;
+            if (!fso?.relative_url) {
+                return [];
+            }
+
+            return this.buildPathBreadcrumbSegments(fso.relative_url);
+        },
     },
 
     watch: {
@@ -1341,10 +1965,39 @@ export default {
             this.viewMode = savedViewMode;
         }
 
+        // Load sidebar width from localStorage
+        const savedWidth = localStorage.getItem("nmrxiv-sidebar-width");
+        if (savedWidth) {
+            const parsed = parseInt(savedWidth, 10);
+            if (!isNaN(parsed) && parsed >= 180 && parsed <= 600) {
+                this.sidebarWidth = parsed;
+            }
+        }
+
+        const savedTreeSortBy = localStorage.getItem(
+            "nmrxiv-files-tree-sort-by"
+        );
+        if (
+            savedTreeSortBy === "alphabetical" ||
+            savedTreeSortBy === "timestamp"
+        ) {
+            this.treeSortBy = savedTreeSortBy;
+        }
+
+        const savedTreeSortOrder = localStorage.getItem(
+            "nmrxiv-files-tree-sort-order"
+        );
+        if (savedTreeSortOrder === "asc" || savedTreeSortOrder === "desc") {
+            this.treeSortOrder = savedTreeSortOrder;
+        }
+
         if (this.draft) {
             this.url =
                 this.baseURL + "/dashboard/drafts/" + this.draft.id + "/files";
-            this.loadDropZone();
+
+            if (!this.readonly) {
+                this.loadDropZone();
+            }
         }
 
         // Initialize current step and set up step change detection
@@ -1358,15 +2011,41 @@ export default {
 
         // Listen for global proceed events
         window.addEventListener("file-browser-proceed", this.handleProceed);
+
+        // Prevent page refresh/navigation during upload
+        window.addEventListener("beforeunload", this.handleBeforeUnload);
+
+        // Close the study context menu on outside click / scroll / escape
+        document.addEventListener("click", this.closeStudyContextMenu);
+        document.addEventListener("scroll", this.closeStudyContextMenu, true);
+        document.addEventListener("keydown", this.handleStudyContextMenuKey);
     },
 
     beforeUnmount() {
+        this.teardownSampleFoldersInfiniteScroll();
+
         // Clear file tree state before component unmounts
         this.clearURLParameters();
 
         // Clean up event listeners
         window.removeEventListener("popstate", this.handleURLChange);
         window.removeEventListener("file-browser-proceed", this.handleProceed);
+        window.removeEventListener("beforeunload", this.handleBeforeUnload);
+
+        // Clean up resize listeners
+        document.removeEventListener("mousemove", this.onResize);
+        document.removeEventListener("mouseup", this.stopResize);
+
+        // Tear down context-menu listeners
+        document.removeEventListener("click", this.closeStudyContextMenu);
+        document.removeEventListener(
+            "scroll",
+            this.closeStudyContextMenu,
+            true
+        );
+        document.removeEventListener("keydown", this.handleStudyContextMenuKey);
+
+        this.destroyDropZone();
     },
     /**
      * Component methods
@@ -1401,6 +2080,148 @@ export default {
                 text.substring(text.length - end)
             );
         },
+
+        /**
+         * Normalize a relative path for comparison (leading slash, no duplicate slashes).
+         *
+         * @param {string|null|undefined} path
+         * @returns {string}
+         */
+        normalizeRelativePath(path) {
+            if (path == null || path === "") {
+                return "/";
+            }
+
+            const normalized = String(path).replace(/\/+/g, "/");
+
+            if (normalized === "/") {
+                return "/";
+            }
+
+            return (
+                "/" +
+                normalized
+                    .replace(/^\/+|\/+$/g, "")
+                    .split("/")
+                    .filter(Boolean)
+                    .join("/")
+            );
+        },
+
+        /**
+         * Build breadcrumb segment descriptors from a relative_url.
+         *
+         * @param {string} relativeUrl
+         * @returns {Array<{ label: string, path: string, isLast: boolean }>}
+         */
+        buildPathBreadcrumbSegments(relativeUrl) {
+            const norm = this.normalizeRelativePath(relativeUrl);
+
+            if (norm === "/") {
+                return [];
+            }
+
+            const parts = norm.split("/").filter(Boolean);
+            const segments = [];
+            let acc = "";
+
+            for (let i = 0; i < parts.length; i++) {
+                acc += "/" + parts[i];
+                segments.push({
+                    label: parts[i],
+                    path: acc,
+                    isLast: i === parts.length - 1,
+                });
+            }
+
+            return segments;
+        },
+
+        /**
+         * Find a file or folder in the tree by normalized relative_url.
+         *
+         * @param {object|null} fileObject
+         * @param {string} targetPath
+         * @returns {object|null}
+         */
+        findObjectByRelativeUrl(fileObject, targetPath) {
+            const norm = this.normalizeRelativePath(targetPath);
+
+            if (norm === "/") {
+                if (
+                    fileObject &&
+                    (fileObject.name === "/" ||
+                        this.normalizeRelativePath(fileObject.relative_url) ===
+                            "/")
+                ) {
+                    return fileObject;
+                }
+
+                return null;
+            }
+
+            return this.findObjectByRelativeUrlRecursive(fileObject, norm);
+        },
+
+        /**
+         * @param {object|null} node
+         * @param {string} norm
+         * @returns {object|null}
+         */
+        findObjectByRelativeUrlRecursive(node, norm) {
+            if (!node) {
+                return null;
+            }
+
+            if (this.normalizeRelativePath(node.relative_url) === norm) {
+                return node;
+            }
+
+            if (node.children && Array.isArray(node.children)) {
+                for (const child of node.children) {
+                    const found = this.findObjectByRelativeUrlRecursive(
+                        child,
+                        norm
+                    );
+
+                    if (found) {
+                        return found;
+                    }
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * Navigate breadcrumb to a folder or file at the given path.
+         *
+         * @param {string} targetPath
+         * @returns {Promise<void>}
+         */
+        async breadcrumbNavigateToPath(targetPath) {
+            const target = this.findObjectByRelativeUrl(this.file, targetPath);
+
+            if (!target) {
+                return;
+            }
+
+            await this.displaySelected(target);
+        },
+
+        /**
+         * Navigate to project root.
+         *
+         * @returns {Promise<void>}
+         */
+        async breadcrumbGoToRoot() {
+            if (!this.file) {
+                return;
+            }
+
+            await this.displaySelected(this.file);
+        },
+
         /**
          * Initialize step tracking from current URL
          *
@@ -1431,16 +2252,66 @@ export default {
         },
 
         /**
+         * Replace the expandedFolders Set so Vue 3 picks up the change.
+         *
+         * Vue 3 reactivity for `Set` instances does not always notify
+         * dependents on `.add` / `.delete` / `.clear` mutations. Reassigning
+         * the property with a new `Set` instance reliably triggers updates.
+         *
+         * @param {Iterable<number>|Set<number>} [iterable]
+         */
+        setExpandedFolders(iterable = []) {
+            this.expandedFolders = new Set(iterable);
+        },
+
+        /**
+         * Mutate the expandedFolders Set immutably via a callback.
+         *
+         * Clones the current Set, hands it to the callback for mutation,
+         * then reassigns it so Vue picks up the change.
+         *
+         * @param {(next: Set<number>) => void} mutator
+         */
+        mutateExpandedFolders(mutator) {
+            const next = new Set(this.expandedFolders);
+            mutator(next);
+            this.expandedFolders = next;
+        },
+
+        /**
+         * Keep file-tree selection off Inertia page props in tree-only mode so
+         * history.replaceState can clone state when navigating away.
+         */
+        syncSelectionToPageProps(file, folder = null) {
+            if (this.treeOnly || !file) {
+                return;
+            }
+
+            this.$page.props.selectedFileSystemObject = file;
+
+            if (folder !== null) {
+                this.$page.props.selectedFolder = folder;
+            }
+        },
+
+        replaceBrowserUrl(newUrl) {
+            const state =
+                window.history.state && typeof window.history.state === "object"
+                    ? window.history.state
+                    : {};
+
+            window.history.replaceState(state, "", newUrl);
+        },
+
+        /**
          * Clear file tree state when step changes
          */
         clearFileTreeState() {
-            // Clear expanded folders
-            this.expandedFolders.clear();
+            this.setExpandedFolders();
 
             // Reset selection to root
             if (this.file) {
-                this.$page.props.selectedFileSystemObject = this.file;
-                this.$page.props.selectedFolder = "/";
+                this.syncSelectionToPageProps(this.file, "/");
             }
 
             // Remove expanded and selected parameters from URL
@@ -1452,7 +2323,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
 
             // Force UI refresh to reflect the cleared state
             this.$nextTick(() => {
@@ -1483,6 +2354,37 @@ export default {
         },
 
         /**
+         * Prevent page navigation/refresh during active uploads
+         *
+         * Shows a browser confirmation dialog when the user attempts to
+         * navigate away or refresh the page while files are being uploaded.
+         *
+         * @param {Event} event - The beforeunload event
+         */
+        handleBeforeUnload(event) {
+            // Check if upload is in progress
+            const uploadInProgress =
+                this.dropzone && this.status && this.precentageUpload < 100;
+
+            // Check if deletion is in progress
+            const deletionInProgress = this.isDeletingFiles;
+
+            if (uploadInProgress || deletionInProgress) {
+                // Standard way to trigger confirmation dialog
+                event.preventDefault();
+
+                // Set appropriate message based on operation
+                const message = uploadInProgress
+                    ? "Files are being uploaded. Are you sure you want to leave?"
+                    : "Files are being deleted. Are you sure you want to leave?";
+
+                // Chrome requires returnValue to be set
+                event.returnValue = message;
+                return event.returnValue;
+            }
+        },
+
+        /**
          * Clear expanded and selected parameters from URL (lightweight version)
          */
         clearURLParameters() {
@@ -1493,7 +2395,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
         },
 
         /**
@@ -1533,6 +2435,10 @@ export default {
             if (this.dropzone) {
                 this.dropzone.removeAllFiles();
             }
+            if (this.checksumScheduleTimer != null) {
+                clearTimeout(this.checksumScheduleTimer);
+                this.checksumScheduleTimer = null;
+            }
             this.precentageUpload = 0;
             this.totalFilesCount = 0;
             this.uploadedFilesCount = 0;
@@ -1558,8 +2464,95 @@ export default {
                 this.dropzone.removeAllFiles();
             }
 
+            if (this.checksumScheduleTimer != null) {
+                clearTimeout(this.checksumScheduleTimer);
+                this.checksumScheduleTimer = null;
+            }
+
             // Update busy status
             this.updateBusyStatus(false);
+        },
+
+        /**
+         * Wait until Dropzone's file queue stops growing, then run checksums.
+         * Folder drag/drop (and large picks) can add files in waves with pauses
+         * longer than a fixed debounce; polling until length stabilizes ensures
+         * MD5/SHA are computed for every queued File like the folder input path.
+         */
+        scheduleChecksumsAfterFilesQueued() {
+            if (this.checksumScheduleTimer != null) {
+                clearTimeout(this.checksumScheduleTimer);
+                this.checksumScheduleTimer = null;
+            }
+
+            const stabilityMs = 450;
+            const maxWaitMs = 120000;
+            const startedAt = Date.now();
+
+            const pollUntilQueueStable = () => {
+                const snapshot = this.dropzone?.files?.length ?? 0;
+
+                this.checksumScheduleTimer = setTimeout(() => {
+                    const current = this.dropzone?.files?.length ?? 0;
+
+                    if (current !== snapshot) {
+                        if (Date.now() - startedAt > maxWaitMs) {
+                            this.checksumScheduleTimer = null;
+                            if (current > 0) {
+                                this.runChecksumsAndStartUploadForQueuedFiles();
+                            }
+
+                            return;
+                        }
+
+                        pollUntilQueueStable();
+
+                        return;
+                    }
+
+                    this.checksumScheduleTimer = null;
+
+                    if (current > 0) {
+                        this.runChecksumsAndStartUploadForQueuedFiles();
+                    }
+                }, stabilityMs);
+            };
+
+            pollUntilQueueStable();
+        },
+
+        /**
+         * Calculate checksums for every file Dropzone has queued, then start batched upload.
+         *
+         * @returns {Promise<void>}
+         */
+        async runChecksumsAndStartUploadForQueuedFiles() {
+            const vm = this;
+
+            if (!vm.dropzone || vm.dropzone.files.length === 0) {
+                return;
+            }
+
+            vm.updateBusyStatus(true);
+
+            const queueFiles = vm.dropzone.files.slice();
+
+            await vm.calculateChecksumsForFiles(queueFiles);
+
+            vm.$nextTick(() => {
+                setTimeout(() => {
+                    const timer = setInterval(() => {
+                        if (vm.totalFilesCount === vm.selectedFSO.length) {
+                            clearInterval(timer);
+                            vm.status = "BATCH UPLOAD STARTED";
+                            vm.processFilesSequentially(vm);
+                        } else {
+                            vm.totalFilesCount = vm.selectedFSO.length;
+                            vm.status = "CALCULATING CHECKSUMS";
+                        }
+                    }, 500);
+                });
+            });
         },
 
         /**
@@ -1863,6 +2856,50 @@ export default {
         },
 
         /**
+         * Start resizing the sidebar via mouse drag
+         * @param {MouseEvent} event - The mousedown event on the resize handle
+         */
+        startResize(event) {
+            event.preventDefault();
+            this.isResizing = true;
+            document.addEventListener("mousemove", this.onResize);
+            document.addEventListener("mouseup", this.stopResize);
+            document.body.style.cursor = "col-resize";
+            document.body.style.userSelect = "none";
+        },
+
+        /**
+         * Handle mousemove during sidebar resize
+         * @param {MouseEvent} event - The mousemove event
+         */
+        onResize(event) {
+            if (!this.isResizing || !this.$refs.sidebarRef) return;
+            const containerLeft =
+                this.$refs.sidebarRef.parentElement.getBoundingClientRect()
+                    .left;
+            let newWidth = event.clientX - containerLeft;
+            // Clamp between min 180px and max 600px
+            newWidth = Math.max(180, Math.min(600, newWidth));
+            this.sidebarWidth = newWidth;
+        },
+
+        /**
+         * Stop resizing the sidebar and persist width
+         */
+        stopResize() {
+            this.isResizing = false;
+            document.removeEventListener("mousemove", this.onResize);
+            document.removeEventListener("mouseup", this.stopResize);
+            document.body.style.cursor = "";
+            document.body.style.userSelect = "";
+            // Persist sidebar width preference
+            localStorage.setItem(
+                "nmrxiv-sidebar-width",
+                String(this.sidebarWidth)
+            );
+        },
+
+        /**
          * Update the busy status of the component
          *
          * Sets the busy state to indicate when the component is performing
@@ -1873,6 +2910,124 @@ export default {
          */
         updateBusyStatus(status) {
             this.busy = status;
+        },
+
+        /**
+         * Open the right-click context menu for a sample folder.
+         *
+         * Children.vue only emits this for folders that are tagged as a study
+         * (model_type === 'study'), so we just need to position and show.
+         */
+        onStudyContextMenu(payload) {
+            if (!payload || !payload.file) {
+                return;
+            }
+
+            // Clamp to viewport so the menu doesn't overflow the right edge.
+            const menuWidth = 220;
+            const menuHeight = 110;
+            const x = Math.min(payload.x, window.innerWidth - menuWidth - 8);
+            const y = Math.min(payload.y, window.innerHeight - menuHeight - 8);
+
+            this.studyContextMenu = {
+                visible: true,
+                x: Math.max(8, x),
+                y: Math.max(8, y),
+                file: payload.file,
+                busy: false,
+            };
+        },
+
+        /**
+         * Close the study context menu, unless an in-flight reset request is
+         * still running (the menu shows the busy spinner during that time).
+         */
+        closeStudyContextMenu() {
+            if (this.studyContextMenu.busy) {
+                return;
+            }
+
+            this.studyContextMenu = {
+                visible: false,
+                x: 0,
+                y: 0,
+                file: null,
+                busy: false,
+            };
+        },
+
+        /**
+         * Keyboard handler so the menu closes on Escape.
+         */
+        handleStudyContextMenuKey(event) {
+            if (event.key === "Escape" && this.studyContextMenu.visible) {
+                this.closeStudyContextMenu();
+            }
+        },
+
+        /**
+         * POST to the reset endpoint for the currently-targeted sample folder
+         * and reload the file tree on success so cleared state (model_type,
+         * study tagging) is reflected in the UI immediately.
+         */
+        resetSelectedSampleFolder() {
+            const target = this.studyContextMenu.file;
+
+            if (!target || !this.draft) {
+                return;
+            }
+
+            this.studyContextMenu.busy = true;
+            this.updateBusyStatus(true);
+
+            axios
+                .post(
+                    "/dashboard/drafts/" +
+                        this.draft.id +
+                        "/sample-folders/" +
+                        target.id +
+                        "/reset"
+                )
+                .then((response) => {
+                    this.studyContextMenu.busy = false;
+                    this.closeStudyContextMenu();
+                    this.updateBusyStatus(false);
+                    this.$emit("sample-folder-reset", {
+                        folder: target,
+                        studyId: response.data?.study_id ?? null,
+                    });
+                    this.loadFiles();
+                })
+                .catch((error) => {
+                    this.studyContextMenu.busy = false;
+                    this.updateBusyStatus(false);
+                    this.closeStudyContextMenu();
+                    console.error(
+                        "Failed to reset sample folder",
+                        error?.response?.data || error
+                    );
+                });
+        },
+
+        filterSubmittedSampleFoldersFromTree(file) {
+            if (!file?.children?.length || !this.submittedStudyIds?.length) {
+                return file;
+            }
+
+            const submittedIds = new Set(
+                this.submittedStudyIds.map((id) => Number(id))
+            );
+
+            return {
+                ...file,
+                children: file.children.filter(
+                    (child) =>
+                        !(
+                            child?.study_id > 0 &&
+                            submittedIds.has(Number(child.study_id))
+                        )
+                ),
+            };
         },
 
         /**
@@ -1891,37 +3046,53 @@ export default {
          */
         loadFiles() {
             this.updateBusyStatus(true);
+            this.loading = true;
+            this.$emit("loading", true);
+
             if (this.draft) {
-                axios.get(this.url).then((response) => {
-                    this.file = response.data.file;
-                    this.file.has_children = true;
-                    this.updateBusyStatus(true);
-                    this.$emit("loading", false);
-                    this.loading = false;
-                    this.missing_files = response.data.missing_files;
+                axios
+                    .get(this.url)
+                    .then((response) => {
+                        this.file = this.filterSubmittedSampleFoldersFromTree(
+                            response.data.file
+                        );
+                        this.file.has_children = true;
+                        this.sampleFoldersPagination =
+                            response.data.sample_folders ?? null;
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+                        this.loading = false;
+                        this.missing_files = response.data.missing_files;
 
-                    // Apply expanded state and select last expanded folder
-                    this.$nextTick(async () => {
-                        this.applyExpandedState(this.file);
+                        // Apply expanded state and select last expanded folder
+                        this.$nextTick(async () => {
+                            this.applyExpandedState(this.file);
 
-                        // Fetch any missing folder contents for expanded folders
-                        await this.fetchMissingFolderContents();
+                            // Fetch any missing folder contents for expanded folders
+                            await this.fetchMissingFolderContents();
 
-                        // Now that all folder contents are loaded, select the target object
-                        if (this.expandedFolders.size > 0) {
-                            await this.selectLastExpandedFolder();
-                        } else {
-                            this.$page.props.selectedFileSystemObject =
-                                this.file;
-                            this.$page.props.selectedFolder = "/";
-                        }
+                            // Now that all folder contents are loaded, select the target object
+                            if (this.expandedFolders.size > 0) {
+                                await this.selectLastExpandedFolder();
+                            } else {
+                                this.syncSelectionToPageProps(this.file, "/");
+                            }
 
-                        // Force refresh to ensure UI updates
-                        this.forceRefreshExpandedState();
+                            // Force refresh to ensure UI updates
+                            this.forceRefreshExpandedState();
+                            this.setupSampleFoldersInfiniteScroll();
+                        });
+                    })
+                    .catch(() => {
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+                        this.loading = false;
                     });
-                });
             } else {
                 this.file = this.$page.props.selectedFileSystemObject;
+                this.updateBusyStatus(false);
+                this.$emit("loading", false);
+                this.loading = false;
             }
         },
 
@@ -2174,9 +3345,48 @@ export default {
          * - Sequential batch processing to prevent server overload
          * - Comprehensive upload logging and error tracking
          */
+        destroyDropZone() {
+            if (this.dropzone) {
+                this.dropzone.destroy();
+                this.dropzone = null;
+            }
+        },
+
         loadDropZone() {
+            if (this.readonly) {
+                return;
+            }
+
             this.$nextTick(() => {
                 const vm = this;
+
+                if (!vm.$el?.isConnected) {
+                    return;
+                }
+
+                const dropzoneElement = document.getElementById(
+                    vm.dropzoneRootId
+                );
+                const dropzoneMessageElement = document.getElementById(
+                    vm.dropzoneMessageId
+                );
+                const dropzoneClickTargetElement = document.getElementById(
+                    vm.dropzoneClickTargetId
+                );
+                const dropzoneHiddenInputElement = document.getElementById(
+                    vm.dropzoneHiddenInputId
+                );
+
+                if (
+                    !dropzoneElement ||
+                    !dropzoneMessageElement ||
+                    !dropzoneClickTargetElement ||
+                    !dropzoneHiddenInputElement
+                ) {
+                    return;
+                }
+
+                vm.destroyDropZone();
 
                 // Initialize upload counters and batch configuration
                 vm.totalFilesCount = 0;
@@ -2187,8 +3397,7 @@ export default {
                 vm.processedBatches = 0;
 
                 // Set initial file system state
-                vm.$page.props.selectedFileSystemObject = vm.file;
-                vm.$page.props.selectedFolder = "/";
+                vm.syncSelectionToPageProps(vm.file, "/");
 
                 vm.selectedFSO = [];
 
@@ -2210,18 +3419,16 @@ export default {
                     useFsAccessApi: false, // Disable File System Access API
                     autoQueue: false, // Manual queue management
                     maxFiles: 20000, // Support large numbers of files
-                    clickable: "#fs-dropzone-click-target", // Click target element
-                    hiddenInputContainer: "#fs-dropzone-hidden-input-container", // Hidden input container
-                    dictDefaultMessage: document.querySelector(
-                        "#fs-dropzone-message"
-                    ).innerHTML, // Default message
+                    clickable: `#${vm.dropzoneClickTargetId}`,
+                    hiddenInputContainer: `#${vm.dropzoneHiddenInputId}`,
+                    dictDefaultMessage: dropzoneMessageElement.innerHTML,
                     totaluploadprogress: function (progress) {
                         vm.progress = Math.ceil(progress);
                     },
                 };
 
                 // Initialize Dropzone instance
-                vm.dropzone = new Dropzone("#fs-dropzone", options);
+                vm.dropzone = new Dropzone(`#${vm.dropzoneRootId}`, options);
 
                 // Enable folder selection by setting webkitdirectory attribute
                 vm.dropzone.hiddenFileInput.setAttribute(
@@ -2282,64 +3489,12 @@ export default {
                         };
                     }
                     vm.selectedFSO.push(file);
+                    vm.scheduleChecksumsAfterFilesQueued();
                 });
-                vm.dropzone.on("addedfiles", (files) => {
-                    if (files.length > 0) {
-                        this.updateBusyStatus(true);
-
-                        // Convert FileList to array for processing
-                        let filesArray = [];
-                        for (let i = 0; i < files.length; i++) {
-                            filesArray.push(files[i]);
-                        }
-
-                        // Extract real File objects from Dropzone wrappers if needed
-                        const realFilesArray = filesArray.map((file) => {
-                            // If it's a Dropzone wrapper object, try to extract the real File
-                            if (
-                                "upload" in file &&
-                                file.upload &&
-                                file.upload.file
-                            ) {
-                                return file.upload.file;
-                            }
-                            // If it doesn't have slice method but has other properties, it might be wrapped
-                            if (
-                                typeof file.slice !== "function" &&
-                                file instanceof File === false
-                            ) {
-                                // Try to find the original file object in the wrapper
-                                for (const key in file) {
-                                    if (file[key] instanceof File) {
-                                        return file[key];
-                                    }
-                                }
-                            }
-                            return file; // Return as-is if it seems to be a real File object
-                        });
-
-                        // Calculate checksums for all files before processing
-                        vm.calculateChecksumsForFiles(realFilesArray).then(
-                            () => {
-                                setTimeout(() => {
-                                    var timer = setInterval(function () {
-                                        if (
-                                            vm.totalFilesCount ===
-                                            vm.selectedFSO.length
-                                        ) {
-                                            clearInterval(timer);
-                                            vm.status = "BATCH UPLOAD STARTED";
-                                            vm.processFilesSequentially(vm);
-                                        } else {
-                                            vm.totalFilesCount =
-                                                vm.selectedFSO.length;
-                                            vm.status = "CALCULATING CHECKSUMS";
-                                        }
-                                    }, 500);
-                                });
-                            }
-                        );
-                    }
+                vm.dropzone.on("addedfiles", () => {
+                    // Intentionally empty: folder drag/drop and paste queue files
+                    // asynchronously: `addedfiles` can fire before all files are
+                    // added. Checksums are scheduled from `addedfile` (debounced).
                 });
                 vm.dropzone.on("queuecomplete", () => {
                     vm.handleQueueComplete();
@@ -2353,7 +3508,8 @@ export default {
          * in the right panel. This method handles:
          * - Setting the selected file system object globally
          * - Calculating the correct folder path for breadcrumb navigation
-         * - Lazy loading folder contents if needed
+         * - Lazy loading folder contents if needed (via expandPathToObject)
+         * - Expanding the left sidebar tree to reveal the selected item
          * - Updating the selected folder state for UI consistency
          *
          * The method determines the correct folder path based on:
@@ -2363,7 +3519,11 @@ export default {
          *
          * @param {Object} file - The file or folder object to display
          */
-        displaySelected(file) {
+        async displaySelected(file) {
+            if (this.treeOnly) {
+                return;
+            }
+
             this.$page.props.selectedFileSystemObject = file;
             let sFolder = "/";
 
@@ -2398,28 +3558,123 @@ export default {
             // Update the selected folder for breadcrumb display
             this.$page.props.selectedFolder = sFolder;
 
-            // Lazy load folder contents if this is an unexpanded folder with children
-            if (file.has_children && file.level > 0 && !file.children) {
-                file.loading = true;
-                axios
-                    .get("/api/v1/files/children/" + file.id)
-                    .then((response) => {
-                        file.children = response.data.files[0].children;
-                        file.loading = false;
-                    });
+            // Expand left tree to this item and load children on the path; updates URL
+            await this.expandPathToObject(file);
+        },
+
+        /**
+         * Recursively collect folder ids in the loaded tree that can be expanded.
+         *
+         * @param {object|null} fileObject
+         * @param {Array<number>} ids
+         * @returns {Array<number>}
+         */
+        collectExpandableFolderIds(fileObject, ids = []) {
+            if (!fileObject) {
+                return ids;
             }
+
+            const isDir =
+                fileObject.type === "directory" || fileObject.name === "/";
+
+            if (isDir && fileObject.has_children && fileObject.id) {
+                ids.push(fileObject.id);
+            }
+
+            if (fileObject.children && Array.isArray(fileObject.children)) {
+                for (const child of fileObject.children) {
+                    this.collectExpandableFolderIds(child, ids);
+                }
+            }
+
+            return ids;
+        },
+
+        /**
+         * Expand all folders that appear in the currently loaded tree data.
+         */
+        expandAllFoldersInTree() {
+            if (!this.file) {
+                return;
+            }
+
+            const ids = this.collectExpandableFolderIds(this.file, []);
+            this.setExpandedFolders(ids);
+            this.updateURLWithExpandedState();
+
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
+        },
+
+        /**
+         * Collapse every expanded folder in the sidebar tree.
+         */
+        collapseAllFoldersInTree() {
+            this.setExpandedFolders();
+            this.updateURLWithExpandedState();
+
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
+        },
+
+        /**
+         * Find a folder node in the tree by id.
+         */
+        findFolderById(fileObject, targetId) {
+            if (!fileObject || targetId == null) {
+                return null;
+            }
+
+            if (fileObject.id === targetId) {
+                return fileObject;
+            }
+
+            if (!Array.isArray(fileObject.children)) {
+                return null;
+            }
+
+            for (const child of fileObject.children) {
+                const found = this.findFolderById(child, targetId);
+
+                if (found) {
+                    return found;
+                }
+            }
+
+            return null;
         },
 
         /**
          * Track when a folder is expanded/collapsed
          */
         toggleFolderExpansion(fsoId, isExpanded) {
-            if (isExpanded) {
-                this.expandedFolders.add(fsoId);
-            } else {
-                this.expandedFolders.delete(fsoId);
+            this.mutateExpandedFolders((next) => {
+                if (isExpanded) {
+                    next.add(fsoId);
+                } else {
+                    next.delete(fsoId);
+                }
+            });
+
+            if (isExpanded && fsoId != null) {
+                const folder = this.findFolderById(this.file, fsoId);
+
+                if (
+                    folder?.has_children &&
+                    (!folder.children || folder.children.length === 0) &&
+                    !folder.loading
+                ) {
+                    this.fetchFolderChildren(folder);
+                }
             }
+
             this.updateURLWithExpandedState();
+
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
         },
 
         /**
@@ -2451,7 +3706,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
         },
 
         /**
@@ -2462,11 +3717,11 @@ export default {
             const expandedParam = urlParams.get("expanded");
 
             if (expandedParam) {
-                this.expandedFolders = new Set(
+                this.setExpandedFolders(
                     expandedParam
                         .split(",")
                         .filter((id) => id)
-                        .map((id) => parseInt(id))
+                        .map((id) => parseInt(id, 10))
                 );
             }
         },
@@ -2562,6 +3817,100 @@ export default {
             }
         },
 
+        teardownSampleFoldersInfiniteScroll() {
+            if (this.sampleFoldersObserver) {
+                this.sampleFoldersObserver.disconnect();
+                this.sampleFoldersObserver = null;
+            }
+        },
+
+        setupSampleFoldersInfiniteScroll() {
+            this.teardownSampleFoldersInfiniteScroll();
+
+            if (!this.sampleFoldersPagination?.has_more) {
+                return;
+            }
+
+            const sentinel = this.$refs.sampleFoldersSentinel;
+            const root = this.$refs.treeScrollContainer;
+
+            if (
+                !sentinel ||
+                !root ||
+                typeof IntersectionObserver === "undefined"
+            ) {
+                return;
+            }
+
+            this.sampleFoldersObserver = new IntersectionObserver(
+                (entries) => {
+                    if (
+                        entries.some((entry) => entry.isIntersecting) &&
+                        !this.loadingMoreSampleFolders
+                    ) {
+                        this.loadMoreSampleFolders();
+                    }
+                },
+                { root, rootMargin: "120px", threshold: 0 }
+            );
+
+            this.sampleFoldersObserver.observe(sentinel);
+        },
+
+        async loadMoreSampleFolders() {
+            if (
+                !this.draft ||
+                !this.sampleFoldersPagination?.has_more ||
+                this.loadingMoreSampleFolders
+            ) {
+                return;
+            }
+
+            const nextPage =
+                (this.sampleFoldersPagination.current_page ?? 1) + 1;
+
+            this.loadingMoreSampleFolders = true;
+
+            try {
+                const response = await axios.get(
+                    `/dashboard/drafts/${this.draft.id}/sample-folders`,
+                    { params: { page: nextPage } }
+                );
+
+                const folders = this.filterSubmittedSampleFoldersFromTree({
+                    children: response.data.folders ?? [],
+                }).children;
+                const existingIds = new Set(
+                    (this.file?.children ?? []).map((child) => child.id)
+                );
+
+                const merged = [...(this.file?.children ?? [])];
+
+                folders.forEach((folder) => {
+                    if (!existingIds.has(folder.id)) {
+                        merged.push(folder);
+                        existingIds.add(folder.id);
+                    }
+                });
+
+                this.file.children = this.filterSubmittedSampleFoldersFromTree({
+                    ...this.file,
+                    children: merged,
+                }).children;
+                this.sampleFoldersPagination =
+                    response.data.sample_folders ??
+                    this.sampleFoldersPagination;
+
+                this.$nextTick(() => {
+                    this.setupSampleFoldersInfiniteScroll();
+                });
+            } catch (error) {
+                console.error("Failed to load more sample folders:", error);
+            } finally {
+                this.loadingMoreSampleFolders = false;
+            }
+        },
+
         /**
          * Fetch children for a specific folder
          */
@@ -2597,7 +3946,9 @@ export default {
 
                 // If this is a 404 or similar, the folder might not exist anymore
                 if (error.response && error.response.status === 404) {
-                    this.expandedFolders.delete(folder.id);
+                    this.mutateExpandedFolders((next) => {
+                        next.delete(folder.id);
+                    });
                     this.updateURLWithExpandedState();
                 }
             } finally {
@@ -2646,6 +3997,10 @@ export default {
          * Find and select the last expanded folder for right panel
          */
         async selectLastExpandedFolder() {
+            if (this.treeOnly) {
+                return;
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const selectedParam = urlParams.get("selected");
 
@@ -2751,15 +4106,19 @@ export default {
             const pathFolders = [];
             this.buildPathToObject(this.file, targetObject, [], pathFolders);
 
-            // Add all path folders to expanded folders and load their children if needed
-            for (const folder of pathFolders) {
-                if (folder.has_children && folder.id) {
-                    this.expandedFolders.add(folder.id);
+            const expandable = pathFolders.filter(
+                (folder) => folder.has_children && folder.id
+            );
 
-                    // Load children if not already loaded
-                    if (!folder.children || folder.children.length === 0) {
-                        await this.fetchFolderChildren(folder);
-                    }
+            this.mutateExpandedFolders((next) => {
+                for (const folder of expandable) {
+                    next.add(folder.id);
+                }
+            });
+
+            for (const folder of expandable) {
+                if (!folder.children || folder.children.length === 0) {
+                    await this.fetchFolderChildren(folder);
                 }
             }
 
@@ -2836,64 +4195,58 @@ export default {
          * Revert selection to parent folder after a file/folder is deleted
          */
         async revertToParentAfterDeletion(deletedObject, parentInfo) {
-            // Remove the deleted object from expanded folders if it was a folder
-            if (deletedObject.type === "directory" && deletedObject.id) {
-                this.expandedFolders.delete(deletedObject.id);
-            }
+            const parentFolder =
+                parentInfo && parentInfo.id
+                    ? this.findObjectById(this.file, parentInfo.id)
+                    : null;
 
-            if (parentInfo && parentInfo.id) {
-                // Find the parent folder in the refreshed tree
-                const parentFolder = this.findObjectById(
-                    this.file,
-                    parentInfo.id
-                );
-
-                if (parentFolder) {
-                    // Select the parent folder
-                    this.$page.props.selectedFileSystemObject = parentFolder;
-                    this.updateSelectedFolder(parentFolder);
-
-                    // Ensure parent folder is in expanded folders if it has children
-                    if (parentFolder.has_children) {
-                        this.expandedFolders.add(parentFolder.id);
-                    }
-
-                    // Load parent folder's children if needed
-                    if (
-                        parentFolder.has_children &&
-                        (!parentFolder.children ||
-                            parentFolder.children.length === 0)
-                    ) {
-                        await this.fetchFolderChildren(parentFolder);
-                    }
-
-                    // Update URL with new selection and expanded state
-                    const urlParams = new URLSearchParams(
-                        window.location.search
-                    );
-                    urlParams.set("selected", parentFolder.id);
-
-                    if (this.expandedFolders.size > 0) {
-                        urlParams.set(
-                            "expanded",
-                            Array.from(this.expandedFolders).join(",")
-                        );
-                    } else {
-                        urlParams.delete("expanded");
-                    }
-
-                    const newUrl = `${
-                        window.location.pathname
-                    }?${urlParams.toString()}`;
-                    window.history.replaceState({}, "", newUrl);
-                } else {
-                    this.revertToRoot();
+            this.mutateExpandedFolders((next) => {
+                if (deletedObject.type === "directory" && deletedObject.id) {
+                    next.delete(deletedObject.id);
                 }
-            } else {
+
+                if (parentFolder && parentFolder.has_children) {
+                    next.add(parentFolder.id);
+                }
+            });
+
+            if (!parentFolder) {
                 this.revertToRoot();
+
+                this.$nextTick(() => {
+                    this.forceRefreshExpandedState();
+                });
+
+                return;
             }
 
-            // Refresh UI to reflect changes
+            this.$page.props.selectedFileSystemObject = parentFolder;
+            this.updateSelectedFolder(parentFolder);
+
+            if (
+                parentFolder.has_children &&
+                (!parentFolder.children || parentFolder.children.length === 0)
+            ) {
+                await this.fetchFolderChildren(parentFolder);
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set("selected", parentFolder.id);
+
+            if (this.expandedFolders.size > 0) {
+                urlParams.set(
+                    "expanded",
+                    Array.from(this.expandedFolders).join(",")
+                );
+            } else {
+                urlParams.delete("expanded");
+            }
+
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            this.replaceBrowserUrl(newUrl);
+
             this.$nextTick(() => {
                 this.forceRefreshExpandedState();
             });
@@ -2903,8 +4256,7 @@ export default {
          * Helper method to revert to root folder
          */
         revertToRoot() {
-            this.$page.props.selectedFileSystemObject = this.file;
-            this.$page.props.selectedFolder = "/";
+            this.syncSelectionToPageProps(this.file, "/");
 
             // Update URL to remove selection and update expanded state
             const urlParams = new URLSearchParams(window.location.search);
@@ -2922,7 +4274,7 @@ export default {
             const newUrl = `${
                 window.location.pathname
             }?${urlParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            this.replaceBrowserUrl(newUrl);
         },
 
         /**
@@ -2931,6 +4283,27 @@ export default {
         setViewMode(mode) {
             this.viewMode = mode;
             localStorage.setItem("nmrxiv-files-view-mode", mode);
+        },
+
+        persistTreeSortPreferences() {
+            localStorage.setItem("nmrxiv-files-tree-sort-by", this.treeSortBy);
+            localStorage.setItem(
+                "nmrxiv-files-tree-sort-order",
+                this.treeSortOrder
+            );
+        },
+
+        setTreeSortBy(mode) {
+            if (this.treeSortBy === mode) {
+                return;
+            }
+            this.treeSortBy = mode;
+            this.persistTreeSortPreferences();
+        },
+
+        toggleTreeSortOrder() {
+            this.treeSortOrder = this.treeSortOrder === "asc" ? "desc" : "asc";
+            this.persistTreeSortPreferences();
         },
 
         /**
@@ -2987,28 +4360,6 @@ export default {
                 // Fallback to parsing original size string
                 return parseInt(file.size?.replace(/[^\d]/g, "") || 0);
             }
-        },
-
-        /**
-         * Format date for display
-         */
-        formatDate(dateString) {
-            if (!dateString) return "--";
-
-            const date = new Date(dateString);
-            const options = {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-            };
-
-            // Format like "18. Aug 2025 at 10:52"
-            return date
-                .toLocaleDateString("en-GB", options)
-                .replace(",", " at")
-                .replace(/(\d+)/, "$1.");
         },
 
         /**

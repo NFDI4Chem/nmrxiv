@@ -74,34 +74,32 @@ class VerifyFileIntegrityJob implements ShouldQueue
 
         // Handle files without existing checksums (calculate initial checksums)
         if (! $this->fileSystemObject->getPrimaryChecksum()) {
-            Log::info('No existing checksum found, calculating initial checksums', [
+            Log::info('No existing checksum found, skipping verification', [
                 'file_id' => $this->fileSystemObject->id,
                 'file_name' => $this->fileSystemObject->name,
             ]);
 
             try {
-                // Calculate and store initial checksums
-                $fileIntegrityService = app(FileIntegrityService::class);
-                $result = $fileIntegrityService->verifyFileIntegrity($this->fileSystemObject, true);
+                // Attempt to verify file integrity (will mark as failed if no checksum exists)
+                $verificationSuccess = $integrityService->verifyFileIntegrity($this->fileSystemObject);
 
-                if ($result['success']) {
-                    Log::info('Initial checksums calculated and stored successfully', [
+                if ($verificationSuccess) {
+                    Log::info('File integrity verification completed successfully', [
                         'file_id' => $this->fileSystemObject->id,
                         'file_name' => $this->fileSystemObject->name,
-                        'checksums' => $result['checksums'] ?? null,
                     ]);
                 } else {
-                    Log::error('Failed to calculate initial checksums', [
+                    Log::warning('File integrity verification failed - no checksum available', [
                         'file_id' => $this->fileSystemObject->id,
                         'file_name' => $this->fileSystemObject->name,
-                        'error' => $result['error'] ?? 'Unknown error',
+                        'error' => $this->fileSystemObject->integrity_error,
                     ]);
                 }
 
                 return;
 
             } catch (\Exception $e) {
-                Log::error('Exception while calculating initial checksums', [
+                Log::error('Exception while verifying file without checksum', [
                     'file_id' => $this->fileSystemObject->id,
                     'file_name' => $this->fileSystemObject->name,
                     'error' => $e->getMessage(),

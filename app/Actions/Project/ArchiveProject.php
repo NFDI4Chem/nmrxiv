@@ -12,14 +12,24 @@ class ArchiveProject
      * @param  mixed  $project
      * @return void
      */
-    public function toggle($project)
+    public function toggleArchive($project)
     {
         $archiveState = ! $project->is_archived;
-        $project->studies()->update(['is_archived' => $archiveState]);
+        $project->studies()->update([
+            'is_archived' => $archiveState,
+            'status' => $archiveState ? 'archived' : 'published',
+        ]);
+
         foreach ($project->studies as $study) {
-            $study->datasets()->update(['is_archived' => $archiveState]);
+            $study->datasets()->update([
+                'is_archived' => $archiveState,
+                'status' => $archiveState ? 'archived' : 'published',
+            ]);
         }
+
         $project->is_archived = $archiveState;
+        $project->status = $archiveState ? 'archived' : 'published';
+
         if ($project->is_archived) {
             $project->sendNotification('archival', $this->prepareSendList($project));
         }
@@ -34,15 +44,19 @@ class ArchiveProject
      */
     public function prepareSendList($project)
     {
-        $sendTo = [];
-        foreach ($project->allUsers() as $member) {
-            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
-                array_push($sendTo, $member);
-            } else {
-                array_push($sendTo, $project->owner);
+        $sendTo = collect();
+
+        if ($project->owner) {
+            $sendTo->push($project->owner);
+        }
+
+        foreach ($project->users as $member) {
+            $role = $member->projectMembership?->role;
+            if ($role === 'creator' || $role === 'owner') {
+                $sendTo->push($member);
             }
         }
 
-        return $sendTo;
+        return $sendTo->unique('id')->values()->all();
     }
 }

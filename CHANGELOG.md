@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.8.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.7.0...v1.8.0) (2026-06-01)
+
+
+### Features
+
+* **instruments:** add Magritek Spinsolve dataset support ([ac0fd95](https://github.com/NFDI4Chem/nmrxiv/commit/ac0fd95478a94c557d6c5d8872e4bce6ba62e487))
+* **magritek:** support classic and modern Spinsolve folder layouts ([0b526bc](https://github.com/NFDI4Chem/nmrxiv/commit/0b526bccd25ec08295099376b7c4985c7d2c0beb))
+
+
+### Bug Fixes
+
+* **chem:** migrate standardize API from cheminf.studio to naturalproducts.net ([e046034](https://github.com/NFDI4Chem/nmrxiv/commit/e0460340c0a14646f636dfaca24e153b312bb0a5))
+* composer audit fix ([5af407b](https://github.com/NFDI4Chem/nmrxiv/commit/5af407bc66fc2ca2f4493a6b9fe5f8b210384119))
+* composer updates and prettier formatting issues resolved ([f7cb999](https://github.com/NFDI4Chem/nmrxiv/commit/f7cb99993b8d07004e1db494a0cdcecd509c723a))
+* **jobs:** guard ProcessSubmission when project has no draft ([5f74f7d](https://github.com/NFDI4Chem/nmrxiv/commit/5f74f7d312ad7d69e61c8fd4e060105ca03d77ff))
+* pint fixes and npm updates ([9b49b38](https://github.com/NFDI4Chem/nmrxiv/commit/9b49b38405cd228d304918735282ba5645d5a473))
+* return value must be of type int, null returned issu fix ([0fd1bd8](https://github.com/NFDI4Chem/nmrxiv/commit/0fd1bd8fdd81cb2abc61f274efd4f5e550d4c15d))
+* **schedule:** re-enable daily publishing of released projects ([7b0dd91](https://github.com/NFDI4Chem/nmrxiv/commit/7b0dd911443cc6c76db9aa4b84af12736c70dff1))
+* **typo:** Advisory Board link in the footer ([cc96a31](https://github.com/NFDI4Chem/nmrxiv/commit/cc96a31f41025c90fc7c380e4dc963c5fb59a61b))
+* update glob package to address security vulnerability ([#1301](https://github.com/NFDI4Chem/nmrxiv/issues/1301)) ([c08cc35](https://github.com/NFDI4Chem/nmrxiv/commit/c08cc35ef44d22fee38f829a71642ed6cd40e503))
+
 ## [1.7.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.6.0...v1.7.0) (2025-10-01)
 
 

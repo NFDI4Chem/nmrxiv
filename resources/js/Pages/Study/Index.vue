@@ -123,7 +123,7 @@
                     <div v-for="study in studies.data" :key="study.uuid">
                         <study-card
                             :preview="preview"
-                            :obfuscation-code="project.obfuscationcode"
+                            :obfuscation-code="project?.obfuscationcode"
                             :study="study"
                         />
                     </div>
@@ -211,6 +211,17 @@ export default {
             default: false,
             type: Boolean,
         },
+        editable: {
+            default: false,
+            type: Boolean,
+        },
+        /**
+         * "dashboard" uses authenticated project studies JSON; "public" uses public studies listing.
+         */
+        studiesEndpoint: {
+            default: "dashboard",
+            type: String,
+        },
     },
     data() {
         return {
@@ -224,23 +235,54 @@ export default {
             if (this.project) {
                 this.loading = true;
                 if (!this.preview) {
-                    this.fetchStudies(
-                        route("dashboard.project.studies", this.project.id)
-                    );
+                    const url = this.initialStudiesUrl();
+                    if (url) {
+                        this.fetchStudies(url);
+                    }
                 } else {
-                    this.fetchStudies(
-                        route("studies.preview", this.project.obfuscationcode)
-                    );
+                    if (this.project?.obfuscationcode) {
+                        this.fetchStudies(
+                            route(
+                                "studies.preview",
+                                this.project.obfuscationcode
+                            )
+                        );
+                    }
                 }
             }
         }
     },
     methods: {
+        initialStudiesUrl() {
+            if (!this.project?.id) {
+                return null;
+            }
+            if (this.studiesEndpoint === "public") {
+                return route("project.studies", this.project.id);
+            }
+
+            return route("dashboard.project.studies", this.project.id);
+        },
+        studiesListingBaseUrl() {
+            if (!this.project?.id) {
+                return null;
+            }
+            if (this.studiesEndpoint === "public") {
+                return route("project.studies", this.project.id);
+            }
+
+            return route("dashboard.project.studies", this.project.id);
+        },
         openDatasetCreateDialog() {
-            this.emitter.emit("openDatasetCreateDialog", {
-                draft_id: this.project.draft_id,
-                return_url: "/projects/" + this.project.id,
-            });
+            if (this.project?.id && this.project?.draft_id) {
+                const returnUrl =
+                    this.project.public_url ||
+                    "/dashboard/projects/" + this.project.id;
+                this.emitter.emit("openDatasetCreateDialog", {
+                    draft_id: this.project.draft_id,
+                    return_url: returnUrl,
+                });
+            }
         },
         fetchStudies(url) {
             axios.get(url).then((response) => {
@@ -251,9 +293,8 @@ export default {
         update(link) {
             if (!link) {
                 link = {};
-                link["url"] =
-                    route("dashboard.project.studies", this.project.id) +
-                    "?page=1";
+                const base = this.studiesListingBaseUrl();
+                link["url"] = base ? base + "?page=1" : null;
             }
             if (link.url) {
                 this.loading = true;
@@ -262,11 +303,13 @@ export default {
         },
         reset() {
             let link = {};
-            link["url"] =
-                route("dashboard.project.studies", this.project.id) + "?page=1";
+            const base = this.studiesListingBaseUrl();
+            link["url"] = base ? base + "?page=1" : null;
             this.query = "";
             this.loading = true;
-            this.executeQuery(link);
+            if (link.url) {
+                this.executeQuery(link);
+            }
         },
         executeQuery(link) {
             this.fetchStudies(link.url + "&search=" + this.query);

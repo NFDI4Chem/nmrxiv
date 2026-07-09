@@ -9,14 +9,18 @@
                     <div
                         class="bg-white rounded-t-md flex justify-center items-center"
                     >
-                        <span>
+                        <span v-if="primarySmiles">
                             <Depictor2D
                                 class="py-2"
-                                :molecule="
-                                    study.sample.molecules[0].canonical_smiles
-                                "
+                                :molecule="primarySmiles"
                                 :show-download="false"
                             ></Depictor2D>
+                        </span>
+                        <span v-else class="block w-full px-3 py-8 text-center">
+                            <p class="text-sm font-medium text-gray-500">
+                                No chemical structure is linked to this compound
+                                yet.
+                            </p>
                         </span>
                     </div>
                 </li>
@@ -50,7 +54,7 @@
             >
                 SPECTRA
             </label> -->
-            <span v-for="(ds, $dsIndex) in study.datasets" :key="$dsIndex">
+            <span v-for="(ds, $dsIndex) in datasets" :key="$dsIndex">
                 <div
                     :class="[
                         study.has_nmrium || ds.has_nmrium
@@ -93,7 +97,7 @@
                         <p class="text-xs text-gray-600">Public</p>
                     </div>
                     <div v-else class="flex items-center mt-1">
-                        <LockClosedIcon class="w-3 h-3 mr-1 text-teal-600" />
+                        <LockClosedIcon class="w-3 h-3 mr-1 text-primary-600" />
                         <p class="text-xs text-gray-600">Private</p>
                     </div>
                 </div>
@@ -117,12 +121,43 @@ export default {
         Link,
         Depictor2D,
     },
-    props: ["study"],
-    setup() {},
+    props: {
+        study: {
+            type: Object,
+            required: true,
+        },
+    },
     data() {
         return {
             selectedPreviewIndex: 0,
         };
+    },
+    computed: {
+        molecules() {
+            if (Array.isArray(this.study?.molecules)) {
+                return this.study.molecules;
+            }
+
+            if (Array.isArray(this.study?.sample?.molecules)) {
+                return this.study.sample.molecules;
+            }
+
+            return [];
+        },
+        primarySmiles() {
+            const smiles = this.molecules[0]?.canonical_smiles;
+
+            if (smiles == null || String(smiles).trim() === "") {
+                return null;
+            }
+
+            return String(smiles).trim();
+        },
+        datasets() {
+            return Array.isArray(this.study?.datasets)
+                ? this.study.datasets
+                : [];
+        },
     },
     methods: {
         getSVGString(molecule) {

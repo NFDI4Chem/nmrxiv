@@ -14,6 +14,11 @@
 
 <script>
 export default {
-    props: ["on"],
+    props: {
+        on: {
+            type: Boolean,
+            default: false,
+        },
+    },
 };
 </script>

@@ -33,8 +33,15 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('v1')->group(function () {
 
-    // Search
-    Route::post('/search/{smiles?}', [SearchController::class, 'search']);
+    Route::prefix('search')->name('api.search.')->group(function () {
+        Route::get('catalog', [SearchController::class, 'catalog'])->name('catalog');
+        Route::post('compounds/{smiles?}', [SearchController::class, 'search'])->name('compounds');
+    });
+
+    // Deprecated search routes (backward compatibility)
+    Route::get('text-search', [SearchController::class, 'catalogTextSearchLegacy'])->name('api.text-search');
+    Route::get('search', [SearchController::class, 'catalogLegacy'])->name('api.search.legacy.catalog');
+    Route::post('search/{smiles?}', [SearchController::class, 'searchLegacy'])->name('api.search.legacy.compounds');
 
     Route::prefix('files')->group(function () {
         Route::get('/children/{file}', [FileSystemController::class, 'children']);
@@ -66,7 +73,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('datacite')->group(function () {
             // Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
             Route::get('/{id}', [DataCiteController::class, 'modelSchemaByID']);
-            Route::put('/{id}', [DOIController::class, 'update']);
+            // Commented out DOI update route, as it could be security risk if left unprotected, also its not exposed via Swagger currently and the endpoint shares the same path pattern as the datacite GET route.
+            // Route::put('/{id}', [DOIController::class, 'update']);
         });
     });
 });

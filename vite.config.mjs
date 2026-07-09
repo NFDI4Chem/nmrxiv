@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
+import path from 'path';
 
 export default defineConfig({
     plugins: [
         laravel([
             'resources/js/app.js',
+            'resources/css/app.css',
         ]),
         vue({
             template: {
@@ -21,7 +23,20 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': '/resources/js'
-        }
-    }
+            '@': '/resources/js',
+            'ziggy-js': path.resolve('vendor/tightenco/ziggy'),
+        },
+        dedupe: ['openchemlib'],
+    },
+    optimizeDeps: {
+        include: ['openchemlib'],
+    },
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        https: false,
+        hmr: {
+            host: 'localhost',
+        },
+    },
 });

@@ -1,4 +1,4 @@
-FROM php:8.3-alpine
+FROM dunglas/frankenphp:1-php8.4-alpine
 
 # Setup proxy settings using build arguments
 ARG HTTP_PROXY
@@ -23,8 +23,7 @@ RUN /sbin/apk add --no-cache \
     oniguruma-dev \
     postgresql-dev \
     zlib-dev \
-    supervisor \
-    $PHPIZE_DEPS
+    supervisor
 
 # Install PostgreSQL client
 RUN /sbin/apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
@@ -32,31 +31,12 @@ RUN /sbin/apk --update add postgresql17-client --repository=https://dl-cdn.alpin
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
 
-# Install APCu and Redis PHP extensions from source
-RUN cd /tmp && \
-    # Download APCu from GitHub
-    curl -L -o apcu.tar.gz https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.22.tar.gz && \
-    mkdir -p /tmp/apcu && \
-    tar -xf apcu.tar.gz -C /tmp/apcu --strip-components=1 && \
-    cd /tmp/apcu && \
-    phpize && \
-    ./configure && \
-    make && \
-    make install && \
-    # Download Redis from GitHub
-    cd /tmp && \
-    curl -L -o redis.tar.gz https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz && \
-    mkdir -p /tmp/redis && \
-    tar -xf redis.tar.gz -C /tmp/redis --strip-components=1 && \
-    cd /tmp/redis && \
-    phpize && \
-    ./configure && \
-    make && \
-    make install && \
-    # Enable extensions
+# Install APCu and Redis via PECL with build dependencies added and removed in same layer
+RUN /sbin/apk add --no-cache --virtual .build-deps autoconf gcc g++ make && \
+    pecl install apcu redis && \
     docker-php-ext-enable apcu redis && \
-    # Clean up
-    rm -rf /tmp/apcu /tmp/redis /tmp/apcu.tar.gz /tmp/redis.tar.gz
+    /sbin/apk del .build-deps && \
+    rm -rf /tmp/pear
 
 # Configure PHP
 COPY deployment/php.production.ini /usr/local/etc/php/conf.d/production.ini
@@ -85,6 +65,10 @@ COPY deployment/supervisord.worker.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Create required directories for Supervisor
 RUN mkdir -p /var/log/supervisor /run/supervisor
+
+# Add healthcheck - verify Horizon process is running
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 \
+  CMD pgrep -f "artisan horizon" || exit 1
 
 # Start Supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 

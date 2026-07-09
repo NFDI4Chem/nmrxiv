@@ -13,13 +13,22 @@ class ProjectMemberAdded
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * Create a new event instance.
-     *
-     * @return void
+     * The project instance.
      */
-    public function __construct()
+    public $project;
+
+    /**
+     * The user instance.
+     */
+    public $user;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct($project, $user)
     {
-        //
+        $this->project = $project;
+        $this->user = $user;
     }
 
     /**

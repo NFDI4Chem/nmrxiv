@@ -9,7 +9,7 @@ use App\Notifications\ProjectDeletionFailureNotification;
 use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +43,9 @@ class Project extends Model implements Auditable
         'starred',
         'location',
         'is_public',
+        'is_deleted',
+        'is_archived',
+        'status',
         'obfuscationcode',
         'description',
         'type',
@@ -58,7 +61,24 @@ class Project extends Model implements Auditable
         'release_date',
         'deleted_on',
         'species',
+        'provisional_doi',
+        'provisional_doi_registered_at',
+        'validation_id',
+        'validation_status',
+        'schema_version',
     ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'provisional_doi_registered_at' => 'datetime',
+            'release_date' => 'datetime',
+            'deleted_on' => 'datetime',
+        ];
+    }
 
     protected static $marks = [
         Like::class,
@@ -70,7 +90,7 @@ class Project extends Model implements Auditable
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published', 'provisional_doi_url'];
 
     /**
      * Get the URL to the project's profile photo.
@@ -80,23 +100,13 @@ class Project extends Model implements Auditable
     public function getProjectPhotoUrlAttribute()
     {
         return $this->project_photo_path
-                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->project_photo_path)
+                    ? Storage::disk(config('filesystems.default_public'))->url($this->project_photo_path)
                     : '';
     }
 
     public function getIsPublishedAttribute()
     {
-        if ($this->is_public) {
-            return true;
-        } else {
-            if ($this->release_date && $this->doi) {
-                return Carbon::now()->startOfDay()->gte($this->release_date);
-            } else {
-                return false;
-            }
-        }
-
-        return false;
+        return (bool) $this->is_public;
     }
 
     /**
@@ -112,6 +122,28 @@ class Project extends Model implements Auditable
         } else {
             return Bookmark::has($this, $user);
         }
+    }
+
+    /**
+     * Resolver URL for the provisional DOI, when set.
+     */
+    protected function provisionalDoiUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $doi = $this->attributes['provisional_doi'] ?? null;
+                if ($doi === null || $doi === '') {
+                    return null;
+                }
+
+                $host = rtrim((string) config('doi.host'), '/');
+                if ($host === '' || ! str_contains($host, '://')) {
+                    $host = 'https://doi.org';
+                }
+
+                return $host.'/'.$doi;
+            },
+        );
     }
 
     /**
@@ -142,6 +174,17 @@ class Project extends Model implements Auditable
     public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    /**
+     * Hide staging projects for the community contribution workspace from the dashboard.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeExcludingCommunityContributionStaging(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('draft', fn (Builder $draft) => $draft->communityContribution());
     }
 
     public function likesCount()
@@ -220,14 +263,16 @@ class Project extends Model implements Auditable
      */
     public function userProjectRole(string $email)
     {
+        $owner = $this->relationLoaded('owner') ? $this->owner : $this->owner()->first();
+
+        if ($owner && $owner->email === $email) {
+            return 'owner';
+        }
+
         $user = $this->userWithEmail($email);
 
-        if ($user) {
-            if ($user['projectMembership']) {
-                return $user['projectMembership']['role'];
-            } elseif ($this->owner_id == $user->id) {
-                return 'owner';
-            }
+        if ($user?->projectMembership) {
+            return $user->projectMembership->role;
         }
     }
 
@@ -265,12 +310,12 @@ class Project extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
-        return env('APP_URL', null).'/project/P'.$this->getRawOriginal('identifier');
+        return config('app.url').'/project/P'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.urlencode($this->url);
+        return config('app.url').'/projects/'.urlencode($this->url);
     }
 
     /**
@@ -353,8 +398,13 @@ class Project extends Model implements Auditable
                 Notification::send($sendTo, new ProjectDeletionFailureNotification($this));
                 break;
             case 'publish':
-                event(new DraftProcessed($this, $sendTo));
+                event(new DraftProcessed($this->fresh() ?? $this, $sendTo));
                 break;
         }
+    }
+
+    public function embargoReminders(): HasMany
+    {
+        return $this->hasMany(EmbargoReminder::class);
     }
 }

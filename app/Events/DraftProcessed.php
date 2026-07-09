@@ -6,6 +6,7 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Facades\Log;
 
 class DraftProcessed implements ShouldBroadcastNow
 {
@@ -24,6 +25,12 @@ class DraftProcessed implements ShouldBroadcastNow
     {
         $this->project = $project;
         $this->sendTo = $sendTo;
+
+        Log::info('embargo_publish_trace', [
+            'stage' => 'draft_processed_event_dispatched',
+            'project_id' => $project->id,
+            'send_to_count' => is_countable($sendTo) ? count($sendTo) : 0,
+        ]);
     }
 
     /**

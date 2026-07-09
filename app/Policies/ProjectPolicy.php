@@ -73,6 +73,20 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can publish the model.
+     *
+     * @return mixed
+     */
+    public function publishProject(User $user, Project $project)
+    {
+        if ($project->is_public || $project->is_archived || $project->is_deleted) {
+            return false;
+        }
+
+        return $user->canUpdateProject($project);
+    }
+
+    /**
      * Determine whether the user can delete the model.
      *
      * @return mixed
@@ -99,6 +113,10 @@ class ProjectPolicy
      */
     public function addProjectMember(User $user, Project $project)
     {
+        if ($project->is_public) {
+            return false;
+        }
+
         return $user->ownsProject($project);
     }
 
@@ -109,6 +127,10 @@ class ProjectPolicy
      */
     public function updateProjectMember(User $user, Project $project)
     {
+        if ($project->is_public) {
+            return false;
+        }
+
         return $user->ownsProject($project);
     }
 
@@ -119,6 +141,10 @@ class ProjectPolicy
      */
     public function removeProjectMember(User $user, Project $project)
     {
+        if ($project->is_public) {
+            return false;
+        }
+
         return $user->ownsProject($project);
     }
 }

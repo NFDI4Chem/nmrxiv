@@ -1,67 +1,26 @@
 <template>
     <app-layout title="Projects">
         <template #header>
-            <div class="relative border-b border-zinc-900/5">
+            <div class="relative border-b border-zinc-900/5 overflow-hidden">
+                <!-- Animated mesh gradient background -->
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                ></div>
+                <div class="absolute inset-0 opacity-20">
+                    <div
+                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                    ></div>
+                    <div
+                        class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+                    ></div>
+                    <div
+                        class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+                    ></div>
+                </div>
+
                 <div
                     class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
                 >
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"
-                        >
-                            <defs>
-                                <pattern
-                                    id=":r99:"
-                                    width="72"
-                                    height="56"
-                                    patternUnits="userSpaceOnUse"
-                                    x="-12"
-                                    y="4"
-                                >
-                                    <path d="M.5 56V.5H72" fill="none"></path>
-                                </pattern>
-                            </defs>
-                            <rect
-                                width="100%"
-                                height="100%"
-                                stroke-width="0"
-                                fill="url(#:r99:)"
-                            ></rect>
-                            <svg x="-12" y="4" class="overflow-visible">
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="288"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="144"
-                                    y="56"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="504"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="720"
-                                    y="336"
-                                ></rect>
-                            </svg>
-                        </svg>
-                    </div>
                     <div
                         class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                     >
@@ -72,7 +31,7 @@
                         assignments. Learn more about
                         <a
                             class="text-teal-900"
-                            href="https://docs.nmrxiv.org/docs/introduction/intro"
+                            href="https://docs.nmrxiv.org/introduction/intro"
                             target="_blank"
                             >projects</a
                         >.
@@ -98,7 +57,9 @@
                 </section>
             </div>
         </div>
-        <div class="min-h-[calc(100vh-500px)] px-6 px-md-12 mb-24 mx-auto">
+        <div
+            class="min-h-[calc(100vh-500px)] w-full px-6 sm:px-6 lg:px-8 mb-24"
+        >
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
                     <Menu as="div" class="relative inline-block text-left">
@@ -199,13 +160,14 @@
                 </div>
                 <div v-if="filters.mode == 'grid'">
                     <div
-                        class="mt-4 mx-auto grid gap-8 lg:grid-cols-4 2xl:grid-cols-6 w-full"
+                        class="mx-auto mt-4 grid w-full gap-6 sm:gap-8 lg:grid-cols-4 2xl:grid-cols-6"
                     >
                         <span
                             v-for="project in projects.data.filter(
                                 (p) => p.owner
                             )"
                             :key="project.id"
+                            class="block min-w-0 overflow-visible"
                         >
                             <project-card
                                 :mode="filters.mode"
@@ -220,7 +182,7 @@
                     >
                         <ul
                             role="list"
-                            class="divide-y border rounded-md divide-gray-200"
+                            class="divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
                         >
                             <span
                                 v-for="project in projects.data.filter(
@@ -243,29 +205,32 @@
                     <Pagination :links="projects.meta.links"></Pagination>
                 </div>
             </div>
-            <div v-else>
-                <div
-                    class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
+            <div v-else :class="publicEmptyStateSectionClasses">
+                <EmptySearchState
+                    layout="public"
+                    entity-type="projects"
+                    :search-query="filters.search || ''"
+                    :title="filters.search ? null : 'No projects yet'"
+                    :message="
+                        filters.search
+                            ? null
+                            : 'When researchers publish their work, shared NMR projects will show up here for you to explore.'
+                    "
+                    :show-clear-button="!!filters.search"
+                    @clear-search="reset"
                 >
-                    <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                    >
-                        <path
-                            vector-effect="non-scaling-stroke"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                        />
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No projects
-                    </h3>
-                </div>
+                    <template v-if="!filters.search" #actions>
+                        <a
+                            href="https://docs.nmrxiv.org/introduction/intro"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-teal-700 dark:hover:bg-teal-950/40 dark:hover:text-teal-200 dark:focus:ring-offset-gray-900"
+                        >
+                            Learn about projects
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </template>
+                </EmptySearchState>
             </div>
         </div>
     </app-layout>
@@ -284,6 +249,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import ProjectCard from "@/Shared/ProjectCard.vue";
 import ProjectSearch from "@/Shared/ProjectSearch.vue";
 import Pagination from "@/Shared/Pagination.vue";
+import EmptySearchState from "@/Shared/EmptySearchState.vue";
+import { publicEmptyStateSectionClasses } from "@/Utils/publicEmptyStateClasses.js";
 import pickBy from "lodash/pickBy";
 export default {
     components: {
@@ -298,6 +265,7 @@ export default {
         ProjectSearch,
         Pagination,
         Squares2X2Icon,
+        EmptySearchState,
     },
     props: {
         projects: {
@@ -315,6 +283,7 @@ export default {
     },
     data() {
         return {
+            publicEmptyStateSectionClasses,
             sortOptions: [
                 { name: "Creation", value: "creation", current: true },
                 { name: "Newest", value: "newest", current: false },
@@ -361,3 +330,33 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+/* Blob animations */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+</style>

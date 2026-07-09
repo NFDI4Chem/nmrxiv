@@ -8,14 +8,21 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserDrafts
 {
+    public function __construct(
+        private CreateDraft $createDraft,
+    ) {}
+
     /**
      * Get user's drafts with files.
      */
-    public function execute(User $user): Collection
+    public function execute(User $user, bool $excludeCommunity = false): Collection
     {
         [$user_id, $team_id] = $user->getUserTeamData();
 
-        return Draft::with('Tags')
+        $drafts = Draft::with([
+            'Tags',
+            'project:id,slug,status,draft_id',
+        ])
             ->where('owner_id', $user_id)
             ->where('team_id', $team_id)
             ->where('is_deleted', false)
@@ -25,10 +32,23 @@ class UserDrafts
             })
             ->orderBy('updated_at', 'DESC')
             ->get();
+
+        if (! $excludeCommunity) {
+            return $drafts;
+        }
+
+        return $drafts
+            ->reject(fn (Draft $draft) => $this->isCommunityDraft($draft))
+            ->values();
+    }
+
+    public function isCommunityDraft(Draft $draft): bool
+    {
+        return $draft->isCommunityContribution();
     }
 
     /**
-     * Find existing default draft without files.
+     * Find existing default draft without files for the user's current team.
      */
     public function findDefaultDraft(User $user): ?Draft
     {
@@ -36,6 +56,11 @@ class UserDrafts
 
         return Draft::doesntHave('files')
             ->where('owner_id', $user_id)
+            ->where('team_id', $team_id)
+            ->where(function ($query) {
+                $query->whereNull('settings->deposition_type')
+                    ->orWhere('settings->deposition_type', '!=', Draft::DEPOSITION_COMMUNITY);
+            })
             ->first();
     }
 
@@ -47,11 +72,42 @@ class UserDrafts
         $defaultDraft = $this->findDefaultDraft($user);
 
         if (! $defaultDraft) {
-            $createDraft = new CreateDraft;
-            $defaultDraft = $createDraft->execute($user);
+            $defaultDraft = $this->createDraft->execute($user);
         }
 
         return $defaultDraft;
+    }
+
+    /**
+     * Find the user's most recent community contribution draft.
+     */
+    public function findCommunityDraft(User $user): ?Draft
+    {
+        [$user_id, $team_id] = $user->getUserTeamData();
+
+        $draft = Draft::query()
+            ->where('owner_id', $user_id)
+            ->where('team_id', $team_id)
+            ->where('is_deleted', false)
+            ->where('settings->deposition_type', Draft::DEPOSITION_COMMUNITY)
+            ->withCount('files')
+            ->orderByDesc('files_count')
+            ->orderByDesc('updated_at')
+            ->first();
+
+        if ($draft) {
+            return $draft;
+        }
+
+        return Draft::query()
+            ->where('owner_id', $user_id)
+            ->where('team_id', $team_id)
+            ->where('is_deleted', false)
+            ->where('name', 'like', Draft::LEGACY_COMMUNITY_NAME_PREFIX.'%')
+            ->withCount('files')
+            ->orderByDesc('files_count')
+            ->orderByDesc('updated_at')
+            ->first();
     }
 
     /**

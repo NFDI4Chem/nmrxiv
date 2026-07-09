@@ -31,8 +31,8 @@ class DeleteProject
         } else {
             $project->studies()->update(['is_deleted' => true]);
             foreach ($project->studies as $study) {
-                $study->update(['is_deleted' => true]);
-                $study->datasets()->update(['is_deleted' => true]);
+                $study->update(['is_deleted' => true, 'status' => 'deleted']);
+                $study->datasets()->update(['is_deleted' => true, 'status' => 'deleted']);
             }
             $draft = $project->draft;
             if ($draft) {
@@ -41,6 +41,7 @@ class DeleteProject
             $project->name = $project->name;
             $project->deleted_on = Carbon::now();
             $project->is_deleted = true;
+            $project->status = 'deleted';
             $project->sendNotification('deletion', $this->prepareSendList($project));
         }
         $project->save();
@@ -205,9 +206,9 @@ class DeleteProject
         $fsoIds = $this->getChildrenIds($filesystemobject, []);
         if (Storage::has($filesystemobject->path)) {
             if ($filesystemobject->type == 'directory') {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->deleteDirectory($filesystemobject->path);
+                Storage::disk(config('filesystems.default'))->deleteDirectory($filesystemobject->path);
             } else {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($filesystemobject->path);
+                Storage::disk(config('filesystems.default'))->delete($filesystemobject->path);
             }
             FileSystemObject::whereIn('id', $fsoIds)->delete();
         }
@@ -255,15 +256,19 @@ class DeleteProject
      */
     public function prepareSendList($project)
     {
-        $sendTo = [];
-        foreach ($project->allUsers() as $member) {
-            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
-                array_push($sendTo, $member);
-            } else {
-                array_push($sendTo, $project->owner);
+        $sendTo = collect();
+
+        if ($project->owner) {
+            $sendTo->push($project->owner);
+        }
+
+        foreach ($project->users as $member) {
+            $role = $member->projectMembership?->role;
+            if ($role === 'creator' || $role === 'owner') {
+                $sendTo->push($member);
             }
         }
 
-        return $sendTo;
+        return $sendTo->unique('id')->values()->all();
     }
 }

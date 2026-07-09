@@ -1,0 +1,30 @@
+name: PR Lint, Security and Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - development
+      - main
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  lint-security:
+    name: Lint & Security (PR)
+    if: github.event.pull_request.merged != true
+    uses: ./.github/workflows/lint-security-check.yml
+    with:
+      run_php: true
+      run_js: true
+      run_secrets: true
+
+  test-coverage:
+    name: Tests & Coverage (PHP 8.4)
+    if: github.event.pull_request.merged != true
+    uses: ./.github/workflows/test-coverage.yml
+    secrets: inherit

@@ -2,12 +2,14 @@
 /public/hot
 /public/build
 /public/storage
+/public/vendor
+/public/vendor/swagger-api
 /storage/*.key
 /storage/pail
+/storage/app/spectra_parse
 /vendor
 .env
 .env.production
-.env.*
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
@@ -24,3 +26,8 @@ docs/.vitepress/cache
 **/caddy
 frankenphp
 frankenphp-worker.php
+
+# Coverage reports
+coverage.xml
+coverage-report/
+.phpunit.cache

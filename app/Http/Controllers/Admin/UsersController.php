@@ -48,6 +48,7 @@ class UsersController extends Controller
                         'role' => $user->getRoleNames(),
                         'orcid_id' => $user->orcid_id,
                         'affiliation' => $user->affiliation,
+                        'ror_id' => $user->ror_id,
                     ];
                 }),
             'roles' => Role::orderBy('name')
@@ -103,6 +104,7 @@ class UsersController extends Controller
                 'profile_photo_url' => $user->profile_photo_url,
                 'orcid_id' => $user->orcid_id,
                 'affiliation' => $user->affiliation,
+                'ror_id' => $user->ror_id,
 
             ],
         ]);
