@@ -766,12 +766,24 @@ export default {
          * Submit citations to backend API
          */
         submitCitationsToBackend() {
-            this.citationsForm.post(route("citation.save", this.project.id), {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: () => this.handleSaveSuccess(),
-                onError: (err) => this.handleSaveError(err),
-            });
+            axios
+                .post(
+                    route("citation.save", this.project.id),
+                    {
+                        citations: this.citationsForm.citations,
+                    },
+                    {
+                        headers: {
+                            Accept: "application/json",
+                        },
+                    }
+                )
+                .then(() => this.handleSaveSuccess())
+                .catch((err) => {
+                    this.citationsForm.errors =
+                        err?.response?.data?.errors ?? {};
+                    this.handleSaveError(err);
+                });
         },
 
         /**

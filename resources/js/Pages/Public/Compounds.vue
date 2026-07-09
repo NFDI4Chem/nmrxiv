@@ -60,6 +60,9 @@
                                                             class="flex w-full md:ml-0"
                                                             action="#"
                                                             method="GET"
+                                                            @submit.prevent="
+                                                                search()
+                                                            "
                                                         >
                                                             <label
                                                                 for="mobile-search-field"
@@ -94,11 +97,28 @@
                                                                 </div>
                                                                 <input
                                                                     id="mobile-search-field"
+                                                                    v-model="
+                                                                        searchTerm
+                                                                    "
                                                                     name="mobile-search-field"
                                                                     class="h-full w-full border-transparent py-2 pl-8 pr-3 text-base text-gray-900 placeholder-gray-500 focus:border-transparent focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:hidden"
                                                                     placeholder="Search"
                                                                     type="search"
                                                                     autofocus
+                                                                    @change="
+                                                                        search(
+                                                                            $event
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    "
+                                                                    @search="
+                                                                        search(
+                                                                            $event
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    "
                                                                 />
                                                                 <input
                                                                     id="desktop-search-field"
@@ -111,11 +131,17 @@
                                                                     type="search"
                                                                     autofocus
                                                                     @change="
-                                                                        search()
+                                                                        search(
+                                                                            $event
+                                                                                .target
+                                                                                .value
+                                                                        )
                                                                     "
                                                                     @search="
                                                                         search(
-                                                                            ''
+                                                                            $event
+                                                                                .target
+                                                                                .value
                                                                         )
                                                                     "
                                                                 />
@@ -748,12 +774,21 @@ export default {
             return url;
         },
         search(entry) {
-            const normalized = this.normalizeRecentQuery(entry);
+            const normalized =
+                entry === undefined
+                    ? {
+                          query: this.searchTerm || "",
+                          type:
+                              this.type ||
+                              this.tagQuery(this.searchTerm) ||
+                              "text",
+                      }
+                    : this.normalizeRecentQuery(entry);
 
-            if (normalized.query) {
-                this.searchTerm = normalized.query;
-                this.type = normalized.type || this.tagQuery(normalized.query);
-            }
+            this.searchTerm = normalized.query;
+            this.type = normalized.query
+                ? normalized.type || this.tagQuery(normalized.query)
+                : "";
 
             this.fetchCompounds(normalized.query, { resetPage: true });
         },
