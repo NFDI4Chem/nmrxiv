@@ -1376,10 +1376,19 @@ export default {
                 this.authors
             );
 
-            this.authorsForm.post(route("author.save", this.project.id), {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: () => {
+            axios
+                .post(
+                    route("author.save", this.project.id),
+                    {
+                        authors: this.authorsForm.authors,
+                    },
+                    {
+                        headers: {
+                            Accept: "application/json",
+                        },
+                    }
+                )
+                .then(() => {
                     if (closeModalOnSuccess) {
                         this.onSaveSuccess();
                     } else {
@@ -1402,9 +1411,11 @@ export default {
                             },
                         });
                     }
-                },
-                onError: (err) => console.error(err),
-            });
+                })
+                .catch((err) => {
+                    this.authorsForm.errors = err?.response?.data?.errors ?? {};
+                    console.error(err);
+                });
         },
 
         /**
@@ -1557,21 +1568,27 @@ export default {
          */
         updateRole(role) {
             this.updateRoleForm.role = role.title;
-            this.updateRoleForm.post(
-                route("author.updateRole", this.project.id),
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                    onSuccess: () => {
-                        router.reload({ only: ["project"] });
-                        this.loadInitial();
-                        this.updateRoleForm.reset();
-                        this.showManageRoleDialog = false;
-                        this.authorId = "";
+            axios
+                .post(
+                    route("author.updateRole", this.project.id),
+                    {
+                        authorId: this.updateRoleForm.authorId,
+                        role: this.updateRoleForm.role,
                     },
-                    onError: (err) => console.error(err),
-                }
-            );
+                    {
+                        headers: {
+                            Accept: "application/json",
+                        },
+                    }
+                )
+                .then(() => {
+                    router.reload({ only: ["project"] });
+                    this.loadInitial();
+                    this.updateRoleForm.reset();
+                    this.showManageRoleDialog = false;
+                    this.authorId = "";
+                })
+                .catch((err) => console.error(err));
         },
 
         /**
