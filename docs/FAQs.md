@@ -2,13 +2,13 @@
 
 ### How can I submit my data to **[nmrXiv](https://nmrxiv.org/)**?
 
-- [Register to nmrXiv](/submission-guides/registration.md).
-- Structure your data in folders similar to **[nmrXiv](https://nmrxiv.org/)** structuring of projects, studies, and datasets. This step might not be intuitive so we recommend [checking its docummentation](/submission-guides/folder-structure.html).
-- Upload your data, edit it, and provide its metadata via the [submission pipeline](/submission-guides/submission-process.html).
+-   [Register to nmrXiv](/submission-guides/registration-and-account.md).
+-   Structure your data in folders similar to **[nmrXiv](https://nmrxiv.org/)** structuring of projects, studies, and datasets. This step might not be intuitive so we recommend [checking its docummentation](/submission-guides/folder-structure.html).
+-   Upload your data, edit it, and provide its metadata via the [submission pipeline](/submission-guides/submission-process.html).
 
 ### Do I need to register before submitting data to nmrXiv?
 
-Yes. Registration is a prerequisite to submitting the data. Although you can submit data by logging in via Single sign-on with your GitHub or Twitter ID, this logging-in will result in registering you on **[nmrXiv](https://nmrxiv.org/)**. Alternatively, you can register via your email id. More on the registration [here](/submission-guides/registration.md).
+Yes. Registration is a prerequisite to submitting the data. Although you can submit data by logging in via Single sign-on with your GitHub or Twitter ID, this logging-in will result in registering you on **[nmrXiv](https://nmrxiv.org/)**. Alternatively, you can register via your email id. More on the registration [here](/submission-guides/registration-and-account.md).
 
 ### How should I structure my data in folders before submitting it to **[nmrXiv](https://nmrxiv.org/)**?
 
@@ -19,6 +19,7 @@ Yes. Registration is a prerequisite to submitting the data. Although you can sub
 **[nmrXiv](https://nmrxiv.org/)** accepts all NMR formats uploaded. However, not all of them are readable at the moment. So far, only NMRium-supported formats can be translated into spectra in **[nmrXiv](https://nmrxiv.org/)**. Those formats are **jcamp-dx, jeol, Bruker folders, NMReData, and nmrium**. For validation purposes, the uploaded data should have at least one readable format.
 
 ### What happens to my data once submitted?
+
 After you submit your data, it will remain private and will only be visible to you, unless you decide to make it public.
 
 All the data uploaded to nmrXiv are stored in the S3 bucket provisioned by the University Computing Center of [Friedrich-Schiller-Universität Jena](https://www.uni-jena.de/) and are backed up daily to the [Google Cloud Storage Archive Storage](https://cloud.google.com/storage/docs/storage-classes#archive) with multiple regions located in the European Union.
@@ -53,13 +54,24 @@ You can share your resources (projects, studies, datasets) singly or in bulks wi
 
 You can assign roles to people with whom you share content:
 
-- **Owner** - Can read and/or update, including deleting the project, study, and dataset.
-- **Collaborator** -  Can read and/or update the project, study, and dataset.
-- **Reviewer** - Can only read the project, study, and dataset.
+-   **Owner** - Can read and/or update, including deleting the project, study, and dataset.
+-   **Collaborator** - Can read and/or update the project, study, and dataset.
+-   **Reviewer** - Can only read the project, study, and dataset.
 
 ### How can I delete or edit my account?
 
-You can edit your account details by heading to your name at the top right corner and clicking on the `Account` tab from the drop-down. To delete your account, please reach out to our [Helpdesk](https://www.nfdi4chem.de/index.php/helpdesk/), or write to us at info.nmrxiv@uni-jena.de.
+You can edit your account details by heading to your name at the top right corner and clicking on the Account tab from the drop-down.
+
+:::warning Important: Account Deletion Policy
+Users cannot delete their nmrXiv account by themselves.
+
+If you want your account to be deleted, please contact us at:
+
+-   info.nmrxiv@uni-jena.de
+-   helpdesk@nfdi4chem.de
+
+This process is handled manually to protect data integrity and traceability in the repository, especially when accounts are connected to submissions, shared resources, or published records.
+:::
 
 ### How can I license my resources, and which license to choose?
 
@@ -74,12 +86,12 @@ To learn more about our environment click [here](/developer-guides/deployment/en
 
 Before reporting a new issue
 
-- Check the existing [issues](https://github.com/NFDI4Chem/nmrxiv/issues) to avoid duplication. [Here](https://docs.github.com/en/issues/tracking-your-work-with-issues/filtering-and-searching-issues-and-pull-requests#searching-for-issues-and-pull-requests) are some tips that can help you to narrow down your search. You can also comment on existing issues to provide additional details.
-- Check our [documentation](https://docs.nmrxiv.org/) first, if you can find an answer to your question.
+-   Check the existing [issues](https://github.com/NFDI4Chem/nmrxiv/issues) to avoid duplication. [Here](https://docs.github.com/en/issues/tracking-your-work-with-issues/filtering-and-searching-issues-and-pull-requests#searching-for-issues-and-pull-requests) are some tips that can help you to narrow down your search. You can also comment on existing issues to provide additional details.
+-   Check our [documentation](https://docs.nmrxiv.org/) first, if you can find an answer to your question.
 
 If the above criteria are not met
 
-- Click [here](https://github.com/NFDI4Chem/nmrxiv/issues/new/choose) to report a new one under appropiate category.
+-   Click [here](https://github.com/NFDI4Chem/nmrxiv/issues/new/choose) to report a new one under appropiate category.
 
 ### How to reach to you?
 

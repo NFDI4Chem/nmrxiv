@@ -45,7 +45,7 @@ export default defineConfig({
         text: 'Submission Guides',
         items: [
           { text: 'Data - Life cycle', link: '/submission-guides/data-lifecycle.md' },
-          { text: 'Registration', link: '/submission-guides/registration.md' },
+          { text: 'Registration and Account', link: '/submission-guides/registration-and-account.md' },
           { text: 'Folder Structure', link: '/submission-guides/folder-structure.md'},
           { text: 'Submission Process', link: '/submission-guides/submission-process.md'},
           { text: 'Dashboard', link: '/submission-guides/dashboard.md'},
