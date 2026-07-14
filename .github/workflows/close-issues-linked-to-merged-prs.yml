@@ -1,0 +1,143 @@
+name: Close issues linked to merged PRs
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "If true, only print issues that would be closed"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  close-linked-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issues referenced by PRs merged into main
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dryRun = core.getInput('dry_run') === 'true';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const baseBranch = 'main';
+
+            core.info(`Repository: ${owner}/${repo}`);
+            core.info(`Base branch filter: ${baseBranch}`);
+            core.info(`Dry run: ${dryRun}`);
+
+            // 1) Collect merged PRs targeting main
+            const mergedPRs = await github.paginate(
+              github.rest.pulls.list,
+              {
+                owner,
+                repo,
+                state: 'closed',
+                base: baseBranch,
+                per_page: 100
+              },
+              (response) => response.data.filter(pr => pr.merged_at)
+            );
+
+            core.info(`Found ${mergedPRs.length} merged PR(s) into ${baseBranch}.`);
+
+            // 2) Parse closing keywords from PR title/body, collect issue numbers
+            // GitHub auto-closing keywords: close(s|d), fix(es|ed), resolve(s|d)
+            const closingRegex = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b/gi;
+            const issueSet = new Set();
+
+            for (const pr of mergedPRs) {
+              const text = `${pr.title || ''}\n${pr.body || ''}`;
+              let match;
+              while ((match = closingRegex.exec(text)) !== null) {
+                issueSet.add(Number(match[1]));
+              }
+            }
+
+            const issueNumbers = [...issueSet].sort((a, b) => a - b);
+            core.info(`Found ${issueNumbers.length} unique issue reference(s) via closing keywords.`);
+
+            if (issueNumbers.length === 0) {
+              core.notice('No linked issues found. Nothing to do.');
+              return;
+            }
+
+            // 3) Close only issues that are currently open
+            let closedCount = 0;
+            let skippedClosed = 0;
+            let skippedMissing = 0;
+            const errors = [];
+
+            for (const issue_number of issueNumbers) {
+              try {
+                const { data: issue } = await github.rest.issues.get({
+                  owner,
+                  repo,
+                  issue_number
+                });
+
+                // Skip pull requests (issues API also returns PRs)
+                if (issue.pull_request) {
+                  core.info(`#${issue_number} is a PR, skipping.`);
+                  continue;
+                }
+
+                if (issue.state !== 'open') {
+                  skippedClosed++;
+                  core.info(`#${issue_number} already closed, skipping.`);
+                  continue;
+                }
+
+                if (dryRun) {
+                  core.notice(`[DRY RUN] Would close issue #${issue_number}: ${issue.title}`);
+                  continue;
+                }
+
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number,
+                  state: 'closed'
+                });
+
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body: `Closing automatically because it is linked via a closing keyword to a PR merged into \`${baseBranch}\`.`
+                });
+
+                closedCount++;
+                core.notice(`Closed issue #${issue_number}: ${issue.title}`);
+              } catch (err) {
+                if (err.status === 404) {
+                  skippedMissing++;
+                  core.warning(`#${issue_number} not found (or inaccessible), skipping.`);
+                } else {
+                  errors.push(`#${issue_number}: ${err.message}`);
+                  core.error(`Failed for #${issue_number}: ${err.message}`);
+                }
+              }
+            }
+
+            core.summary
+              .addHeading('Close linked issues summary')
+              .addRaw(`- Dry run: ${dryRun}\n`)
+              .addRaw(`- Candidate issues: ${issueNumbers.length}\n`)
+              .addRaw(`- Closed: ${closedCount}\n`)
+              .addRaw(`- Already closed/skipped: ${skippedClosed}\n`)
+              .addRaw(`- Missing/skipped: ${skippedMissing}\n`)
+              .addRaw(`- Errors: ${errors.length}\n`)
+              .write();
+
+            if (errors.length > 0) {
+              core.setFailed(`Encountered ${errors.length} error(s):\n${errors.join('\n')}`);
+            }
