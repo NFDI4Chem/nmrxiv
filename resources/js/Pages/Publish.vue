@@ -1464,7 +1464,7 @@ import {
     UserGroupIcon,
 } from "@heroicons/vue/24/outline";
 import Draggable from "vuedraggable";
-import "ontology-elements/dist/index.js";
+import "@/lib/ontology-elements";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 
