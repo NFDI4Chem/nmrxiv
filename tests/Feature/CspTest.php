@@ -86,7 +86,7 @@ class CspTest extends TestCase
 
         $policyString = $policy->getContents();
 
-        $this->assertStringContainsString('https://service.tib.eu', $policyString);
+        $this->assertStringContainsString('https://api.terminology.tib.eu', $policyString);
     }
 
     public function test_csp_allows_meilisearch_connections_and_uses_report_uri_from_env(): void
