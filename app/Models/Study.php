@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
@@ -33,7 +32,6 @@ class Study extends Model implements Auditable
     use Markable;
     use \OwenIt\Auditing\Auditable;
     use ResolvesNmrxivRouteBinding;
-    use Searchable;
 
     protected $fillable = [
         'name',
@@ -360,16 +358,6 @@ class Study extends Model implements Auditable
     public function removeUser($user)
     {
         $this->users()->detach($user);
-    }
-
-    /**
-     * Determine if the model should be searchable.
-     *
-     * @return bool
-     */
-    public function shouldBeSearchable()
-    {
-        return $this->is_public && ! $this->is_archived;
     }
 
     /**

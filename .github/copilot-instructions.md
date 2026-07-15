@@ -13,7 +13,6 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/framework (LARAVEL) - v12
 - laravel/octane (OCTANE) - v2
 - laravel/prompts (PROMPTS) - v0
-- laravel/scout (SCOUT) - v10
 - tightenco/ziggy (ZIGGY) - v2
 - laravel/pint (PINT) - v1
 - @inertiajs/vue3 (INERTIA) - v1

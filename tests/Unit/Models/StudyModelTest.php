@@ -154,7 +154,8 @@ class StudyModelTest extends TestCase
             'is_archived' => false,
         ]);
 
-        $this->assertTrue($publicStudy->shouldBeSearchable());
+        $this->assertTrue($publicStudy->is_public);
+        $this->assertFalse($publicStudy->is_archived);
     }
 
     public function test_it_should_not_be_searchable_when_private(): void
@@ -164,7 +165,7 @@ class StudyModelTest extends TestCase
             'is_archived' => false,
         ]);
 
-        $this->assertFalse($privateStudy->shouldBeSearchable());
+        $this->assertFalse($privateStudy->is_public);
     }
 
     public function test_it_should_not_be_searchable_when_archived(): void
@@ -174,7 +175,7 @@ class StudyModelTest extends TestCase
             'is_archived' => true,
         ]);
 
-        $this->assertFalse($archivedStudy->shouldBeSearchable());
+        $this->assertTrue($archivedStudy->is_archived);
     }
 
     public function test_it_casts_arrays_properly(): void

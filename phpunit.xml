@@ -29,7 +29,6 @@
     <env name="FILESYSTEM_DRIVER_PUBLIC" value="local"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
-    <env name="SCOUT_DRIVER" value="null"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="TELESCOPE_ENABLED" value="false"/>
     <env name="DEBUGBAR_ENABLED" value="false"/>
