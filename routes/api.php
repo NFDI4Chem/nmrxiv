@@ -7,6 +7,7 @@ use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\ELNController;
 use App\Http\Controllers\API\FileSystemController;
+use App\Http\Controllers\API\NmriumController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
@@ -59,6 +60,14 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/list/{model}', [DataController::class, 'all'])
         ->name('public.api.projects');
+
+    Route::get('samples/{study}/nmriumInfo', [NmriumController::class, 'sample'])
+        ->where('study', '([0-9]+|(NMRXIV:)?(S|s)[0-9]+)')
+        ->name('api.samples.nmrium');
+
+    Route::get('datasets/{dataset}/nmriumInfo', [NmriumController::class, 'dataset'])
+        ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
+        ->name('api.datasets.nmrium');
 
     Route::get('/{id}', [DataController::class, 'id'])
         ->name('public.api.project');

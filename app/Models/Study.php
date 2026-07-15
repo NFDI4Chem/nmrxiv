@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use App\Traits\ResolvesNmrxivRouteBinding;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -31,6 +32,7 @@ class Study extends Model implements Auditable
     use HasTags;
     use Markable;
     use \OwenIt\Auditing\Auditable;
+    use ResolvesNmrxivRouteBinding;
     use Searchable;
 
     protected $fillable = [
@@ -445,5 +447,15 @@ class Study extends Model implements Auditable
         } else {
             return Bookmark::has($this, $user);
         }
+    }
+
+    protected static function nmrxivRouteBindingNamespace(): string
+    {
+        return 'Study';
+    }
+
+    protected static function nmrxivRouteBindingPrefix(): string
+    {
+        return 'S';
     }
 }

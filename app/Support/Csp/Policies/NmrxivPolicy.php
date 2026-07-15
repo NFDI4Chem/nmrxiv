@@ -112,7 +112,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, config('services.chemotion_tracker.base_url'))
             ->add(Directive::CONNECT, config('external-links.cm_api'))
             ->add(Directive::CONNECT, config('filesystems.disks.ceph.endpoint'))
-            ->add(Directive::CONNECT, 'https://service.tib.eu')
+            ->add(Directive::CONNECT, 'https://api.terminology.tib.eu')
             ->add(Directive::CONNECT, 'https://nmrium.nmrxiv.org')
             ->add(Directive::CONNECT, 'https://nmriumdev.nmrxiv.org')
             ->add(Directive::CONNECT, 'https://*.naturalproducts.net')

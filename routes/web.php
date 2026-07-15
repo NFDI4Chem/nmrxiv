@@ -117,11 +117,19 @@ Route::get('/compound/{id}', [ApplicationController::class, 'resolveCompound'])-
 Route::get('/sample/{id}', [ApplicationController::class, 'resolveSample'])->where('id', '(S|s)[0-9]+')
     ->name('public.sample');
 
+Route::get('/sample/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+    ->where('study', '([0-9]+|(NMRXIV:)?(S|s)[0-9]+)')
+    ->name('public.sample.nmrium');
+
 Route::get('/project/{id}', [ApplicationController::class, 'resolveProject'])->where('id', '(P|p)[0-9]+')
     ->name('public.project.id');
 
 Route::get('/dataset/{id}', [ApplicationController::class, 'resolveDataset'])->where('id', '(D|d)[0-9]+')
     ->name('public.dataset.id');
+
+Route::get('/dataset/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+    ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
+    ->name('public.dataset.nmrium');
 
 Route::get('project/{url}', [ProjectController::class, 'review'])->name('project.preview');
 Route::get('project/{url}/studies', [ProjectController::class, 'reviewerStudies'])->name('studies.preview');
