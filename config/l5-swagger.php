@@ -1,5 +1,6 @@
 <?php
 
+use App\Providers\AppServiceProvider;
 use L5Swagger\Generator;
 
 return [
@@ -116,15 +117,13 @@ return [
             'default_processors_configuration' => [],
 
             /**
-             * Keep config cache serializable in normal runtime (null).
-             * Use reflection analyser only for docs generation when explicitly enabled.
+             * Must stay `null` here so this config file remains serializable for `config:cache`.
+             * When `L5_SWAGGER_USE_REFLECTION_ANALYSER` is enabled, the actual analyser instance
+             * is injected at runtime (not cached) right before `l5-swagger:generate` runs.
+             *
+             * @see AppServiceProvider::bootSwaggerReflectionAnalyser()
              */
-            'analyser' => env('L5_SWAGGER_USE_REFLECTION_ANALYSER', false)
-                ? new ReflectionAnalyser([
-                    new AttributeAnnotationFactory,
-                    new DocBlockAnnotationFactory,
-                ])
-                : null,
+            'analyser' => null,
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .

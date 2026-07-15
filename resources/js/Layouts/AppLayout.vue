@@ -893,12 +893,6 @@ export default {
                 (t) => t.personal_team
             )[0];
         },
-        MEILISEARCH_HOST() {
-            return this.$page.props.MEILISEARCH_HOST;
-        },
-        MEILISEARCH_PUBLICKEY() {
-            return this.$page.props.MEILISEARCH_PUBLICKEY;
-        },
     },
     mounted() {
         // Auto-collapse sidebar when on upload page

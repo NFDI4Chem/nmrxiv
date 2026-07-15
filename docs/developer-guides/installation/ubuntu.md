@@ -6,7 +6,6 @@ The whole project is a package of below services and features.
 - [PostgreSQL](https://www.postgresql.org/)
 - [Redis](https://redis.io/)
 - [Selenium](https://www.selenium.dev/documentation/)
-- [Meilisearch](https://docs.meilisearch.com/)
 - [MailHog](https://mailtrap.io/blog/mailhog-explained/)
 - [Minio](https://min.io/)
 

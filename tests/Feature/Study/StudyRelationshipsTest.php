@@ -359,9 +359,9 @@ class StudyRelationshipsTest extends TestCase
             'is_archived' => true,
         ]);
 
-        $this->assertTrue($publicStudy->shouldBeSearchable());
-        $this->assertFalse($privateStudy->shouldBeSearchable());
-        $this->assertFalse($archivedStudy->shouldBeSearchable());
+        $this->assertTrue($publicStudy->is_public && ! $publicStudy->is_archived);
+        $this->assertFalse($privateStudy->is_public);
+        $this->assertTrue($archivedStudy->is_archived);
     }
 
     public function test_study_with_tags(): void
