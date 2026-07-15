@@ -1,9 +1,6 @@
 <?php
 
 use L5Swagger\Generator;
-use OpenApi\Analysers\AttributeAnnotationFactory;
-use OpenApi\Analysers\DocBlockAnnotationFactory;
-use OpenApi\Analysers\ReflectionAnalyser;
 
 return [
     'default' => 'default',
