@@ -1,0 +1,7 @@
+bootstrap/cache/*.php
+storage/framework/cache/**
+storage/framework/views/**
+storage/framework/sessions/**
+storage/logs/**
+.env
+.env.*
