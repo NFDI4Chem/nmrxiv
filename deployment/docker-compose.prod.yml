@@ -103,8 +103,7 @@ services:
     labels:
     - traefik.enable=true
     - traefik.http.routers.nmrkit.rule=Host(`nmrkit.nmrxiv.org`)
-    - traefik.http.routers.nmrkit.entrypoints=websecure
-    - traefik.http.routers.nmrkit.tls=true
+    - traefik.http.routers.nmrkit.entrypoints=web
     - traefik.http.services.nmrkit.loadbalancer.server.port=80
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/latest/registration/health"]

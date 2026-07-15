@@ -1,9 +1,6 @@
 <?php
 
 use L5Swagger\Generator;
-use OpenApi\Analysers\AttributeAnnotationFactory;
-use OpenApi\Analysers\DocBlockAnnotationFactory;
-use OpenApi\Analysers\ReflectionAnalyser;
 
 return [
     'default' => 'default',
@@ -119,12 +116,10 @@ return [
             'default_processors_configuration' => [],
 
             /**
-             * Supports PHP 8 attributes and legacy @OA\ docblock annotations.
+             * Keep this serializable for Laravel config cache.
+             * Null uses swagger-php defaults (attributes + docblocks when supported).
              */
-            'analyser' => new ReflectionAnalyser([
-                new AttributeAnnotationFactory,
-                new DocBlockAnnotationFactory,
-            ]),
+            'analyser' => null,
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .
