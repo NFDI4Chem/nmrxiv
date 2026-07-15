@@ -3594,7 +3594,7 @@ import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import "ontology-elements/dist/index.js";
+import "@/lib/ontology-elements";
 import Global from "@/Mixins/Global.js";
 import OCL from "openchemlib";
 import { createStructureEditor } from "@/Utils/structureEditor";

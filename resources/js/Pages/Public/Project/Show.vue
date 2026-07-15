@@ -444,7 +444,7 @@ import ProjectDetails from "@/Pages/Project/Partials/Details.vue";
 import Publish from "@/Shared/Publish.vue";
 import Citation from "@/Shared/Citation.vue";
 import Tag from "@/Shared/Tag.vue";
-import "ontology-elements/dist/index.js";
+import "@/lib/ontology-elements";
 import { Head } from "@inertiajs/vue3";
 import { PencilIcon } from "@heroicons/vue/24/solid";
 

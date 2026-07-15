@@ -2297,6 +2297,182 @@
                 ]
             }
         },
+        "/api/v1/samples/{id}/nmriumInfo": {
+            "get": {
+                "tags": [
+                    "NMRium Data Access"
+                ],
+                "summary": "Retrieve NMRium workspace data for a public sample",
+                "description": "Returns the NMRium JSON payload for a publicly available sample (study). Accepts NMRXIV sample identifiers (S123), NMRXIV-prefixed identifiers (NMRXIV:S123), or numeric database ids. The payload follows the NMRium exchange format and includes spectra and molecule metadata suitable for visualization in NMRium.",
+                "operationId": "getSampleNmriumInfo",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Sample identifier (NMRXIV S-prefixed id, NMRXIV:S-prefixed id, or numeric database id)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^([0-9]+|(NMRXIV:)?[Ss][0-9]+)$",
+                            "example": "S7"
+                        },
+                        "examples": {
+                            "identifier": {
+                                "summary": "NMRXIV sample identifier",
+                                "value": "S7"
+                            },
+                            "prefixed": {
+                                "summary": "NMRXIV-prefixed sample identifier",
+                                "value": "NMRXIV:S7"
+                            },
+                            "numeric": {
+                                "summary": "Numeric database id",
+                                "value": "42"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "NMRium workspace data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "4"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "spectra": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "molecules": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sample not found, not public, or has no NMRium data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No NMRium data found for this sample."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/datasets/{id}/nmriumInfo": {
+            "get": {
+                "tags": [
+                    "NMRium Data Access"
+                ],
+                "summary": "Retrieve NMRium workspace data for a public dataset",
+                "description": "Returns the NMRium JSON payload for a publicly available dataset. Accepts NMRXIV dataset identifiers (D123), NMRXIV-prefixed identifiers (NMRXIV:D123), or numeric database ids. The payload follows the NMRium exchange format and includes spectra and molecule metadata suitable for visualization in NMRium.",
+                "operationId": "getDatasetNmriumInfo",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Dataset identifier (NMRXIV D-prefixed id, NMRXIV:D-prefixed id, or numeric database id)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^([0-9]+|(NMRXIV:)?[Dd][0-9]+)$",
+                            "example": "D9"
+                        },
+                        "examples": {
+                            "identifier": {
+                                "summary": "NMRXIV dataset identifier",
+                                "value": "D9"
+                            },
+                            "prefixed": {
+                                "summary": "NMRXIV-prefixed dataset identifier",
+                                "value": "NMRXIV:D9"
+                            },
+                            "numeric": {
+                                "summary": "Numeric database id",
+                                "value": "42"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "NMRium workspace data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "4"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "spectra": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "molecules": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Dataset not found, not public, or has no NMRium data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No NMRium data found for this dataset."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/schemas/bioschemas/{id}": {
             "get": {
                 "tags": [
@@ -4082,6 +4258,10 @@
         {
             "name": "ELN Submission",
             "description": "ELN Submission"
+        },
+        {
+            "name": "NMRium Data Access",
+            "description": "NMRium Data Access"
         },
         {
             "name": "Scientific Metadata Schemas",

@@ -63,7 +63,6 @@
         "marked": "^4.0.4",
         "medium-zoom": "^1.0.8",
         "mitt": "^3.0.0",
-        "ontology-elements": "^0.2.3",
         "openchemlib": "^9.22.1",
         "pluralize": "^8.0.0",
         "popper.js": "^1.16.1",
