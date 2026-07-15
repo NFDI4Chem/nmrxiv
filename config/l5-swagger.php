@@ -116,10 +116,15 @@ return [
             'default_processors_configuration' => [],
 
             /**
-             * Keep this serializable for Laravel config cache.
-             * Null uses swagger-php defaults (attributes + docblocks when supported).
+             * Keep config cache serializable in normal runtime (null).
+             * Use reflection analyser only for docs generation when explicitly enabled.
              */
-            'analyser' => null,
+            'analyser' => env('L5_SWAGGER_USE_REFLECTION_ANALYSER', false)
+                ? new ReflectionAnalyser([
+                    new AttributeAnnotationFactory,
+                    new DocBlockAnnotationFactory,
+                ])
+                : null,
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .
