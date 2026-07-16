@@ -1,307 +1,546 @@
 <template>
-    <div class="flex flex-col" :class="compact ? '' : 'h-full'">
-        <!-- Title Section -->
-        <div v-if="!compact" class="mb-6">
-            <h2 class="text-3xl font-bold text-gray-900">Metadata Search</h2>
-            <p class="mt-2 text-gray-600">
-                Search by free text or specific NMR metadata fields
+    <div class="flex flex-col text-left">
+        <header
+            v-if="!compact"
+            class="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-gray-100 pb-5"
+        >
+            <div>
+                <h2 class="text-xl font-semibold tracking-tight text-gray-900">
+                    Advanced metadata search
+                </h2>
+                <p class="mt-1 text-sm text-gray-500">
+                    Filter public samples and spectra by indexed NMRium fields.
+                </p>
+            </div>
+            <div v-if="hasAnyValue" class="flex items-center gap-3">
+                <span class="text-xs text-gray-500">
+                    {{ activeFilterCount }}
+                    {{ activeFilterCount === 1 ? "filter" : "filters" }}
+                </span>
+                <button
+                    type="button"
+                    class="text-xs font-medium text-gray-600 underline-offset-2 hover:text-gray-900 hover:underline"
+                    @click="clearAll"
+                >
+                    Clear all
+                </button>
+            </div>
+        </header>
+
+        <div v-else class="mb-4 flex items-center justify-between gap-3">
+            <p class="text-sm text-gray-600">
+                Refine by solvent, nucleus, experiment, and instrument metadata.
             </p>
+            <button
+                v-if="hasAnyValue"
+                type="button"
+                class="shrink-0 text-xs font-medium text-gray-600 underline-offset-2 hover:text-gray-900 hover:underline"
+                @click="clearAll"
+            >
+                Clear
+            </button>
+        </div>
+
+        <div class="relative">
+            <MagnifyingGlassIcon
+                class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                aria-hidden="true"
+            />
+            <label for="metadata-free-text" class="sr-only"> Keywords </label>
+            <input
+                id="metadata-free-text"
+                v-model="freeText"
+                type="search"
+                placeholder="Keywords across all metadata fields"
+                class="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+            />
         </div>
 
         <div
-            class="grid grid-cols-1 gap-6"
-            :class="compact ? 'gap-4 lg:grid-cols-2' : 'lg:grid-cols-2'"
+            class="mt-5 grid grid-cols-1 gap-6"
+            :class="
+                compact
+                    ? 'mx-auto w-full max-w-3xl md:grid-cols-2'
+                    : 'lg:grid-cols-2 xl:grid-cols-4'
+            "
         >
-            <!-- Left Column: Free Text Search -->
-            <div class="space-y-4">
-                <div>
-                    <label
-                        class="block text-sm font-semibold text-gray-900 mb-2"
-                    >
-                        Free Text Search
-                    </label>
-                    <textarea
-                        v-model="freeText"
-                        placeholder="Enter keywords to search across all metadata fields..."
-                        :rows="compact ? 3 : 4"
-                        class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+            <section :class="sectionClass">
+                <h3 :class="sectionTitleClass">Sample</h3>
+                <div class="space-y-3">
+                    <MetadataFacetField
+                        v-model="solvent"
+                        label="Solvent"
+                        compact
+                        :options="solventOptions"
+                        :loading="!facetsLoaded"
+                    />
+                    <MetadataFacetField
+                        v-model="temperature"
+                        label="Temperature"
+                        compact
+                        :options="temperatureOptions"
+                        :loading="!facetsLoaded"
+                    />
+                    <MetadataFacetField
+                        v-model="tubeDiameter"
+                        label="Tube diameter"
+                        compact
+                        :options="tubeDiameterOptions"
+                        :disabled-values="disabledTubeDiameters"
+                        :loading="!facetsLoaded"
+                        :pill-threshold="5"
                     />
                 </div>
+            </section>
 
-                <!-- Sample Information -->
-                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">
-                        Sample Information
-                    </h3>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            NMR Solvent
-                        </label>
-                        <input
-                            v-model="solvent"
-                            type="text"
-                            placeholder="e.g., D₂O, CDCl₃, DMSO-d6"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Temperature (K)
-                        </label>
-                        <input
-                            v-model.number="temperature"
-                            type="number"
-                            step="0.01"
-                            placeholder="e.g., 298.15"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Sample Tube Diameter (mm)
-                        </label>
-                        <select
-                            v-model="tubeDiameter"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        >
-                            <option value="">Any</option>
-                            <option value="3">3 mm</option>
-                            <option value="5">5 mm</option>
-                            <option value="10">10 mm</option>
-                        </select>
-                    </div>
+            <section :class="sectionClass">
+                <h3 :class="sectionTitleClass">Nucleus &amp; frequency</h3>
+                <div class="space-y-3">
+                    <MetadataFacetField
+                        v-model="acquisitionNucleus"
+                        label="Nucleus"
+                        compact
+                        :options="nucleusOptions"
+                        :disabled-values="disabledNuclei"
+                        :loading="!facetsLoaded"
+                        :pill-threshold="7"
+                    />
+                    <MetadataFacetField
+                        v-model="protonFrequency"
+                        label="Observed frequency"
+                        compact
+                        :options="protonFrequencyOptions"
+                        :disabled-values="disabledProtonFrequencies"
+                        :loading="!facetsLoaded"
+                        :pill-threshold="5"
+                    />
                 </div>
-            </div>
+            </section>
 
-            <!-- Right Column: Acquisition Parameters -->
-            <div class="space-y-4">
-                <!-- Acquisition Parameters -->
-                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">
-                        Acquisition Parameters
-                    </h3>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Acquisition Nucleus
-                        </label>
-                        <select
-                            v-model="acquisitionNucleus"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        >
-                            <option value="">Any</option>
-                            <option value="1H">1H</option>
-                            <option value="13C">13C</option>
-                            <option value="15N">15N</option>
-                            <option value="19F">19F</option>
-                            <option value="31P">31P</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Proton Frequency (MHz)
-                        </label>
-                        <select
-                            v-model="protonFrequency"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        >
-                            <option value="">Any</option>
-                            <option value="300">300</option>
-                            <option value="400">400</option>
-                            <option value="500">500</option>
-                            <option value="600">600</option>
-                            <option value="700">700</option>
-                            <option value="800">800</option>
-                            <option value="900">900</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            NMR Method
-                        </label>
-                        <input
-                            v-model="nmrMethod"
-                            type="text"
-                            placeholder="e.g., HSQC, COSY, NOESY"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Pulse Sequence Name
-                        </label>
-                        <input
-                            v-model="pulseSequence"
-                            type="text"
-                            placeholder="e.g., zg30, zgpg30"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Number of Scans
-                        </label>
-                        <input
-                            v-model.number="numberOfScans"
-                            type="number"
-                            placeholder="e.g., 8, 16, 32"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                    </div>
+            <section :class="sectionClass">
+                <h3 :class="sectionTitleClass">Experiment</h3>
+                <div class="space-y-3">
+                    <MetadataFacetField
+                        v-model="nmrMethod"
+                        label="Method"
+                        compact
+                        :options="nmrMethodOptions"
+                        :loading="!facetsLoaded"
+                    />
+                    <MetadataFacetField
+                        v-model="pulseSequence"
+                        label="Pulse sequence"
+                        compact
+                        :options="pulseSequenceOptions"
+                        :loading="!facetsLoaded"
+                    />
+                    <MetadataFacetField
+                        v-model="numberOfScans"
+                        label="Scans"
+                        compact
+                        :options="numberOfScansOptions"
+                        :loading="!facetsLoaded"
+                        :pill-threshold="5"
+                    />
                 </div>
+            </section>
 
-                <!-- Instrument Information -->
-                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">
-                        Instrument Information
-                    </h3>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Manufacturer
-                        </label>
-                        <select
-                            v-model="manufacturer"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        >
-                            <option value="">Any</option>
-                            <option value="Bruker">Bruker</option>
-                            <option value="JEOL">JEOL</option>
-                            <option value="Agilent">Agilent</option>
-                            <option value="Varian">Varian</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-gray-700 mb-1.5"
-                        >
-                            Instrument Model
-                        </label>
-                        <input
-                            v-model="instrumentModel"
-                            type="text"
-                            placeholder="e.g., AVANCE III HD"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                    </div>
+            <section :class="sectionClass">
+                <h3 :class="sectionTitleClass">Instrument</h3>
+                <div class="space-y-3">
+                    <MetadataFacetField
+                        v-model="manufacturer"
+                        label="Manufacturer"
+                        compact
+                        :options="manufacturerOptions"
+                        :loading="!facetsLoaded"
+                    />
+                    <MetadataFacetField
+                        v-model="instrumentModel"
+                        label="Probe"
+                        compact
+                        :options="instrumentModelOptions"
+                        :loading="!facetsLoaded"
+                    />
                 </div>
-            </div>
-        </div>
-
-        <!-- Clear All Button -->
-        <div class="mt-4 flex justify-end">
-            <button
-                v-if="hasAnyValue"
-                class="text-xs font-medium text-gray-600 hover:text-red-600 underline transition-colors"
-                @click="clearAll"
-            >
-                Clear all fields
-            </button>
+            </section>
         </div>
     </div>
 </template>
 
 <script>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
+import MetadataFacetField from "@/Shared/MetadataFacetField.vue";
+import {
+    metadataParamsFromForm,
+    metadataParamsToForm,
+    readAdvancedFormParamsFromUrl,
+    syncAdvancedFormBrowserUrl,
+    fetchMetadataFacets,
+} from "@/Utils/unifiedSearchApi.js";
+
+const tubeDiameterStaticOptions = [
+    { label: "Any", value: "" },
+    { label: "3 mm", value: "3" },
+    { label: "5 mm", value: "5" },
+    { label: "10 mm", value: "10" },
+];
+
+const nucleusStaticOptions = [
+    { label: "Any", value: "" },
+    { label: "¹H", value: "1H" },
+    { label: "¹³C", value: "13C" },
+    { label: "¹⁵N", value: "15N" },
+    { label: "¹⁹F", value: "19F" },
+    { label: "³¹P", value: "31P" },
+];
+
+function buildFacetOptions(values, labelFn = (value) => value) {
+    return [
+        { label: "Any", value: "" },
+        ...values.map((value) => ({
+            label: labelFn(value),
+            value: String(value),
+        })),
+    ];
+}
+
+function buildStaticFacetOptions(staticOptions, availableValues, facetsLoaded) {
+    if (!facetsLoaded) {
+        return staticOptions;
+    }
+
+    const available = new Set(availableValues.map(String));
+
+    return staticOptions.filter(
+        (option) => option.value === "" || available.has(String(option.value))
+    );
+}
 
 export default {
+    components: {
+        MetadataFacetField,
+        MagnifyingGlassIcon,
+    },
     props: {
         compact: {
             type: Boolean,
             default: false,
         },
+        persistInUrl: {
+            type: Boolean,
+            default: false,
+        },
+        initialParams: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     emits: ["search-params-updated"],
     setup(props, { emit }) {
-        // Free text
         const freeText = ref("");
-
-        // Sample information
         const solvent = ref("");
-        const temperature = ref(null);
+        const temperature = ref("");
         const tubeDiameter = ref("");
-
-        // Acquisition parameters
         const acquisitionNucleus = ref("");
         const protonFrequency = ref("");
         const nmrMethod = ref("");
         const pulseSequence = ref("");
-        const numberOfScans = ref(null);
-
-        // Instrument information
+        const numberOfScans = ref("");
         const manufacturer = ref("");
         const instrumentModel = ref("");
-
-        const hasAnyValue = computed(() => {
-            return !!(
-                freeText.value ||
-                solvent.value ||
-                temperature.value ||
-                tubeDiameter.value ||
-                acquisitionNucleus.value ||
-                protonFrequency.value ||
-                nmrMethod.value ||
-                pulseSequence.value ||
-                numberOfScans.value ||
-                manufacturer.value ||
-                instrumentModel.value
-            );
+        const hydrated = ref(false);
+        const facetsLoaded = ref(false);
+        const facetAvailability = ref({
+            solvent: [],
+            temperature: [],
+            tube_diameter: [],
+            nucleus: [],
+            proton_frequency: [],
+            nmr_method: [],
+            pulse_sequence: [],
+            number_of_scans: [],
+            manufacturer: [],
+            instrument_model: [],
         });
+        let facetRequestId = 0;
+        let facetDebounceTimeout = null;
+
+        const sectionClass = computed(() =>
+            props.compact
+                ? "min-w-0"
+                : "min-w-0 rounded-xl border border-gray-200 bg-gray-50/40 p-4"
+        );
+
+        const sectionTitleClass = computed(() =>
+            props.compact
+                ? "mb-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500"
+                : "mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500"
+        );
+
+        const applyInitialParams = (params = {}) => {
+            const form = metadataParamsToForm(params);
+
+            freeText.value = form.freeText ?? "";
+            solvent.value = form.solvent ?? "";
+            temperature.value = form.temperature ?? "";
+            tubeDiameter.value = form.tubeDiameter ?? "";
+            acquisitionNucleus.value = form.acquisitionNucleus ?? "";
+            protonFrequency.value = form.protonFrequency ?? "";
+            nmrMethod.value = form.nmrMethod ?? "";
+            pulseSequence.value = form.pulseSequence ?? "";
+            numberOfScans.value = form.numberOfScans ?? "";
+            manufacturer.value = form.manufacturer ?? "";
+            instrumentModel.value = form.instrumentModel ?? "";
+        };
+
+        const buildPayload = () => ({
+            freeText: freeText.value,
+            solvent: solvent.value,
+            temperature: temperature.value,
+            tubeDiameter: tubeDiameter.value,
+            acquisitionNucleus: acquisitionNucleus.value,
+            protonFrequency: protonFrequency.value,
+            nmrMethod: nmrMethod.value,
+            pulseSequence: pulseSequence.value,
+            numberOfScans: numberOfScans.value,
+            manufacturer: manufacturer.value,
+            instrumentModel: instrumentModel.value,
+        });
+
+        const emitParams = () => {
+            const payload = buildPayload();
+
+            emit("search-params-updated", payload);
+
+            if (props.persistInUrl) {
+                syncAdvancedFormBrowserUrl(payload);
+            }
+        };
+
+        const applyFacetConstraints = () => {
+            if (!facetsLoaded.value) {
+                return;
+            }
+
+            const facets = facetAvailability.value;
+            const constraints = [
+                ["solvent", solvent],
+                ["temperature", temperature],
+                ["tube_diameter", tubeDiameter],
+                ["nucleus", acquisitionNucleus],
+                ["proton_frequency", protonFrequency],
+                ["nmr_method", nmrMethod],
+                ["pulse_sequence", pulseSequence],
+                ["number_of_scans", numberOfScans],
+                ["manufacturer", manufacturer],
+                ["instrument_model", instrumentModel],
+            ];
+
+            for (const [field, fieldRef] of constraints) {
+                if (
+                    fieldRef.value &&
+                    !facets[field].includes(String(fieldRef.value))
+                ) {
+                    fieldRef.value = "";
+                }
+            }
+        };
+
+        const refreshFacets = async () => {
+            const requestId = ++facetRequestId;
+
+            try {
+                const facets = await fetchMetadataFacets(
+                    metadataParamsFromForm(buildPayload())
+                );
+
+                if (requestId !== facetRequestId) {
+                    return;
+                }
+
+                facetAvailability.value = {
+                    solvent: facets.solvent ?? [],
+                    temperature: facets.temperature ?? [],
+                    tube_diameter: facets.tube_diameter ?? [],
+                    nucleus: facets.nucleus ?? [],
+                    proton_frequency: facets.proton_frequency ?? [],
+                    nmr_method: facets.nmr_method ?? [],
+                    pulse_sequence: facets.pulse_sequence ?? [],
+                    number_of_scans: facets.number_of_scans ?? [],
+                    manufacturer: facets.manufacturer ?? [],
+                    instrument_model: facets.instrument_model ?? [],
+                };
+                facetsLoaded.value = true;
+                applyFacetConstraints();
+            } catch {
+                if (requestId !== facetRequestId) {
+                    return;
+                }
+
+                facetsLoaded.value = false;
+            }
+        };
+
+        const scheduleFacetRefresh = () => {
+            if (!hydrated.value) {
+                return;
+            }
+
+            if (facetDebounceTimeout) {
+                clearTimeout(facetDebounceTimeout);
+            }
+
+            facetDebounceTimeout = setTimeout(() => {
+                refreshFacets();
+            }, 300);
+        };
+
+        onMounted(() => {
+            if (props.persistInUrl) {
+                applyInitialParams(readAdvancedFormParamsFromUrl());
+            } else if (Object.keys(props.initialParams).length > 0) {
+                applyInitialParams(props.initialParams);
+            }
+
+            hydrated.value = true;
+            emitParams();
+            scheduleFacetRefresh();
+        });
+
+        onBeforeUnmount(() => {
+            if (facetDebounceTimeout) {
+                clearTimeout(facetDebounceTimeout);
+            }
+        });
+
+        watch(
+            () => props.initialParams,
+            (params) => {
+                if (props.persistInUrl || !hydrated.value) {
+                    return;
+                }
+
+                applyInitialParams(params);
+                emitParams();
+                scheduleFacetRefresh();
+            },
+            { deep: true }
+        );
+
+        const solventOptions = computed(() =>
+            buildFacetOptions(facetAvailability.value.solvent)
+        );
+
+        const temperatureOptions = computed(() =>
+            buildFacetOptions(
+                facetAvailability.value.temperature,
+                (value) => `${value} K`
+            )
+        );
+
+        const tubeDiameterOptionsComputed = computed(() =>
+            buildStaticFacetOptions(
+                tubeDiameterStaticOptions,
+                facetAvailability.value.tube_diameter,
+                facetsLoaded.value
+            )
+        );
+
+        const nucleusOptionsComputed = computed(() =>
+            buildStaticFacetOptions(
+                nucleusStaticOptions,
+                facetAvailability.value.nucleus,
+                facetsLoaded.value
+            )
+        );
+
+        const protonFrequencyOptions = computed(() =>
+            buildFacetOptions(
+                facetAvailability.value.proton_frequency,
+                (value) => `${value} MHz`
+            )
+        );
+
+        const nmrMethodOptions = computed(() =>
+            buildFacetOptions(facetAvailability.value.nmr_method)
+        );
+
+        const pulseSequenceOptions = computed(() =>
+            buildFacetOptions(facetAvailability.value.pulse_sequence)
+        );
+
+        const numberOfScansOptions = computed(() =>
+            buildFacetOptions(facetAvailability.value.number_of_scans)
+        );
+
+        const manufacturerOptions = computed(() =>
+            buildFacetOptions(facetAvailability.value.manufacturer)
+        );
+
+        const instrumentModelOptions = computed(() =>
+            buildFacetOptions(facetAvailability.value.instrument_model)
+        );
+
+        const disabledTubeDiameters = computed(() => []);
+        const disabledNuclei = computed(() => []);
+        const disabledProtonFrequencies = computed(() => []);
+
+        const activeFilterCount = computed(() => {
+            let count = 0;
+
+            if (freeText.value?.trim()) {
+                count++;
+            }
+            if (solvent.value) {
+                count++;
+            }
+            if (temperature.value) {
+                count++;
+            }
+            if (tubeDiameter.value) {
+                count++;
+            }
+            if (acquisitionNucleus.value) {
+                count++;
+            }
+            if (protonFrequency.value) {
+                count++;
+            }
+            if (nmrMethod.value) {
+                count++;
+            }
+            if (pulseSequence.value) {
+                count++;
+            }
+            if (numberOfScans.value) {
+                count++;
+            }
+            if (manufacturer.value) {
+                count++;
+            }
+            if (instrumentModel.value) {
+                count++;
+            }
+
+            return count;
+        });
+
+        const hasAnyValue = computed(() => activeFilterCount.value > 0);
 
         const clearAll = () => {
             freeText.value = "";
             solvent.value = "";
-            temperature.value = null;
+            temperature.value = "";
             tubeDiameter.value = "";
             acquisitionNucleus.value = "";
             protonFrequency.value = "";
             nmrMethod.value = "";
             pulseSequence.value = "";
-            numberOfScans.value = null;
+            numberOfScans.value = "";
             manufacturer.value = "";
             instrumentModel.value = "";
-        };
-
-        const emitParams = () => {
-            emit("search-params-updated", {
-                freeText: freeText.value,
-                solvent: solvent.value,
-                temperature: temperature.value,
-                tubeDiameter: tubeDiameter.value,
-                acquisitionNucleus: acquisitionNucleus.value,
-                protonFrequency: protonFrequency.value,
-                nmrMethod: nmrMethod.value,
-                pulseSequence: pulseSequence.value,
-                numberOfScans: numberOfScans.value,
-                manufacturer: manufacturer.value,
-                instrumentModel: instrumentModel.value,
-            });
         };
 
         watch(
@@ -319,9 +558,13 @@ export default {
                 instrumentModel,
             ],
             () => {
+                if (!hydrated.value) {
+                    return;
+                }
+
                 emitParams();
-            },
-            { immediate: true }
+                scheduleFacetRefresh();
+            }
         );
 
         return {
@@ -337,8 +580,24 @@ export default {
             manufacturer,
             instrumentModel,
             hasAnyValue,
+            activeFilterCount,
             clearAll,
-            emitParams,
+            solventOptions,
+            temperatureOptions,
+            tubeDiameterOptions: tubeDiameterOptionsComputed,
+            nucleusOptions: nucleusOptionsComputed,
+            protonFrequencyOptions,
+            nmrMethodOptions,
+            pulseSequenceOptions,
+            numberOfScansOptions,
+            manufacturerOptions,
+            instrumentModelOptions,
+            facetsLoaded,
+            disabledTubeDiameters,
+            disabledNuclei,
+            disabledProtonFrequencies,
+            sectionClass,
+            sectionTitleClass,
         };
     },
 };
