@@ -18,6 +18,8 @@ class ProcessELNSpectraTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const PARSER_URL = 'https://nmrkit.example/latest/spectra/parse/url';
+
     private Project $project;
 
     private Study $study;
@@ -25,6 +27,8 @@ class ProcessELNSpectraTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => self::PARSER_URL]);
 
         $user = User::factory()->create();
         $this->project = Project::factory()->create([
@@ -113,7 +117,7 @@ class ProcessELNSpectraTest extends TestCase
         ];
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response($mockResponse, 200),
+            self::PARSER_URL => Http::response($mockResponse, 200),
         ]);
 
         Log::shouldReceive('info')->atLeast()->once();
@@ -148,7 +152,7 @@ class ProcessELNSpectraTest extends TestCase
         ];
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response($mockResponse, 200),
+            self::PARSER_URL => Http::response($mockResponse, 200),
         ]);
 
         Log::shouldReceive('info')->atLeast()->once();
@@ -187,7 +191,7 @@ class ProcessELNSpectraTest extends TestCase
         ];
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response($mockResponse, 200),
+            self::PARSER_URL => Http::response($mockResponse, 200),
         ]);
 
         Log::shouldReceive('info')->atLeast()->once();
@@ -208,7 +212,7 @@ class ProcessELNSpectraTest extends TestCase
         $this->study->save();
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response([
+            self::PARSER_URL => Http::response([
                 'data' => [
                     'spectra' => [],
                     'version' => '1.0',
@@ -223,9 +227,9 @@ class ProcessELNSpectraTest extends TestCase
         $job->handle();
 
         Http::assertSent(function ($request) {
-            return $request->url() === 'https://nodejs.nmrxiv.org/spectra-parser' &&
-                   $request['snapshot'] === false &&
-                   is_array($request['urls']);
+            return $request->url() === self::PARSER_URL &&
+                   $request['capture_snapshot'] === false &&
+                   $request['url'] === 'https://example.com/test-spectra.zip';
         });
     }
 

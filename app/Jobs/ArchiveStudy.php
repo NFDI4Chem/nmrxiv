@@ -371,13 +371,10 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
 
     // protected function processSpectra($url)
     // {
-    //     $url = urlencode($url);
-    //     $response = Http::post('https://nodejs.nmrxiv.org/spectra-parser', '{
-    //         "urls": [
-    //           '. $url .'
-    //         ],
-    //         "snapshot": false
-    //       }');
+    //     $response = Http::post(config('nmrxiv.spectra_parsing.nmrkit_api_url'), [
+    //         'url' => $url,
+    //         'capture_snapshot' => false,
+    //     ]);
 
     //     return $response->json();
     // }
