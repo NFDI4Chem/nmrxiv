@@ -23,9 +23,6 @@
                 as="div"
                 :default-open="file.name == '/' || isExpanded(file.id)"
                 class="space-y-1"
-                @update:open="
-                    (isOpen) => handleDisclosureToggle(file.id, isOpen)
-                "
             >
                 <!-- Folder header with selection highlighting -->
                 <div
@@ -43,6 +40,9 @@
                     <DisclosureButton
                         class="flex-shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                         :aria-label="open ? 'Collapse folder' : 'Expand folder'"
+                        @click.stop.prevent="
+                            handleDisclosureButtonClick(file.id)
+                        "
                     >
                         <span v-if="file.loading">
                             <ArrowPathIcon
@@ -210,13 +210,6 @@
                                             as="div"
                                             class="space-y-1"
                                             :default-open="isExpanded(sfile.id)"
-                                            @update:open="
-                                                (isOpen) =>
-                                                    handleDisclosureToggle(
-                                                        sfile.id,
-                                                        isOpen
-                                                    )
-                                            "
                                         >
                                             <!-- Nested directory header -->
                                             <div
@@ -235,6 +228,11 @@
                                                         open
                                                             ? 'Collapse folder'
                                                             : 'Expand folder'
+                                                    "
+                                                    @click.stop.prevent="
+                                                        handleDisclosureButtonClick(
+                                                            sfile.id
+                                                        )
                                                     "
                                                 >
                                                     <span v-if="sfile.loading">
@@ -488,6 +486,13 @@
                                                                         isOpen
                                                                     )
                                                             "
+                                                            @load-folder-children="
+                                                                (folder) =>
+                                                                    $emit(
+                                                                        'load-folder-children',
+                                                                        folder
+                                                                    )
+                                                            "
                                                             @study-context-menu="
                                                                 (payload) =>
                                                                     $emit(
@@ -698,7 +703,12 @@ export default {
     /**
      * Events emitted by this component
      */
-    emits: ["toggle-expansion", "study-context-menu", "sample-folder-selected"],
+    emits: [
+        "toggle-expansion",
+        "load-folder-children",
+        "study-context-menu",
+        "sample-folder-selected",
+    ],
 
     /**
      * Composition API setup function
@@ -979,30 +989,13 @@ export default {
         },
 
         /**
-         * Handle disclosure toggle events from HeadlessUI
-         *
-         * Emits expansion state changes to parent component for tracking.
-         * This allows the parent to maintain a global expansion state.
-         *
-         * @param {String|Number} fsoId - File system object ID
-         * @param {Boolean} isOpen - New expansion state
-         */
-        handleDisclosureToggle(fsoId, isOpen) {
-            // Emit to parent component to update expansion tracking
-            this.$emit("toggle-expansion", fsoId, isOpen);
-        },
-
-        /**
-         * Handle disclosure button clicks directly
-         *
-         * Manually toggles expansion state when the disclosure button is clicked.
-         * This provides an alternative way to control expansion beyond HeadlessUI's
-         * automatic handling.
+         * Handle chevron clicks — toggle expansion from parent state, not
+         * HeadlessUI's internal open flag (which can desync during remounts
+         * or while a children request is still pending).
          *
          * @param {String|Number} fsoId - File system object ID
          */
         handleDisclosureButtonClick(fsoId) {
-            // Toggle the current state and emit
             const isCurrentlyExpanded = this.isExpanded(fsoId);
             this.$emit("toggle-expansion", fsoId, !isCurrentlyExpanded);
         },
@@ -1075,22 +1068,7 @@ export default {
                 (!file.children || file.children.length === 0) &&
                 !file.loading
             ) {
-                file.loading = true;
-                axios
-                    .get("/api/v1/files/children/" + file.id)
-                    .then((response) => {
-                        if (response.data?.files?.[0]?.children) {
-                            file.children = response.data.files[0].children;
-                        } else {
-                            file.children = [];
-                        }
-                    })
-                    .catch(() => {
-                        file.children = [];
-                    })
-                    .finally(() => {
-                        file.loading = false;
-                    });
+                this.$emit("load-folder-children", file);
             }
 
             if (this.isSampleFolder(file)) {
