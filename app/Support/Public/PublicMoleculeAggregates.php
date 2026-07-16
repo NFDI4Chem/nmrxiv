@@ -7,6 +7,7 @@ namespace App\Support\Public;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Study;
+use App\Support\Nmr\MoleculeExperimentTypeCounts;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -87,7 +88,7 @@ SQL;
         )));
 
         $sampleCounts = self::sampleCountsByMoleculeId($ids);
-        $experimentCounts = self::experimentTypeCountsByMoleculeId($ids);
+        $experimentCounts = (new MoleculeExperimentTypeCounts)->forPublicCatalog($ids);
 
         foreach ($molecules as $molecule) {
             $id = $molecule instanceof Molecule ? (int) $molecule->id : (int) $molecule->id;
@@ -160,57 +161,6 @@ SQL,
         }
 
         return $counts;
-    }
-
-    /**
-     * @param  array<int, int>  $moleculeIds
-     * @return array<int, array<string, int>>
-     */
-    private static function experimentTypeCountsByMoleculeId(array $moleculeIds): array
-    {
-        if ($moleculeIds === []) {
-            return [];
-        }
-
-        $placeholders = implode(',', array_fill(0, count($moleculeIds), '?'));
-        $datasetNotDeleted = self::datasetNotDeletedSql('d');
-        $studyNotDeleted = '(st.is_deleted IS NULL OR st.is_deleted = false)';
-        $datasetSpectra = self::datasetHasSpectraSql('d', 'n');
-
-        $rows = DB::select(
-            <<<SQL
-SELECT ms.molecule_id, d.type AS experiment_type, COUNT(DISTINCT d.id) AS dataset_count
-FROM datasets d
-INNER JOIN studies st ON st.id = d.study_id
-INNER JOIN samples s ON s.study_id = st.id
-INNER JOIN molecule_sample ms ON ms.sample_id = s.id
-LEFT JOIN nmrium n ON n.nmriumable_type = ?
-    AND n.nmriumable_id = d.id
-WHERE ms.molecule_id IN ({$placeholders})
-  AND st.is_public = true
-  AND st.is_archived = false
-  AND {$studyNotDeleted}
-  AND d.is_public = true
-  AND (d.is_archived IS NULL OR d.is_archived = false)
-  AND d.type IS NOT NULL
-  AND d.type <> ''
-  AND {$datasetNotDeleted}
-  AND {$datasetSpectra}
-GROUP BY ms.molecule_id, d.type
-SQL,
-            array_merge([Dataset::class], $moleculeIds),
-        );
-
-        /** @var array<int, array<string, int>> $grouped */
-        $grouped = [];
-
-        foreach ($rows as $row) {
-            $moleculeId = (int) $row->molecule_id;
-            $type = (string) $row->experiment_type;
-            $grouped[$moleculeId][$type] = (int) $row->dataset_count;
-        }
-
-        return $grouped;
     }
 
     private static function datasetHasSpectraSql(string $datasetAlias, string $nmriumAlias): string
