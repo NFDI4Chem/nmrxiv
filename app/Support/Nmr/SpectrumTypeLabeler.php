@@ -92,9 +92,13 @@ final class SpectrumTypeLabeler
             return [];
         }
 
-        $decoded = is_array($nmriumInfo)
-            ? $nmriumInfo
-            : json_decode(json_encode($nmriumInfo), true);
+        if (is_string($nmriumInfo)) {
+            $decoded = json_decode($nmriumInfo, true);
+        } elseif (is_array($nmriumInfo)) {
+            $decoded = $nmriumInfo;
+        } else {
+            $decoded = json_decode(json_encode($nmriumInfo), true);
+        }
 
         if (! is_array($decoded)) {
             return [];

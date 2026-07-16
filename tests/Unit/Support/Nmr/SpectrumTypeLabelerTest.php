@@ -28,4 +28,17 @@ class SpectrumTypeLabelerTest extends TestCase
 
         $this->assertSame(['1H NMR - 1D', '13C-1H NMR - 2D'], $labels);
     }
+
+    public function test_parses_json_string_nmrium_info_from_database_queries(): void
+    {
+        $labeler = new SpectrumTypeLabeler;
+
+        $labels = $labeler->labelsFromSpectra(
+            $labeler->spectraFromNmriumInfo(
+                '{"data":{"spectra":[{"info":{"experiment":"1D","nucleus":"1H"}},{"info":{"experiment":"2D","nucleus":["13C","1H"]}}]}}'
+            )
+        );
+
+        $this->assertSame(['1H NMR - 1D', '13C-1H NMR - 2D'], $labels);
+    }
 }
