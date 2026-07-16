@@ -30,7 +30,9 @@ class ApiDocumentationTest extends TestCase
 
         $this->assertArrayHasKey('/api/v1/search/metadata', $spec['paths']);
         $this->assertArrayHasKey('/api/v1/search/metadata/facets', $spec['paths']);
+        $this->assertArrayHasKey('/api/v1/search/metadata/stats', $spec['paths']);
         $this->assertSame('searchMetadata', $spec['paths']['/api/v1/search/metadata']['get']['operationId']);
         $this->assertSame('searchMetadataFacets', $spec['paths']['/api/v1/search/metadata/facets']['get']['operationId']);
+        $this->assertSame('searchMetadataStats', $spec['paths']['/api/v1/search/metadata/stats']['get']['operationId']);
     }
 }

@@ -11,6 +11,7 @@ All public search endpoints are read-only `GET` requests under `/api/v1/search/`
 | `/api/v1/search/catalog` | `GET` | Free-text search across project, sample, and spectra names/descriptions |
 | `/api/v1/search/metadata` | `GET` | Structured NMR metadata search over indexed NMRium fields |
 | `/api/v1/search/metadata/facets` | `GET` | Available values for metadata filters (for building UIs) |
+| `/api/v1/search/metadata/stats` | `GET` | Aggregate counts and distributions for indexed public spectra |
 | `/api/v1/search/compounds` | `POST` | Structure and compound property search |
 
 ## Metadata search
@@ -113,6 +114,67 @@ curl -G "https://nmrxiv.org/api/v1/search/metadata/facets" \
 
 Facet keys with empty arrays indicate that no public indexed spectra currently carry that metadata.
 
+### `GET /api/v1/search/metadata/stats`
+
+Returns aggregate statistics for public datasets with extracted NMRium metadata: totals, 1D/2D dimension breakdown, and count distributions for nucleus, solvent, experiment type, measuring frequency (MHz), manufacturer, temperature, pulse sequence, tube diameter, scans, and probe model.
+
+Unfiltered requests are served from the persisted `spectra_metadata_stats_index` table (rebuilt daily). Filtered requests are computed live and include `"source": "live"`. Use `limit` (default `50`, max `200`) to cap buckets per distribution when reading the index.
+
+#### Example
+
+```bash
+curl -G "https://nmrxiv.org/api/v1/search/metadata/stats"
+```
+
+#### Response `200`
+
+```json
+{
+  "scope": "public_indexed",
+  "source": "index",
+  "computed_at": "2026-07-16T00:00:00+00:00",
+  "totals": {
+    "spectra_indexed": 1200,
+    "samples_with_indexed_spectra": 340,
+    "public_spectra": 1300,
+    "indexed_coverage_percent": 92.3
+  },
+  "distributions": {
+    "dimension": [
+      { "value": "1D", "count": 800 },
+      { "value": "2D", "count": 400 }
+    ],
+    "nucleus": [
+      { "value": "1H", "count": 700 },
+      { "value": "13C", "count": 350 }
+    ],
+    "solvent": [
+      { "value": "CDCl3", "count": 500 }
+    ],
+    "experiment": [
+      { "value": "proton", "count": 400 }
+    ],
+    "measuring_frequency_mhz": [
+      { "value": "600", "count": 650 }
+    ]
+  },
+  "missing": {
+    "dimension": 12,
+    "nucleus": 3
+  }
+}
+```
+
+For terminal inspection, operators can also run:
+
+```bash
+php artisan nmrxiv:index-spectra-metadata-stats
+php artisan nmrxiv:spectra-metadata-stats
+php artisan nmrxiv:spectra-metadata-stats --json
+```
+
+The index is rebuilt automatically every day via the scheduler. After deployment or bulk metadata extraction, run `nmrxiv:index-spectra-metadata-stats` once to populate it immediately.
+
 ## Catalog text search
 
 ### `GET /api/v1/search/catalog`
@@ -131,10 +193,11 @@ Metadata search relies on denormalized columns populated from NMRium. After depl
 ```bash
 php artisan migrate
 php artisan nmrxiv:extract-dataset-spectra-info
+php artisan nmrxiv:index-spectra-metadata-stats
 ```
 
 Re-run with `--force` to refresh all datasets after extractor changes.
 
 ## OpenAPI
 
-Machine-readable specifications are generated with `php artisan l5-swagger:generate` and served at `/api/documentation`. Metadata operations are tagged **Search** with operation IDs `searchMetadata` and `searchMetadataFacets`.
+Machine-readable specifications are generated with `php artisan l5-swagger:generate` and served at `/api/documentation`. Metadata operations are tagged **Search** with operation IDs `searchMetadata`, `searchMetadataFacets`, and `searchMetadataStats`.

@@ -199,6 +199,133 @@ class MetadataSearchControllerTest extends TestCase
         $response->assertJsonPath('facets.proton_frequency', ['600']);
     }
 
+    public function test_metadata_stats_returns_totals_and_distributions(): void
+    {
+        $this->createIndexedPublicDataset([
+            'solvent' => 'CDCl3',
+            'nucleus' => ['1H'],
+            'experiment' => 'HSQC',
+            'baseFrequency' => 600,
+            'dimension' => 2,
+        ]);
+
+        $this->createIndexedPublicDataset([
+            'solvent' => 'CDCl3',
+            'nucleus' => ['1H'],
+            'experiment' => 'proton',
+            'baseFrequency' => 600,
+            'dimension' => 1,
+        ]);
+
+        $this->createIndexedPublicDataset([
+            'solvent' => 'DMSO-d6',
+            'nucleus' => ['13C'],
+            'experiment' => 'COSY',
+            'baseFrequency' => 400,
+            'dimension' => 2,
+        ]);
+
+        $this->artisan('nmrxiv:index-spectra-metadata-stats')->assertSuccessful();
+
+        $response = $this->getJson('/api/v1/search/metadata/stats');
+
+        $response->assertOk();
+        $response->assertJsonPath('scope', 'public_indexed');
+        $response->assertJsonPath('source', 'index');
+        $response->assertJsonPath('totals.spectra_indexed', 3);
+        $response->assertJsonPath('totals.samples_with_indexed_spectra', 3);
+        $response->assertJsonPath('distributions.dimension', [
+            ['value' => '2D', 'count' => 2],
+            ['value' => '1D', 'count' => 1],
+        ]);
+        $response->assertJsonPath('distributions.nucleus', [
+            ['value' => '1H', 'count' => 2],
+            ['value' => '13C', 'count' => 1],
+        ]);
+        $response->assertJsonPath('distributions.solvent', [
+            ['value' => 'CDCl3', 'count' => 2],
+            ['value' => 'DMSO-d6', 'count' => 1],
+        ]);
+        $response->assertJsonPath('distributions.experiment', [
+            ['value' => 'COSY', 'count' => 1],
+            ['value' => 'HSQC', 'count' => 1],
+            ['value' => 'proton', 'count' => 1],
+        ]);
+        $response->assertJsonPath('distributions.measuring_frequency_mhz', [
+            ['value' => '600', 'count' => 2],
+            ['value' => '400', 'count' => 1],
+        ]);
+        $response->assertJsonPath('distributions.nucleus_measuring_frequency_mhz', [
+            [
+                'nucleus' => '1H',
+                'count' => 2,
+                'frequencies' => [
+                    ['value' => '600', 'count' => 2],
+                ],
+            ],
+            [
+                'nucleus' => '13C',
+                'count' => 1,
+                'frequencies' => [
+                    ['value' => '400', 'count' => 1],
+                ],
+            ],
+        ]);
+        $response->assertJsonPath('distributions.dimension_experiment_breakdown', [
+            [
+                'dimension' => '1D',
+                'count' => 1,
+                'breakdown' => 'nucleus',
+                'segments' => [
+                    ['value' => '1H', 'count' => 1, 'kind' => 'nucleus'],
+                ],
+            ],
+            [
+                'dimension' => '2D',
+                'count' => 2,
+                'breakdown' => 'experiment',
+                'segments' => [
+                    ['value' => 'COSY', 'count' => 1, 'kind' => 'experiment'],
+                    ['value' => 'HSQC', 'count' => 1, 'kind' => 'experiment'],
+                ],
+            ],
+        ]);
+    }
+
+    public function test_metadata_stats_can_be_scoped_with_filters(): void
+    {
+        $this->createIndexedPublicDataset([
+            'solvent' => 'CDCl3',
+            'nucleus' => ['1H'],
+            'experiment' => 'HSQC',
+            'dimension' => 2,
+        ]);
+
+        $this->createIndexedPublicDataset([
+            'solvent' => 'DMSO-d6',
+            'nucleus' => ['13C'],
+            'experiment' => 'COSY',
+            'dimension' => 2,
+        ]);
+
+        $this->artisan('nmrxiv:index-spectra-metadata-stats')->assertSuccessful();
+
+        $response = $this->getJson('/api/v1/search/metadata/stats?'.http_build_query([
+            'solvent' => 'CDCl3',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('source', 'live');
+        $response->assertJsonPath('computed_at', null);
+        $response->assertJsonPath('totals.spectra_indexed', 1);
+        $response->assertJsonPath('distributions.nucleus', [
+            ['value' => '1H', 'count' => 1],
+        ]);
+        $response->assertJsonPath('distributions.experiment', [
+            ['value' => 'HSQC', 'count' => 1],
+        ]);
+    }
+
     public function test_metadata_search_filters_tube_diameter_exactly(): void
     {
         $fiveMillimeter = $this->createIndexedPublicDataset([

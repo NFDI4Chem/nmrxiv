@@ -300,6 +300,95 @@ class SearchController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/v1/search/metadata/stats",
+     *     operationId="searchMetadataStats",
+     *     tags={"Search"},
+     *     summary="Aggregate metadata statistics for public indexed spectra",
+     *     description="Returns totals and count distributions for public datasets with extracted NMRium metadata. Unfiltered requests are served from the persisted statistics index (refreshed daily). Filtered requests are computed live.",
+     *
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchQ"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchSolvent"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTemperature"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTubeDiameter"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNucleus"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchProtonFrequency"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNmrMethod"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchPulseSequence"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNumberOfScans"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchManufacturer"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchInstrumentModel"),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum buckets per distribution (default: 50, max: 200)",
+     *
+     *         @OA\Schema(type="integer", minimum=1, maximum=200, default=50)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Metadata catalog statistics",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="scope", type="string", example="public_indexed"),
+     *             @OA\Property(property="source", type="string", enum={"index", "live"}, example="index"),
+     *             @OA\Property(property="computed_at", type="string", format="date-time", nullable=true, example="2026-07-16T00:00:00+00:00"),
+     *             @OA\Property(
+     *                 property="totals",
+     *                 type="object",
+     *                 @OA\Property(property="spectra_indexed", type="integer", example=1200),
+     *                 @OA\Property(property="samples_with_indexed_spectra", type="integer", example=340),
+     *                 @OA\Property(property="public_spectra", type="integer", example=1300),
+     *                 @OA\Property(property="indexed_coverage_percent", type="number", format="float", example=92.3)
+     *             ),
+     *             @OA\Property(
+     *                 property="distributions",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="dimension",
+     *                     type="array",
+     *
+     *                     @OA\Items(
+     *                         type="object",
+     *
+     *                         @OA\Property(property="value", type="string", example="1D"),
+     *                         @OA\Property(property="count", type="integer", example=800)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="nucleus", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="solvent", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="experiment", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="measuring_frequency_mhz", type="array", @OA\Items(type="object"))
+     *             ),
+     *             @OA\Property(property="missing", type="object", description="Indexed spectra lacking each metadata field")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function metadataStats(MetadataFacetsRequest $request): JsonResponse
+    {
+        $limit = (int) $request->query('limit', 50);
+        $limit = max(1, min(200, $limit));
+
+        return response()->json(
+            $this->metadataSearch->statisticsFromRequest($request, $limit)
+        );
+    }
+
+    /**
      * @deprecated Use GET /api/v1/search/catalog
      */
     public function catalogTextSearchLegacy(TextSearchRequest $request): JsonResponse

@@ -4156,6 +4156,140 @@
                 }
             }
         },
+        "/api/v1/search/metadata/stats": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Aggregate metadata statistics for public indexed spectra",
+                "description": "Returns totals and count distributions for public datasets with extracted NMRium metadata. Unfiltered requests are served from the persisted statistics index (refreshed daily). Filtered requests are computed live.",
+                "operationId": "searchMetadataStats",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/metadataSearchQ"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchSolvent"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchTemperature"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchTubeDiameter"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNucleus"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchProtonFrequency"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNmrMethod"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchPulseSequence"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNumberOfScans"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchManufacturer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchInstrumentModel"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum buckets per distribution (default: 50, max: 200)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 50,
+                            "maximum": 200,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata catalog statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "scope": {
+                                            "type": "string",
+                                            "example": "public_indexed"
+                                        },
+                                        "source": {
+                                            "type": "string",
+                                            "enum": [
+                                                "index",
+                                                "live"
+                                            ],
+                                            "example": "index"
+                                        },
+                                        "computed_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "nullable": true,
+                                            "example": "2026-07-16T00:00:00+00:00"
+                                        },
+                                        "totals": {
+                                            "properties": {
+                                                "spectra_indexed": {
+                                                    "type": "integer",
+                                                    "example": 1200
+                                                },
+                                                "samples_with_indexed_spectra": {
+                                                    "type": "integer",
+                                                    "example": 340
+                                                },
+                                                "public_spectra": {
+                                                    "type": "integer",
+                                                    "example": 1300
+                                                },
+                                                "indexed_coverage_percent": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 92.3
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "distributions": {
+                                            "type": "object"
+                                        },
+                                        "missing": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/search/compounds": {
             "post": {
                 "tags": [

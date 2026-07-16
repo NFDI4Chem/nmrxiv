@@ -100,7 +100,7 @@ namespace App\OpenApi;
  *     name="manufacturer",
  *     in="query",
  *     required=false,
- *     description="Instrument manufacturer (`spectra_manufacturer`).",
+ *     description="Instrument vendor from the sample folder type (`instrument_type`: Bruker, JEOL, Magritek, JCAMP) stored in `spectra_manufacturer`.",
  *
  *     @OA\Schema(type="string", maxLength=255, example="Bruker")
  * )
