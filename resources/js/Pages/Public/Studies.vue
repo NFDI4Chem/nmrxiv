@@ -82,10 +82,13 @@
                                                         Molecular Formula:
                                                         <span
                                                             class="text-base inline font-semibold text-gray-900"
-                                                            >{{
-                                                                molecule.molecular_formula
-                                                            }}</span
                                                         >
+                                                            <MolecularFormula
+                                                                :formula="
+                                                                    molecule.molecular_formula
+                                                                "
+                                                            />
+                                                        </span>
                                                     </a>
                                                     &emsp; &middot; &emsp;
                                                     <a>
@@ -417,6 +420,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
+import MolecularFormula from "@/Shared/MolecularFormula.vue";
 import StudySearch from "@/Shared/StudySearch.vue";
 import StudyPublicCard from "@/Shared/StudyCardPublic.vue";
 import { ref } from "vue";
@@ -433,6 +437,7 @@ import {
 export default {
     components: {
         AppLayout,
+        MolecularFormula,
         StudySearch,
         Pagination,
         Menu,

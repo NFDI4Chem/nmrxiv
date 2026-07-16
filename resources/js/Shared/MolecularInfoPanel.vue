@@ -36,7 +36,11 @@
                                 : 'text-sm font-medium tabular-nums',
                         ]"
                     >
-                        {{ field.value }}
+                        <MolecularFormula
+                            v-if="field.formula"
+                            :formula="field.value"
+                        />
+                        <template v-else>{{ field.value }}</template>
                     </dd>
                 </div>
             </dl>
@@ -55,12 +59,14 @@
 
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
+import MolecularFormula from "@/Shared/MolecularFormula.vue";
 
 export default {
     name: "MolecularInfoPanel",
 
     components: {
         Depictor2D,
+        MolecularFormula,
     },
 
     props: {
@@ -133,6 +139,7 @@ export default {
                     label: "Molecular formula",
                     value: String(formula).trim(),
                     mono: true,
+                    formula: true,
                 });
             }
 
