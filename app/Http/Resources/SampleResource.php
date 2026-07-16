@@ -22,6 +22,12 @@ class SampleResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'molecules' => $this->molecules,
+            'mixture_composition' => $this->when(
+                $this->relationLoaded('mixtureComposition') && $this->mixtureComposition,
+                fn () => new MixtureCompositionResource(
+                    $this->mixtureComposition->loadMissing('components.molecule')
+                )
+            ),
             'submitted_through' => $this->submitted_through,
         ];
     }
