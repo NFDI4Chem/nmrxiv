@@ -13,7 +13,7 @@ class ProjectResource extends JsonResource
 {
     private bool $lite = true;
 
-    private array $properties = ['users', 'studies', 'files', 'authors', 'citations'];
+    private array $properties = ['users', 'studies', 'files', 'authors', 'citations', 'fundingReferences'];
 
     public function lite(bool $lite, ?array $properties = []): self
     {
@@ -115,6 +115,16 @@ class ProjectResource extends JsonResource
                             return [
                                 'citations' => CitationResource::collection(
                                     $this->citations
+                                ),
+                            ];
+                        }
+                    ),
+                    $this->mergeWhen(
+                        in_array('fundingReferences', $this->properties),
+                        function () {
+                            return [
+                                'funding_references' => FundingReferenceResource::collection(
+                                    $this->fundingReferences
                                 ),
                             ];
                         }
