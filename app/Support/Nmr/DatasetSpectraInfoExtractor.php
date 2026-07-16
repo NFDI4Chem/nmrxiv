@@ -45,7 +45,8 @@ class DatasetSpectraInfoExtractor
             'spectra_base_frequency' => $baseFrequency,
             'spectra_number_of_scans' => $this->normalizeInteger($this->property($infoArray, 'numberOfScans')),
             'spectra_probe_name' => $this->normalizeString($this->property($infoArray, 'probeName')),
-            'spectra_manufacturer' => $this->extractManufacturer($infoArray),
+            'spectra_manufacturer' => InstrumentTypeManufacturerResolver::forDataset($dataset)
+                ?? $this->extractManufacturer($infoArray),
             'spectra_field_strength' => $this->normalizeDecimal($this->property($infoArray, 'fieldStrength')),
             'spectra_spectral_width' => $this->normalizeDecimal($this->property($infoArray, 'spectralWidth')),
             'spectra_number_of_points' => $this->normalizeInteger($this->property($infoArray, 'numberOfPoints')),

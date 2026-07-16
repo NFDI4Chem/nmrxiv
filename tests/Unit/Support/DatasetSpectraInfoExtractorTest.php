@@ -3,6 +3,7 @@
 namespace Tests\Unit\Support;
 
 use App\Models\Dataset;
+use App\Models\FileSystemObject;
 use App\Models\License;
 use App\Models\NMRium;
 use App\Models\Project;
@@ -196,6 +197,41 @@ class DatasetSpectraInfoExtractorTest extends TestCase
         $payload = $this->extractor->extractForDataset($dataset);
 
         $this->assertSame('Bruker', $payload['spectra_manufacturer']);
+    }
+
+    public function test_extract_prefers_sample_folder_instrument_type_for_manufacturer(): void
+    {
+        $dataset = $this->makeDataset();
+
+        $folder = FileSystemObject::factory()->directory()->create([
+            'study_id' => $dataset->study_id,
+            'instrument_type' => 'joel',
+        ]);
+
+        $dataset->update(['fs_id' => $folder->id]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H'],
+                                'experiment' => 'proton',
+                                'manufacturer' => 'Bruker',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataset->refresh();
+
+        $payload = $this->extractor->extractForDataset($dataset);
+
+        $this->assertSame('JEOL', $payload['spectra_manufacturer']);
     }
 
     public function test_extract_returns_empty_payload_when_no_nmrium_info(): void
