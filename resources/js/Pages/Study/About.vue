@@ -664,6 +664,7 @@ import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import { applySampleMoleculeResponse } from "@/Utils/mixtureComposition";
 export default {
     components: {
         StudyContent,
@@ -775,7 +776,7 @@ export default {
                         mol.id
                 )
                 .then((res) => {
-                    this.study.sample.molecules = res.data;
+                    applySampleMoleculeResponse(this.study.sample, res.data);
                     this.smiles = "";
                     this.percentage = 0;
                     this.editor.setSmiles("");
@@ -792,7 +793,7 @@ export default {
                         mol.id
                 )
                 .then((res) => {
-                    this.study.sample.molecules = res.data;
+                    applySampleMoleculeResponse(this.study.sample, res.data);
                 });
         },
         saveMolecule(mol, study) {
@@ -821,7 +822,7 @@ export default {
                     canonical_smiles: mol.canonical_smiles,
                 })
                 .then((res) => {
-                    study.sample.molecules = res.data;
+                    applySampleMoleculeResponse(study.sample, res.data);
                     this.smiles = "";
                     this.percentage = 0;
                     // this.editor.setSmiles("");
