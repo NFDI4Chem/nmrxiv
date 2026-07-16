@@ -67,16 +67,13 @@ class ExtractDatasetSpectraInfoCommandTest extends TestCase
         $this->assertSame('CDCl3', $dataset->spectra_solvent);
         $this->assertSame('1H', $dataset->spectra_nucleus);
         $this->assertSame('COSY', $dataset->spectra_experiment);
-        $this->assertSame('500', $dataset->spectra_base_frequency);
+        $this->assertEquals(500, (float) $dataset->spectra_base_frequency);
         $this->assertNotNull($dataset->spectra_info_extracted_at);
     }
 
     public function test_command_skips_already_extracted_rows_without_force(): void
     {
-        $dataset = $this->makeDataset([
-            'spectra_solvent' => 'D2O',
-            'spectra_info_extracted_at' => now(),
-        ]);
+        $dataset = $this->makeDataset();
 
         NMRium::factory()->forDataset($dataset)->create([
             'nmrium_info' => [
@@ -93,6 +90,11 @@ class ExtractDatasetSpectraInfoCommandTest extends TestCase
                 ],
             ],
         ]);
+
+        $dataset->forceFill([
+            'spectra_solvent' => 'D2O',
+            'spectra_info_extracted_at' => now(),
+        ])->saveQuietly();
 
         $this->artisan('nmrxiv:extract-dataset-spectra-info', [
             '--dataset' => $dataset->id,
@@ -142,7 +144,7 @@ class ExtractDatasetSpectraInfoCommandTest extends TestCase
         $this->assertSame('1H', $dataset->spectra_nucleus);
         $this->assertSame('proton', $dataset->spectra_experiment);
         $this->assertSame('zg30', $dataset->spectra_pulse_sequence);
-        $this->assertSame('600', $dataset->spectra_base_frequency);
+        $this->assertEquals(600, (float) $dataset->spectra_base_frequency);
         $this->assertSame(16, $dataset->spectra_number_of_scans);
         $this->assertSame('BBO', $dataset->spectra_probe_name);
         $this->assertSame('Bruker', $dataset->spectra_manufacturer);
