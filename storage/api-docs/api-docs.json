@@ -28,15 +28,15 @@
                                         "description": "User's registered email address",
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255,
-                                        "example": "scientist@example.com"
+                                        "example": "scientist@example.com",
+                                        "maxLength": 255
                                     },
                                     "password": {
                                         "description": "User's password (minimum 8 characters)",
                                         "type": "string",
                                         "format": "password",
-                                        "minLength": 8,
-                                        "example": "SecurePassword123!"
+                                        "example": "SecurePassword123!",
+                                        "minLength": 8
                                     }
                                 },
                                 "type": "object"
@@ -267,37 +267,37 @@
                                     "first_name": {
                                         "description": "User's first name",
                                         "type": "string",
+                                        "example": "Dr. Sarah",
                                         "maxLength": 255,
-                                        "minLength": 1,
-                                        "example": "Dr. Sarah"
+                                        "minLength": 1
                                     },
                                     "last_name": {
                                         "description": "User's last name",
                                         "type": "string",
+                                        "example": "Johnson",
                                         "maxLength": 255,
-                                        "minLength": 1,
-                                        "example": "Johnson"
+                                        "minLength": 1
                                     },
                                     "email": {
                                         "description": "User's email address (must be unique)",
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255,
-                                        "example": "sarah.johnson@university.edu"
+                                        "example": "sarah.johnson@university.edu",
+                                        "maxLength": 255
                                     },
                                     "username": {
                                         "description": "Unique username for the account",
                                         "type": "string",
+                                        "example": "sarah_johnson_chem",
                                         "maxLength": 255,
-                                        "minLength": 1,
-                                        "example": "sarah_johnson_chem"
+                                        "minLength": 1
                                     },
                                     "password": {
                                         "description": "Password for the account (minimum 8 characters)",
                                         "type": "string",
                                         "format": "password",
-                                        "minLength": 8,
-                                        "example": "SecurePassword123!"
+                                        "example": "SecurePassword123!",
+                                        "minLength": 8
                                     },
                                     "orcid_id": {
                                         "description": "Optional ORCID identifier for academic users",
@@ -309,9 +309,9 @@
                                     "affiliation": {
                                         "description": "Optional institutional affiliation",
                                         "type": "string",
-                                        "maxLength": 500,
                                         "example": "University of Chemistry, Department of Organic Chemistry",
-                                        "nullable": true
+                                        "nullable": true,
+                                        "maxLength": 500
                                     }
                                 },
                                 "type": "object"
@@ -1001,12 +1001,12 @@
                         "required": true,
                         "schema": {
                             "type": "string",
+                            "example": "projects",
                             "enum": [
                                 "projects",
                                 "samples",
                                 "datasets"
-                            ],
-                            "example": "projects"
+                            ]
                         }
                     },
                     {
@@ -1917,11 +1917,11 @@
                         "required": true,
                         "schema": {
                             "type": "string",
+                            "example": "chemotion",
                             "enum": [
                                 "chemotion",
                                 "nobs"
-                            ],
-                            "example": "chemotion"
+                            ]
                         }
                     }
                 ],
@@ -2112,11 +2112,11 @@
                         "required": true,
                         "schema": {
                             "type": "string",
+                            "example": "chemotion",
                             "enum": [
                                 "chemotion",
                                 "nobs"
-                            ],
-                            "example": "chemotion"
+                            ]
                         }
                     },
                     {
@@ -3647,8 +3647,8 @@
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "maxLength": 1000,
-                            "example": "caffeine nmr"
+                            "example": "caffeine nmr",
+                            "maxLength": 1000
                         }
                     },
                     {
@@ -3778,6 +3778,384 @@
                 }
             }
         },
+        "/api/v1/search/metadata": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search public samples and spectra by NMR metadata",
+                "description": "Structured metadata search over denormalized NMRium spectrum fields on public datasets. Combine free-text keywords with exact or ranged filters for solvent, nucleus, temperature, experiment, pulse sequence, scans, manufacturer, and probe. Returns grouped sample (study) and spectra (dataset) results. At least one criterion is required.",
+                "operationId": "searchMetadata",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/metadataSearchQ"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchSolvent"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchTemperature"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchTubeDiameter"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNucleus"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchProtonFrequency"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNmrMethod"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchPulseSequence"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNumberOfScans"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchManufacturer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchInstrumentModel"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchPerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchStudiesPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchDatasetsPage"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grouped metadata search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "query": {
+                                            "properties": {
+                                                "q": {
+                                                    "type": "string",
+                                                    "example": ""
+                                                },
+                                                "tokens": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "solvent": {
+                                                    "type": "string",
+                                                    "example": "CDCl3",
+                                                    "nullable": true
+                                                },
+                                                "temperature": {
+                                                    "type": "number",
+                                                    "example": 294,
+                                                    "nullable": true
+                                                },
+                                                "tube_diameter": {
+                                                    "type": "string",
+                                                    "example": "5",
+                                                    "nullable": true
+                                                },
+                                                "nucleus": {
+                                                    "type": "string",
+                                                    "example": "1H",
+                                                    "nullable": true
+                                                },
+                                                "proton_frequency": {
+                                                    "type": "number",
+                                                    "example": 600,
+                                                    "nullable": true
+                                                },
+                                                "nmr_method": {
+                                                    "type": "string",
+                                                    "example": "hsqc",
+                                                    "nullable": true
+                                                },
+                                                "pulse_sequence": {
+                                                    "type": "string",
+                                                    "example": "zg30",
+                                                    "nullable": true
+                                                },
+                                                "number_of_scans": {
+                                                    "type": "integer",
+                                                    "example": 16,
+                                                    "nullable": true
+                                                },
+                                                "manufacturer": {
+                                                    "type": "string",
+                                                    "example": "Bruker",
+                                                    "nullable": true
+                                                },
+                                                "instrument_model": {
+                                                    "type": "string",
+                                                    "example": "BBO",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "studies": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "datasets": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No public samples or spectra matched the criteria",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No results found matching your metadata search criteria."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error (for example, no criteria supplied)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/search/metadata/facets": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "List available metadata filter values",
+                "description": "Returns distinct filter values that currently match public indexed spectra, given the other active criteria. Use this endpoint to populate advanced metadata search controls. Facet lists are narrowed as additional filters are applied.",
+                "operationId": "searchMetadataFacets",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/metadataSearchQ"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchSolvent"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchTemperature"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchTubeDiameter"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNucleus"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchProtonFrequency"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNmrMethod"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchPulseSequence"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchNumberOfScans"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchManufacturer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/metadataSearchInstrumentModel"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Available metadata facet values",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "facets": {
+                                            "properties": {
+                                                "solvent": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "CDCl3",
+                                                        "DMSO"
+                                                    ]
+                                                },
+                                                "temperature": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "294"
+                                                    ]
+                                                },
+                                                "tube_diameter": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "3",
+                                                        "5"
+                                                    ]
+                                                },
+                                                "nucleus": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "1H",
+                                                        "13C"
+                                                    ]
+                                                },
+                                                "proton_frequency": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "600"
+                                                    ]
+                                                },
+                                                "nmr_method": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "hsqc",
+                                                        "1d"
+                                                    ]
+                                                },
+                                                "pulse_sequence": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "zg30"
+                                                    ]
+                                                },
+                                                "number_of_scans": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "16"
+                                                    ]
+                                                },
+                                                "manufacturer": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "Bruker"
+                                                    ]
+                                                },
+                                                "instrument_model": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "BBO"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/search/compounds": {
             "post": {
                 "tags": [
@@ -3849,6 +4227,7 @@
                                     "type": {
                                         "description": "Search query type - auto-detected if not specified",
                                         "type": "string",
+                                        "example": "inchikey",
                                         "enum": [
                                             "text",
                                             "smiles",
@@ -3859,8 +4238,7 @@
                                             "similarity",
                                             "tags",
                                             "filters"
-                                        ],
-                                        "example": "inchikey"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -4232,6 +4610,166 @@
         }
     },
     "components": {
+        "parameters": {
+            "metadataSearchQ": {
+                "name": "q",
+                "in": "query",
+                "description": "Free-text search across denormalized NMRium metadata (`spectra_search_text`). Multi-word queries use AND semantics.",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "caffeine hsqc",
+                    "maxLength": 1000
+                }
+            },
+            "metadataSearchSolvent": {
+                "name": "solvent",
+                "in": "query",
+                "description": "NMR solvent (exact match on `spectra_solvent`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "CDCl3",
+                    "maxLength": 255
+                }
+            },
+            "metadataSearchTemperature": {
+                "name": "temperature",
+                "in": "query",
+                "description": "Sample temperature in kelvin (`spectra_temperature`). Integer values match ±0.5 K.",
+                "required": false,
+                "schema": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 294
+                }
+            },
+            "metadataSearchTubeDiameter": {
+                "name": "tube_diameter",
+                "in": "query",
+                "description": "Sample tube diameter in millimetres (`spectra_tube_diameter`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "5",
+                    "enum": [
+                        "3",
+                        "5",
+                        "10"
+                    ]
+                }
+            },
+            "metadataSearchNucleus": {
+                "name": "nucleus",
+                "in": "query",
+                "description": "Acquisition nucleus (`spectra_nucleus`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "1H"
+                }
+            },
+            "metadataSearchProtonFrequency": {
+                "name": "proton_frequency",
+                "in": "query",
+                "description": "Observed base frequency in MHz (`spectra_base_frequency`). Matches ±0.5 MHz.",
+                "required": false,
+                "schema": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 600
+                }
+            },
+            "metadataSearchNmrMethod": {
+                "name": "nmr_method",
+                "in": "query",
+                "description": "NMR experiment / method (`spectra_experiment`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "hsqc",
+                    "maxLength": 255
+                }
+            },
+            "metadataSearchPulseSequence": {
+                "name": "pulse_sequence",
+                "in": "query",
+                "description": "Pulse sequence name (`spectra_pulse_sequence`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "zg30",
+                    "maxLength": 255
+                }
+            },
+            "metadataSearchNumberOfScans": {
+                "name": "number_of_scans",
+                "in": "query",
+                "description": "Number of scans (`spectra_number_of_scans`).",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "example": 16,
+                    "minimum": 1
+                }
+            },
+            "metadataSearchManufacturer": {
+                "name": "manufacturer",
+                "in": "query",
+                "description": "Instrument manufacturer (`spectra_manufacturer`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "Bruker",
+                    "maxLength": 255
+                }
+            },
+            "metadataSearchInstrumentModel": {
+                "name": "instrument_model",
+                "in": "query",
+                "description": "Probe name (`spectra_probe_name`).",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "example": "BBO",
+                    "maxLength": 255
+                }
+            },
+            "metadataSearchPerPage": {
+                "name": "per_page",
+                "in": "query",
+                "description": "Results per entity group (default: 12, max: 24).",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "default": 12,
+                    "maximum": 24,
+                    "minimum": 1
+                }
+            },
+            "metadataSearchStudiesPage": {
+                "name": "studies_page",
+                "in": "query",
+                "description": "Page number for sample (study) results.",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "default": 1,
+                    "minimum": 1
+                }
+            },
+            "metadataSearchDatasetsPage": {
+                "name": "datasets_page",
+                "in": "query",
+                "description": "Page number for spectra (dataset) results.",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "default": 1,
+                    "minimum": 1
+                }
+            }
+        },
         "securitySchemes": {
             "token": {
                 "type": "apiKey",
