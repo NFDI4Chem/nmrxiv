@@ -22,6 +22,7 @@ use App\Support\ProjectWorkspace;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -95,7 +96,21 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        $projects = ProjectResource::collection(Project::where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        $projects = ProjectResource::collection(Project::query()
+            ->where([
+                ['is_public', true],
+                ['is_archived', false],
+                ['is_deleted', false],
+            ])
+            ->whereHas('studies', function (Builder $query): void {
+                $query
+                    ->where('is_public', true)
+                    ->where('is_archived', false)
+                    ->where('is_deleted', false);
+            })
+            ->filter($request->only('search', 'sort', 'mode'))
+            ->paginate(12)
+            ->withQueryString());
 
         return Inertia::render('Public/Projects', [
             'filters' => $request->all('search', 'sort', 'mode'),
