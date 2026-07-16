@@ -100,6 +100,7 @@ trait HasDOI
         $users = [];
         $keywords = [];
         $citations = [];
+        $fundingReferences = [];
 
         $issuedDate = $this->release_date ?? $this->updated_at ?? Carbon::now();
 
@@ -133,6 +134,7 @@ trait HasDOI
             $users = $this->allUsers();
             $authors = $this->authors ? $this->authors : [];
             $citations = $this->citations ? $this->citations : [];
+            $fundingReferences = $this->fundingReferences ? $this->fundingReferences : [];
             foreach ($this->tags as &$tag) {
                 $keyword = $tag->name;
                 array_push($keywords, $keyword);
@@ -144,6 +146,7 @@ trait HasDOI
             if ($this->project) {
                 $authors = $this->project->authors ? $this->project->authors : [];
                 $citations = $this->project->citations ? $this->project->citations : [];
+                $fundingReferences = $this->project->fundingReferences ? $this->project->fundingReferences : [];
             }
 
         } elseif ($this instanceof Dataset) {
@@ -155,6 +158,7 @@ trait HasDOI
                 $authors = $this->project->authors ? $this->project->authors : [];
 
                 $citations = $this->project->citations ? $this->project->citations : [];
+                $fundingReferences = $this->project->fundingReferences ? $this->project->fundingReferences : [];
             }
 
         }
@@ -314,7 +318,51 @@ trait HasDOI
             ];
         }
 
+        $dataciteFundingReferences = $this->buildFundingReferences($fundingReferences);
+        if ($dataciteFundingReferences !== []) {
+            $attributes['fundingReferences'] = $dataciteFundingReferences;
+        }
+
         return $attributes;
+    }
+
+    /**
+     * @param  iterable<int, FundingReference>  $fundingReferences
+     * @return array<int, array<string, string>>
+     */
+    private function buildFundingReferences(iterable $fundingReferences): array
+    {
+        $entries = [];
+
+        foreach ($fundingReferences as $fundingReference) {
+            $entry = [
+                'funderName' => $fundingReference->funder_name,
+            ];
+
+            if (! empty($fundingReference->funder_identifier)) {
+                $entry['funderIdentifier'] = $fundingReference->funder_identifier;
+            }
+
+            if (! empty($fundingReference->funder_identifier_type)) {
+                $entry['funderIdentifierType'] = $fundingReference->funder_identifier_type;
+            }
+
+            if (! empty($fundingReference->award_number)) {
+                $entry['awardNumber'] = $fundingReference->award_number;
+            }
+
+            if (! empty($fundingReference->award_title)) {
+                $entry['awardTitle'] = $fundingReference->award_title;
+            }
+
+            if (! empty($fundingReference->award_uri)) {
+                $entry['awardUri'] = $fundingReference->award_uri;
+            }
+
+            $entries[] = $entry;
+        }
+
+        return $entries;
     }
 
     public function addRelatedIdentifiers($doiService)
