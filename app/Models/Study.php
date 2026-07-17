@@ -126,6 +126,11 @@ class Study extends Model implements Auditable
         return false;
     }
 
+    public function likesCount(): int
+    {
+        return Like::count($this);
+    }
+
     /**
      * Get the study identifier
      */
