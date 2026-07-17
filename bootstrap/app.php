@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiDocumentationController;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\XFrameOptions;
 use App\Providers\AppServiceProvider;
@@ -9,6 +10,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use L5Swagger\L5SwaggerServiceProvider;
 use Lab404\Impersonate\ImpersonateServiceProvider;
@@ -34,6 +36,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         // channels: __DIR__.'/../routes/channels.php',
         health: '/up',
+        then: function () {
+            Route::get('api/documentation/openapi.json', [ApiDocumentationController::class, 'openApiSpec'])
+                ->name('api.documentation.openapi');
+        },
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->redirectGuestsTo(fn () => route('login'));
