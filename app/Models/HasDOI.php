@@ -154,11 +154,13 @@ trait HasDOI
             $title = $studyName.'['.$this->name.']';
             $users = $this->study->allUsers();
 
-            if ($this->project) {
-                $authors = $this->project->authors ? $this->project->authors : [];
+            $project = $this->project ?? $this->study?->project;
 
-                $citations = $this->project->citations ? $this->project->citations : [];
-                $fundingReferences = $this->project->fundingReferences ? $this->project->fundingReferences : [];
+            if ($project) {
+                $authors = $project->authors ? $project->authors : [];
+
+                $citations = $project->citations ? $project->citations : [];
+                $fundingReferences = $project->fundingReferences ? $project->fundingReferences : [];
             }
 
         }

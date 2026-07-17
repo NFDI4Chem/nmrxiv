@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Actions\FundingReference\PushProjectDoiMetadata;
 use App\Models\FundingReference;
 use App\Models\Project;
 use App\Models\User;
-use App\Services\DOI\DOIService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class ManageFundingReferencesTest extends TestCase
@@ -123,8 +123,6 @@ class ManageFundingReferencesTest extends TestCase
 
     public function test_saving_funding_reference_syncs_doi_metadata_when_project_has_doi(): void
     {
-        putenv('DOI_HOST=https://api.datacite.org');
-
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
         $project = Project::factory()->create([
@@ -132,27 +130,17 @@ class ManageFundingReferencesTest extends TestCase
             'doi' => '10.1234/nmrxiv.test-project',
         ]);
 
-        $doiService = $this->createMock(DOIService::class);
-        $doiService->expects($this->once())
-            ->method('updateDOI')
-            ->with(
-                '10.1234/nmrxiv.test-project',
-                $this->callback(function (array $attributes): bool {
-                    return isset($attributes['fundingReferences'])
-                        && $attributes['fundingReferences'][0]['funderName'] === 'Deutsche Forschungsgemeinschaft';
-                })
-            )
-            ->willReturn(['data' => ['id' => '10.1234/nmrxiv.test-project']]);
-
-        $this->instance(DOIService::class, $doiService);
+        $this->mock(PushProjectDoiMetadata::class, function ($mock): void {
+            $mock->shouldReceive('push')
+                ->once()
+                ->withArgs(fn (?Project $project): bool => $project?->doi === '10.1234/nmrxiv.test-project');
+        });
 
         $fundingReference = FundingReference::factory()->make();
         $body = $this->prepareBody($fundingReference);
 
         $response = $this->updateFundingReference($body, $project->id);
         $response->assertStatus(200);
-
-        putenv('DOI_HOST=');
     }
 
     public function test_funding_reference_cannot_be_updated_with_foreign_id(): void
@@ -211,7 +199,7 @@ class ManageFundingReferencesTest extends TestCase
     /**
      * @param  array<string, mixed>  $body
      */
-    public function updateFundingReference(array $body, int $projectId): Response
+    public function updateFundingReference(array $body, int $projectId): TestResponse
     {
         return $this->withHeaders([
             'Accept' => 'application/json',
@@ -221,7 +209,7 @@ class ManageFundingReferencesTest extends TestCase
     /**
      * @param  array<string, mixed>  $body
      */
-    public function detachFundingReference(array $body, int $projectId): Response
+    public function detachFundingReference(array $body, int $projectId): TestResponse
     {
         return $this->withHeaders([
             'Accept' => 'application/json',
