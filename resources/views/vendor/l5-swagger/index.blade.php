@@ -58,10 +58,10 @@
 
 <div id="app"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+<script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.62.9"></script>
 <script>
     Scalar.createApiReference('#app', {
-        url: @json($urlToDocs),
+        url: @json(route('l5-swagger.'.$documentation.'.docs', [], $useAbsolutePath)),
         favicon: @json(asset('img/logo.svg')),
         persistAuth: @json((bool) config('l5-swagger.defaults.ui.authorization.persist_authorization', false)),
         defaultOpenAllTags: @json(config('l5-swagger.defaults.ui.display.doc_expansion', 'none') === 'full'),
