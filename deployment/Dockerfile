@@ -75,7 +75,8 @@ RUN npm run build && \
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/Caddyfile /etc/caddy/Caddyfile
 
-RUN L5_SWAGGER_USE_REFLECTION_ANALYSER=true php artisan l5-swagger:generate
+RUN L5_SWAGGER_USE_REFLECTION_ANALYSER=true php artisan l5-swagger:generate && \
+    cp storage/api-docs/api-docs.json public/api-docs.json
 
 # Add healthcheck - use Laravel health endpoint for broader compatibility
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
