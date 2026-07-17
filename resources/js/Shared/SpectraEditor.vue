@@ -1,8 +1,12 @@
 <template>
     <div>
         <div>
-            <div class="mb-2 float-right">
-                <small>
+            <div class="mb-2 clearfix">
+                <DefaultSpectrumTabSelect
+                    v-if="!isViewerLoading"
+                    @changed="onDefaultSpectrumTabChanged"
+                />
+                <small class="float-right">
                     <a
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
                         href="https://docs.nmrxiv.org/advanced-guides/nmrium/nmrium.html"
@@ -114,6 +118,13 @@
 
 <script>
 import Versions from "./Versions.vue";
+import DefaultSpectrumTabSelect from "./DefaultSpectrumTabSelect.vue";
+import {
+    getDefaultSpectrumTab,
+    postNmriumLoad,
+    requestSelectTab,
+    resolveNmriumTargetOrigin,
+} from "@/Utils/nmriumTabPreference.js";
 import {
     ArrowPathIcon,
     ChevronDownIcon,
@@ -162,6 +173,7 @@ function buildNmriumIframeSrc(nmriumURLProp, sessionKey) {
 export default {
     components: {
         Versions,
+        DefaultSpectrumTabSelect,
         ArrowPathIcon,
         ChevronDownIcon,
         ExclamationTriangleIcon,
@@ -207,6 +219,7 @@ export default {
             nmriumHandoffTimeoutId: null,
             nmriumMessageHandler: null,
             nmriumPostLoadAt: null,
+            defaultTabApplied: false,
             nmriumInfoCache: markRaw(new Map()),
             /** Mirrors last status sent on the `loading` event so we can skip duplicate emits. */
             lastEmittedLoadingStatus: null,
@@ -250,6 +263,9 @@ export default {
                 }
             });
             return Array.from(groups.values());
+        },
+        isViewerLoading() {
+            return this.lastEmittedLoadingStatus === true;
         },
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
@@ -471,6 +487,7 @@ export default {
                                 "INITIATE on existing nmrium -> skip storing payload (avoids Vue deep-reactivity on huge NMRium state)"
                             );
                             this.updateLoadingStatus(false);
+                            this.applyDefaultSpectrumTab();
 
                             // Auto-imports come in via the parse-url backend
                             // path which never gets the chance to capture a
@@ -514,6 +531,7 @@ export default {
                                 resetInProgress: this.resetInProgress,
                                 has_nmrium: this.study?.has_nmrium,
                             });
+                            this.applyDefaultSpectrumTab();
                             if (
                                 !this.study.has_nmrium ||
                                 this.resetInProgress
@@ -639,10 +657,13 @@ export default {
                 type: "nmrium",
             };
             this.nmriumPostLoadAt = performance.now();
+            this.defaultTabApplied = false;
             dbg("iframe.postMessage(nmr-wrapper:load) -> sent");
-            iframe.postMessage(
-                { type: `nmr-wrapper:load`, data: payload },
-                "*"
+            postNmriumLoad(
+                iframe,
+                payload,
+                this.nmriumTargetOrigin(),
+                getDefaultSpectrumTab(this.$page)
             );
             this.scheduleNmriumHandoff();
 
@@ -665,6 +686,7 @@ export default {
             this.spectraErrorsCollapsed = true;
             this.currentMolecules = [];
             this.nmriumLoadError = null;
+            this.defaultTabApplied = false;
             if (!iframe || !this.study) {
                 dbg("loadSpectra: aborted (no iframe or study)");
                 return;
@@ -767,9 +789,35 @@ export default {
             };
 
             this.nmriumPostLoadAt = performance.now();
+            this.defaultTabApplied = false;
             dbg("iframe.postMessage(nmr-wrapper:load url) -> sent");
-            iframe.postMessage({ type: `nmr-wrapper:load`, data: data }, "*");
+            postNmriumLoad(
+                iframe,
+                data,
+                this.nmriumTargetOrigin(),
+                getDefaultSpectrumTab(this.$page)
+            );
             this.scheduleNmriumHandoff();
+        },
+        nmriumTargetOrigin() {
+            return resolveNmriumTargetOrigin(this.$page.props.nmriumURL);
+        },
+        applyDefaultSpectrumTab() {
+            const tab = getDefaultSpectrumTab(this.$page);
+            if (!tab || this.defaultTabApplied) {
+                return;
+            }
+
+            this.defaultTabApplied = true;
+            requestSelectTab(
+                window.frames.submissionNMRiumIframe,
+                tab,
+                this.nmriumTargetOrigin()
+            );
+        },
+        onDefaultSpectrumTabChanged() {
+            this.defaultTabApplied = false;
+            this.applyDefaultSpectrumTab();
         },
         /**
          * Persist the current NMRium project to the study.
@@ -961,7 +1009,7 @@ export default {
                         type: `nmr-wrapper:action-request`,
                         data,
                     },
-                    "*"
+                    this.nmriumTargetOrigin()
                 );
             }
         },

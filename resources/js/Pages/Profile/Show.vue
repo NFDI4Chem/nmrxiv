@@ -22,6 +22,12 @@
                     />
 
                     <jet-section-border />
+
+                    <update-spectra-preferences-form
+                        :user="$page.props.auth.user"
+                    />
+
+                    <jet-section-border />
                 </div>
 
                 <div v-if="$page.props.jetstream.canUpdatePassword">
@@ -65,6 +71,7 @@ import LogoutOtherBrowserSessionsForm from "@/Pages/Profile/Partials/LogoutOther
 import TwoFactorAuthenticationForm from "@/Pages/Profile/Partials/TwoFactorAuthenticationForm.vue";
 import UpdatePasswordForm from "@/Pages/Profile/Partials/UpdatePasswordForm.vue";
 import UpdateProfileInformationForm from "@/Pages/Profile/Partials/UpdateProfileInformationForm.vue";
+import UpdateSpectraPreferencesForm from "@/Pages/Profile/Partials/UpdateSpectraPreferencesForm.vue";
 
 export default {
     components: {
@@ -75,6 +82,7 @@ export default {
         TwoFactorAuthenticationForm,
         UpdatePasswordForm,
         UpdateProfileInformationForm,
+        UpdateSpectraPreferencesForm,
     },
     props: ["sessions"],
 };
