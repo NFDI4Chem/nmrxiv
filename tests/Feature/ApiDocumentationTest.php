@@ -12,6 +12,8 @@ class ApiDocumentationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Scalar.createApiReference', false);
+        $response->assertSee('url: "\/docs"', false);
+        $response->assertDontSee('docs?api-docs.json', false);
         $response->assertSee('nmrXiv API Reference', false);
         $response->assertSee('img/logo.svg', false);
         $response->assertSee('nmrxiv-docs-header', false);
