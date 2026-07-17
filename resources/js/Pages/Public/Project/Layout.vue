@@ -194,6 +194,55 @@
                             <div
                                 class="flex items-center space-x-2 flex-shrink-0"
                             >
+                                <!-- View and download statistics -->
+                                <div
+                                    v-if="project.data.stats"
+                                    class="hidden sm:flex items-center gap-3 text-sm text-gray-600"
+                                >
+                                    <span
+                                        class="inline-flex items-center gap-1"
+                                        title="Views"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="M10 12a2 2 0 100-4 2 2 0 000 4z"
+                                            />
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                        {{ project.data.stats.views }}
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1"
+                                        title="Downloads"
+                                    >
+                                        <svg
+                                            class="h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
+                                        </svg>
+                                        {{ project.data.stats.downloads }}
+                                    </span>
+                                </div>
+
                                 <!-- Like/upvote button with count -->
                                 <div
                                     v-if="project.data.stats"
@@ -236,9 +285,15 @@
                                     v-if="project.data.download_url"
                                     class="flex-shrink-0"
                                 >
-                                    <a
+                                    <button
+                                        type="button"
                                         class="inline-flex items-center px-4 py-1.5 rounded-full border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                                        :href="project.data.download_url"
+                                        @click="
+                                            requestDownload(
+                                                project.data.download_url,
+                                                trackingIdentifier(project.data)
+                                            )
+                                        "
                                     >
                                         <!-- Download icon -->
                                         <svg
@@ -255,7 +310,7 @@
                                             />
                                         </svg>
                                         Download
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -904,6 +959,14 @@
                 </jet-success-button>
             </template>
         </jet-confirmation-modal>
+
+        <DownloadTermsModal
+            :show="showDownloadTerms"
+            :download-url="pendingDownloadUrl"
+            :download-identifier="pendingDownloadIdentifier"
+            :license-title="project?.data?.license?.title"
+            @close="closeDownloadTerms"
+        />
     </app-layout>
 </template>
 
@@ -929,6 +992,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import SeededCoverBackground from "@/Shared/SeededCoverBackground.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import DownloadTermsModal from "@/Shared/DownloadTermsModal.vue";
+import DownloadTerms from "@/Mixins/DownloadTerms.js";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
@@ -956,6 +1021,7 @@ export default {
         SeededCoverBackground,
         AccessDialogue,
         DOIBadge,
+        DownloadTermsModal,
         JetDialogModal,
         JetConfirmationModal,
         JetSecondaryButton,
@@ -972,6 +1038,8 @@ export default {
         BookmarkIconSolid,
         BookmarkIconOutline,
     },
+
+    mixins: [DownloadTerms],
 
     /**
      * Component props
