@@ -10,9 +10,15 @@ class ApiDocumentationTest extends TestCase
     {
         $response = $this->get('/api/documentation');
 
+        $docsUrl = route(
+            'l5-swagger.default.docs',
+            [],
+            config('l5-swagger.documentations.default.paths.use_absolute_path', true)
+        );
+
         $response->assertOk();
         $response->assertSee('Scalar.createApiReference', false);
-        $response->assertSee('url: "\/docs"', false);
+        $response->assertSee('url: '.json_encode($docsUrl), false);
         $response->assertDontSee('docs?api-docs.json', false);
         $response->assertSee('nmrXiv API Reference', false);
         $response->assertSee('img/logo.svg', false);
