@@ -57,6 +57,13 @@ jobs:
           require-status: running
           require-healthy: true
 
+      - name: Verify OpenAPI spec is available in app image
+        if: matrix.container.name == 'app'
+        run: |
+          docker exec nmrxiv-${{ matrix.container.name }}-test curl -fsS \
+            http://localhost/api/documentation/openapi.json \
+            | jq -e '.openapi and .paths'
+
       - name: Cleanup ${{ matrix.container.name }} container
         if: always()
         run: docker rm -f nmrxiv-${{ matrix.container.name }}-test
