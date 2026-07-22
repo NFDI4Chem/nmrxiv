@@ -106,7 +106,9 @@
                                 <dd
                                     class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 font-mono text-[11px] font-medium text-gray-800 dark:bg-gray-800/80 dark:text-gray-200"
                                 >
-                                    {{ molecularFormula }}
+                                    <MolecularFormula
+                                        :formula="molecularFormula"
+                                    />
                                 </dd>
                             </template>
                             <span
@@ -230,10 +232,12 @@
 </template>
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
+import MolecularFormula from "@/Shared/MolecularFormula.vue";
 import { Link as InertiaLink } from "@inertiajs/vue3";
 export default {
     components: {
         Depictor2D,
+        MolecularFormula,
         InertiaLink,
     },
     props: {

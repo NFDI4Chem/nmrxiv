@@ -280,12 +280,7 @@
                                     >View Notifications</span
                                 >
                             </div>
-                            <notification
-                                ref="notificationElement"
-                                :notification="
-                                    $page.props.auth.user?.notifications
-                                "
-                            />
+                            <notification ref="notificationElement" />
                         </span>
 
                         <div class="tooltip">

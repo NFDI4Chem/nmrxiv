@@ -80,7 +80,13 @@ class PublicTextSearchService
         $query = Project::query()
             ->where('is_public', true)
             ->where('is_archived', false)
-            ->where('is_deleted', false);
+            ->where('is_deleted', false)
+            ->whereHas('studies', function (Builder $studyQuery): void {
+                $studyQuery
+                    ->where('is_public', true)
+                    ->where('is_archived', false)
+                    ->where('is_deleted', false);
+            });
 
         $this->applyTokenSearch($query, $tokens, 'projects', ['name', 'description']);
         $this->applyRelevanceOrdering($query, $tokens, $normalizedQuery, 'projects', 'name');

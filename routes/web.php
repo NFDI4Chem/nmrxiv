@@ -19,6 +19,7 @@ use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
+use App\Http\Controllers\FundingReferenceController;
 use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
@@ -120,7 +121,7 @@ Route::get('/compound/{id}', [ApplicationController::class, 'resolveCompound'])-
 Route::get('/sample/{id}', [ApplicationController::class, 'resolveSample'])->where('id', '(S|s)[0-9]+')
     ->name('public.sample');
 
-Route::get('/sample/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+Route::get('/sample/{study}/nmriumInfo', [StudyController::class, 'fetchPublicNMRium'])
     ->where('study', '([0-9]+|(NMRXIV:)?(S|s)[0-9]+)')
     ->name('public.sample.nmrium');
 
@@ -130,7 +131,7 @@ Route::get('/project/{id}', [ApplicationController::class, 'resolveProject'])->w
 Route::get('/dataset/{id}', [ApplicationController::class, 'resolveDataset'])->where('id', '(D|d)[0-9]+')
     ->name('public.dataset.id');
 
-Route::get('/dataset/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+Route::get('/dataset/{dataset}/nmriumInfo', [DatasetController::class, 'fetchPublicNMRium'])
     ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
     ->name('public.dataset.nmrium');
 
@@ -183,6 +184,13 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::delete('citations/study/{study}/delete', [CitationController::class, 'destroyStudy'])
         ->name('citation.study.delete');
+
+    // Funding references
+    Route::post('funding-references/{project}', [FundingReferenceController::class, 'save'])
+        ->name('fundingReference.save');
+
+    Route::delete('funding-references/{project}/delete', [FundingReferenceController::class, 'destroy'])
+        ->name('fundingReference.delete');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
         ->name('onboarding.complete');
@@ -495,7 +503,7 @@ Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggl
 Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStarred'])
     ->name('study.toggle-starred');
 
-Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchPublicNMRium'])
     ->name('public.studies.nmrium');
 
 Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
@@ -507,7 +515,7 @@ Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectV
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])
     ->name('public.projects');
 
-Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchPublicNMRium'])
     ->name('public.datasets.nmrium');
 
 Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])
