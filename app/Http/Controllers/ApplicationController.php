@@ -10,6 +10,7 @@ use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
 use App\Support\ProjectWorkspace;
+use App\Support\Public\PublicEntityAccess;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -207,6 +208,10 @@ class ApplicationController extends Controller
             case 'study':
                 $studyForView = $study ?? $this->resolveStudyForProjectTab($request, $project);
 
+                if ($studyForView) {
+                    PublicEntityAccess::authorizeStudyAccess($request, $studyForView, $reviewerPreview);
+                }
+
                 if ($project && $studyForView) {
                     return $this->renderPublicProject(
                         'Public/Project/Study',
@@ -269,6 +274,9 @@ class ApplicationController extends Controller
                         $reviewerPreview
                     );
                 }
+
+                PublicEntityAccess::authorizeStudyAccess($request, $studyForView, $reviewerPreview);
+                PublicEntityAccess::authorizeDatasetAccess($request, $datasetForView, $reviewerPreview);
 
                 $datasetResource = (new DatasetResource($datasetForView))->lite(false, ['nmrium']);
 
