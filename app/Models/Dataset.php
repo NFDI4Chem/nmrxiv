@@ -63,6 +63,9 @@ class Dataset extends Model implements Auditable
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'assignments' => 'array',
+            'spectra_is_ft' => 'boolean',
+            'spectra_is_fid' => 'boolean',
+            'spectra_info_extracted_at' => 'datetime',
         ];
     }
 

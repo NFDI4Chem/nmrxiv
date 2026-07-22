@@ -72,7 +72,22 @@
                             information or a technical issue. Please complete
                             the required fields and click Publish Now via the
                             Edit Release Date option, or contact us at
-                            info.nmrxiv@uni-jena.de
+
+                            <a
+                                id="tour-step-get-in-touch"
+                                href="mailTo"
+                                class="text-medium font-medium text-indigo-600 hover:text-indigo-500"
+                                >info.nmrxiv@uni-jena.de
+                            </a>
+                            or
+                            <a
+                                href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
+                            >
+                                Learn more.
+                            </a>
                         </p>
                         <button
                             v-if="showReleaseDateEditLink"

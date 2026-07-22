@@ -2019,284 +2019,74 @@
                                                                                     </div>
 
                                                                                     <div
-                                                                                        class="rounded-md bg-gray-100 p-0.5 dark:bg-slate-900/80"
-                                                                                        role="tablist"
+                                                                                        class="relative flex h-[min(380px,52vh)] min-h-[280px] w-full flex-shrink-0 flex-col"
                                                                                     >
                                                                                         <div
-                                                                                            class="flex flex-wrap gap-0.5"
-                                                                                        >
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="tab"
-                                                                                                aria-label="Draw structure in editor"
-                                                                                                :aria-selected="
-                                                                                                    activeInputTab ===
-                                                                                                    'editor'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    activeInputTab ===
-                                                                                                    'editor'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    switchToEditorTab()
-                                                                                                "
-                                                                                            >
-                                                                                                Draw
-                                                                                            </button>
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="tab"
-                                                                                                aria-label="Paste SMILES, MOL, or SDF"
-                                                                                                :aria-selected="
-                                                                                                    activeInputTab ===
-                                                                                                    'structure'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    activeInputTab ===
-                                                                                                    'structure'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    switchToStructureTab()
-                                                                                                "
-                                                                                            >
-                                                                                                Paste
-                                                                                            </button>
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="tab"
-                                                                                                aria-label="Look up CAS registry number"
-                                                                                                :aria-selected="
-                                                                                                    activeInputTab ===
-                                                                                                    'cas'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    activeInputTab ===
-                                                                                                    'cas'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    switchToCasTab()
-                                                                                                "
-                                                                                            >
-                                                                                                CAS
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <div
-                                                                                        class="flex h-[min(380px,52vh)] min-h-[280px] w-full flex-shrink-0 flex-col"
-                                                                                    >
-                                                                                        <!-- Structure/SMILES Input Tab -->
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                activeInputTab ===
-                                                                                                'structure'
+                                                                                            class="relative min-h-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 shadow-inner transition-colors dark:border-gray-600 dark:bg-slate-900/50"
+                                                                                            :class="{
+                                                                                                'border-teal-400 bg-teal-50/50 dark:bg-teal-950/20':
+                                                                                                    isDragging,
+                                                                                            }"
+                                                                                            tabindex="0"
+                                                                                            @dragover.capture.prevent="
+                                                                                                handleDragOver
                                                                                             "
-                                                                                            class="flex min-h-0 flex-1 flex-col gap-2 pt-1"
+                                                                                            @dragleave.capture.prevent="
+                                                                                                handleDragLeave
+                                                                                            "
+                                                                                            @drop.capture.prevent="
+                                                                                                handleDrop
+                                                                                            "
+                                                                                            @paste.capture="
+                                                                                                handleEditorPaste
+                                                                                            "
                                                                                         >
                                                                                             <div
-                                                                                                class="flex min-h-0 flex-1 flex-col border-2 border-dashed border-gray-300 rounded-lg p-2 transition-colors hover:border-teal-400 dark:border-gray-600 dark:hover:border-teal-500"
-                                                                                                :class="{
-                                                                                                    'border-teal-400 bg-teal-50 dark:bg-teal-950/30':
-                                                                                                        isDragging,
-                                                                                                }"
-                                                                                                @dragover.prevent="
-                                                                                                    handleDragOver
-                                                                                                "
-                                                                                                @dragleave.prevent="
-                                                                                                    handleDragLeave
-                                                                                                "
-                                                                                                @drop.prevent="
-                                                                                                    handleDrop
-                                                                                                "
-                                                                                            >
-                                                                                                <p
-                                                                                                    v-if="
-                                                                                                        !chemicalInput
-                                                                                                    "
-                                                                                                    class="mb-2 text-left text-xs text-gray-500 dark:text-slate-400"
-                                                                                                >
-                                                                                                    SMILES,
-                                                                                                    MOL,
-                                                                                                    or
-                                                                                                    SDF
-                                                                                                    —
-                                                                                                    paste
-                                                                                                    or
-                                                                                                    drop
-                                                                                                    .mol
-                                                                                                    /
-                                                                                                    .sdf
-                                                                                                </p>
-                                                                                                <textarea
-                                                                                                    v-model="
-                                                                                                        chemicalInput
-                                                                                                    "
-                                                                                                    placeholder="SMILES (one line) or MOL/SDF block…"
-                                                                                                    class="min-h-0 w-full flex-1 resize-y rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
-                                                                                                    @blur="
-                                                                                                        loadStructure
-                                                                                                    "
-                                                                                                    @paste="
-                                                                                                        handlePaste
-                                                                                                    "
-                                                                                                    @input="
-                                                                                                        handleInput
-                                                                                                    "
-                                                                                                ></textarea>
-                                                                                            </div>
-
-                                                                                            <div
-                                                                                                class="flex shrink-0 items-center justify-between"
-                                                                                            >
-                                                                                                <div
-                                                                                                    class="flex space-x-2"
-                                                                                                >
-                                                                                                    <button
-                                                                                                        v-if="
-                                                                                                            chemicalInput
-                                                                                                        "
-                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                                                                                        @click="
-                                                                                                            clearInput
-                                                                                                        "
-                                                                                                    >
-                                                                                                        Clear
-                                                                                                    </button>
-                                                                                                </div>
-
-                                                                                                <div
-                                                                                                    v-if="
-                                                                                                        detectedFormat
-                                                                                                    "
-                                                                                                    class="text-xs text-gray-500"
-                                                                                                >
-                                                                                                    Detected:
-                                                                                                    {{
-                                                                                                        detectedFormat
-                                                                                                    }}
-                                                                                                </div>
-                                                                                            </div>
+                                                                                                id="structureSearchEditor"
+                                                                                                class="absolute inset-0"
+                                                                                            ></div>
                                                                                         </div>
-
-                                                                                        <!-- CAS Registry Number Input Tab -->
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                activeInputTab ===
-                                                                                                'cas'
-                                                                                            "
-                                                                                            class="flex min-h-0 flex-1 flex-col pt-1"
+                                                                                        <p
+                                                                                            class="mt-2 text-xs text-gray-500 dark:text-slate-400"
                                                                                         >
-                                                                                            <div
-                                                                                                class="rounded-lg border border-gray-300 p-2 dark:border-gray-600"
-                                                                                            >
-                                                                                                <div
-                                                                                                    class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
-                                                                                                >
-                                                                                                    <div
-                                                                                                        class="min-w-0 flex-1"
-                                                                                                    >
-                                                                                                        <input
-                                                                                                            v-model="
-                                                                                                                casInput
-                                                                                                            "
-                                                                                                            type="text"
-                                                                                                            placeholder="CAS e.g. 58-08-2"
-                                                                                                            class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
-                                                                                                            :disabled="
-                                                                                                                casLoading
-                                                                                                            "
-                                                                                                            @keyup.enter="
-                                                                                                                importFromCAS
-                                                                                                            "
-                                                                                                        />
-                                                                                                    </div>
-                                                                                                    <button
-                                                                                                        :disabled="
-                                                                                                            !casInput.trim() ||
-                                                                                                            casLoading
-                                                                                                        "
-                                                                                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                                                        @click="
-                                                                                                            importFromCAS
-                                                                                                        "
-                                                                                                    >
-                                                                                                        <svg
-                                                                                                            v-if="
-                                                                                                                casLoading
-                                                                                                            "
-                                                                                                            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                                            fill="none"
-                                                                                                            viewBox="0 0 24 24"
-                                                                                                        >
-                                                                                                            <circle
-                                                                                                                class="opacity-25"
-                                                                                                                cx="12"
-                                                                                                                cy="12"
-                                                                                                                r="10"
-                                                                                                                stroke="currentColor"
-                                                                                                                stroke-width="4"
-                                                                                                            ></circle>
-                                                                                                            <path
-                                                                                                                class="opacity-75"
-                                                                                                                fill="currentColor"
-                                                                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                                                                            ></path>
-                                                                                                        </svg>
-                                                                                                        {{
-                                                                                                            casLoading
-                                                                                                                ? "Loading..."
-                                                                                                                : "Import"
-                                                                                                        }}
-                                                                                                    </button>
-                                                                                                </div>
-
-                                                                                                <div
-                                                                                                    v-if="
-                                                                                                        casInput
-                                                                                                    "
-                                                                                                    class="mt-2 flex justify-between"
-                                                                                                >
-                                                                                                    <button
-                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                                                                                        @click="
-                                                                                                            clearCasInput
-                                                                                                        "
-                                                                                                    >
-                                                                                                        Clear
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        <!-- Structure editor tab -->
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                activeInputTab ===
-                                                                                                'editor'
+                                                                                            Draw
+                                                                                            a
+                                                                                            structure,
+                                                                                            or
+                                                                                            paste
+                                                                                            /
+                                                                                            drop
+                                                                                            SMILES,
+                                                                                            MOL,
+                                                                                            SDF,
+                                                                                            or
+                                                                                            a
+                                                                                            CAS
+                                                                                            number
+                                                                                            (e.g.
+                                                                                            58-08-2).
+                                                                                        </p>
+                                                                                        <p
+                                                                                            v-if="
+                                                                                                structureLoading
                                                                                             "
-                                                                                            id="structureSearchEditor"
-                                                                                            class="min-h-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 shadow-inner dark:border-gray-600 dark:bg-slate-900/50"
-                                                                                        ></div>
+                                                                                            class="mt-1 text-xs text-teal-600 dark:text-teal-400"
+                                                                                        >
+                                                                                            Loading
+                                                                                            structure…
+                                                                                        </p>
                                                                                     </div>
 
                                                                                     <jet-input-error
                                                                                         :message="
-                                                                                            errorMessage ||
-                                                                                            casError
+                                                                                            errorMessage
                                                                                         "
                                                                                         class="mt-1.5"
                                                                                     />
                                                                                     <div
+                                                                                        v-if="
+                                                                                            editorHasStructure
+                                                                                        "
                                                                                         class="mb-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm ring-1 ring-gray-900/5 dark:border-gray-600 dark:bg-slate-900/50 dark:ring-white/5"
                                                                                     >
                                                                                         <p
@@ -2453,6 +2243,9 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <button
+                                                                                        v-if="
+                                                                                            editorHasStructure
+                                                                                        "
                                                                                         type="button"
                                                                                         class="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 sm:w-auto"
                                                                                         @click="
@@ -3597,6 +3390,12 @@ import VueTagsInput from "@sipec/vue3-tags-input";
 import "@/lib/ontology-elements";
 import Global from "@/Mixins/Global.js";
 import OCL from "openchemlib";
+import {
+    detectStructureInputFormat,
+    detectStructureInputType,
+    editorHasStructureContent,
+    resolveStructureForEditorWithStandardize,
+} from "@/Utils/structureImport";
 import { createStructureEditor } from "@/Utils/structureEditor";
 
 export default {
@@ -3731,19 +3530,14 @@ export default {
             validation: null,
             validationStatus: true,
 
-            chemicalInput: "",
-            detectedFormat: "",
             isDragging: false,
+            structureLoading: false,
+            structureLoadCounter: 0,
             percentage: 99.99,
             /** 'pure' | 'mixture' | 'unknown' — unknown stores no pivot percentage */
             compositionSampleType: "pure",
             editor: null,
-
-            // Chemical input tabs and CAS support
-            activeInputTab: "editor", // "structure" | "cas" | "editor"
-            casInput: "",
-            casLoading: false,
-            casError: "",
+            editorHasStructure: false,
 
             showPrimer: false,
             busy: false,
@@ -4130,17 +3924,6 @@ export default {
         },
         chemicalCompositionExpanded(isOpen) {
             if (isOpen) {
-                this.ensureStructureSearchEditor();
-            }
-        },
-        activeInputTab(newTab, oldTab) {
-            if (oldTab === "cas") {
-                this.casError = "";
-            }
-            if (oldTab === "structure") {
-                this.errorMessage = "";
-            }
-            if (newTab === "editor") {
                 this.ensureStructureSearchEditor();
             }
         },
@@ -5094,16 +4877,10 @@ export default {
             }
         },
         /**
-         * Create the OpenChemLib SVG editor only when the composition panel is
-         * expanded and the Draw tab is active, so the host element has layout size.
-         *
          * @param {() => void} [onReady]
          */
         ensureStructureSearchEditor(onReady) {
-            if (
-                !this.chemicalCompositionExpanded ||
-                this.activeInputTab !== "editor"
-            ) {
+            if (!this.chemicalCompositionExpanded) {
                 if (typeof onReady === "function") {
                     onReady();
                 }
@@ -5136,28 +4913,11 @@ export default {
                             this.editor = await createStructureEditor(
                                 "structureSearchEditor"
                             );
-                            if (
-                                this.chemicalInput &&
-                                this.chemicalInput.trim()
-                            ) {
-                                try {
-                                    const format = this.detectFormat(
-                                        this.chemicalInput
-                                    );
-                                    if (format === "SMILES") {
-                                        this.editor.setSmiles(
-                                            this.chemicalInput.trim()
-                                        );
-                                    } else if (format === "MOL/SDF") {
-                                        this.editor.setMolFile(
-                                            this.chemicalInput
-                                        );
-                                    }
-                                } catch {
-                                    // Input may be invalid; user can fix in Paste tab
-                                }
-                            }
+                            this.editor.onChange(() => {
+                                this.syncEditorHasStructure();
+                            });
                         }
+                        this.syncEditorHasStructure();
                         if (typeof onReady === "function") {
                             onReady();
                         }
@@ -5166,13 +4926,15 @@ export default {
             };
             run(20);
         },
+        syncEditorHasStructure() {
+            this.editorHasStructure = editorHasStructureContent(this.editor);
+        },
         selectStudy(study, index, datasetIndex = null) {
             if (!this.busy) {
                 if (study.internal_status == "complete") {
                     this.selectedStudyIndex = index;
                     this.selectedStudy = study;
                     this.chemicalCompositionExpanded = false;
-                    this.activeInputTab = "editor";
                     this.setQueryStringParameter("sample", study.id);
                     this.studyNameDraft = this.selectedStudy.name;
                     this.studyForm.name = this.selectedStudy.name;
@@ -5195,6 +4957,7 @@ export default {
                         this.displaySamplesSummaryInfo = false;
                     }
                     this.editor = null;
+                    this.editorHasStructure = false;
                     this.compositionSampleType =
                         this.selectedStudy.sample.molecules.length > 0
                             ? "mixture"
@@ -5595,11 +5358,11 @@ export default {
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
+                        this.syncEditorHasStructure();
                     }
                 });
         },
         editMolecule(mol) {
-            this.activeInputTab = "editor";
             const raw = mol.pivot?.percentage_composition;
             if (this.isCompositionPercentUnknown(raw)) {
                 this.compositionSampleType = "unknown";
@@ -5611,6 +5374,7 @@ export default {
             this.ensureStructureSearchEditor(() => {
                 if (this.editor) {
                     this.editor.setSmiles(mol.canonical_smiles);
+                    this.syncEditorHasStructure();
                 }
                 axios
                     .delete(
@@ -5656,8 +5420,6 @@ export default {
                 })
                 .then((res) => {
                     study.sample.molecules = res.data;
-                    this.chemicalInput = "";
-                    this.detectedFormat = "";
                     this.compositionSampleType =
                         res.data.length > 0 ? "mixture" : "pure";
                     this.$nextTick(() => {
@@ -5668,6 +5430,7 @@ export default {
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
+                        this.syncEditorHasStructure();
                     }
                 });
         },
@@ -6089,116 +5852,131 @@ export default {
                 this.saveStudyDetails();
             }
         },
-        loadStructure() {
-            this.errorMessage = "";
-
-            if (!this.chemicalInput || this.chemicalInput.trim() === "") {
+        handleEditorPaste(event) {
+            if (!this.chemicalCompositionExpanded) {
                 return;
             }
 
-            const format = this.detectFormat(this.chemicalInput);
+            const pastedText = event.clipboardData?.getData("text/plain") ?? "";
+
+            if (!pastedText.trim()) {
+                return;
+            }
+
+            const inputType = detectStructureInputType(pastedText);
+
+            if (
+                inputType === "CAS" ||
+                inputType === "SMILES" ||
+                inputType === "MOL/SDF"
+            ) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.importStructureInput(pastedText);
+            }
+        },
+
+        async importStructureInput(text, fileName = "") {
+            const trimmed = text.trim();
+
+            if (!trimmed) {
+                return;
+            }
+
+            const inputType = detectStructureInputType(trimmed, fileName);
+            this.errorMessage = "";
+
+            if (inputType === "CAS") {
+                await this.loadCasStructure(trimmed);
+                return;
+            }
+
+            if (inputType === "SMILES" || inputType === "MOL/SDF") {
+                await this.loadStructureIntoEditor(
+                    trimmed,
+                    fileName,
+                    inputType
+                );
+                return;
+            }
+
+            this.errorMessage =
+                "Unrecognized format. Paste or drop SMILES, MOL, SDF, or a CAS number.";
+        },
+
+        async loadStructureIntoEditor(text, fileName = "", format = null) {
+            const loadId = ++this.structureLoadCounter;
+            this.errorMessage = "";
+            this.structureLoading = true;
+
+            const resolvedFormat = format ?? detectStructureInputFormat(text);
+            /** @type {{ type: 'smiles' | 'molfile', value: string } | null} */
+            let structureToLoad = null;
 
             try {
-                if (format === "SMILES") {
-                    OCL.Molecule.fromSmiles(this.chemicalInput.trim());
-                } else if (format === "MOL/SDF") {
-                    OCL.Molecule.fromMolfile(this.chemicalInput);
+                if (resolvedFormat === "SMILES") {
+                    const smiles = text.trim();
+                    OCL.Molecule.fromSmiles(smiles);
+                    structureToLoad = { type: "smiles", value: smiles };
+                } else if (resolvedFormat === "MOL/SDF") {
+                    structureToLoad =
+                        await resolveStructureForEditorWithStandardize(
+                            text,
+                            fileName,
+                            (molfile) => this.standardizeMolecules(molfile)
+                        );
                 } else {
                     this.errorMessage =
                         "Unable to detect chemical format. Please check your input.";
                     return;
                 }
-                this.detectedFormat = format;
             } catch (e) {
-                this.errorMessage = `Invalid ${format} format. Please check your input.`;
-                return;
-            }
-
-            if (!this.editor) {
-                return;
-            }
-
-            try {
-                if (format === "SMILES") {
-                    this.editor.setSmiles(this.chemicalInput.trim());
-                } else if (format === "MOL/SDF") {
-                    this.editor.setMolFile(this.chemicalInput);
+                if (loadId !== this.structureLoadCounter) {
+                    return;
                 }
-            } catch (e) {
-                this.errorMessage = `Invalid ${format} format. Please check your input.`;
-            }
-        },
-
-        detectFormat(input) {
-            if (!input || input.trim() === "") return "";
-
-            const trimmed = input.trim();
-            const lines = trimmed.split("\n");
-
-            // Check for MOL/SDF format indicators
-            if (
-                trimmed.includes("M  END") ||
-                trimmed.includes("$$$$") ||
-                trimmed.includes("V2000") ||
-                trimmed.includes("V3000") ||
-                (lines.length > 3 && lines[3] && lines[3].includes(" 0  0  0"))
-            ) {
-                return "MOL/SDF";
-            }
-
-            // If it's a single line or very short, likely SMILES
-            if (lines.length <= 2 && trimmed.length < 500) {
-                // Additional SMILES validation - common SMILES characters
-                const smilesPattern = /^[A-Za-z0-9@+\-\[\]()=#\\/\\.:]+$/;
-                if (smilesPattern.test(trimmed.replace(/\s/g, ""))) {
-                    return "SMILES";
+                this.errorMessage =
+                    "Could not parse the structure. Check the file or pasted content.";
+                return;
+            } finally {
+                if (loadId === this.structureLoadCounter) {
+                    this.structureLoading = false;
                 }
             }
 
-            // Default to trying as MOL/SDF for multi-line content
-            if (lines.length > 2) {
-                return "MOL/SDF";
+            if (loadId !== this.structureLoadCounter || !structureToLoad) {
+                return;
             }
 
-            // Default to SMILES for single line content
-            return "SMILES";
-        },
+            this.ensureStructureSearchEditor(() => {
+                if (loadId !== this.structureLoadCounter || !this.editor) {
+                    return;
+                }
 
-        handleInput() {
-            if (this.chemicalInput && this.chemicalInput.trim()) {
-                this.detectedFormat = this.detectFormat(this.chemicalInput);
-            } else {
-                this.detectedFormat = "";
-            }
-        },
-
-        clearInput() {
-            this.chemicalInput = "";
-            this.detectedFormat = "";
-            this.errorMessage = "";
-            if (this.editor) {
-                this.editor.setSmiles("");
-            }
-        },
-
-        clearCasInput() {
-            this.casInput = "";
-            this.casError = "";
+                try {
+                    if (structureToLoad.type === "smiles") {
+                        this.editor.setSmiles(structureToLoad.value);
+                    } else {
+                        this.editor.setMolFile(structureToLoad.value);
+                    }
+                    this.syncEditorHasStructure();
+                } catch (e) {
+                    this.errorMessage =
+                        "Could not load the structure into the editor.";
+                }
+            });
         },
 
         async fetchFromCAS(casNumber) {
             try {
-                // Use backend API proxy to avoid CORS issues
                 const response = await axios.get("/cas/detail", {
                     params: {
                         cas_rn: casNumber,
                     },
-                    timeout: 30000, // 30 second timeout
+                    timeout: 30000,
                 });
 
                 return response.data;
             } catch (error) {
-                // Use error message from backend controller
                 const errorMessage =
                     error.response?.data?.error ||
                     error.response?.data?.message ||
@@ -6207,123 +5985,41 @@ export default {
             }
         },
 
-        async importFromCAS() {
-            if (!this.casInput.trim()) {
-                this.casError = "Please enter a CAS Registry Number";
-                return;
-            }
-
-            const casNumber = this.casInput.trim();
-
-            this.casLoading = true;
-            this.casError = "";
+        async loadCasStructure(casNumber) {
+            const loadId = ++this.structureLoadCounter;
+            this.errorMessage = "";
+            this.structureLoading = true;
 
             try {
-                // Fetch data from CAS Common Chemistry API
                 const casData = await this.fetchFromCAS(casNumber);
-
-                // Validate that we have the required data
-                if (!casData.smile && !casData.canonicalSmile) {
-                    this.casError = `No structural data (SMILES) available for CAS number ${casNumber}`;
-                    return;
-                }
-
-                // Process the CAS response
-                this.processCASResponse(casData);
-            } catch (error) {
-                // Use error messages from backend controller
-                this.casError = error.message;
-            } finally {
-                this.casLoading = false;
-            }
-        },
-
-        processCASResponse(casData) {
-            try {
-                // Extract SMILES from CAS response
-                let smiles = casData.smile || casData.canonicalSmile;
+                const smiles = casData.smile || casData.canonicalSmile;
 
                 if (!smiles) {
-                    this.casError =
-                        "No SMILES data available for this CAS number";
+                    this.errorMessage = `No structural data available for CAS ${casNumber}`;
                     return;
                 }
 
-                // Clear any existing errors
-                this.errorMessage = "";
-                this.casError = "";
-
-                // Set the chemical input to the SMILES from CAS
-                this.chemicalInput = smiles;
-                this.detectedFormat = "SMILES (from CAS)";
-
-                this.switchToEditorTab();
+                if (loadId !== this.structureLoadCounter) {
+                    return;
+                }
 
                 this.ensureStructureSearchEditor(() => {
-                    if (this.editor) {
-                        this.editor.setSmiles(smiles);
+                    if (loadId !== this.structureLoadCounter || !this.editor) {
+                        return;
                     }
+
+                    this.editor.setSmiles(smiles);
+                    this.syncEditorHasStructure();
                 });
-
-                // Use existing standardization workflow
-                this.processCASMolecule(casData, smiles);
             } catch (error) {
-                this.casError = "Failed to process CAS response data";
-            }
-        },
-
-        async processCASMolecule(casData, smiles) {
-            try {
-                // Create a molecule object from SMILES to standardize
-                let mol = OCL.Molecule.fromSmiles(smiles);
-                let molfile = mol.toMolfile();
-
-                // Use existing standardization workflow
-                const response = await this.standardizeMolecules(molfile);
-
-                // Add CAS-specific data to the standardized molecule
-                const standardizedMol = response.data;
-                standardizedMol.cas_number = casData.rn;
-                standardizedMol.cas_name = casData.name;
-                standardizedMol.molecular_formula =
-                    this.stripHtmlTags(casData.molecularFormula) ||
-                    standardizedMol.molecular_formula;
-
-                // Add synonyms if available
-                if (casData.synonyms && casData.synonyms.length > 0) {
-                    standardizedMol.synonyms = casData.synonyms.slice(0, 5); // Limit to first 5 synonyms
+                if (loadId === this.structureLoadCounter) {
+                    this.errorMessage = error.message;
                 }
-
-                // Integrate with existing molecule association workflow
-                if (this.selectedStudy) {
-                    this.associateMoleculeToStudy(
-                        standardizedMol,
-                        this.selectedStudy
-                    );
-
-                    // Clear CAS input after successful association
-                    this.clearCasInput();
-
-                    // Show success message
-                    this.$emit("show-notification", {
-                        type: "success",
-                        message: `Successfully imported ${casData.name} (CAS: ${casData.rn}) from CAS Registry`,
-                    });
-                } else {
-                    this.casError =
-                        "Please select a study before importing molecules";
+            } finally {
+                if (loadId === this.structureLoadCounter) {
+                    this.structureLoading = false;
                 }
-            } catch (error) {
-                this.casError = `Failed to standardize molecule: ${error.message}`;
             }
-        },
-
-        handlePaste() {
-            // Allow default paste behavior, then auto-load structure
-            this.$nextTick(() => {
-                this.handleInput(); // Update detected format
-                this.loadStructure(); // Auto-load the pasted content
-            });
         },
 
         handleDragOver(event) {
@@ -6340,31 +6036,40 @@ export default {
             event.preventDefault();
             this.isDragging = false;
 
-            const files = Array.from(event.dataTransfer.files);
-            this.processFiles(files);
-        },
+            const files = Array.from(event.dataTransfer?.files ?? []);
 
-        processFiles(files) {
-            if (files.length === 0) return;
-
-            // Filter for mol/sdf files
-            const validFiles = files.filter((file) => {
-                const extension = file.name.toLowerCase().split(".").pop();
-                return ["mol", "sdf"].includes(extension);
-            });
-
-            if (validFiles.length === 0) {
-                this.errorMessage = "Please select valid MOL or SDF files.";
+            if (files.length > 0) {
+                this.processFiles(files);
                 return;
             }
 
-            // Process the first valid file
+            const text = event.dataTransfer?.getData("text/plain") ?? "";
+
+            if (text.trim()) {
+                this.importStructureInput(text);
+            }
+        },
+
+        processFiles(files) {
+            if (files.length === 0) {
+                return;
+            }
+
+            const validFiles = files.filter((file) => {
+                const extension = file.name.toLowerCase().split(".").pop();
+                return ["mol", "sdf", "sd"].includes(extension);
+            });
+
+            if (validFiles.length === 0) {
+                this.errorMessage = "Please drop a valid MOL or SDF file.";
+                return;
+            }
+
             const file = validFiles[0];
             const reader = new FileReader();
 
             reader.onload = (e) => {
-                this.chemicalInput = e.target.result;
-                this.loadStructure();
+                this.importStructureInput(e.target.result, file.name);
             };
 
             reader.onerror = () => {
@@ -6374,30 +6079,8 @@ export default {
             reader.readAsText(file);
 
             if (validFiles.length > 1) {
-                this.errorMessage = `Only the first file (${file.name}) was loaded. Multiple file support coming soon.`;
+                this.errorMessage = `Only the first file (${file.name}) was loaded.`;
             }
-        },
-
-        // Tab switching methods with error clearing
-        switchToStructureTab() {
-            this.activeInputTab = "structure";
-            this.casError = "";
-        },
-
-        switchToCasTab() {
-            this.activeInputTab = "cas";
-            this.errorMessage = "";
-        },
-
-        switchToEditorTab() {
-            this.activeInputTab = "editor";
-            this.casError = "";
-            this.errorMessage = "";
-        },
-
-        // Legacy method name for backward compatibility
-        loadSmiles() {
-            this.loadStructure();
         },
         toggleSummaryBar() {
             this.showSummary = !this.showSummary;

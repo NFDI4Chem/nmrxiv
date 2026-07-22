@@ -206,6 +206,7 @@ const linkSections = [
                 href: "/search?scope=compounds",
                 external: false,
             },
+            { name: "Statistics", href: "/stats", external: false },
             { name: "FAQs", href: "/faqs", external: false },
         ],
     },

@@ -58,7 +58,13 @@
                 <div class="mt-4 flex justify-end">
                     <button
                         type="button"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                        :disabled="!canPerformHeroStructureSearch"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                        :class="
+                            canPerformHeroStructureSearch
+                                ? 'hover:bg-gray-800'
+                                : 'opacity-50 cursor-not-allowed'
+                        "
                         @click="performStructureSearch"
                     >
                         <MagnifyingGlassIcon
@@ -71,50 +77,63 @@
             </div>
             <div
                 v-else-if="heroSearchType.type === 'spectra'"
-                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+                class="rounded-3xl border border-gray-200 bg-white p-8 shadow-lg ring-1 ring-gray-900/5 text-center"
             >
-                <SpectraUploadContent
-                    compact
-                    @files-uploaded="handleSpectraFiles"
-                />
-                <div class="mt-4 flex justify-end">
-                    <button
-                        type="button"
-                        :disabled="spectraFiles.length === 0"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
-                        :class="
-                            spectraFiles.length === 0
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'hover:bg-gray-800'
-                        "
-                        @click="performSpectraSearch"
-                    >
-                        <MagnifyingGlassIcon
-                            class="h-4 w-4 shrink-0"
-                            aria-hidden="true"
-                        />
-                        Search{{
-                            spectraFiles.length > 0
-                                ? ` (${spectraFiles.length} file${
-                                      spectraFiles.length > 1 ? "s" : ""
-                                  })`
-                                : ""
-                        }}
-                    </button>
+                <div
+                    class="mx-auto flex size-12 items-center justify-center rounded-full bg-gray-100 text-gray-500"
+                >
+                    <ChartBarIcon class="h-6 w-6" aria-hidden="true" />
                 </div>
+                <h2 class="mt-4 text-lg font-semibold text-gray-900">
+                    Spectra search
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-600">
+                    Upload NMR spectra to find similar data. This feature is
+                    coming soon.
+                </p>
+                <span
+                    class="mt-4 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                    Coming soon
+                </span>
             </div>
             <div
                 v-else-if="heroSearchType.type === 'advanced'"
-                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+                class="overflow-hidden rounded-3xl border border-gray-200 bg-white text-left shadow-lg ring-1 ring-gray-900/5"
             >
-                <MetadataSearchContent
-                    compact
-                    @search-params-updated="handleMetadataParams"
-                />
-                <div class="mt-4 flex justify-end">
+                <div
+                    class="max-h-[min(70vh,42rem)] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6"
+                >
+                    <MetadataSearchContent
+                        compact
+                        :persist-in-url="variant === 'hero'"
+                        @search-params-updated="handleMetadataParams"
+                    />
+                </div>
+                <div
+                    class="flex items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/50 px-5 py-4 sm:px-6"
+                >
+                    <p
+                        class="text-left text-xs text-gray-500"
+                        aria-live="polite"
+                    >
+                        <template v-if="metadataActiveFilterCount > 0">
+                            {{ metadataActiveFilterCount }}
+                            {{
+                                metadataActiveFilterCount === 1
+                                    ? "filter"
+                                    : "filters"
+                            }}
+                            active
+                        </template>
+                        <template v-else>
+                            Select at least one filter or keyword
+                        </template>
+                    </p>
                     <button
                         type="button"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+                        :disabled="!canPerformHeroAdvancedSearch"
                         @click="performMetadataSearch"
                     >
                         <MagnifyingGlassIcon
@@ -144,7 +163,13 @@
                 />
                 <button
                     type="button"
-                    class="shrink-0 rounded-full bg-gray-900 px-4 sm:px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+                    :disabled="!canPerformHeroTextSearch"
+                    class="shrink-0 rounded-full bg-gray-900 px-4 sm:px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                    :class="
+                        canPerformHeroTextSearch
+                            ? 'hover:bg-gray-800'
+                            : 'opacity-50 cursor-not-allowed'
+                    "
                     @click="openHeroSearch"
                 >
                     Search
@@ -537,6 +562,7 @@
                             <div class="flex-1 overflow-y-auto">
                                 <div class="px-4 py-6 max-w-6xl mx-auto">
                                     <MetadataSearchContent
+                                        :persist-in-url="variant === 'hero'"
                                         @search-params-updated="
                                             handleMetadataParams
                                         "
@@ -575,7 +601,12 @@
 <script>
 import { ref, computed, watch, watchEffect, onMounted, shallowRef } from "vue";
 import { router } from "@inertiajs/vue3";
-import { SEARCH_SCOPE, buildSearchPagePath } from "@/Utils/unifiedSearchApi.js";
+import {
+    SEARCH_SCOPE,
+    buildSearchPagePath,
+    metadataParamsFromForm,
+    readAdvancedFormParamsFromUrl,
+} from "@/Utils/unifiedSearchApi.js";
 import { useMagicKeys } from "@vueuse/core";
 import {
     Dialog as HDialog,
@@ -608,6 +639,7 @@ export default {
         PlusIcon,
         PencilIcon,
         AdjustmentsHorizontalIcon,
+        ChartBarIcon,
         StructureEditorContent,
         SpectraUploadContent,
         PeakListSearchContent,
@@ -641,6 +673,7 @@ export default {
         const pendingHeroStructureSmiles = ref(null);
         const heroSearchQuery = ref("");
         const heroStructureDraft = ref(null);
+        const heroHasStructure = ref(false);
 
         const heroSearchTypes = [
             {
@@ -659,7 +692,7 @@ export default {
                 type: "spectra",
                 label: "Spectra",
                 icon: ChartBarIcon,
-                comingSoon: false,
+                comingSoon: true,
             },
             {
                 type: "advanced",
@@ -709,10 +742,6 @@ export default {
             (newType, oldType) => {
                 spectraFiles.value = [];
 
-                if (oldType === "advanced") {
-                    metadataParams.value = null;
-                }
-
                 if (props.variant !== "hero") {
                     return;
                 }
@@ -744,29 +773,55 @@ export default {
             }
         });
 
-        const hasHeroStructure = computed(() => {
-            if (heroSearchQuery.value.trim() !== "") {
-                return true;
+        const canPerformHeroTextSearch = computed(
+            () => heroSearchQuery.value.trim() !== ""
+        );
+
+        const canPerformHeroSpectraSearch = computed(
+            () => spectraFiles.value.length > 0
+        );
+
+        const canPerformHeroStructureSearch = computed(
+            () => heroHasStructure.value
+        );
+
+        const hasMetadataCriteria = (params) => {
+            if (!params) {
+                return false;
             }
 
-            if (heroStructureDraft.value) {
-                return true;
+            return Object.values(params).some(
+                (value) => value !== null && value !== undefined && value !== ""
+            );
+        };
+
+        const canPerformHeroAdvancedSearch = computed(() =>
+            hasMetadataCriteria(metadataParams.value)
+        );
+
+        const syncHeroStructureAvailability = () => {
+            if (!heroStructureEditor.value) {
+                heroHasStructure.value = Boolean(heroStructureDraft.value);
+                return;
             }
 
-            if (heroStructureEditor.value) {
-                try {
-                    const smiles = heroStructureEditor.value
-                        .getSmiles()
-                        ?.trim();
+            try {
+                const smiles = heroStructureEditor.value.getSmiles()?.trim();
+                heroHasStructure.value = Boolean(smiles);
 
-                    return Boolean(smiles);
-                } catch {
-                    return false;
+                if (smiles) {
+                    heroStructureDraft.value = smiles;
+                } else {
+                    heroStructureDraft.value = null;
                 }
+            } catch {
+                heroHasStructure.value = Boolean(heroStructureDraft.value);
             }
+        };
 
-            return false;
-        });
+        const hasHeroStructure = computed(
+            () => heroSearchQuery.value.trim() !== "" || heroHasStructure.value
+        );
 
         const heroStructureActionLabel = computed(() =>
             hasHeroStructure.value ? "Edit structure" : "Draw structure"
@@ -794,6 +849,7 @@ export default {
 
         const onHeroStructureEditorReady = async (editor) => {
             heroStructureEditor.value = editor;
+            editor.onChange(syncHeroStructureAvailability);
 
             const url = new URL(window.location.href);
             const querySmiles = url.searchParams.get("query");
@@ -810,6 +866,7 @@ export default {
             }
 
             persistHeroStructureDraft();
+            syncHeroStructureAvailability();
         };
 
         const onModalStructureEditorReady = (editor) => {
@@ -837,7 +894,7 @@ export default {
                 image: "/img/instrument-format.png",
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
-                comingSoon: false,
+                comingSoon: true,
             },
             {
                 type: "peaks",
@@ -936,6 +993,7 @@ export default {
 
             heroStructureDraft.value = smiles;
             pendingHeroStructureSmiles.value = smiles;
+            heroHasStructure.value = Boolean(smiles?.trim());
         };
 
         const selectAndProceed = (type) => {
@@ -953,6 +1011,14 @@ export default {
 
             // Handle spectra search - show upload interface
             if (type === "spectra") {
+                const spectraOption = searchOptions.find(
+                    (option) => option.type === "spectra"
+                );
+
+                if (spectraOption?.comingSoon) {
+                    return;
+                }
+
                 showSpectraUpload.value = true;
                 return;
             }
@@ -978,15 +1044,20 @@ export default {
             showMetadataSearch.value = false;
         };
 
-        const hasMetadataCriteria = (params) => {
+        const metadataActiveFilterCount = computed(() => {
+            const params = metadataParams.value;
+
             if (!params) {
-                return false;
+                return 0;
             }
 
-            return Object.values(params).some(
-                (value) => value !== null && value !== undefined && value !== ""
-            );
-        };
+            return Object.values(params).filter(
+                (value) =>
+                    value !== null &&
+                    value !== undefined &&
+                    String(value).trim() !== ""
+            ).length;
+        });
 
         const hasOnlyFreeTextMetadata = (params) => {
             if (!params?.freeText?.trim()) {
@@ -1012,6 +1083,10 @@ export default {
 
         const openHeroSearch = () => {
             if (heroSearchType.value.type === "metadata") {
+                if (!canPerformHeroTextSearch.value) {
+                    return;
+                }
+
                 performTextSearch();
                 return;
             }
@@ -1066,20 +1141,24 @@ export default {
                     ? modalStructureEditor.value
                     : heroStructureEditor.value;
 
-            if (editor) {
-                const smiles = editor.getSmiles();
-                window.location.href = buildSearchPagePath(
-                    SEARCH_SCOPE.COMPOUNDS,
-                    {
-                        query: smiles,
-                        type: structureSearchType.value,
-                    }
-                );
+            if (!editor) {
+                return;
             }
+
+            const smiles = editor.getSmiles()?.trim();
+
+            if (!smiles) {
+                return;
+            }
+
+            window.location.href = buildSearchPagePath(SEARCH_SCOPE.COMPOUNDS, {
+                query: smiles,
+                type: structureSearchType.value,
+            });
         };
 
         const performSpectraSearch = () => {
-            if (spectraFiles.value.length === 0) {
+            if (!canPerformHeroSpectraSearch.value) {
                 return;
             }
             // TODO: Implement spectra file upload and search
@@ -1102,7 +1181,6 @@ export default {
 
         const performMetadataSearch = () => {
             if (!hasMetadataCriteria(metadataParams.value)) {
-                alert("Please enter search criteria");
                 return;
             }
 
@@ -1111,8 +1189,11 @@ export default {
                 return;
             }
 
-            alert(
-                "Field-specific metadata search will be implemented next. Use free text search for now."
+            router.visit(
+                buildSearchPagePath(
+                    SEARCH_SCOPE.METADATA,
+                    metadataParamsFromForm(metadataParams.value)
+                )
             );
         };
 
@@ -1120,6 +1201,13 @@ export default {
         onMounted(() => {
             const url = new URL(window.location.href);
             const searchParam = url.searchParams.get("search");
+
+            if (
+                props.variant === "hero" &&
+                url.searchParams.get("tab") === "advanced"
+            ) {
+                metadataParams.value = readAdvancedFormParamsFromUrl();
+            }
 
             if (searchParam) {
                 open.value = true;
@@ -1157,11 +1245,16 @@ export default {
             spectraFiles,
             peakListParams,
             metadataParams,
+            metadataActiveFilterCount,
             searchButton,
             heroSearchInput,
             heroSearchTypes,
             heroSearchType,
             heroPlaceholder,
+            canPerformHeroTextSearch,
+            canPerformHeroStructureSearch,
+            canPerformHeroSpectraSearch,
+            canPerformHeroAdvancedSearch,
             heroStructureActionLabel,
             onHeroSearchInput,
             caffeineExampleSmiles,

@@ -8,6 +8,7 @@ use App\Models\NMRium;
 use App\Models\Sample;
 use App\Models\User;
 use App\Services\InteractionTracker;
+use App\Support\Public\PublicEntityAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -34,6 +35,13 @@ class DatasetController extends Controller
         return Inertia::render('Public/Dataset', [
             'dataset' => $dataset,
         ]);
+    }
+
+    public function fetchPublicNMRium(Request $request, Dataset $dataset)
+    {
+        PublicEntityAccess::authorizeDatasetAccess($request, $dataset);
+
+        return $this->fetchNMRium($request, $dataset);
     }
 
     public function fetchNMRium(Request $request, Dataset $dataset)

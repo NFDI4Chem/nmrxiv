@@ -75,6 +75,7 @@ final class ProjectWorkspace
                     'tags',
                     'authors',
                     'citations',
+                    'fundingReferences',
                     'owner',
                     'draft',
                 ]),
