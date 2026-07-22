@@ -253,6 +253,64 @@
                                         </div>
                                     </dd>
                                 </div>
+
+                                <div
+                                    v-if="
+                                        canUpdateProject ||
+                                        (project.data.funding_references &&
+                                            project.data.funding_references
+                                                .length > 0)
+                                    "
+                                    class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                                >
+                                    <div
+                                        class="sm:col-span-6 flex flex-wrap items-center justify-between gap-2"
+                                    >
+                                        <h2
+                                            class="text-xl font-extrabold mb-0 text-blue-gray-900 dark:text-gray-100"
+                                        >
+                                            Funding
+                                        </h2>
+                                        <button
+                                            v-if="canUpdateProject"
+                                            type="button"
+                                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
+                                            @click="
+                                                toggleManageFundingReference
+                                            "
+                                        >
+                                            <PencilIcon
+                                                class="h-3.5 w-3.5 mr-1"
+                                            />
+                                            Edit
+                                        </button>
+                                    </div>
+
+                                    <dd
+                                        class="sm:col-span-6 mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                                    >
+                                        <div
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                                        >
+                                            <funding-reference-card
+                                                :funding-references="
+                                                    project.data
+                                                        .funding_references ||
+                                                    []
+                                                "
+                                                :show-edit-delete="
+                                                    canUpdateProject
+                                                "
+                                                @edit="
+                                                    onFundingReferenceCardEdit
+                                                "
+                                                @delete="
+                                                    onFundingReferenceCardDelete
+                                                "
+                                            />
+                                        </div>
+                                    </dd>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -425,6 +483,11 @@
                     ref="manageCitationElement"
                     :project="dashboardProject"
                 />
+                <manage-funding-reference
+                    v-if="workspace && dashboardProject"
+                    ref="manageFundingReferenceElement"
+                    :project="dashboardProject"
+                />
             </div>
         </template>
     </project-layout>
@@ -438,8 +501,10 @@
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import FundingReferenceCard from "@/Shared/FundingReferenceCard.vue";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
+import ManageFundingReference from "@/Shared/ManageFundingReference.vue";
 import ProjectDetails from "@/Pages/Project/Partials/Details.vue";
 import Publish from "@/Shared/Publish.vue";
 import Citation from "@/Shared/Citation.vue";
@@ -455,10 +520,12 @@ export default {
         ProjectLayout,
         AuthorCard,
         CitationCard,
+        FundingReferenceCard,
         Citation,
         Head,
         ManageAuthor,
         ManageCitation,
+        ManageFundingReference,
         ProjectDetails,
         Publish,
         PencilIcon,
@@ -579,6 +646,9 @@ export default {
         toggleManageCitation() {
             this.$refs.manageCitationElement?.toggleDialog();
         },
+        toggleManageFundingReference() {
+            this.$refs.manageFundingReferenceElement?.toggleDialog();
+        },
         onCitationCardEdit(citation) {
             const modal = this.$refs.manageCitationElement;
             if (!modal) {
@@ -593,6 +663,20 @@ export default {
         },
         onCitationCardDelete(citation) {
             this.$refs.manageCitationElement?.confirmDeletion(citation);
+        },
+        onFundingReferenceCardEdit(fundingReference) {
+            const modal = this.$refs.manageFundingReferenceElement;
+            if (!modal?.showDialog) {
+                modal?.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal?.edit(fundingReference);
+            });
+        },
+        onFundingReferenceCardDelete(fundingReference) {
+            this.$refs.manageFundingReferenceElement?.confirmDeletion(
+                fundingReference
+            );
         },
         onAuthorCardEdit(author) {
             const modal = this.$refs.manageAuthorElement;
