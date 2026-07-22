@@ -277,7 +277,7 @@ The project name must be meaningful and cannot remain the default draft name.
 
 ## Release Date and Embargo
 
-If you choose today as the release date, nmrXiv queues the submission for immediate publication. If you choose a future release date, the project is kept under embargo and published automatically when the release date arrives. [Click on the link to learn complete details about the **Embargo** feature.](/submission-guides/embargo.html)
+If you choose today as the release date, nmrXiv queues the submission for immediate publication. If you choose a future release date, the project is kept under embargo and published automatically when the release date arrives. [Click on the link to learn complete details about the **Embargo** feature.](/submission-guides/embargo)
 
 After publication, nmrXiv assigns identifiers and DOI metadata, moves files from draft storage to permanent publication storage, rebuilds public archives, and sends notifications.
 
