@@ -19,6 +19,7 @@ use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
+use App\Http\Controllers\FundingReferenceController;
 use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
@@ -180,6 +181,13 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::delete('citations/study/{study}/delete', [CitationController::class, 'destroyStudy'])
         ->name('citation.study.delete');
+
+    // Funding references
+    Route::post('funding-references/{project}', [FundingReferenceController::class, 'save'])
+        ->name('fundingReference.save');
+
+    Route::delete('funding-references/{project}/delete', [FundingReferenceController::class, 'destroy'])
+        ->name('fundingReference.delete');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
         ->name('onboarding.complete');

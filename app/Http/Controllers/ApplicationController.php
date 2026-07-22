@@ -160,7 +160,7 @@ class ApplicationController extends Controller
             }
         }
 
-        $project?->loadMissing(['owner', 'tags', 'authors', 'citations', 'users', 'projectInvitations']);
+        $project?->loadMissing(['owner', 'tags', 'authors', 'citations', 'fundingReferences', 'users', 'projectInvitations']);
 
         $tab = $tabOverride ?? $request->get('tab', 'info');
 
@@ -173,7 +173,7 @@ class ApplicationController extends Controller
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                         'tab' => $tab,
                     ],
                     $request,
@@ -241,7 +241,7 @@ class ApplicationController extends Controller
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                         'tab' => 'info',
                     ],
                     $request,
@@ -265,7 +265,7 @@ class ApplicationController extends Controller
                     return $this->renderPublicProject(
                         'Public/Project/Show',
                         [
-                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                             'tab' => 'info',
                         ],
                         $request,
@@ -305,7 +305,7 @@ class ApplicationController extends Controller
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                         'tab' => 'info',
                     ],
                     $request,

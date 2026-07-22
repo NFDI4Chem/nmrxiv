@@ -362,6 +362,14 @@ class Project extends Model implements Auditable
     }
 
     /**
+     * Funding references linked to this project.
+     */
+    public function fundingReferences(): BelongsToMany
+    {
+        return $this->belongsToMany(FundingReference::class);
+    }
+
+    /**
      * Send Notification via email.
      *
      * @param  string  $notifyType  (deletion / deletionReminder / archival / archivalAdmin)
