@@ -48,6 +48,7 @@ export default defineConfig({
           { text: 'Registration', link: '/submission-guides/registration.md' },
           { text: 'Folder Structure', link: '/submission-guides/folder-structure.md'},
           { text: 'Submission Process', link: '/submission-guides/submission-process.md'},
+          { text: 'Embargo Publication', link: '/submission-guides/embargo.md'},
           { text: 'Dashboard', link: '/submission-guides/dashboard.md'},
           { text: 'Data Models',
             items: [
