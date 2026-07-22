@@ -13,7 +13,7 @@
         "darkaonline/l5-swagger": "^11.1",
         "doctrine/annotations": "^2.0",
         "doctrine/dbal": "^3.5",
-        "guzzlehttp/guzzle": "^7.8",
+        "guzzlehttp/guzzle": "^7.15",
         "http-interop/http-factory-guzzle": "^1.2",
         "inertiajs/inertia-laravel": "^2.0",
         "lab404/laravel-impersonate": "^1.7",

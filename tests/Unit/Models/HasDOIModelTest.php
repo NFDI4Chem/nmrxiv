@@ -5,6 +5,7 @@ namespace Tests\Unit\Models;
 use App\Models\Author;
 use App\Models\Citation;
 use App\Models\Dataset;
+use App\Models\FundingReference;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
@@ -528,6 +529,71 @@ class HasDOIModelTest extends TestCase
         $this->assertEquals('findable', $metadata['state']);
         $this->assertEquals('http://datacite.org/schema/kernel-4.4', $metadata['schemaVersion']);
         $this->assertEquals('en', $metadata['language']);
+        $this->assertArrayNotHasKey('fundingReferences', $metadata);
+    }
+
+    public function test_get_metadata_includes_funding_references_for_project(): void
+    {
+        $license = License::factory()->create();
+        $project = Project::factory()->create(['license_id' => $license->id]);
+
+        $fundingReference = FundingReference::factory()->create();
+        $project->fundingReferences()->attach($fundingReference->id, ['user' => '1']);
+        $project->load('fundingReferences');
+
+        $metadata = $project->getMetadata();
+
+        $this->assertArrayHasKey('fundingReferences', $metadata);
+        $this->assertCount(1, $metadata['fundingReferences']);
+        $this->assertEquals('Deutsche Forschungsgemeinschaft', $metadata['fundingReferences'][0]['funderName']);
+        $this->assertEquals('441958208', $metadata['fundingReferences'][0]['awardNumber']);
+        $this->assertEquals('ROR', $metadata['fundingReferences'][0]['funderIdentifierType']);
+    }
+
+    public function test_get_metadata_study_inherits_project_funding_references(): void
+    {
+        $license = License::factory()->create();
+        $project = Project::factory()->create(['license_id' => $license->id]);
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'license_id' => $license->id,
+        ]);
+
+        $fundingReference = FundingReference::factory()->create();
+        $project->fundingReferences()->attach($fundingReference->id, ['user' => '1']);
+        $project->load('fundingReferences');
+        $study->setRelation('project', $project);
+
+        $metadata = $study->getMetadata();
+
+        $this->assertArrayHasKey('fundingReferences', $metadata);
+        $this->assertEquals('Deutsche Forschungsgemeinschaft', $metadata['fundingReferences'][0]['funderName']);
+    }
+
+    public function test_get_metadata_dataset_inherits_project_funding_references(): void
+    {
+        $license = License::factory()->create();
+        $project = Project::factory()->create(['license_id' => $license->id]);
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'license_id' => $license->id,
+        ]);
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'license_id' => $license->id,
+        ]);
+
+        $fundingReference = FundingReference::factory()->create();
+        $project->fundingReferences()->attach($fundingReference->id, ['user' => '1']);
+        $project->load('fundingReferences');
+        $study->setRelation('project', $project);
+        $dataset->setRelation('study', $study);
+        $dataset->study->setRelation('project', $project);
+
+        $metadata = $dataset->getMetadata();
+
+        $this->assertArrayHasKey('fundingReferences', $metadata);
+        $this->assertEquals('441958208', $metadata['fundingReferences'][0]['awardNumber']);
     }
 
     public function test_add_related_identifiers_for_project(): void
