@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Support\Public\PublicMoleculeAggregates;
 
 class ArchiveProject
 {
@@ -34,6 +35,8 @@ class ArchiveProject
             $project->sendNotification('archival', $this->prepareSendList($project));
         }
         $project->save();
+
+        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
     }
 
     /**

@@ -18,4 +18,9 @@ class WelcomePageTest extends TestCase
     {
         $this->assertInertiaPageComponent($this->get('/?tab=advanced'), 'Welcome');
     }
+
+    public function test_welcome_page_accepts_spectra_search_tab_query(): void
+    {
+        $this->assertInertiaPageComponent($this->get('/?tab=spectra'), 'Welcome');
+    }
 }

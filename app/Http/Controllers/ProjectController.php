@@ -56,7 +56,7 @@ class ProjectController extends Controller
         $tab = $request->get('tab');
         if ($tab == 'info') {
             return $render('Public/Project/Show', [
-                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                 'tab' => $tab,
             ]);
         }
@@ -88,7 +88,7 @@ class ProjectController extends Controller
         }
 
         return $render('Public/Project/Show', [
-            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
             'tab' => 'info',
         ]);
     }
@@ -147,7 +147,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Project/Show', array_merge(
             [
-                'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner'),
+                'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'fundingReferences', 'owner'),
             ],
             ProjectWorkspace::dashboardShowCompanionProps($request, $project, $getLicense)
         ));
@@ -330,7 +330,7 @@ class ProjectController extends Controller
         $validation->process();
 
         return Inertia::render('Project/Validation', [
-            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
+            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'fundingReferences'),
             'validation' => $validation->fresh(),
         ]);
     }
