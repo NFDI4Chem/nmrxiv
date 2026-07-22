@@ -7,7 +7,9 @@ namespace App\Support\Public;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Study;
+use App\Support\Nmr\MoleculeExperimentTypeCounts;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -15,6 +17,10 @@ use Illuminate\Support\Facades\DB;
  */
 final class PublicMoleculeAggregates
 {
+    public const PUBLIC_CATALOG_TOTAL_CACHE_KEY = 'search.compounds.public_catalog_total';
+
+    private const PUBLIC_CATALOG_TOTAL_CACHE_SECONDS = 300;
+
     /**
      * Correlated EXISTS: molecule has ≥1 spectrum in the public catalog.
      */
@@ -62,6 +68,126 @@ SQL;
     }
 
     /**
+     * Paginate molecule IDs without COUNT(*) OVER (), which forces a full catalog scan.
+     *
+     * SQL fragments must be built from trusted internal identifiers only — never user input.
+     *
+     * @param  array{
+     *     from: string,
+     *     where: string,
+     *     id?: string,
+     *     order?: string
+     * }  $query
+     * @param  list<mixed>  $bindings  Bindings for the WHERE clause only
+     * @return array{ids: list<int>, total: int}
+     */
+    public static function paginateIds(
+        array $query,
+        array $bindings,
+        int $limit,
+        int $offset,
+        ?string $totalCacheKey = null,
+        int $totalCacheSeconds = self::PUBLIC_CATALOG_TOTAL_CACHE_SECONDS,
+    ): array {
+        $from = $query['from'];
+        $where = $query['where'];
+        $idColumn = $query['id'] ?? 'molecules.id';
+        $order = trim($query['order'] ?? '');
+
+        $limit = max(1, $limit);
+        $offset = max(0, $offset);
+
+        $orderSql = $order !== '' ? " {$order}" : '';
+
+        $idRows = DB::select(
+            "SELECT {$idColumn} AS id {$from} {$where}{$orderSql} LIMIT ? OFFSET ?",
+            [...$bindings, $limit, $offset]
+        );
+
+        /** @var list<int> $ids */
+        $ids = array_map(static fn (object $row): int => (int) $row->id, $idRows);
+
+        // First page that is not full is the entire result set — skip the count query.
+        if ($offset === 0 && count($ids) < $limit) {
+            return [
+                'ids' => $ids,
+                'total' => count($ids),
+            ];
+        }
+
+        $total = self::countIds($from, $where, $idColumn, $bindings, $totalCacheKey, $totalCacheSeconds);
+
+        return [
+            'ids' => $ids,
+            'total' => $total,
+        ];
+    }
+
+    /**
+     * Browse the public compounds catalog (identifier + public spectra), newest first.
+     *
+     * @return array{ids: list<int>, total: int}
+     */
+    public static function paginatePublicCatalog(
+        int $limit,
+        int $offset,
+        bool $orderByRecent = true,
+    ): array {
+        $exists = self::hasPublicSpectraExistsSql('molecules.id');
+
+        return self::paginateIds(
+            [
+                'from' => 'FROM molecules',
+                'where' => "WHERE molecules.identifier IS NOT NULL AND {$exists}",
+                'id' => 'molecules.id',
+                'order' => $orderByRecent ? 'ORDER BY molecules.created_at DESC' : '',
+            ],
+            [],
+            $limit,
+            $offset,
+            self::PUBLIC_CATALOG_TOTAL_CACHE_KEY,
+        );
+    }
+
+    /**
+     * Load molecule rows for the given IDs, preserving input order.
+     *
+     * @param  list<int>  $ids
+     * @return list<object>
+     */
+    public static function moleculesByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $rows = DB::select(
+            "SELECT * FROM molecules WHERE identifier IS NOT NULL AND id IN ({$placeholders})",
+            $ids
+        );
+
+        $byId = [];
+        foreach ($rows as $row) {
+            $byId[(int) $row->id] = $row;
+        }
+
+        $ordered = [];
+        foreach ($ids as $id) {
+            if (isset($byId[$id])) {
+                $ordered[] = $byId[$id];
+            }
+        }
+
+        return $ordered;
+    }
+
+    public static function forgetPublicCatalogTotalCache(): void
+    {
+        Cache::forget(self::PUBLIC_CATALOG_TOTAL_CACHE_KEY);
+    }
+
+    /**
      * @param  Builder<Molecule>  $query
      */
     public static function scopePublicCatalog(Builder $query): Builder
@@ -87,7 +213,7 @@ SQL;
         )));
 
         $sampleCounts = self::sampleCountsByMoleculeId($ids);
-        $experimentCounts = self::experimentTypeCountsByMoleculeId($ids);
+        $experimentCounts = (new MoleculeExperimentTypeCounts)->forPublicCatalog($ids);
 
         foreach ($molecules as $molecule) {
             $id = $molecule instanceof Molecule ? (int) $molecule->id : (int) $molecule->id;
@@ -105,6 +231,33 @@ SQL;
         }
 
         return $molecules;
+    }
+
+    /**
+     * @param  list<mixed>  $bindings
+     */
+    private static function countIds(
+        string $from,
+        string $where,
+        string $idColumn,
+        array $bindings,
+        ?string $totalCacheKey,
+        int $totalCacheSeconds,
+    ): int {
+        $resolve = static function () use ($from, $where, $idColumn, $bindings): int {
+            $row = DB::selectOne(
+                "SELECT COUNT(DISTINCT {$idColumn}) AS aggregate {$from} {$where}",
+                $bindings
+            );
+
+            return (int) ($row->aggregate ?? 0);
+        };
+
+        if ($totalCacheKey === null) {
+            return $resolve();
+        }
+
+        return (int) Cache::remember($totalCacheKey, $totalCacheSeconds, $resolve);
     }
 
     /**
@@ -160,57 +313,6 @@ SQL,
         }
 
         return $counts;
-    }
-
-    /**
-     * @param  array<int, int>  $moleculeIds
-     * @return array<int, array<string, int>>
-     */
-    private static function experimentTypeCountsByMoleculeId(array $moleculeIds): array
-    {
-        if ($moleculeIds === []) {
-            return [];
-        }
-
-        $placeholders = implode(',', array_fill(0, count($moleculeIds), '?'));
-        $datasetNotDeleted = self::datasetNotDeletedSql('d');
-        $studyNotDeleted = '(st.is_deleted IS NULL OR st.is_deleted = false)';
-        $datasetSpectra = self::datasetHasSpectraSql('d', 'n');
-
-        $rows = DB::select(
-            <<<SQL
-SELECT ms.molecule_id, d.type AS experiment_type, COUNT(DISTINCT d.id) AS dataset_count
-FROM datasets d
-INNER JOIN studies st ON st.id = d.study_id
-INNER JOIN samples s ON s.study_id = st.id
-INNER JOIN molecule_sample ms ON ms.sample_id = s.id
-LEFT JOIN nmrium n ON n.nmriumable_type = ?
-    AND n.nmriumable_id = d.id
-WHERE ms.molecule_id IN ({$placeholders})
-  AND st.is_public = true
-  AND st.is_archived = false
-  AND {$studyNotDeleted}
-  AND d.is_public = true
-  AND (d.is_archived IS NULL OR d.is_archived = false)
-  AND d.type IS NOT NULL
-  AND d.type <> ''
-  AND {$datasetNotDeleted}
-  AND {$datasetSpectra}
-GROUP BY ms.molecule_id, d.type
-SQL,
-            array_merge([Dataset::class], $moleculeIds),
-        );
-
-        /** @var array<int, array<string, int>> $grouped */
-        $grouped = [];
-
-        foreach ($rows as $row) {
-            $moleculeId = (int) $row->molecule_id;
-            $type = (string) $row->experiment_type;
-            $grouped[$moleculeId][$type] = (int) $row->dataset_count;
-        }
-
-        return $grouped;
     }
 
     private static function datasetHasSpectraSql(string $datasetAlias, string $nmriumAlias): string

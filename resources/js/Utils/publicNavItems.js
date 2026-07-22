@@ -3,6 +3,7 @@ import {
     SwatchIcon,
     InformationCircleIcon,
     QuestionMarkCircleIcon,
+    ChartBarIcon,
 } from "@heroicons/vue/24/outline";
 
 export const publicNavItems = [
@@ -18,6 +19,12 @@ export const publicNavItems = [
         icon: SwatchIcon,
         match: ["/compounds"],
         searchScope: "compounds",
+    },
+    {
+        name: "Statistics",
+        href: "/stats",
+        icon: ChartBarIcon,
+        match: ["/stats"],
     },
     {
         name: "About",

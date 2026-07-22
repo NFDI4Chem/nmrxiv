@@ -21,6 +21,7 @@ Artisan::command('nmrxiv', function () {
 Schedule::command('nmrxiv:publish-embargo-projects')->daily();
 Schedule::command('nmrxiv:delete-projects')->daily();
 Schedule::command('nmrxiv:index-molecules')->daily();
+Schedule::command('nmrxiv:index-spectra-metadata-stats')->daily();
 Schedule::command('nmrxiv:delete-citations')->weekly();
 Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {

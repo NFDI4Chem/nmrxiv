@@ -7,14 +7,19 @@ use App\Http\Requests\MetadataSearchRequest;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
+use App\Models\SpectraMetadataStatsIndex;
 use App\Models\Study;
+use App\Support\Search\PublicDatasetScope;
 use App\Support\Search\TextSearchNormalizer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class PublicMetadataSearchService
 {
+    public const STATS_SCOPE_PUBLIC_INDEXED = SpectraMetadataStatsIndex::SCOPE_PUBLIC_INDEXED;
+
     /**
      * @var array<string, list<string>>
      */
@@ -34,6 +39,23 @@ class PublicMetadataSearchService
         'pulse_sequence' => 'spectra_pulse_sequence',
         'number_of_scans' => 'spectra_number_of_scans',
         'manufacturer' => 'spectra_manufacturer',
+        'instrument_model' => 'spectra_probe_name',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    private const STATS_DISTRIBUTION_COLUMNS = [
+        'dimension' => 'spectra_dimension',
+        'nucleus' => 'spectra_nucleus',
+        'solvent' => 'spectra_solvent',
+        'experiment' => 'spectra_experiment',
+        'measuring_frequency_mhz' => 'spectra_base_frequency',
+        'manufacturer' => 'spectra_manufacturer',
+        'temperature_k' => 'spectra_temperature',
+        'pulse_sequence' => 'spectra_pulse_sequence',
+        'tube_diameter_mm' => 'spectra_tube_diameter',
+        'number_of_scans' => 'spectra_number_of_scans',
         'instrument_model' => 'spectra_probe_name',
     ];
 
@@ -61,6 +83,196 @@ class PublicMetadataSearchService
     public function facetsFromRequest(MetadataFacetsRequest $request): array
     {
         return $this->availableFacets($request->criteria(), $request->freeTextTokens());
+    }
+
+    /**
+     * @return array{
+     *     scope: string,
+     *     source: string,
+     *     computed_at: string|null,
+     *     totals: array{
+     *         spectra_indexed: int,
+     *         samples_with_indexed_spectra: int,
+     *         public_spectra: int,
+     *         indexed_coverage_percent: float|null
+     *     },
+     *     distributions: array<string, list<array{value: string, count: int}>>,
+     *     missing: array<string, int>
+     * }
+     */
+    public function statisticsFromRequest(MetadataFacetsRequest $request, int $distributionLimit = 50): array
+    {
+        $criteria = $request->criteria();
+        $freeTextTokens = $request->freeTextTokens();
+        $distributionLimit = max(1, min(200, $distributionLimit));
+
+        if ($this->hasStatisticsScope($criteria, $freeTextTokens)) {
+            return $this->attachStatisticsMetadata(
+                $this->catalogStatistics($criteria, $freeTextTokens, $distributionLimit),
+                source: 'live',
+            );
+        }
+
+        $indexed = $this->indexedCatalogStatistics($distributionLimit);
+
+        if ($indexed !== null) {
+            return $indexed;
+        }
+
+        $index = $this->refreshStatisticsIndex();
+
+        return $this->attachStatisticsMetadata(
+            $index->toStatisticsPayload($distributionLimit),
+            source: 'index',
+            computedAt: $index->computed_at,
+        );
+    }
+
+    public function refreshStatisticsIndex(): SpectraMetadataStatsIndex
+    {
+        $statistics = $this->catalogStatistics(distributionLimit: null);
+
+        return SpectraMetadataStatsIndex::query()->updateOrCreate(
+            ['scope' => self::STATS_SCOPE_PUBLIC_INDEXED],
+            [
+                'totals' => $statistics['totals'],
+                'distributions' => $statistics['distributions'],
+                'missing' => $statistics['missing'],
+                'computed_at' => now(),
+            ],
+        );
+    }
+
+    /**
+     * @return array{
+     *     scope: string,
+     *     source: string,
+     *     computed_at: string|null,
+     *     totals: array{
+     *         spectra_indexed: int,
+     *         samples_with_indexed_spectra: int,
+     *         public_spectra: int,
+     *         indexed_coverage_percent: float|null
+     *     },
+     *     distributions: array<string, list<array{value: string, count: int}>>,
+     *     missing: array<string, int>
+     * }|null
+     */
+    public function indexedCatalogStatistics(int $distributionLimit = 50): ?array
+    {
+        $record = SpectraMetadataStatsIndex::query()
+            ->where('scope', self::STATS_SCOPE_PUBLIC_INDEXED)
+            ->first();
+
+        if ($record === null) {
+            return null;
+        }
+
+        return $this->attachStatisticsMetadata(
+            $record->toStatisticsPayload($distributionLimit),
+            source: 'index',
+            computedAt: $record->computed_at,
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     * @return array{
+     *     scope: string,
+     *     totals: array{
+     *         spectra_indexed: int,
+     *         samples_with_indexed_spectra: int,
+     *         public_spectra: int,
+     *         indexed_coverage_percent: float|null
+     *     },
+     *     distributions: array<string, list<array{value: string, count: int}>>,
+     *     missing: array<string, int>
+     * }
+     */
+    public function catalogStatistics(
+        array $criteria = [],
+        array $freeTextTokens = [],
+        ?int $distributionLimit = 50,
+    ): array {
+        $effectiveLimit = $distributionLimit === null
+            ? PHP_INT_MAX
+            : max(1, min(200, $distributionLimit));
+
+        $indexedQuery = $this->indexedPublicDatasetQuery($criteria, $freeTextTokens);
+        $spectraIndexed = (clone $indexedQuery)->count();
+        $samplesWithIndexedSpectra = (int) (clone $indexedQuery)
+            ->distinct()
+            ->count('study_id');
+
+        $publicSpectra = Dataset::query()
+            ->where('is_public', true)
+            ->where('is_archived', false)
+            ->where('is_deleted', false)
+            ->count();
+
+        $distributions = [];
+        $missing = [];
+
+        foreach (self::STATS_DISTRIBUTION_COLUMNS as $field => $column) {
+            $distributions[$field] = $this->distributionCounts(
+                $criteria,
+                $freeTextTokens,
+                $column,
+                $field,
+                $effectiveLimit,
+            );
+            $missing[$field] = max(0, $spectraIndexed - array_sum(array_column($distributions[$field], 'count')));
+        }
+
+        $distributions['nucleus_measuring_frequency_mhz'] = $this->nucleusFrequencyDistribution(
+            $criteria,
+            $freeTextTokens,
+            $effectiveLimit,
+        );
+        $missing['nucleus_measuring_frequency_mhz'] = max(
+            0,
+            $spectraIndexed - (clone $indexedQuery)
+                ->whereNotNull('spectra_nucleus')
+                ->whereNotNull('spectra_base_frequency')
+                ->count(),
+        );
+
+        $distributions['dimension_experiment_breakdown'] = $this->dimensionExperimentDistribution(
+            $criteria,
+            $freeTextTokens,
+            $effectiveLimit,
+        );
+        $missing['dimension_experiment_breakdown'] = max(
+            0,
+            $spectraIndexed - (clone $indexedQuery)
+                ->where(function (Builder $query): void {
+                    $query->where(function (Builder $oneDimensional): void {
+                        $oneDimensional
+                            ->where('spectra_dimension', 1)
+                            ->whereNotNull('spectra_nucleus');
+                    })->orWhere(function (Builder $twoDimensional): void {
+                        $twoDimensional
+                            ->where('spectra_dimension', 2)
+                            ->whereNotNull('spectra_experiment');
+                    });
+                })
+                ->count(),
+        );
+
+        return [
+            'scope' => self::STATS_SCOPE_PUBLIC_INDEXED,
+            'totals' => [
+                'spectra_indexed' => $spectraIndexed,
+                'samples_with_indexed_spectra' => $samplesWithIndexedSpectra,
+                'public_spectra' => $publicSpectra,
+                'indexed_coverage_percent' => $publicSpectra > 0
+                    ? round(($spectraIndexed / $publicSpectra) * 100, 1)
+                    : null,
+            ],
+            'distributions' => $distributions,
+            'missing' => $missing,
+        ];
     }
 
     /**
@@ -104,13 +316,22 @@ class PublicMetadataSearchService
      */
     public function countMatchingDatasets(array $criteria, array $freeTextTokens = []): int
     {
+        return $this->indexedPublicDatasetQuery($criteria, $freeTextTokens)->count();
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     */
+    private function indexedPublicDatasetQuery(array $criteria, array $freeTextTokens = []): Builder
+    {
         $query = Dataset::query()
             ->whereNotNull('spectra_info_extracted_at');
 
         $this->applyPublicDatasetScope($query);
         $this->applyMetadataFilters($query, $criteria, $freeTextTokens);
 
-        return $query->count();
+        return $query;
     }
 
     /**
@@ -185,21 +406,7 @@ class PublicMetadataSearchService
 
     private function applyPublicDatasetScope(Builder $query): void
     {
-        $query
-            ->where('is_public', true)
-            ->where('is_archived', false)
-            ->where('is_deleted', false)
-            ->whereHas('study', function (Builder $studyQuery): void {
-                $studyQuery
-                    ->where('is_public', true)
-                    ->where('is_archived', false);
-            })
-            ->whereHas('project', function (Builder $projectQuery): void {
-                $projectQuery
-                    ->where('is_public', true)
-                    ->where('is_archived', false)
-                    ->where('is_deleted', false);
-            });
+        PublicDatasetScope::apply($query);
     }
 
     /**
@@ -435,6 +642,286 @@ class PublicMetadataSearchService
         }
 
         return trim((string) $value);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     * @return list<array{value: string, count: int}>
+     */
+    private function distributionCounts(
+        array $criteria,
+        array $freeTextTokens,
+        string $column,
+        string $field,
+        int $limit,
+    ): array {
+        $query = $this->indexedPublicDatasetQuery($criteria, $freeTextTokens);
+
+        $bucketExpression = match ($field) {
+            'measuring_frequency_mhz' => 'CAST(ROUND('.$column.') AS INTEGER)',
+            'temperature_k' => 'CAST(ROUND('.$column.') AS INTEGER)',
+            'dimension' => $column,
+            default => $column,
+        };
+
+        $rows = $query
+            ->selectRaw($bucketExpression.' as bucket, COUNT(*) as aggregate_count')
+            ->whereNotNull($column)
+            ->groupByRaw($bucketExpression)
+            ->orderByDesc('aggregate_count');
+
+        if ($limit < PHP_INT_MAX) {
+            $rows->limit($limit);
+        }
+
+        $rows = $rows->get();
+
+        return $rows
+            ->map(function (object $row) use ($field): array {
+                return [
+                    'value' => $this->normalizeDistributionValue($field, $row->bucket),
+                    'count' => (int) $row->aggregate_count,
+                ];
+            })
+            ->filter(fn (array $row): bool => $row['value'] !== '')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     * @return list<array{
+     *     nucleus: string,
+     *     count: int,
+     *     frequencies: list<array{value: string, count: int}>
+     * }>
+     */
+    private function nucleusFrequencyDistribution(
+        array $criteria,
+        array $freeTextTokens,
+        int $limit,
+    ): array {
+        $query = $this->indexedPublicDatasetQuery($criteria, $freeTextTokens);
+
+        $rows = $query
+            ->selectRaw(
+                'spectra_nucleus as nucleus, CAST(ROUND(spectra_base_frequency) AS INTEGER) as frequency, COUNT(*) as aggregate_count'
+            )
+            ->whereNotNull('spectra_nucleus')
+            ->whereNotNull('spectra_base_frequency')
+            ->groupByRaw('spectra_nucleus, CAST(ROUND(spectra_base_frequency) AS INTEGER)')
+            ->orderBy('nucleus')
+            ->orderByDesc('aggregate_count')
+            ->get();
+
+        /** @var array<string, array{nucleus: string, count: int, frequencies: list<array{value: string, count: int}>}> $grouped */
+        $grouped = [];
+
+        foreach ($rows as $row) {
+            $nucleus = trim((string) $row->nucleus);
+            $frequency = (string) (int) $row->frequency;
+
+            if ($nucleus === '' || $frequency === '') {
+                continue;
+            }
+
+            if (! array_key_exists($nucleus, $grouped)) {
+                $grouped[$nucleus] = [
+                    'nucleus' => $nucleus,
+                    'count' => 0,
+                    'frequencies' => [],
+                ];
+            }
+
+            $count = (int) $row->aggregate_count;
+            $grouped[$nucleus]['count'] += $count;
+            $grouped[$nucleus]['frequencies'][] = [
+                'value' => $frequency,
+                'count' => $count,
+            ];
+        }
+
+        $distribution = collect($grouped)
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+
+        return $this->limitDistribution($distribution, $limit);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     * @return list<array{
+     *     dimension: string,
+     *     count: int,
+     *     breakdown: string,
+     *     segments: list<array{value: string, count: int, kind: string}>
+     * }>
+     */
+    private function dimensionExperimentDistribution(
+        array $criteria,
+        array $freeTextTokens,
+        int $limit,
+    ): array {
+        $query = $this->indexedPublicDatasetQuery($criteria, $freeTextTokens);
+
+        $oneDimensionalRows = (clone $query)
+            ->selectRaw('spectra_nucleus as segment_value, COUNT(*) as aggregate_count')
+            ->where('spectra_dimension', 1)
+            ->whereNotNull('spectra_nucleus')
+            ->groupBy('spectra_nucleus')
+            ->orderByDesc('aggregate_count')
+            ->get();
+
+        $twoDimensionalRows = (clone $query)
+            ->selectRaw('spectra_experiment as segment_value, COUNT(*) as aggregate_count')
+            ->where('spectra_dimension', 2)
+            ->whereNotNull('spectra_experiment')
+            ->groupBy('spectra_experiment')
+            ->orderByDesc('aggregate_count')
+            ->get();
+
+        $distribution = [];
+
+        $oneDimensionalSegments = $this->mapDimensionExperimentSegments(
+            $oneDimensionalRows,
+            kind: 'nucleus',
+        );
+        $oneDimensionalCount = array_sum(array_column($oneDimensionalSegments, 'count'));
+
+        if ($oneDimensionalCount > 0) {
+            $distribution[] = [
+                'dimension' => '1D',
+                'count' => $oneDimensionalCount,
+                'breakdown' => 'nucleus',
+                'segments' => $oneDimensionalSegments,
+            ];
+        }
+
+        $twoDimensionalSegments = $this->mapDimensionExperimentSegments(
+            $twoDimensionalRows,
+            kind: 'experiment',
+        );
+        $twoDimensionalCount = array_sum(array_column($twoDimensionalSegments, 'count'));
+
+        if ($twoDimensionalCount > 0) {
+            $distribution[] = [
+                'dimension' => '2D',
+                'count' => $twoDimensionalCount,
+                'breakdown' => 'experiment',
+                'segments' => $twoDimensionalSegments,
+            ];
+        }
+
+        return $this->limitDistribution($distribution, $limit);
+    }
+
+    /**
+     * @param  list<mixed>  $distribution
+     * @return list<mixed>
+     */
+    private function limitDistribution(array $distribution, int $limit): array
+    {
+        if ($limit < PHP_INT_MAX) {
+            return array_slice($distribution, 0, $limit);
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * @param  Collection<int, object>  $rows
+     * @return list<array{value: string, count: int, kind: string}>
+     */
+    private function mapDimensionExperimentSegments(
+        Collection $rows,
+        string $kind,
+    ): array {
+        return $rows
+            ->map(function (object $row) use ($kind): array {
+                return [
+                    'value' => trim((string) $row->segment_value),
+                    'count' => (int) $row->aggregate_count,
+                    'kind' => $kind,
+                ];
+            })
+            ->filter(fn (array $segment): bool => $segment['value'] !== '')
+            ->values()
+            ->all();
+    }
+
+    private function normalizeDistributionValue(string $field, mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        if ($field === 'dimension') {
+            return match ((int) $value) {
+                1 => '1D',
+                2 => '2D',
+                default => (string) $value,
+            };
+        }
+
+        if ($field === 'measuring_frequency_mhz' || $field === 'temperature_k') {
+            return (string) (int) $value;
+        }
+
+        return trim((string) $value);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     */
+    private function hasStatisticsScope(array $criteria, array $freeTextTokens): bool
+    {
+        if ($freeTextTokens !== []) {
+            return true;
+        }
+
+        foreach ($criteria as $value) {
+            if (filled($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array{
+     *     scope: string,
+     *     totals: array<string, mixed>,
+     *     distributions: array<string, list<array{value: string, count: int}>>,
+     *     missing: array<string, int>
+     * }  $statistics
+     * @return array{
+     *     scope: string,
+     *     source: string,
+     *     computed_at: string|null,
+     *     totals: array<string, mixed>,
+     *     distributions: array<string, list<array{value: string, count: int}>>,
+     *     missing: array<string, int>
+     * }
+     */
+    private function attachStatisticsMetadata(
+        array $statistics,
+        string $source,
+        ?\DateTimeInterface $computedAt = null,
+    ): array {
+        return [
+            'scope' => $statistics['scope'],
+            'source' => $source,
+            'computed_at' => $computedAt?->format(DATE_ATOM),
+            'totals' => $statistics['totals'],
+            'distributions' => $statistics['distributions'],
+            'missing' => $statistics['missing'],
+        ];
     }
 
     /**

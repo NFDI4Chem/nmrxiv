@@ -179,6 +179,7 @@ import {
     syncAdvancedFormBrowserUrl,
     fetchMetadataFacets,
 } from "@/Utils/unifiedSearchApi.js";
+import { formatSolventLabel } from "@/Utils/nmrLabels.js";
 
 const tubeDiameterStaticOptions = [
     { label: "Any", value: "" },
@@ -430,7 +431,10 @@ export default {
         );
 
         const solventOptions = computed(() =>
-            buildFacetOptions(facetAvailability.value.solvent)
+            buildFacetOptions(
+                facetAvailability.value.solvent,
+                formatSolventLabel
+            )
         );
 
         const temperatureOptions = computed(() =>

@@ -15,7 +15,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -297,6 +296,95 @@ class SearchController extends Controller
         return response()->json([
             'facets' => $this->metadataSearch->facetsFromRequest($request),
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/search/metadata/stats",
+     *     operationId="searchMetadataStats",
+     *     tags={"Search"},
+     *     summary="Aggregate metadata statistics for public indexed spectra",
+     *     description="Returns totals and count distributions for public datasets with extracted NMRium metadata. Unfiltered requests are served from the persisted statistics index (refreshed daily). Filtered requests are computed live.",
+     *
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchQ"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchSolvent"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTemperature"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTubeDiameter"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNucleus"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchProtonFrequency"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNmrMethod"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchPulseSequence"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNumberOfScans"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchManufacturer"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchInstrumentModel"),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum buckets per distribution (default: 50, max: 200)",
+     *
+     *         @OA\Schema(type="integer", minimum=1, maximum=200, default=50)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Metadata catalog statistics",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="scope", type="string", example="public_indexed"),
+     *             @OA\Property(property="source", type="string", enum={"index", "live"}, example="index"),
+     *             @OA\Property(property="computed_at", type="string", format="date-time", nullable=true, example="2026-07-16T00:00:00+00:00"),
+     *             @OA\Property(
+     *                 property="totals",
+     *                 type="object",
+     *                 @OA\Property(property="spectra_indexed", type="integer", example=1200),
+     *                 @OA\Property(property="samples_with_indexed_spectra", type="integer", example=340),
+     *                 @OA\Property(property="public_spectra", type="integer", example=1300),
+     *                 @OA\Property(property="indexed_coverage_percent", type="number", format="float", example=92.3)
+     *             ),
+     *             @OA\Property(
+     *                 property="distributions",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="dimension",
+     *                     type="array",
+     *
+     *                     @OA\Items(
+     *                         type="object",
+     *
+     *                         @OA\Property(property="value", type="string", example="1D"),
+     *                         @OA\Property(property="count", type="integer", example=800)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="nucleus", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="solvent", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="experiment", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="measuring_frequency_mhz", type="array", @OA\Items(type="object"))
+     *             ),
+     *             @OA\Property(property="missing", type="object", description="Indexed spectra lacking each metadata field")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function metadataStats(MetadataFacetsRequest $request): JsonResponse
+    {
+        $limit = (int) $request->query('limit', 50);
+        $limit = max(1, min(200, $limit));
+
+        return response()->json(
+            $this->metadataSearch->statisticsFromRequest($request, $limit)
+        );
     }
 
     /**
@@ -658,64 +746,98 @@ class SearchController extends Controller
 
             $queryType = strtolower($queryType);
 
-            $publicSpectraFilter = ' AND '.PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+            $publicSpectraExists = PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+            $orderByRecentSql = $sort === 'recent' ? 'ORDER BY molecules.created_at DESC' : '';
 
-            $statement = null;
+            $ids = [];
+            $count = 0;
 
             if ($queryType == 'smiles') {
-                $hits = DB::select(
-                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (smiles LIKE ? OR absolute_smiles LIKE ? OR canonical_smiles LIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
-                    ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                    [
+                        'from' => 'FROM molecules',
+                        'where' => "WHERE identifier IS NOT NULL AND (smiles LIKE ? OR absolute_smiles LIKE ? OR canonical_smiles LIKE ?) AND {$publicSpectraExists}",
+                        'order' => $orderByRecentSql,
+                    ],
+                    ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%'],
+                    $limit,
+                    $offset
                 );
             } elseif ($queryType == 'substructure') {
                 try {
-                    $hits = DB::select(
-                        "SELECT mols.id, COUNT(*) OVER () as count FROM mols
-                        INNER JOIN molecules ON molecules.id = mols.id
-                        WHERE m@>? AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
-                        LIMIT ? OFFSET ?",
-                        [$query, $limit, $offset]
+                    ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                        [
+                            'from' => 'FROM mols INNER JOIN molecules ON molecules.id = mols.id',
+                            'where' => "WHERE m@>? AND molecules.identifier IS NOT NULL AND {$publicSpectraExists}",
+                            'id' => 'mols.id',
+                            'order' => $orderByRecentSql,
+                        ],
+                        [$query],
+                        $limit,
+                        $offset
                     );
                 } catch (\Exception $e) {
-                    // Log the error and return empty results for invalid SMILES
                     \Log::warning('SMILES query error: '.$e->getMessage(), ['query' => $query]);
-                    $hits = [];
+                    $ids = [];
+                    $count = 0;
                 }
             } elseif ($queryType == 'inchi') {
-                $hits = DB::select(
-                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (inchi LIKE ? OR standard_inchi LIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
-                    ['%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                    [
+                        'from' => 'FROM molecules',
+                        'where' => "WHERE identifier IS NOT NULL AND (inchi LIKE ? OR standard_inchi LIKE ?) AND {$publicSpectraExists}",
+                        'order' => $orderByRecentSql,
+                    ],
+                    ['%'.$query.'%', '%'.$query.'%'],
+                    $limit,
+                    $offset
                 );
             } elseif ($queryType == 'inchikey') {
-                $hits = DB::select(
-                    "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (inchi_key LIKE ? OR standard_inchi_key LIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
-                    ['%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                    [
+                        'from' => 'FROM molecules',
+                        'where' => "WHERE identifier IS NOT NULL AND (inchi_key LIKE ? OR standard_inchi_key LIKE ?) AND {$publicSpectraExists}",
+                        'order' => $orderByRecentSql,
+                    ],
+                    ['%'.$query.'%', '%'.$query.'%'],
+                    $limit,
+                    $offset
                 );
             } elseif ($queryType == 'exact') {
                 try {
-                    $hits = DB::select(
-                        "SELECT mols.id, COUNT(*) OVER () as count FROM mols
-                        INNER JOIN molecules ON molecules.id = mols.id
-                        WHERE m@=? AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
-                        LIMIT ? OFFSET ?",
-                        [$query, $limit, $offset]
+                    ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                        [
+                            'from' => 'FROM mols INNER JOIN molecules ON molecules.id = mols.id',
+                            'where' => "WHERE m@=? AND molecules.identifier IS NOT NULL AND {$publicSpectraExists}",
+                            'id' => 'mols.id',
+                            'order' => $orderByRecentSql,
+                        ],
+                        [$query],
+                        $limit,
+                        $offset
                     );
                 } catch (\Exception $e) {
                     \Log::warning('Exact match query error: '.$e->getMessage(), ['query' => $query]);
-                    $hits = [];
+                    $ids = [];
+                    $count = 0;
                 }
             } elseif ($queryType == 'similarity') {
                 try {
-                    $hits = DB::select(
-                        "SELECT fps.id, COUNT(*) OVER () as count FROM fps
-                        INNER JOIN molecules ON molecules.id = fps.id
-                        WHERE mfp2%morganbv_fp(?) AND molecules.identifier IS NOT NULL{$publicSpectraFilter}
-                        LIMIT ? OFFSET ?",
-                        [$query, $limit, $offset]
+                    ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                        [
+                            'from' => 'FROM fps INNER JOIN molecules ON molecules.id = fps.id',
+                            'where' => "WHERE mfp2%morganbv_fp(?) AND molecules.identifier IS NOT NULL AND {$publicSpectraExists}",
+                            'id' => 'fps.id',
+                            'order' => $orderByRecentSql,
+                        ],
+                        [$query],
+                        $limit,
+                        $offset
                     );
                 } catch (\Exception $e) {
                     \Log::warning('Similarity query error: '.$e->getMessage(), ['query' => $query]);
-                    $hits = [];
+                    $ids = [];
+                    $count = 0;
                 }
             } elseif ($queryType == 'tags') {
                 $tagQuery = $this->buildTaggedMoleculeQuery($query, $tagType);
@@ -737,57 +859,30 @@ class SearchController extends Controller
                 );
                 $count = $tagPaginator->total();
             } elseif ($queryType == 'filters') {
-                $result = $this->buildSecureFilterQuery($query, $filterMap, $limit, $offset);
-                $hits = $result['hits'];
+                $result = $this->buildSecureFilterQuery($query, $filterMap, $limit, $offset, $sort === 'recent');
+                $ids = $result['ids'];
                 $count = $result['count'];
+            } elseif ($query) {
+                ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                    [
+                        'from' => 'FROM molecules',
+                        'where' => "WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?) AND {$publicSpectraExists}",
+                        'order' => $orderByRecentSql,
+                    ],
+                    ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', '%'.$query.'%'],
+                    $limit,
+                    $offset
+                );
             } else {
-                if ($query) {
-                    $hits = DB::select(
-                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?){$publicSpectraFilter} LIMIT ? OFFSET ?",
-                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
-                    );
-                } else {
-                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
-                    $hits = DB::select(
-                        "SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL{$publicSpectraFilter} {$orderBy} LIMIT ? OFFSET ?",
-                        [$limit, $offset]
-                    );
-                }
+                ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginatePublicCatalog(
+                    $limit,
+                    $offset,
+                    $sort === 'recent'
+                );
             }
 
-            // Process results for non-tag queries
-            if ($queryType !== 'tags' && $queryType !== 'filters') {
-                $count = count($hits) > 0 ? $hits[0]->count : 0;
-
-                $ids = collect($hits)->pluck('id')->toArray();
-
-                if (! empty($ids)) {
-                    $placeholders = str_repeat('?,', count($ids) - 1).'?';
-                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
-
-                    $results = DB::select(
-                        "SELECT * FROM molecules WHERE identifier IS NOT NULL AND id IN ({$placeholders}) {$orderBy}",
-                        $ids
-                    );
-                } else {
-                    $results = [];
-                    $count = 0;
-                }
-            } elseif ($queryType === 'filters') {
-                // Results already processed in buildSecureFilterQuery
-                $ids = collect($hits)->pluck('id')->toArray();
-
-                if (! empty($ids)) {
-                    $placeholders = str_repeat('?,', count($ids) - 1).'?';
-                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
-
-                    $results = DB::select(
-                        "SELECT * FROM molecules WHERE identifier IS NOT NULL AND id IN ({$placeholders}) {$orderBy}",
-                        $ids
-                    );
-                } else {
-                    $results = [];
-                }
+            if ($queryType !== 'tags') {
+                $results = PublicMoleculeAggregates::moleculesByIds($ids);
             }
 
             if ($results !== []) {
@@ -922,8 +1017,10 @@ class SearchController extends Controller
 
     /**
      * Build secure filter query with parameter binding
+     *
+     * @return array{ids: list<int>, count: int}
      */
-    private function buildSecureFilterQuery(string $query, array $filterMap, int $limit, int $offset): array
+    private function buildSecureFilterQuery(string $query, array $filterMap, int $limit, int $offset, bool $orderByRecent = false): array
     {
         try {
             $orConditions = explode('OR', $query);
@@ -1016,33 +1113,32 @@ class SearchController extends Controller
             }
 
             if (empty($whereConditions)) {
-                return ['hits' => [], 'count' => 0];
+                return ['ids' => [], 'count' => 0];
             }
 
             $whereClause = implode(' OR ', $whereConditions);
             $publicSpectraFilter = PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
-            $sql = "SELECT properties.molecule_id as id, COUNT(*) OVER () as count
-                FROM properties
-                INNER JOIN molecules ON molecules.id = properties.molecule_id
-                WHERE ({$whereClause})
-                  AND molecules.identifier IS NOT NULL
-                  AND {$publicSpectraFilter}
-                LIMIT ? OFFSET ?";
 
-            $parameters[] = $limit;
-            $parameters[] = $offset;
+            ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
+                [
+                    'from' => 'FROM properties INNER JOIN molecules ON molecules.id = properties.molecule_id',
+                    'where' => "WHERE ({$whereClause}) AND molecules.identifier IS NOT NULL AND {$publicSpectraFilter}",
+                    'id' => 'properties.molecule_id',
+                    'order' => $orderByRecent ? 'ORDER BY molecules.created_at DESC' : '',
+                ],
+                $parameters,
+                $limit,
+                $offset
+            );
 
-            $hits = DB::select($sql, $parameters);
-            $count = count($hits) > 0 ? $hits[0]->count : 0;
-
-            return ['hits' => $hits, 'count' => $count];
+            return ['ids' => $ids, 'count' => $count];
 
         } catch (\Exception $e) {
             // Log the error but don't expose it to prevent information leakage
             \Log::warning('Filter query error: '.$e->getMessage(), ['query' => $query]);
 
             // Return empty results for any error to prevent SQL injection
-            return ['hits' => [], 'count' => 0];
+            return ['ids' => [], 'count' => 0];
         }
     }
 }
