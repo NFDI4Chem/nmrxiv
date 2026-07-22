@@ -26,6 +26,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\PublicSearchController;
+use App\Http\Controllers\PublicStatsController;
 use App\Http\Controllers\RorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
@@ -101,6 +102,8 @@ Route::get('/faqs', function () {
 Route::get('/predict', function () {
     return Inertia::render('Predict');
 })->name('predict');
+
+Route::get('/stats', [PublicStatsController::class, 'index'])->name('stats');
 
 // Custom support bubble route with rate limiting and enhanced security
 Route::post('support-bubble', [SupportBubbleController::class, 'submit'])

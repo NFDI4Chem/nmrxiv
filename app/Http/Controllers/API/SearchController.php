@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MetadataFacetsRequest;
+use App\Http\Requests\MetadataSearchRequest;
 use App\Http\Requests\TextSearchRequest;
 use App\Models\Molecule;
+use App\Services\PublicMetadataSearchService;
 use App\Services\PublicTextSearchService;
 use App\Support\Public\PublicMoleculeAggregates;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,7 +20,10 @@ use Illuminate\Validation\Rule;
 
 class SearchController extends Controller
 {
-    public function __construct(private PublicTextSearchService $catalogSearch) {}
+    public function __construct(
+        private PublicTextSearchService $catalogSearch,
+        private PublicMetadataSearchService $metadataSearch,
+    ) {}
 
     /**
      * @OA\Get(
@@ -121,6 +127,264 @@ class SearchController extends Controller
         }
 
         return response()->json($results);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/search/metadata",
+     *     operationId="searchMetadata",
+     *     tags={"Search"},
+     *     summary="Search public samples and spectra by NMR metadata",
+     *     description="Structured metadata search over denormalized NMRium spectrum fields on public datasets. Combine free-text keywords with exact or ranged filters for solvent, nucleus, temperature, experiment, pulse sequence, scans, manufacturer, and probe. Returns grouped sample (study) and spectra (dataset) results. At least one criterion is required.",
+     *
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchQ"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchSolvent"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTemperature"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTubeDiameter"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNucleus"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchProtonFrequency"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNmrMethod"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchPulseSequence"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNumberOfScans"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchManufacturer"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchInstrumentModel"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchPerPage"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchStudiesPage"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchDatasetsPage"),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Grouped metadata search results",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(
+     *                 property="query",
+     *                 type="object",
+     *                 @OA\Property(property="q", type="string", example=""),
+     *                 @OA\Property(property="tokens", type="array", @OA\Items(type="string")),
+     *                 @OA\Property(property="solvent", type="string", nullable=true, example="CDCl3"),
+     *                 @OA\Property(property="temperature", type="number", nullable=true, example=294),
+     *                 @OA\Property(property="tube_diameter", type="string", nullable=true, example="5"),
+     *                 @OA\Property(property="nucleus", type="string", nullable=true, example="1H"),
+     *                 @OA\Property(property="proton_frequency", type="number", nullable=true, example=600),
+     *                 @OA\Property(property="nmr_method", type="string", nullable=true, example="hsqc"),
+     *                 @OA\Property(property="pulse_sequence", type="string", nullable=true, example="zg30"),
+     *                 @OA\Property(property="number_of_scans", type="integer", nullable=true, example=16),
+     *                 @OA\Property(property="manufacturer", type="string", nullable=true, example="Bruker"),
+     *                 @OA\Property(property="instrument_model", type="string", nullable=true, example="BBO")
+     *             ),
+     *             @OA\Property(
+     *                 property="studies",
+     *                 type="object",
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(
+     *                     property="meta",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=1),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="per_page", type="integer", example=12),
+     *                     @OA\Property(property="last_page", type="integer", example=1)
+     *                 )
+     *             ),
+     *             @OA\Property(property="datasets", type="object")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="No public samples or spectra matched the criteria",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="No results found matching your metadata search criteria.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error (for example, no criteria supplied)",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function metadata(MetadataSearchRequest $request): JsonResponse
+    {
+        $results = $this->metadataSearch->searchFromRequest($request);
+
+        if (
+            $results['studies']['meta']['total'] === 0
+            && $results['datasets']['meta']['total'] === 0
+        ) {
+            return response()->json([
+                'message' => 'No results found matching your metadata search criteria.',
+            ], 404);
+        }
+
+        return response()->json($results);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/search/metadata/facets",
+     *     operationId="searchMetadataFacets",
+     *     tags={"Search"},
+     *     summary="List available metadata filter values",
+     *     description="Returns distinct filter values that currently match public indexed spectra, given the other active criteria. Use this endpoint to populate advanced metadata search controls. Facet lists are narrowed as additional filters are applied.",
+     *
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchQ"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchSolvent"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTemperature"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTubeDiameter"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNucleus"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchProtonFrequency"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNmrMethod"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchPulseSequence"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNumberOfScans"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchManufacturer"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchInstrumentModel"),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Available metadata facet values",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(
+     *                 property="facets",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="solvent",
+     *                     type="array",
+     *
+     *                     @OA\Items(type="string"),
+     *                     example={"CDCl3", "DMSO"}
+     *                 ),
+     *
+     *                 @OA\Property(property="temperature", type="array", @OA\Items(type="string"), example={"294"}),
+     *                 @OA\Property(property="tube_diameter", type="array", @OA\Items(type="string"), example={"3", "5"}),
+     *                 @OA\Property(property="nucleus", type="array", @OA\Items(type="string"), example={"1H", "13C"}),
+     *                 @OA\Property(property="proton_frequency", type="array", @OA\Items(type="string"), example={"600"}),
+     *                 @OA\Property(property="nmr_method", type="array", @OA\Items(type="string"), example={"hsqc", "1d"}),
+     *                 @OA\Property(property="pulse_sequence", type="array", @OA\Items(type="string"), example={"zg30"}),
+     *                 @OA\Property(property="number_of_scans", type="array", @OA\Items(type="string"), example={"16"}),
+     *                 @OA\Property(property="manufacturer", type="array", @OA\Items(type="string"), example={"Bruker"}),
+     *                 @OA\Property(property="instrument_model", type="array", @OA\Items(type="string"), example={"BBO"})
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function metadataFacets(MetadataFacetsRequest $request): JsonResponse
+    {
+        return response()->json([
+            'facets' => $this->metadataSearch->facetsFromRequest($request),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/search/metadata/stats",
+     *     operationId="searchMetadataStats",
+     *     tags={"Search"},
+     *     summary="Aggregate metadata statistics for public indexed spectra",
+     *     description="Returns totals and count distributions for public datasets with extracted NMRium metadata. Unfiltered requests are served from the persisted statistics index (refreshed daily). Filtered requests are computed live.",
+     *
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchQ"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchSolvent"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTemperature"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchTubeDiameter"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNucleus"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchProtonFrequency"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNmrMethod"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchPulseSequence"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchNumberOfScans"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchManufacturer"),
+     *     @OA\Parameter(ref="#/components/parameters/metadataSearchInstrumentModel"),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum buckets per distribution (default: 50, max: 200)",
+     *
+     *         @OA\Schema(type="integer", minimum=1, maximum=200, default=50)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Metadata catalog statistics",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="scope", type="string", example="public_indexed"),
+     *             @OA\Property(property="source", type="string", enum={"index", "live"}, example="index"),
+     *             @OA\Property(property="computed_at", type="string", format="date-time", nullable=true, example="2026-07-16T00:00:00+00:00"),
+     *             @OA\Property(
+     *                 property="totals",
+     *                 type="object",
+     *                 @OA\Property(property="spectra_indexed", type="integer", example=1200),
+     *                 @OA\Property(property="samples_with_indexed_spectra", type="integer", example=340),
+     *                 @OA\Property(property="public_spectra", type="integer", example=1300),
+     *                 @OA\Property(property="indexed_coverage_percent", type="number", format="float", example=92.3)
+     *             ),
+     *             @OA\Property(
+     *                 property="distributions",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="dimension",
+     *                     type="array",
+     *
+     *                     @OA\Items(
+     *                         type="object",
+     *
+     *                         @OA\Property(property="value", type="string", example="1D"),
+     *                         @OA\Property(property="count", type="integer", example=800)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="nucleus", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="solvent", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="experiment", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="measuring_frequency_mhz", type="array", @OA\Items(type="object"))
+     *             ),
+     *             @OA\Property(property="missing", type="object", description="Indexed spectra lacking each metadata field")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function metadataStats(MetadataFacetsRequest $request): JsonResponse
+    {
+        $limit = (int) $request->query('limit', 50);
+        $limit = max(1, min(200, $limit));
+
+        return response()->json(
+            $this->metadataSearch->statisticsFromRequest($request, $limit)
+        );
     }
 
     /**

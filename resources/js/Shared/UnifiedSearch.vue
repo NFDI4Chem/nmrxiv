@@ -99,22 +99,41 @@
             </div>
             <div
                 v-else-if="heroSearchType.type === 'advanced'"
-                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+                class="overflow-hidden rounded-3xl border border-gray-200 bg-white text-left shadow-lg ring-1 ring-gray-900/5"
             >
-                <MetadataSearchContent
-                    compact
-                    @search-params-updated="handleMetadataParams"
-                />
-                <div class="mt-4 flex justify-end">
+                <div
+                    class="max-h-[min(70vh,42rem)] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6"
+                >
+                    <MetadataSearchContent
+                        compact
+                        :persist-in-url="variant === 'hero'"
+                        @search-params-updated="handleMetadataParams"
+                    />
+                </div>
+                <div
+                    class="flex items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/50 px-5 py-4 sm:px-6"
+                >
+                    <p
+                        class="text-left text-xs text-gray-500"
+                        aria-live="polite"
+                    >
+                        <template v-if="metadataActiveFilterCount > 0">
+                            {{ metadataActiveFilterCount }}
+                            {{
+                                metadataActiveFilterCount === 1
+                                    ? "filter"
+                                    : "filters"
+                            }}
+                            active
+                        </template>
+                        <template v-else>
+                            Select at least one filter or keyword
+                        </template>
+                    </p>
                     <button
                         type="button"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
                         :disabled="!canPerformHeroAdvancedSearch"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
-                        :class="
-                            canPerformHeroAdvancedSearch
-                                ? 'hover:bg-gray-800'
-                                : 'opacity-50 cursor-not-allowed'
-                        "
                         @click="performMetadataSearch"
                     >
                         <MagnifyingGlassIcon
@@ -543,6 +562,7 @@
                             <div class="flex-1 overflow-y-auto">
                                 <div class="px-4 py-6 max-w-6xl mx-auto">
                                     <MetadataSearchContent
+                                        :persist-in-url="variant === 'hero'"
                                         @search-params-updated="
                                             handleMetadataParams
                                         "
@@ -581,7 +601,12 @@
 <script>
 import { ref, computed, watch, watchEffect, onMounted, shallowRef } from "vue";
 import { router } from "@inertiajs/vue3";
-import { SEARCH_SCOPE, buildSearchPagePath } from "@/Utils/unifiedSearchApi.js";
+import {
+    SEARCH_SCOPE,
+    buildSearchPagePath,
+    metadataParamsFromForm,
+    readAdvancedFormParamsFromUrl,
+} from "@/Utils/unifiedSearchApi.js";
 import { useMagicKeys } from "@vueuse/core";
 import {
     Dialog as HDialog,
@@ -716,10 +741,6 @@ export default {
             () => heroSearchType.value.type,
             (newType, oldType) => {
                 spectraFiles.value = [];
-
-                if (oldType === "advanced") {
-                    metadataParams.value = null;
-                }
 
                 if (props.variant !== "hero") {
                     return;
@@ -1023,6 +1044,21 @@ export default {
             showMetadataSearch.value = false;
         };
 
+        const metadataActiveFilterCount = computed(() => {
+            const params = metadataParams.value;
+
+            if (!params) {
+                return 0;
+            }
+
+            return Object.values(params).filter(
+                (value) =>
+                    value !== null &&
+                    value !== undefined &&
+                    String(value).trim() !== ""
+            ).length;
+        });
+
         const hasOnlyFreeTextMetadata = (params) => {
             if (!params?.freeText?.trim()) {
                 return false;
@@ -1145,10 +1181,6 @@ export default {
 
         const performMetadataSearch = () => {
             if (!hasMetadataCriteria(metadataParams.value)) {
-                if (showMetadataSearch.value) {
-                    alert("Please enter search criteria");
-                }
-
                 return;
             }
 
@@ -1157,8 +1189,11 @@ export default {
                 return;
             }
 
-            alert(
-                "Field-specific metadata search will be implemented next. Use free text search for now."
+            router.visit(
+                buildSearchPagePath(
+                    SEARCH_SCOPE.METADATA,
+                    metadataParamsFromForm(metadataParams.value)
+                )
             );
         };
 
@@ -1166,6 +1201,13 @@ export default {
         onMounted(() => {
             const url = new URL(window.location.href);
             const searchParam = url.searchParams.get("search");
+
+            if (
+                props.variant === "hero" &&
+                url.searchParams.get("tab") === "advanced"
+            ) {
+                metadataParams.value = readAdvancedFormParamsFromUrl();
+            }
 
             if (searchParam) {
                 open.value = true;
@@ -1203,6 +1245,7 @@ export default {
             spectraFiles,
             peakListParams,
             metadataParams,
+            metadataActiveFilterCount,
             searchButton,
             heroSearchInput,
             heroSearchTypes,
