@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\NMRium;
+use App\Observers\NMRiumObserver;
 use App\Services\FileIntegrityService;
 use App\Services\FileSystemObjectService;
 use App\Services\PathGeneratorService;
@@ -71,6 +73,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->bootEvent();
         $this->bootSwaggerReflectionAnalyser();
+
+        NMRium::observe(NMRiumObserver::class);
     }
 
     /**

@@ -41,4 +41,22 @@ class ApiDocumentationTest extends TestCase
             'paths',
         ]);
     }
+
+    public function test_openapi_spec_includes_metadata_search_endpoints(): void
+    {
+        $specPath = storage_path('api-docs/api-docs.json');
+
+        if (! is_file($specPath)) {
+            $this->markTestSkipped('OpenAPI spec file is not present.');
+        }
+
+        $spec = json_decode((string) file_get_contents($specPath), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertArrayHasKey('/api/v1/search/metadata', $spec['paths']);
+        $this->assertArrayHasKey('/api/v1/search/metadata/facets', $spec['paths']);
+        $this->assertArrayHasKey('/api/v1/search/metadata/stats', $spec['paths']);
+        $this->assertSame('searchMetadata', $spec['paths']['/api/v1/search/metadata']['get']['operationId']);
+        $this->assertSame('searchMetadataFacets', $spec['paths']['/api/v1/search/metadata/facets']['get']['operationId']);
+        $this->assertSame('searchMetadataStats', $spec['paths']['/api/v1/search/metadata/stats']['get']['operationId']);
+    }
 }

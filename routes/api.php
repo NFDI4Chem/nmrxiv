@@ -36,6 +36,9 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('search')->name('api.search.')->group(function () {
         Route::get('catalog', [SearchController::class, 'catalog'])->name('catalog');
+        Route::get('metadata', [SearchController::class, 'metadata'])->name('metadata');
+        Route::get('metadata/facets', [SearchController::class, 'metadataFacets'])->name('metadata.facets');
+        Route::get('metadata/stats', [SearchController::class, 'metadataStats'])->name('metadata.stats');
         Route::post('compounds/{smiles?}', [SearchController::class, 'search'])->name('compounds');
     });
 
