@@ -1506,6 +1506,13 @@
                             able to change the data uploaded! If published as a
                             project, you may add more samples (spectra) to the
                             project later if desired.
+                            <a
+                                href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
+                                >Learn more</a
+                            >
                         </span>
                         <span v-else>
                             Individual samples publish with immediate public

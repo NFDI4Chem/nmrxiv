@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Support\Public\PublicMoleculeAggregates;
 
 class UnPublishProject
 {
@@ -27,5 +28,7 @@ class UnPublishProject
                 $dataset->save();
             }
         }
+
+        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
     }
 }
