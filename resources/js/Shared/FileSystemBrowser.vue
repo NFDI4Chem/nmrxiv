@@ -547,6 +547,7 @@
                                 (fsoId, isExpanded) =>
                                     toggleFolderExpansion(fsoId, isExpanded)
                             "
+                            @load-folder-children="ensureFolderChildrenLoaded"
                             @study-context-menu="onStudyContextMenu"
                             @sample-folder-selected="
                                 (folder) =>
@@ -3663,10 +3664,9 @@ export default {
 
                 if (
                     folder?.has_children &&
-                    (!folder.children || folder.children.length === 0) &&
-                    !folder.loading
+                    (!folder.children || folder.children.length === 0)
                 ) {
-                    this.fetchFolderChildren(folder);
+                    this.ensureFolderChildrenLoaded(folder);
                 }
             }
 
@@ -3912,10 +3912,37 @@ export default {
         },
 
         /**
+         * Ensure folder children are loaded, reusing any in-flight request.
+         */
+        ensureFolderChildrenLoaded(folder) {
+            if (
+                !folder?.has_children ||
+                !folder.id ||
+                (folder.children && folder.children.length > 0)
+            ) {
+                return Promise.resolve();
+            }
+
+            if (folder._childrenLoadPromise) {
+                return folder._childrenLoadPromise;
+            }
+
+            folder._childrenLoadPromise = this.fetchFolderChildren(
+                folder
+            ).finally(() => {
+                delete folder._childrenLoadPromise;
+            });
+
+            return folder._childrenLoadPromise;
+        },
+
+        /**
          * Fetch children for a specific folder
          */
         async fetchFolderChildren(folder) {
-            if (folder.loading) return; // Already loading
+            if (!folder?.id || folder.loading) {
+                return;
+            }
 
             folder.loading = true;
 
@@ -3953,6 +3980,18 @@ export default {
                 }
             } finally {
                 folder.loading = false;
+                this.refreshExpandedIfNeeded(folder.id);
+            }
+        },
+
+        /**
+         * Refresh the tree when a folder is expanded after async children load.
+         */
+        refreshExpandedIfNeeded(fsoId) {
+            if (fsoId != null && this.expandedFolders.has(fsoId)) {
+                this.$nextTick(() => {
+                    this.forceRefreshExpandedState();
+                });
             }
         },
 

@@ -298,16 +298,21 @@ class ProcessELNSpectra implements ShouldQueue
     }
 
     /**
-     * Process spectra using external service.
+     * Process spectra using NMRKit.
      */
     private function processSpectra(string $url): ?array
     {
-        try {
-            $encodedUrl = urlencode($url);
+        $parserUrl = config('nmrxiv.spectra_parsing.nmrkit_api_url');
+        if (! is_string($parserUrl) || $parserUrl === '') {
+            Log::error('NMRKit spectra parser URL is not configured.');
 
-            $response = Http::timeout(300)->post('https://nodejs.nmrxiv.org/spectra-parser', [
-                'urls' => [$encodedUrl],
-                'snapshot' => false,
+            return null;
+        }
+
+        try {
+            $response = Http::timeout((int) config('nmrxiv.spectra_parsing.api_timeout', 300))->post($parserUrl, [
+                'url' => $url,
+                'capture_snapshot' => false,
             ]);
 
             if (! $response->successful()) {
@@ -316,7 +321,19 @@ class ProcessELNSpectra implements ShouldQueue
                 return null;
             }
 
-            return $response->json();
+            $body = $response->json();
+            $nmriumState = $body['nmriumState'] ?? $body;
+            $data = $nmriumState['data'] ?? null;
+
+            if (! is_array($data)) {
+                return null;
+            }
+
+            if (isset($nmriumState['version'])) {
+                $data['version'] = $nmriumState['version'];
+            }
+
+            return ['data' => $data];
 
         } catch (Exception $e) {
             Log::error("Failed to process spectra from URL {$url}: ".$e->getMessage());

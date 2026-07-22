@@ -58,7 +58,13 @@
                 <div class="mt-4 flex justify-end">
                     <button
                         type="button"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                        :disabled="!canPerformHeroStructureSearch"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                        :class="
+                            canPerformHeroStructureSearch
+                                ? 'hover:bg-gray-800'
+                                : 'opacity-50 cursor-not-allowed'
+                        "
                         @click="performStructureSearch"
                     >
                         <MagnifyingGlassIcon
@@ -71,37 +77,25 @@
             </div>
             <div
                 v-else-if="heroSearchType.type === 'spectra'"
-                class="rounded-3xl border border-gray-200 bg-white p-4 shadow-lg ring-1 ring-gray-900/5"
+                class="rounded-3xl border border-gray-200 bg-white p-8 shadow-lg ring-1 ring-gray-900/5 text-center"
             >
-                <SpectraUploadContent
-                    compact
-                    @files-uploaded="handleSpectraFiles"
-                />
-                <div class="mt-4 flex justify-end">
-                    <button
-                        type="button"
-                        :disabled="spectraFiles.length === 0"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
-                        :class="
-                            spectraFiles.length === 0
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'hover:bg-gray-800'
-                        "
-                        @click="performSpectraSearch"
-                    >
-                        <MagnifyingGlassIcon
-                            class="h-4 w-4 shrink-0"
-                            aria-hidden="true"
-                        />
-                        Search{{
-                            spectraFiles.length > 0
-                                ? ` (${spectraFiles.length} file${
-                                      spectraFiles.length > 1 ? "s" : ""
-                                  })`
-                                : ""
-                        }}
-                    </button>
+                <div
+                    class="mx-auto flex size-12 items-center justify-center rounded-full bg-gray-100 text-gray-500"
+                >
+                    <ChartBarIcon class="h-6 w-6" aria-hidden="true" />
                 </div>
+                <h2 class="mt-4 text-lg font-semibold text-gray-900">
+                    Spectra search
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-600">
+                    Upload NMR spectra to find similar data. This feature is
+                    coming soon.
+                </p>
+                <span
+                    class="mt-4 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                    Coming soon
+                </span>
             </div>
             <div
                 v-else-if="heroSearchType.type === 'advanced'"
@@ -114,7 +108,13 @@
                 <div class="mt-4 flex justify-end">
                     <button
                         type="button"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                        :disabled="!canPerformHeroAdvancedSearch"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                        :class="
+                            canPerformHeroAdvancedSearch
+                                ? 'hover:bg-gray-800'
+                                : 'opacity-50 cursor-not-allowed'
+                        "
                         @click="performMetadataSearch"
                     >
                         <MagnifyingGlassIcon
@@ -144,7 +144,13 @@
                 />
                 <button
                     type="button"
-                    class="shrink-0 rounded-full bg-gray-900 px-4 sm:px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+                    :disabled="!canPerformHeroTextSearch"
+                    class="shrink-0 rounded-full bg-gray-900 px-4 sm:px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                    :class="
+                        canPerformHeroTextSearch
+                            ? 'hover:bg-gray-800'
+                            : 'opacity-50 cursor-not-allowed'
+                    "
                     @click="openHeroSearch"
                 >
                     Search
@@ -608,6 +614,7 @@ export default {
         PlusIcon,
         PencilIcon,
         AdjustmentsHorizontalIcon,
+        ChartBarIcon,
         StructureEditorContent,
         SpectraUploadContent,
         PeakListSearchContent,
@@ -641,6 +648,7 @@ export default {
         const pendingHeroStructureSmiles = ref(null);
         const heroSearchQuery = ref("");
         const heroStructureDraft = ref(null);
+        const heroHasStructure = ref(false);
 
         const heroSearchTypes = [
             {
@@ -659,7 +667,7 @@ export default {
                 type: "spectra",
                 label: "Spectra",
                 icon: ChartBarIcon,
-                comingSoon: false,
+                comingSoon: true,
             },
             {
                 type: "advanced",
@@ -744,29 +752,55 @@ export default {
             }
         });
 
-        const hasHeroStructure = computed(() => {
-            if (heroSearchQuery.value.trim() !== "") {
-                return true;
+        const canPerformHeroTextSearch = computed(
+            () => heroSearchQuery.value.trim() !== ""
+        );
+
+        const canPerformHeroSpectraSearch = computed(
+            () => spectraFiles.value.length > 0
+        );
+
+        const canPerformHeroStructureSearch = computed(
+            () => heroHasStructure.value
+        );
+
+        const hasMetadataCriteria = (params) => {
+            if (!params) {
+                return false;
             }
 
-            if (heroStructureDraft.value) {
-                return true;
+            return Object.values(params).some(
+                (value) => value !== null && value !== undefined && value !== ""
+            );
+        };
+
+        const canPerformHeroAdvancedSearch = computed(() =>
+            hasMetadataCriteria(metadataParams.value)
+        );
+
+        const syncHeroStructureAvailability = () => {
+            if (!heroStructureEditor.value) {
+                heroHasStructure.value = Boolean(heroStructureDraft.value);
+                return;
             }
 
-            if (heroStructureEditor.value) {
-                try {
-                    const smiles = heroStructureEditor.value
-                        .getSmiles()
-                        ?.trim();
+            try {
+                const smiles = heroStructureEditor.value.getSmiles()?.trim();
+                heroHasStructure.value = Boolean(smiles);
 
-                    return Boolean(smiles);
-                } catch {
-                    return false;
+                if (smiles) {
+                    heroStructureDraft.value = smiles;
+                } else {
+                    heroStructureDraft.value = null;
                 }
+            } catch {
+                heroHasStructure.value = Boolean(heroStructureDraft.value);
             }
+        };
 
-            return false;
-        });
+        const hasHeroStructure = computed(
+            () => heroSearchQuery.value.trim() !== "" || heroHasStructure.value
+        );
 
         const heroStructureActionLabel = computed(() =>
             hasHeroStructure.value ? "Edit structure" : "Draw structure"
@@ -794,6 +828,7 @@ export default {
 
         const onHeroStructureEditorReady = async (editor) => {
             heroStructureEditor.value = editor;
+            editor.onChange(syncHeroStructureAvailability);
 
             const url = new URL(window.location.href);
             const querySmiles = url.searchParams.get("query");
@@ -810,6 +845,7 @@ export default {
             }
 
             persistHeroStructureDraft();
+            syncHeroStructureAvailability();
         };
 
         const onModalStructureEditorReady = (editor) => {
@@ -837,7 +873,7 @@ export default {
                 image: "/img/instrument-format.png",
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
-                comingSoon: false,
+                comingSoon: true,
             },
             {
                 type: "peaks",
@@ -936,6 +972,7 @@ export default {
 
             heroStructureDraft.value = smiles;
             pendingHeroStructureSmiles.value = smiles;
+            heroHasStructure.value = Boolean(smiles?.trim());
         };
 
         const selectAndProceed = (type) => {
@@ -953,6 +990,14 @@ export default {
 
             // Handle spectra search - show upload interface
             if (type === "spectra") {
+                const spectraOption = searchOptions.find(
+                    (option) => option.type === "spectra"
+                );
+
+                if (spectraOption?.comingSoon) {
+                    return;
+                }
+
                 showSpectraUpload.value = true;
                 return;
             }
@@ -976,16 +1021,6 @@ export default {
             showSpectraUpload.value = false;
             showPeakListSearch.value = false;
             showMetadataSearch.value = false;
-        };
-
-        const hasMetadataCriteria = (params) => {
-            if (!params) {
-                return false;
-            }
-
-            return Object.values(params).some(
-                (value) => value !== null && value !== undefined && value !== ""
-            );
         };
 
         const hasOnlyFreeTextMetadata = (params) => {
@@ -1012,6 +1047,10 @@ export default {
 
         const openHeroSearch = () => {
             if (heroSearchType.value.type === "metadata") {
+                if (!canPerformHeroTextSearch.value) {
+                    return;
+                }
+
                 performTextSearch();
                 return;
             }
@@ -1066,20 +1105,24 @@ export default {
                     ? modalStructureEditor.value
                     : heroStructureEditor.value;
 
-            if (editor) {
-                const smiles = editor.getSmiles();
-                window.location.href = buildSearchPagePath(
-                    SEARCH_SCOPE.COMPOUNDS,
-                    {
-                        query: smiles,
-                        type: structureSearchType.value,
-                    }
-                );
+            if (!editor) {
+                return;
             }
+
+            const smiles = editor.getSmiles()?.trim();
+
+            if (!smiles) {
+                return;
+            }
+
+            window.location.href = buildSearchPagePath(SEARCH_SCOPE.COMPOUNDS, {
+                query: smiles,
+                type: structureSearchType.value,
+            });
         };
 
         const performSpectraSearch = () => {
-            if (spectraFiles.value.length === 0) {
+            if (!canPerformHeroSpectraSearch.value) {
                 return;
             }
             // TODO: Implement spectra file upload and search
@@ -1102,7 +1145,10 @@ export default {
 
         const performMetadataSearch = () => {
             if (!hasMetadataCriteria(metadataParams.value)) {
-                alert("Please enter search criteria");
+                if (showMetadataSearch.value) {
+                    alert("Please enter search criteria");
+                }
+
                 return;
             }
 
@@ -1162,6 +1208,10 @@ export default {
             heroSearchTypes,
             heroSearchType,
             heroPlaceholder,
+            canPerformHeroTextSearch,
+            canPerformHeroStructureSearch,
+            canPerformHeroSpectraSearch,
+            canPerformHeroAdvancedSearch,
             heroStructureActionLabel,
             onHeroSearchInput,
             caffeineExampleSmiles,

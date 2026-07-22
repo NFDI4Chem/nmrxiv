@@ -69,6 +69,37 @@ class SearchControllerTest extends TestCase
     /**
      * Test search validation with invalid parameters
      */
+    public function test_empty_browse_preserves_stable_order_across_pages(): void
+    {
+        $molecules = [];
+
+        foreach (range(1, 5) as $i) {
+            $molecules[] = $this->createMoleculeInPublicCatalog([
+                'created_at' => now()->subMinutes($i),
+            ]);
+        }
+
+        $pageOne = $this->postJson('/api/v1/search/compounds?limit=2&page=1&sort=recent', [
+            'query' => '',
+        ]);
+        $pageTwo = $this->postJson('/api/v1/search/compounds?limit=2&page=2&sort=recent', [
+            'query' => '',
+        ]);
+
+        $pageOne->assertOk();
+        $pageTwo->assertOk();
+
+        $this->assertSame(5, $pageOne->json('total'));
+        $this->assertSame(
+            [$molecules[0]->id, $molecules[1]->id],
+            collect($pageOne->json('data'))->pluck('id')->all()
+        );
+        $this->assertSame(
+            [$molecules[2]->id, $molecules[3]->id],
+            collect($pageTwo->json('data'))->pluck('id')->all()
+        );
+    }
+
     public function test_search_validation_rejects_invalid_parameters()
     {
         $response = $this->postJson('/api/v1/search/compounds', [
