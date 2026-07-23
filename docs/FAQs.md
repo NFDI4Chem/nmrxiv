@@ -3,7 +3,7 @@
 ### How can I submit my data to **[nmrXiv](https://nmrxiv.org/)**?
 
 -   [Register to nmrXiv](/submission-guides/registration-and-account.md).
--   Structure your data in folders similar to **[nmrXiv](https://nmrxiv.org/)** structuring of projects, studies, and datasets. This step might not be intuitive so we recommend [checking its docummentation](/submission-guides/folder-structure.html).
+-   Structure your data in folders similar to **[nmrXiv](https://nmrxiv.org/)** structuring of projects, studies, and datasets. This step might not be intuitive so we recommend [checking its documentation](/submission-guides/folder-structure.html).
 -   Upload your data, edit it, and provide its metadata via the [submission pipeline](/submission-guides/submission-process.html).
 
 ### Do I need to register before submitting data to nmrXiv?
@@ -91,7 +91,7 @@ Before reporting a new issue
 
 If the above criteria are not met
 
--   Click [here](https://github.com/NFDI4Chem/nmrxiv/issues/new/choose) to report a new one under appropiate category.
+-   Click [here](https://github.com/NFDI4Chem/nmrxiv/issues/new/choose) to report a new one under appropriate category.
 
 ### How to reach to you?
 
