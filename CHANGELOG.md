@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.1.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.0.0...v2.1.0) (2026-07-23)
+
+
+### Features
+
+* funding references and file browser expansion fix ([#1464](https://github.com/NFDI4Chem/nmrxiv/issues/1464)) ([7adc4c2](https://github.com/NFDI4Chem/nmrxiv/commit/7adc4c2e8546230ab726743b7d193b149283081a))
+* **search-ui:** disable hero search actions until input is provided ([#1469](https://github.com/NFDI4Chem/nmrxiv/issues/1469)) ([ad96f65](https://github.com/NFDI4Chem/nmrxiv/commit/ad96f653c064e2382ef722f5fa4903f1dfc7a359))
+* **stats:** explorable statistics for public indexed spectra ([#1463](https://github.com/NFDI4Chem/nmrxiv/issues/1463)) ([3aeeccb](https://github.com/NFDI4Chem/nmrxiv/commit/3aeeccb6487bc2b71bddb2b1d426794a0f8731a4))
+* **study:** extract reusable ChemicalCompositionEditor and align composition layout ([#1483](https://github.com/NFDI4Chem/nmrxiv/issues/1483)) ([528789a](https://github.com/NFDI4Chem/nmrxiv/commit/528789a230c39c6b06e2d3da55d6c3744940010b))
+
+
+### Bug Fixes
+
+* **api-docs:** correct Scalar OpenAPI spec URL ([0324fbe](https://github.com/NFDI4Chem/nmrxiv/commit/0324fbe257fda16084b93475b9f50db8a7b999ed))
+* **api-docs:** serve OpenAPI spec outside mounted storage volume ([6ee0a22](https://github.com/NFDI4Chem/nmrxiv/commit/6ee0a223a6c10171ad796933606760e628c5e3a0))
+* **deploy:** l5 swagger serialization issue ([f9fb6af](https://github.com/NFDI4Chem/nmrxiv/commit/f9fb6afb76a6bb56a00972cab37db8a4db6305ae))
+* **deploy:** patch prod rollout fix l5 swagger issue ([0ddf404](https://github.com/NFDI4Chem/nmrxiv/commit/0ddf404229efd46c44d7300145fe1552823c0c87))
+* **deploy:** patch prod rollout l5 swagger serialization issue ([#1453](https://github.com/NFDI4Chem/nmrxiv/issues/1453)) ([b87b237](https://github.com/NFDI4Chem/nmrxiv/commit/b87b2379c7e58ebb2eba1609727b890bdc32cc1e))
+* **deploy:** patch prod rollout swagger serialization issue ([b4b99d4](https://github.com/NFDI4Chem/nmrxiv/commit/b4b99d4010c54c625bca24ac344262c5bb2f2e41))
+* **deps:** resolve open Dependabot security advisories ([#1477](https://github.com/NFDI4Chem/nmrxiv/issues/1477)) ([26b1275](https://github.com/NFDI4Chem/nmrxiv/commit/26b127585c43dce795346f5e745920aa9215ceed))
+* **projects:** tighten public project listing filters ([#1458](https://github.com/NFDI4Chem/nmrxiv/issues/1458)) ([bf385d1](https://github.com/NFDI4Chem/nmrxiv/commit/bf385d1a4e08b63a0dece9389bdf849e2560f15c))
+* remove nodejs.nmrxiv.org references in favor of NMRKit ([#1460](https://github.com/NFDI4Chem/nmrxiv/issues/1460)) ([9027200](https://github.com/NFDI4Chem/nmrxiv/commit/9027200f1eee60fd820f6916c563c6f697085609))
+* **security:** block public access to private samples and datasets ([#1474](https://github.com/NFDI4Chem/nmrxiv/issues/1474)) ([9764d8b](https://github.com/NFDI4Chem/nmrxiv/commit/9764d8b4f7b20ff335965504203f5232fa7e0b0e))
+* small ui/ux fixes ([c74ff70](https://github.com/NFDI4Chem/nmrxiv/commit/c74ff70b7a7cbaf94dcbff2baf5829b3461b5192))
+* **ui:** render molecular formula numbers as subscripts ([#1461](https://github.com/NFDI4Chem/nmrxiv/issues/1461)) ([73bd358](https://github.com/NFDI4Chem/nmrxiv/commit/73bd3589988d73601d79345177cd48c3ff94eb26)), closes [#1432](https://github.com/NFDI4Chem/nmrxiv/issues/1432)
+* **upload:** import MOL/SDF structures into editor on paste and drop ([#1459](https://github.com/NFDI4Chem/nmrxiv/issues/1459)) ([a58ea9c](https://github.com/NFDI4Chem/nmrxiv/commit/a58ea9c2341a17fda44d70f7610d3b6bdce72830))
+
+
+### Performance Improvements
+
+* **search:** paginate compound ids without full-catalog count scans ([#1466](https://github.com/NFDI4Chem/nmrxiv/issues/1466)) ([dcfa699](https://github.com/NFDI4Chem/nmrxiv/commit/dcfa699d251a913ef74fba3ca250006083527648))
+
 ## [1.8.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.7.0...v1.8.0) (2026-07-15)
 
 
