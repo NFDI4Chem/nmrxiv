@@ -1750,723 +1750,28 @@
                                                                             </div>
                                                                         </div>
 
-                                                                        <section
-                                                                            class="mx-auto max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
-                                                                                :aria-expanded="
-                                                                                    chemicalCompositionExpanded
-                                                                                "
-                                                                                aria-controls="chemical-composition-panel"
-                                                                                @click="
-                                                                                    chemicalCompositionExpanded =
-                                                                                        !chemicalCompositionExpanded
-                                                                                "
-                                                                            >
-                                                                                <div
-                                                                                    class="flex min-w-0 flex-1 items-center gap-3"
-                                                                                >
-                                                                                    <h3
-                                                                                        id="chemical-composition"
-                                                                                        class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
-                                                                                    >
-                                                                                        Chemical
-                                                                                        composition
-                                                                                        <span
-                                                                                            class="text-red-500"
-                                                                                            aria-hidden="true"
-                                                                                            >*</span
-                                                                                        >
-                                                                                    </h3>
-                                                                                    <span
-                                                                                        v-if="
-                                                                                            !chemicalCompositionExpanded &&
-                                                                                            selectedStudy
-                                                                                        "
-                                                                                        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold tabular-nums text-gray-700 ring-1 ring-inset ring-gray-200/80 dark:bg-slate-700/80 dark:text-slate-200 dark:ring-gray-600"
-                                                                                    >
-                                                                                        <img
-                                                                                            src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
-                                                                                            alt=""
-                                                                                            class="h-5 w-5 shrink-0 object-contain opacity-80 dark:opacity-90"
-                                                                                            width="20"
-                                                                                            height="20"
-                                                                                            loading="lazy"
-                                                                                            decoding="async"
-                                                                                        />
-                                                                                        {{
-                                                                                            selectedStudyMoleculeCount
-                                                                                        }}
-                                                                                        <span
-                                                                                            class="sr-only"
-                                                                                            >{{
-                                                                                                selectedStudyMoleculeCount
-                                                                                            }}
-                                                                                            molecule(s)
-                                                                                            in
-                                                                                            this
-                                                                                            sample</span
-                                                                                        >
-                                                                                    </span>
-                                                                                </div>
-                                                                                <ChevronRightIcon
-                                                                                    class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
-                                                                                    :class="{
-                                                                                        'rotate-90':
-                                                                                            chemicalCompositionExpanded,
-                                                                                    }"
-                                                                                    aria-hidden="true"
-                                                                                />
-                                                                            </button>
-
-                                                                            <div
-                                                                                v-show="
-                                                                                    chemicalCompositionExpanded
-                                                                                "
-                                                                                id="chemical-composition-panel"
-                                                                                class="grid min-h-0 gap-4 p-3 sm:p-4 lg:grid-cols-2 lg:items-stretch lg:gap-6 lg:p-4"
-                                                                                role="region"
-                                                                                aria-labelledby="chemical-composition"
-                                                                            >
-                                                                                <div
-                                                                                    class="flex h-full min-h-0 min-w-0 flex-col gap-3 lg:border-r lg:border-gray-100 lg:pr-4 dark:lg:border-gray-700"
-                                                                                >
-                                                                                    <div
-                                                                                        v-if="
-                                                                                            selectedStudy
-                                                                                                .sample
-                                                                                                .molecules
-                                                                                                .length >
-                                                                                            0
-                                                                                        "
-                                                                                        class="min-h-0"
-                                                                                    >
-                                                                                        <ul
-                                                                                            role="list"
-                                                                                            class="flex flex-col gap-3"
-                                                                                        >
-                                                                                            <li
-                                                                                                v-for="molecule in selectedStudy
-                                                                                                    .sample
-                                                                                                    .molecules"
-                                                                                                :key="
-                                                                                                    molecule.standard_inchi
-                                                                                                "
-                                                                                                class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-600 dark:bg-slate-900/50 dark:ring-white/5"
-                                                                                            >
-                                                                                                <div
-                                                                                                    class="border-b border-gray-100 bg-gray-50/90 px-3 py-2.5 dark:border-gray-700 dark:bg-slate-900/70"
-                                                                                                >
-                                                                                                    <div
-                                                                                                        class="flex items-start justify-between gap-2"
-                                                                                                    >
-                                                                                                        <span
-                                                                                                            class="inline-flex shrink-0 items-center rounded-md bg-teal-50 px-2 py-0.5 text-xs font-semibold tabular-nums text-teal-800 dark:bg-teal-900/50 dark:text-teal-200"
-                                                                                                        >
-                                                                                                            <template
-                                                                                                                v-if="
-                                                                                                                    molecule.pivot
-                                                                                                                "
-                                                                                                            >
-                                                                                                                <template
-                                                                                                                    v-if="
-                                                                                                                        isCompositionPercentUnknown(
-                                                                                                                            molecule
-                                                                                                                                .pivot
-                                                                                                                                .percentage_composition
-                                                                                                                        )
-                                                                                                                    "
-                                                                                                                >
-                                                                                                                    Unknown
-                                                                                                                </template>
-                                                                                                                <template
-                                                                                                                    v-else
-                                                                                                                >
-                                                                                                                    {{
-                                                                                                                        formatCompositionPercent(
-                                                                                                                            molecule
-                                                                                                                                .pivot
-                                                                                                                                .percentage_composition
-                                                                                                                        )
-                                                                                                                    }}%
-                                                                                                                </template>
-                                                                                                            </template>
-                                                                                                            <template
-                                                                                                                v-else
-                                                                                                                >—</template
-                                                                                                            >
-                                                                                                        </span>
-                                                                                                        <div
-                                                                                                            class="flex shrink-0 gap-0.5"
-                                                                                                        >
-                                                                                                            <button
-                                                                                                                type="button"
-                                                                                                                title="Edit compound"
-                                                                                                                class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-white hover:text-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:hover:bg-slate-800 dark:hover:text-teal-400"
-                                                                                                                @click="
-                                                                                                                    editMolecule(
-                                                                                                                        molecule
-                                                                                                                    )
-                                                                                                                "
-                                                                                                            >
-                                                                                                                <PencilIcon
-                                                                                                                    class="h-4 w-4"
-                                                                                                                    aria-hidden="true"
-                                                                                                                />
-                                                                                                            </button>
-                                                                                                            <button
-                                                                                                                type="button"
-                                                                                                                title="Remove compound"
-                                                                                                                class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-white hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 dark:hover:bg-slate-800"
-                                                                                                                @click="
-                                                                                                                    deleteMolecule(
-                                                                                                                        molecule
-                                                                                                                    )
-                                                                                                                "
-                                                                                                            >
-                                                                                                                <TrashIcon
-                                                                                                                    class="h-4 w-4"
-                                                                                                                    aria-hidden="true"
-                                                                                                                />
-                                                                                                            </button>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <p
-                                                                                                        class="mt-2 min-w-0 break-all font-mono text-[11px] leading-snug text-gray-700 dark:text-slate-300"
-                                                                                                    >
-                                                                                                        {{
-                                                                                                            molecule.standard_inchi
-                                                                                                        }}
-                                                                                                    </p>
-                                                                                                </div>
-                                                                                                <div
-                                                                                                    v-if="
-                                                                                                        molecule.canonical_smiles
-                                                                                                    "
-                                                                                                    class="flex bg-white px-2 py-3 dark:bg-slate-900/40"
-                                                                                                >
-                                                                                                    <Depictor
-                                                                                                        class="width-full py-2"
-                                                                                                        :model-value="
-                                                                                                            molecule.canonical_smiles
-                                                                                                        "
-                                                                                                        :show-download="
-                                                                                                            false
-                                                                                                        "
-                                                                                                    ></Depictor>
-                                                                                                </div>
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        v-else
-                                                                                        class="flex min-h-0 flex-1 flex-col justify-center"
-                                                                                    >
-                                                                                        <div
-                                                                                            class="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/80 px-4 py-8 text-center dark:border-gray-600 dark:bg-slate-900/35"
-                                                                                        >
-                                                                                            <div
-                                                                                                class="rounded-full bg-gray-100 p-2 dark:bg-slate-800"
-                                                                                            >
-                                                                                                <svg
-                                                                                                    class="mx-auto h-8 w-8 text-gray-400 dark:text-slate-500"
-                                                                                                    fill="none"
-                                                                                                    viewBox="0 0 24 24"
-                                                                                                    stroke="currentColor"
-                                                                                                    aria-hidden="true"
-                                                                                                >
-                                                                                                    <path
-                                                                                                        vector-effect="non-scaling-stroke"
-                                                                                                        stroke-linecap="round"
-                                                                                                        stroke-linejoin="round"
-                                                                                                        stroke-width="2"
-                                                                                                        d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                                                                                                    />
-                                                                                                </svg>
-                                                                                            </div>
-                                                                                            <p
-                                                                                                class="mt-3 text-sm font-medium text-gray-900 dark:text-slate-200"
-                                                                                            >
-                                                                                                No
-                                                                                                compounds
-                                                                                                yet
-                                                                                            </p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    class="flex min-w-0 flex-col gap-3"
-                                                                                >
-                                                                                    <div
-                                                                                        class="flex items-center justify-between gap-2"
-                                                                                    >
-                                                                                        <h4
-                                                                                            class="text-sm font-semibold text-gray-900 dark:text-slate-200"
-                                                                                        >
-                                                                                            Add
-                                                                                            structure
-                                                                                        </h4>
-                                                                                        <a
-                                                                                            href="https://docs.nmrxiv.org/submission-guides/editor.html"
-                                                                                            target="_blank"
-                                                                                            rel="noopener noreferrer"
-                                                                                            class="text-xs font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300"
-                                                                                        >
-                                                                                            Help
-                                                                                        </a>
-                                                                                    </div>
-
-                                                                                    <div
-                                                                                        class="rounded-md bg-gray-100 p-0.5 dark:bg-slate-900/80"
-                                                                                        role="tablist"
-                                                                                    >
-                                                                                        <div
-                                                                                            class="flex flex-wrap gap-0.5"
-                                                                                        >
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="tab"
-                                                                                                aria-label="Draw structure in editor"
-                                                                                                :aria-selected="
-                                                                                                    activeInputTab ===
-                                                                                                    'editor'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    activeInputTab ===
-                                                                                                    'editor'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    switchToEditorTab()
-                                                                                                "
-                                                                                            >
-                                                                                                Draw
-                                                                                            </button>
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="tab"
-                                                                                                aria-label="Paste SMILES, MOL, or SDF"
-                                                                                                :aria-selected="
-                                                                                                    activeInputTab ===
-                                                                                                    'structure'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    activeInputTab ===
-                                                                                                    'structure'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    switchToStructureTab()
-                                                                                                "
-                                                                                            >
-                                                                                                Paste
-                                                                                            </button>
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="tab"
-                                                                                                aria-label="Look up CAS registry number"
-                                                                                                :aria-selected="
-                                                                                                    activeInputTab ===
-                                                                                                    'cas'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    activeInputTab ===
-                                                                                                    'cas'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-700'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors sm:text-sm',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    switchToCasTab()
-                                                                                                "
-                                                                                            >
-                                                                                                CAS
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <div
-                                                                                        class="flex h-[min(380px,52vh)] min-h-[280px] w-full flex-shrink-0 flex-col"
-                                                                                    >
-                                                                                        <!-- Structure/SMILES Input Tab -->
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                activeInputTab ===
-                                                                                                'structure'
-                                                                                            "
-                                                                                            class="flex min-h-0 flex-1 flex-col gap-2 pt-1"
-                                                                                        >
-                                                                                            <div
-                                                                                                class="flex min-h-0 flex-1 flex-col border-2 border-dashed border-gray-300 rounded-lg p-2 transition-colors hover:border-teal-400 dark:border-gray-600 dark:hover:border-teal-500"
-                                                                                                :class="{
-                                                                                                    'border-teal-400 bg-teal-50 dark:bg-teal-950/30':
-                                                                                                        isDragging,
-                                                                                                }"
-                                                                                                @dragover.prevent="
-                                                                                                    handleDragOver
-                                                                                                "
-                                                                                                @dragleave.prevent="
-                                                                                                    handleDragLeave
-                                                                                                "
-                                                                                                @drop.prevent="
-                                                                                                    handleDrop
-                                                                                                "
-                                                                                            >
-                                                                                                <p
-                                                                                                    v-if="
-                                                                                                        !chemicalInput
-                                                                                                    "
-                                                                                                    class="mb-2 text-left text-xs text-gray-500 dark:text-slate-400"
-                                                                                                >
-                                                                                                    SMILES,
-                                                                                                    MOL,
-                                                                                                    or
-                                                                                                    SDF
-                                                                                                    —
-                                                                                                    paste
-                                                                                                    or
-                                                                                                    drop
-                                                                                                    .mol
-                                                                                                    /
-                                                                                                    .sdf
-                                                                                                </p>
-                                                                                                <textarea
-                                                                                                    v-model="
-                                                                                                        chemicalInput
-                                                                                                    "
-                                                                                                    placeholder="SMILES (one line) or MOL/SDF block…"
-                                                                                                    class="min-h-0 w-full flex-1 resize-y rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
-                                                                                                    @blur="
-                                                                                                        loadStructure
-                                                                                                    "
-                                                                                                    @paste="
-                                                                                                        handlePaste
-                                                                                                    "
-                                                                                                    @input="
-                                                                                                        handleInput
-                                                                                                    "
-                                                                                                ></textarea>
-                                                                                            </div>
-
-                                                                                            <div
-                                                                                                class="flex shrink-0 items-center justify-between"
-                                                                                            >
-                                                                                                <div
-                                                                                                    class="flex space-x-2"
-                                                                                                >
-                                                                                                    <button
-                                                                                                        v-if="
-                                                                                                            chemicalInput
-                                                                                                        "
-                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                                                                                        @click="
-                                                                                                            clearInput
-                                                                                                        "
-                                                                                                    >
-                                                                                                        Clear
-                                                                                                    </button>
-                                                                                                </div>
-
-                                                                                                <div
-                                                                                                    v-if="
-                                                                                                        detectedFormat
-                                                                                                    "
-                                                                                                    class="text-xs text-gray-500"
-                                                                                                >
-                                                                                                    Detected:
-                                                                                                    {{
-                                                                                                        detectedFormat
-                                                                                                    }}
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        <!-- CAS Registry Number Input Tab -->
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                activeInputTab ===
-                                                                                                'cas'
-                                                                                            "
-                                                                                            class="flex min-h-0 flex-1 flex-col pt-1"
-                                                                                        >
-                                                                                            <div
-                                                                                                class="rounded-lg border border-gray-300 p-2 dark:border-gray-600"
-                                                                                            >
-                                                                                                <div
-                                                                                                    class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
-                                                                                                >
-                                                                                                    <div
-                                                                                                        class="min-w-0 flex-1"
-                                                                                                    >
-                                                                                                        <input
-                                                                                                            v-model="
-                                                                                                                casInput
-                                                                                                            "
-                                                                                                            type="text"
-                                                                                                            placeholder="CAS e.g. 58-08-2"
-                                                                                                            class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-900/40 dark:text-slate-100"
-                                                                                                            :disabled="
-                                                                                                                casLoading
-                                                                                                            "
-                                                                                                            @keyup.enter="
-                                                                                                                importFromCAS
-                                                                                                            "
-                                                                                                        />
-                                                                                                    </div>
-                                                                                                    <button
-                                                                                                        :disabled="
-                                                                                                            !casInput.trim() ||
-                                                                                                            casLoading
-                                                                                                        "
-                                                                                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                                                        @click="
-                                                                                                            importFromCAS
-                                                                                                        "
-                                                                                                    >
-                                                                                                        <svg
-                                                                                                            v-if="
-                                                                                                                casLoading
-                                                                                                            "
-                                                                                                            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                                            fill="none"
-                                                                                                            viewBox="0 0 24 24"
-                                                                                                        >
-                                                                                                            <circle
-                                                                                                                class="opacity-25"
-                                                                                                                cx="12"
-                                                                                                                cy="12"
-                                                                                                                r="10"
-                                                                                                                stroke="currentColor"
-                                                                                                                stroke-width="4"
-                                                                                                            ></circle>
-                                                                                                            <path
-                                                                                                                class="opacity-75"
-                                                                                                                fill="currentColor"
-                                                                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                                                                            ></path>
-                                                                                                        </svg>
-                                                                                                        {{
-                                                                                                            casLoading
-                                                                                                                ? "Loading..."
-                                                                                                                : "Import"
-                                                                                                        }}
-                                                                                                    </button>
-                                                                                                </div>
-
-                                                                                                <div
-                                                                                                    v-if="
-                                                                                                        casInput
-                                                                                                    "
-                                                                                                    class="mt-2 flex justify-between"
-                                                                                                >
-                                                                                                    <button
-                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                                                                                        @click="
-                                                                                                            clearCasInput
-                                                                                                        "
-                                                                                                    >
-                                                                                                        Clear
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        <!-- Structure editor tab -->
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                activeInputTab ===
-                                                                                                'editor'
-                                                                                            "
-                                                                                            id="structureSearchEditor"
-                                                                                            class="min-h-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 shadow-inner dark:border-gray-600 dark:bg-slate-900/50"
-                                                                                        ></div>
-                                                                                    </div>
-
-                                                                                    <jet-input-error
-                                                                                        :message="
-                                                                                            errorMessage ||
-                                                                                            casError
-                                                                                        "
-                                                                                        class="mt-1.5"
-                                                                                    />
-                                                                                    <div
-                                                                                        class="mb-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm ring-1 ring-gray-900/5 dark:border-gray-600 dark:bg-slate-900/50 dark:ring-white/5"
-                                                                                    >
-                                                                                        <p
-                                                                                            class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400"
-                                                                                        >
-                                                                                            Composition
-                                                                                            share
-                                                                                        </p>
-                                                                                        <div
-                                                                                            class="mt-3 flex flex-wrap rounded-lg bg-gray-100 p-1 dark:bg-slate-800/90"
-                                                                                            role="radiogroup"
-                                                                                            aria-label="Composition share type"
-                                                                                        >
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="radio"
-                                                                                                :disabled="
-                                                                                                    compositionPureSampleDisabled
-                                                                                                "
-                                                                                                :aria-checked="
-                                                                                                    compositionSampleType ===
-                                                                                                    'pure'
-                                                                                                "
-                                                                                                :title="
-                                                                                                    compositionPureSampleDisabled
-                                                                                                        ? 'Pure sample is only available before you add compounds'
-                                                                                                        : undefined
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    compositionPureSampleDisabled
-                                                                                                        ? 'cursor-not-allowed opacity-60 text-gray-400 dark:text-slate-500'
-                                                                                                        : compositionSampleType ===
-                                                                                                          'pure'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-600'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:pointer-events-none dark:focus-visible:ring-offset-slate-900',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    compositionSampleType =
-                                                                                                        'pure'
-                                                                                                "
-                                                                                            >
-                                                                                                Pure
-                                                                                                sample
-                                                                                            </button>
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="radio"
-                                                                                                :aria-checked="
-                                                                                                    compositionSampleType ===
-                                                                                                    'mixture'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    compositionSampleType ===
-                                                                                                    'mixture'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-600'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    compositionSampleType =
-                                                                                                        'mixture'
-                                                                                                "
-                                                                                            >
-                                                                                                Mixture
-                                                                                            </button>
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                role="radio"
-                                                                                                :aria-checked="
-                                                                                                    compositionSampleType ===
-                                                                                                    'unknown'
-                                                                                                "
-                                                                                                :class="[
-                                                                                                    compositionSampleType ===
-                                                                                                    'unknown'
-                                                                                                        ? 'bg-white text-teal-800 shadow-sm ring-1 ring-gray-200/80 dark:bg-slate-800 dark:text-teal-200 dark:ring-gray-600'
-                                                                                                        : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200',
-                                                                                                    'min-w-0 flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900',
-                                                                                                ]"
-                                                                                                @click="
-                                                                                                    compositionSampleType =
-                                                                                                        'unknown'
-                                                                                                "
-                                                                                            >
-                                                                                                Unknown
-                                                                                            </button>
-                                                                                        </div>
-
-                                                                                        <div
-                                                                                            v-if="
-                                                                                                compositionSampleType ===
-                                                                                                'pure'
-                                                                                            "
-                                                                                            class="mt-4 flex justify-end border-t border-gray-100 pt-4 dark:border-gray-700"
-                                                                                        >
-                                                                                            <span
-                                                                                                class="text-2xl font-semibold tabular-nums tracking-tight text-teal-800 dark:text-teal-200"
-                                                                                                aria-live="polite"
-                                                                                                >{{
-                                                                                                    formatCompositionPercent(
-                                                                                                        percentage
-                                                                                                    )
-                                                                                                }}%</span
-                                                                                            >
-                                                                                        </div>
-
-                                                                                        <div
-                                                                                            v-show="
-                                                                                                compositionSampleType ===
-                                                                                                'mixture'
-                                                                                            "
-                                                                                            class="mt-4 border-t border-gray-100 pt-4 dark:border-gray-700"
-                                                                                        >
-                                                                                            <div
-                                                                                                class="mb-3 flex justify-end"
-                                                                                            >
-                                                                                                <span
-                                                                                                    id="composition-percentage-label"
-                                                                                                    class="text-xl font-semibold tabular-nums text-teal-800 dark:text-teal-200"
-                                                                                                    aria-live="polite"
-                                                                                                    >{{
-                                                                                                        formatCompositionPercent(
-                                                                                                            percentage
-                                                                                                        )
-                                                                                                    }}%</span
-                                                                                                >
-                                                                                            </div>
-                                                                                            <slider
-                                                                                                v-if="
-                                                                                                    compositionSliderMax >
-                                                                                                    0
-                                                                                                "
-                                                                                                v-model="
-                                                                                                    percentage
-                                                                                                "
-                                                                                                class="block w-full"
-                                                                                                :min="
-                                                                                                    0
-                                                                                                "
-                                                                                                :max="
-                                                                                                    compositionSliderMax
-                                                                                                "
-                                                                                                :step="
-                                                                                                    0.001
-                                                                                                "
-                                                                                                :height="
-                                                                                                    10
-                                                                                                "
-                                                                                                color="#0d9488"
-                                                                                                track-color="#cbd5e1"
-                                                                                                aria-labelledby="composition-percentage-label"
-                                                                                            />
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        class="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 sm:w-auto"
-                                                                                        @click="
-                                                                                            saveMolecule(
-                                                                                                null
-                                                                                            )
-                                                                                        "
-                                                                                    >
-                                                                                        Add
-                                                                                        compound
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </section>
+                                                                        <ChemicalCompositionEditor
+                                                                            v-if="
+                                                                                selectedStudy
+                                                                            "
+                                                                            :study="
+                                                                                selectedStudy
+                                                                            "
+                                                                            :can-update-study="
+                                                                                true
+                                                                            "
+                                                                            :chemistry-standardize-url="
+                                                                                chemistryStandardizeUrl
+                                                                            "
+                                                                            :expanded="
+                                                                                chemicalCompositionExpanded
+                                                                            "
+                                                                            id-prefix="upload-chemical-composition"
+                                                                            @update:expanded="
+                                                                                chemicalCompositionExpanded =
+                                                                                    $event
+                                                                            "
+                                                                        />
                                                                         <section
                                                                             class="mx-auto mt-3 max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                         >
@@ -3590,6 +2895,7 @@ import {
     ArrowsPointingInIcon,
 } from "@heroicons/vue/24/outline";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
+import ChemicalCompositionEditor from "@/Shared/ChemicalCompositionEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
@@ -3597,6 +2903,12 @@ import VueTagsInput from "@sipec/vue3-tags-input";
 import "@/lib/ontology-elements";
 import Global from "@/Mixins/Global.js";
 import OCL from "openchemlib";
+import {
+    detectStructureInputFormat,
+    detectStructureInputType,
+    editorHasStructureContent,
+    resolveStructureForEditorWithStandardize,
+} from "@/Utils/structureImport";
 import { createStructureEditor } from "@/Utils/structureEditor";
 
 export default {
@@ -3618,6 +2930,7 @@ export default {
         EyeSlashIcon,
         Validation,
         SpectraEditor,
+        ChemicalCompositionEditor,
         Depictor,
         Depictor2D,
         slider,
@@ -3731,19 +3044,14 @@ export default {
             validation: null,
             validationStatus: true,
 
-            chemicalInput: "",
-            detectedFormat: "",
             isDragging: false,
+            structureLoading: false,
+            structureLoadCounter: 0,
             percentage: 99.99,
             /** 'pure' | 'mixture' | 'unknown' — unknown stores no pivot percentage */
             compositionSampleType: "pure",
             editor: null,
-
-            // Chemical input tabs and CAS support
-            activeInputTab: "editor", // "structure" | "cas" | "editor"
-            casInput: "",
-            casLoading: false,
-            casError: "",
+            editorHasStructure: false,
 
             showPrimer: false,
             busy: false,
@@ -4130,17 +3438,6 @@ export default {
         },
         chemicalCompositionExpanded(isOpen) {
             if (isOpen) {
-                this.ensureStructureSearchEditor();
-            }
-        },
-        activeInputTab(newTab, oldTab) {
-            if (oldTab === "cas") {
-                this.casError = "";
-            }
-            if (oldTab === "structure") {
-                this.errorMessage = "";
-            }
-            if (newTab === "editor") {
                 this.ensureStructureSearchEditor();
             }
         },
@@ -5094,16 +4391,10 @@ export default {
             }
         },
         /**
-         * Create the OpenChemLib SVG editor only when the composition panel is
-         * expanded and the Draw tab is active, so the host element has layout size.
-         *
          * @param {() => void} [onReady]
          */
         ensureStructureSearchEditor(onReady) {
-            if (
-                !this.chemicalCompositionExpanded ||
-                this.activeInputTab !== "editor"
-            ) {
+            if (!this.chemicalCompositionExpanded) {
                 if (typeof onReady === "function") {
                     onReady();
                 }
@@ -5136,28 +4427,11 @@ export default {
                             this.editor = await createStructureEditor(
                                 "structureSearchEditor"
                             );
-                            if (
-                                this.chemicalInput &&
-                                this.chemicalInput.trim()
-                            ) {
-                                try {
-                                    const format = this.detectFormat(
-                                        this.chemicalInput
-                                    );
-                                    if (format === "SMILES") {
-                                        this.editor.setSmiles(
-                                            this.chemicalInput.trim()
-                                        );
-                                    } else if (format === "MOL/SDF") {
-                                        this.editor.setMolFile(
-                                            this.chemicalInput
-                                        );
-                                    }
-                                } catch {
-                                    // Input may be invalid; user can fix in Paste tab
-                                }
-                            }
+                            this.editor.onChange(() => {
+                                this.syncEditorHasStructure();
+                            });
                         }
+                        this.syncEditorHasStructure();
                         if (typeof onReady === "function") {
                             onReady();
                         }
@@ -5166,13 +4440,15 @@ export default {
             };
             run(20);
         },
+        syncEditorHasStructure() {
+            this.editorHasStructure = editorHasStructureContent(this.editor);
+        },
         selectStudy(study, index, datasetIndex = null) {
             if (!this.busy) {
                 if (study.internal_status == "complete") {
                     this.selectedStudyIndex = index;
                     this.selectedStudy = study;
                     this.chemicalCompositionExpanded = false;
-                    this.activeInputTab = "editor";
                     this.setQueryStringParameter("sample", study.id);
                     this.studyNameDraft = this.selectedStudy.name;
                     this.studyForm.name = this.selectedStudy.name;
@@ -5195,6 +4471,7 @@ export default {
                         this.displaySamplesSummaryInfo = false;
                     }
                     this.editor = null;
+                    this.editorHasStructure = false;
                     this.compositionSampleType =
                         this.selectedStudy.sample.molecules.length > 0
                             ? "mixture"
@@ -5595,11 +4872,11 @@ export default {
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
+                        this.syncEditorHasStructure();
                     }
                 });
         },
         editMolecule(mol) {
-            this.activeInputTab = "editor";
             const raw = mol.pivot?.percentage_composition;
             if (this.isCompositionPercentUnknown(raw)) {
                 this.compositionSampleType = "unknown";
@@ -5611,6 +4888,7 @@ export default {
             this.ensureStructureSearchEditor(() => {
                 if (this.editor) {
                     this.editor.setSmiles(mol.canonical_smiles);
+                    this.syncEditorHasStructure();
                 }
                 axios
                     .delete(
@@ -5656,8 +4934,6 @@ export default {
                 })
                 .then((res) => {
                     study.sample.molecules = res.data;
-                    this.chemicalInput = "";
-                    this.detectedFormat = "";
                     this.compositionSampleType =
                         res.data.length > 0 ? "mixture" : "pure";
                     this.$nextTick(() => {
@@ -5668,6 +4944,7 @@ export default {
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
+                        this.syncEditorHasStructure();
                     }
                 });
         },
@@ -6089,116 +5366,131 @@ export default {
                 this.saveStudyDetails();
             }
         },
-        loadStructure() {
-            this.errorMessage = "";
-
-            if (!this.chemicalInput || this.chemicalInput.trim() === "") {
+        handleEditorPaste(event) {
+            if (!this.chemicalCompositionExpanded) {
                 return;
             }
 
-            const format = this.detectFormat(this.chemicalInput);
+            const pastedText = event.clipboardData?.getData("text/plain") ?? "";
+
+            if (!pastedText.trim()) {
+                return;
+            }
+
+            const inputType = detectStructureInputType(pastedText);
+
+            if (
+                inputType === "CAS" ||
+                inputType === "SMILES" ||
+                inputType === "MOL/SDF"
+            ) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.importStructureInput(pastedText);
+            }
+        },
+
+        async importStructureInput(text, fileName = "") {
+            const trimmed = text.trim();
+
+            if (!trimmed) {
+                return;
+            }
+
+            const inputType = detectStructureInputType(trimmed, fileName);
+            this.errorMessage = "";
+
+            if (inputType === "CAS") {
+                await this.loadCasStructure(trimmed);
+                return;
+            }
+
+            if (inputType === "SMILES" || inputType === "MOL/SDF") {
+                await this.loadStructureIntoEditor(
+                    trimmed,
+                    fileName,
+                    inputType
+                );
+                return;
+            }
+
+            this.errorMessage =
+                "Unrecognized format. Paste or drop SMILES, MOL, SDF, or a CAS number.";
+        },
+
+        async loadStructureIntoEditor(text, fileName = "", format = null) {
+            const loadId = ++this.structureLoadCounter;
+            this.errorMessage = "";
+            this.structureLoading = true;
+
+            const resolvedFormat = format ?? detectStructureInputFormat(text);
+            /** @type {{ type: 'smiles' | 'molfile', value: string } | null} */
+            let structureToLoad = null;
 
             try {
-                if (format === "SMILES") {
-                    OCL.Molecule.fromSmiles(this.chemicalInput.trim());
-                } else if (format === "MOL/SDF") {
-                    OCL.Molecule.fromMolfile(this.chemicalInput);
+                if (resolvedFormat === "SMILES") {
+                    const smiles = text.trim();
+                    OCL.Molecule.fromSmiles(smiles);
+                    structureToLoad = { type: "smiles", value: smiles };
+                } else if (resolvedFormat === "MOL/SDF") {
+                    structureToLoad =
+                        await resolveStructureForEditorWithStandardize(
+                            text,
+                            fileName,
+                            (molfile) => this.standardizeMolecules(molfile)
+                        );
                 } else {
                     this.errorMessage =
                         "Unable to detect chemical format. Please check your input.";
                     return;
                 }
-                this.detectedFormat = format;
             } catch (e) {
-                this.errorMessage = `Invalid ${format} format. Please check your input.`;
-                return;
-            }
-
-            if (!this.editor) {
-                return;
-            }
-
-            try {
-                if (format === "SMILES") {
-                    this.editor.setSmiles(this.chemicalInput.trim());
-                } else if (format === "MOL/SDF") {
-                    this.editor.setMolFile(this.chemicalInput);
+                if (loadId !== this.structureLoadCounter) {
+                    return;
                 }
-            } catch (e) {
-                this.errorMessage = `Invalid ${format} format. Please check your input.`;
-            }
-        },
-
-        detectFormat(input) {
-            if (!input || input.trim() === "") return "";
-
-            const trimmed = input.trim();
-            const lines = trimmed.split("\n");
-
-            // Check for MOL/SDF format indicators
-            if (
-                trimmed.includes("M  END") ||
-                trimmed.includes("$$$$") ||
-                trimmed.includes("V2000") ||
-                trimmed.includes("V3000") ||
-                (lines.length > 3 && lines[3] && lines[3].includes(" 0  0  0"))
-            ) {
-                return "MOL/SDF";
-            }
-
-            // If it's a single line or very short, likely SMILES
-            if (lines.length <= 2 && trimmed.length < 500) {
-                // Additional SMILES validation - common SMILES characters
-                const smilesPattern = /^[A-Za-z0-9@+\-\[\]()=#\\/\\.:]+$/;
-                if (smilesPattern.test(trimmed.replace(/\s/g, ""))) {
-                    return "SMILES";
+                this.errorMessage =
+                    "Could not parse the structure. Check the file or pasted content.";
+                return;
+            } finally {
+                if (loadId === this.structureLoadCounter) {
+                    this.structureLoading = false;
                 }
             }
 
-            // Default to trying as MOL/SDF for multi-line content
-            if (lines.length > 2) {
-                return "MOL/SDF";
+            if (loadId !== this.structureLoadCounter || !structureToLoad) {
+                return;
             }
 
-            // Default to SMILES for single line content
-            return "SMILES";
-        },
+            this.ensureStructureSearchEditor(() => {
+                if (loadId !== this.structureLoadCounter || !this.editor) {
+                    return;
+                }
 
-        handleInput() {
-            if (this.chemicalInput && this.chemicalInput.trim()) {
-                this.detectedFormat = this.detectFormat(this.chemicalInput);
-            } else {
-                this.detectedFormat = "";
-            }
-        },
-
-        clearInput() {
-            this.chemicalInput = "";
-            this.detectedFormat = "";
-            this.errorMessage = "";
-            if (this.editor) {
-                this.editor.setSmiles("");
-            }
-        },
-
-        clearCasInput() {
-            this.casInput = "";
-            this.casError = "";
+                try {
+                    if (structureToLoad.type === "smiles") {
+                        this.editor.setSmiles(structureToLoad.value);
+                    } else {
+                        this.editor.setMolFile(structureToLoad.value);
+                    }
+                    this.syncEditorHasStructure();
+                } catch (e) {
+                    this.errorMessage =
+                        "Could not load the structure into the editor.";
+                }
+            });
         },
 
         async fetchFromCAS(casNumber) {
             try {
-                // Use backend API proxy to avoid CORS issues
                 const response = await axios.get("/cas/detail", {
                     params: {
                         cas_rn: casNumber,
                     },
-                    timeout: 30000, // 30 second timeout
+                    timeout: 30000,
                 });
 
                 return response.data;
             } catch (error) {
-                // Use error message from backend controller
                 const errorMessage =
                     error.response?.data?.error ||
                     error.response?.data?.message ||
@@ -6207,123 +5499,41 @@ export default {
             }
         },
 
-        async importFromCAS() {
-            if (!this.casInput.trim()) {
-                this.casError = "Please enter a CAS Registry Number";
-                return;
-            }
-
-            const casNumber = this.casInput.trim();
-
-            this.casLoading = true;
-            this.casError = "";
+        async loadCasStructure(casNumber) {
+            const loadId = ++this.structureLoadCounter;
+            this.errorMessage = "";
+            this.structureLoading = true;
 
             try {
-                // Fetch data from CAS Common Chemistry API
                 const casData = await this.fetchFromCAS(casNumber);
-
-                // Validate that we have the required data
-                if (!casData.smile && !casData.canonicalSmile) {
-                    this.casError = `No structural data (SMILES) available for CAS number ${casNumber}`;
-                    return;
-                }
-
-                // Process the CAS response
-                this.processCASResponse(casData);
-            } catch (error) {
-                // Use error messages from backend controller
-                this.casError = error.message;
-            } finally {
-                this.casLoading = false;
-            }
-        },
-
-        processCASResponse(casData) {
-            try {
-                // Extract SMILES from CAS response
-                let smiles = casData.smile || casData.canonicalSmile;
+                const smiles = casData.smile || casData.canonicalSmile;
 
                 if (!smiles) {
-                    this.casError =
-                        "No SMILES data available for this CAS number";
+                    this.errorMessage = `No structural data available for CAS ${casNumber}`;
                     return;
                 }
 
-                // Clear any existing errors
-                this.errorMessage = "";
-                this.casError = "";
-
-                // Set the chemical input to the SMILES from CAS
-                this.chemicalInput = smiles;
-                this.detectedFormat = "SMILES (from CAS)";
-
-                this.switchToEditorTab();
+                if (loadId !== this.structureLoadCounter) {
+                    return;
+                }
 
                 this.ensureStructureSearchEditor(() => {
-                    if (this.editor) {
-                        this.editor.setSmiles(smiles);
+                    if (loadId !== this.structureLoadCounter || !this.editor) {
+                        return;
                     }
+
+                    this.editor.setSmiles(smiles);
+                    this.syncEditorHasStructure();
                 });
-
-                // Use existing standardization workflow
-                this.processCASMolecule(casData, smiles);
             } catch (error) {
-                this.casError = "Failed to process CAS response data";
-            }
-        },
-
-        async processCASMolecule(casData, smiles) {
-            try {
-                // Create a molecule object from SMILES to standardize
-                let mol = OCL.Molecule.fromSmiles(smiles);
-                let molfile = mol.toMolfile();
-
-                // Use existing standardization workflow
-                const response = await this.standardizeMolecules(molfile);
-
-                // Add CAS-specific data to the standardized molecule
-                const standardizedMol = response.data;
-                standardizedMol.cas_number = casData.rn;
-                standardizedMol.cas_name = casData.name;
-                standardizedMol.molecular_formula =
-                    this.stripHtmlTags(casData.molecularFormula) ||
-                    standardizedMol.molecular_formula;
-
-                // Add synonyms if available
-                if (casData.synonyms && casData.synonyms.length > 0) {
-                    standardizedMol.synonyms = casData.synonyms.slice(0, 5); // Limit to first 5 synonyms
+                if (loadId === this.structureLoadCounter) {
+                    this.errorMessage = error.message;
                 }
-
-                // Integrate with existing molecule association workflow
-                if (this.selectedStudy) {
-                    this.associateMoleculeToStudy(
-                        standardizedMol,
-                        this.selectedStudy
-                    );
-
-                    // Clear CAS input after successful association
-                    this.clearCasInput();
-
-                    // Show success message
-                    this.$emit("show-notification", {
-                        type: "success",
-                        message: `Successfully imported ${casData.name} (CAS: ${casData.rn}) from CAS Registry`,
-                    });
-                } else {
-                    this.casError =
-                        "Please select a study before importing molecules";
+            } finally {
+                if (loadId === this.structureLoadCounter) {
+                    this.structureLoading = false;
                 }
-            } catch (error) {
-                this.casError = `Failed to standardize molecule: ${error.message}`;
             }
-        },
-
-        handlePaste() {
-            // Allow default paste behavior, then auto-load structure
-            this.$nextTick(() => {
-                this.handleInput(); // Update detected format
-                this.loadStructure(); // Auto-load the pasted content
-            });
         },
 
         handleDragOver(event) {
@@ -6340,31 +5550,40 @@ export default {
             event.preventDefault();
             this.isDragging = false;
 
-            const files = Array.from(event.dataTransfer.files);
-            this.processFiles(files);
-        },
+            const files = Array.from(event.dataTransfer?.files ?? []);
 
-        processFiles(files) {
-            if (files.length === 0) return;
-
-            // Filter for mol/sdf files
-            const validFiles = files.filter((file) => {
-                const extension = file.name.toLowerCase().split(".").pop();
-                return ["mol", "sdf"].includes(extension);
-            });
-
-            if (validFiles.length === 0) {
-                this.errorMessage = "Please select valid MOL or SDF files.";
+            if (files.length > 0) {
+                this.processFiles(files);
                 return;
             }
 
-            // Process the first valid file
+            const text = event.dataTransfer?.getData("text/plain") ?? "";
+
+            if (text.trim()) {
+                this.importStructureInput(text);
+            }
+        },
+
+        processFiles(files) {
+            if (files.length === 0) {
+                return;
+            }
+
+            const validFiles = files.filter((file) => {
+                const extension = file.name.toLowerCase().split(".").pop();
+                return ["mol", "sdf", "sd"].includes(extension);
+            });
+
+            if (validFiles.length === 0) {
+                this.errorMessage = "Please drop a valid MOL or SDF file.";
+                return;
+            }
+
             const file = validFiles[0];
             const reader = new FileReader();
 
             reader.onload = (e) => {
-                this.chemicalInput = e.target.result;
-                this.loadStructure();
+                this.importStructureInput(e.target.result, file.name);
             };
 
             reader.onerror = () => {
@@ -6374,30 +5593,8 @@ export default {
             reader.readAsText(file);
 
             if (validFiles.length > 1) {
-                this.errorMessage = `Only the first file (${file.name}) was loaded. Multiple file support coming soon.`;
+                this.errorMessage = `Only the first file (${file.name}) was loaded.`;
             }
-        },
-
-        // Tab switching methods with error clearing
-        switchToStructureTab() {
-            this.activeInputTab = "structure";
-            this.casError = "";
-        },
-
-        switchToCasTab() {
-            this.activeInputTab = "cas";
-            this.errorMessage = "";
-        },
-
-        switchToEditorTab() {
-            this.activeInputTab = "editor";
-            this.casError = "";
-            this.errorMessage = "";
-        },
-
-        // Legacy method name for backward compatibility
-        loadSmiles() {
-            this.loadStructure();
         },
         toggleSummaryBar() {
             this.showSummary = !this.showSummary;

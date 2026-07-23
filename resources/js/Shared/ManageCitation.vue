@@ -318,8 +318,8 @@
                 </div>
             </template>
             <template #footer>
-                <div class="flex">
-                    <jet-secondary-button class="float-left" @click="onClose">
+                <div class="flex justify-end">
+                    <jet-secondary-button @click="onClose">
                         Close
                     </jet-secondary-button>
                 </div>

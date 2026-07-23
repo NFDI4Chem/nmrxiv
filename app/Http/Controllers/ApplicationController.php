@@ -10,6 +10,7 @@ use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
 use App\Support\ProjectWorkspace;
+use App\Support\Public\PublicEntityAccess;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -159,7 +160,7 @@ class ApplicationController extends Controller
             }
         }
 
-        $project?->loadMissing(['owner', 'tags', 'authors', 'citations', 'users', 'projectInvitations']);
+        $project?->loadMissing(['owner', 'tags', 'authors', 'citations', 'fundingReferences', 'users', 'projectInvitations']);
 
         $tab = $tabOverride ?? $request->get('tab', 'info');
 
@@ -172,7 +173,7 @@ class ApplicationController extends Controller
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                         'tab' => $tab,
                     ],
                     $request,
@@ -207,6 +208,10 @@ class ApplicationController extends Controller
             case 'study':
                 $studyForView = $study ?? $this->resolveStudyForProjectTab($request, $project);
 
+                if ($studyForView) {
+                    PublicEntityAccess::authorizeStudyAccess($request, $studyForView, $reviewerPreview);
+                }
+
                 if ($project && $studyForView) {
                     return $this->renderPublicProject(
                         'Public/Project/Study',
@@ -236,7 +241,7 @@ class ApplicationController extends Controller
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                         'tab' => 'info',
                     ],
                     $request,
@@ -260,7 +265,7 @@ class ApplicationController extends Controller
                     return $this->renderPublicProject(
                         'Public/Project/Show',
                         [
-                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                            'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                             'tab' => 'info',
                         ],
                         $request,
@@ -269,6 +274,9 @@ class ApplicationController extends Controller
                         $reviewerPreview
                     );
                 }
+
+                PublicEntityAccess::authorizeStudyAccess($request, $studyForView, $reviewerPreview);
+                PublicEntityAccess::authorizeDatasetAccess($request, $datasetForView, $reviewerPreview);
 
                 $datasetResource = (new DatasetResource($datasetForView))->lite(false, ['nmrium']);
 
@@ -297,7 +305,7 @@ class ApplicationController extends Controller
                 return $this->renderPublicProject(
                     'Public/Project/Show',
                     [
-                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                         'tab' => 'info',
                     ],
                     $request,

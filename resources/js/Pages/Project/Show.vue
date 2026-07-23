@@ -326,6 +326,10 @@
                                 ref="manageCitationElement"
                                 :project="project"
                             />
+                            <manage-funding-reference
+                                ref="manageFundingReferenceElement"
+                                :project="project"
+                            />
                             <span
                                 class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                             >
@@ -1234,6 +1238,57 @@
                     </dd>
                 </div>
 
+                <!-- Funding -->
+                <div
+                    v-if="
+                        canUpdateProject ||
+                        (project.funding_references &&
+                            project.funding_references.length > 0)
+                    "
+                    class="border-b border-gray-200 pb-8"
+                >
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 flex items-center"
+                            aria-hidden="true"
+                        >
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex items-center justify-between">
+                            <span
+                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                            >
+                                Funding
+                            </span>
+                            <button
+                                v-if="canUpdateProject"
+                                type="button"
+                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                @click="toggleManageFundingReference"
+                            >
+                                <PencilIcon
+                                    class="w-4 h-4 mr-1 text-gray-600"
+                                />
+                                <span>Edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <dd
+                        class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                    >
+                        <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <funding-reference-card
+                                :funding-references="
+                                    project.funding_references || []
+                                "
+                                :show-edit-delete="canUpdateProject"
+                                @edit="onFundingReferenceCardEdit"
+                                @delete="onFundingReferenceCardDelete"
+                            />
+                        </div>
+                    </dd>
+                </div>
+
                 <!-- Author -->
                 <div
                     v-if="canUpdateProject || project.authors.length > 0"
@@ -1310,10 +1365,12 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/vue/24/outline";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
+import ManageFundingReference from "@/Shared/ManageFundingReference.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import FundingReferenceCard from "@/Shared/FundingReferenceCard.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import Tag from "@/Shared/Tag.vue";
 import Datepicker from "@vuepic/vue-datepicker";
@@ -1342,10 +1399,12 @@ export default {
         ManageAuthor,
         ToolTip,
         ManageCitation,
+        ManageFundingReference,
         Citation,
         Publish,
         AuthorCard,
         CitationCard,
+        FundingReferenceCard,
         DOIBadge,
         Tag,
         Dialog,
@@ -1373,11 +1432,13 @@ export default {
         const projectDetailsElement = ref(null);
         const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
+        const manageFundingReferenceElement = ref(null);
 
         return {
             projectDetailsElement,
             manageAuthorElement,
             manageCitationElement,
+            manageFundingReferenceElement,
         };
     },
     data() {
@@ -1475,6 +1536,8 @@ export default {
                 this.toggleDetails();
             } else if (editOperation == "citation") {
                 this.toggleManageCitation();
+            } else if (editOperation == "funding") {
+                this.toggleManageFundingReference();
             } else if (editOperation == "authors") {
                 this.toggleManageAuthor();
             } else if (editOperation == "release_date") {
@@ -1516,6 +1579,9 @@ export default {
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
         },
+        toggleManageFundingReference() {
+            this.manageFundingReferenceElement.toggleDialog();
+        },
         onCitationCardEdit(citation) {
             const modal = this.manageCitationElement;
             if (!modal.showDialog) {
@@ -1527,6 +1593,20 @@ export default {
         },
         onCitationCardDelete(citation) {
             this.manageCitationElement.confirmDeletion(citation);
+        },
+        onFundingReferenceCardEdit(fundingReference) {
+            const modal = this.manageFundingReferenceElement;
+            if (!modal.showDialog) {
+                modal.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal.edit(fundingReference);
+            });
+        },
+        onFundingReferenceCardDelete(fundingReference) {
+            this.manageFundingReferenceElement.confirmDeletion(
+                fundingReference
+            );
         },
         onAuthorCardEdit(author) {
             const modal = this.manageAuthorElement;

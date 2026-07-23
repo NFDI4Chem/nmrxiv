@@ -211,7 +211,7 @@
 
                         <!-- Spectra Card -->
                         <a
-                            href="/projects"
+                            href="/stats"
                             class="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 transition-colors hover:border-gray-200"
                         >
                             <div>

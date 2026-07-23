@@ -341,7 +341,7 @@ export default {
                 parts.push(
                     `${kinds} experiment type${
                         kinds === 1 ? "" : "s"
-                    } · ${total} dataset${total === 1 ? "" : "s"}`
+                    } · ${total} spectrum${total === 1 ? "" : "a"}`
                 );
             }
 

@@ -69,6 +69,37 @@ class SearchControllerTest extends TestCase
     /**
      * Test search validation with invalid parameters
      */
+    public function test_empty_browse_preserves_stable_order_across_pages(): void
+    {
+        $molecules = [];
+
+        foreach (range(1, 5) as $i) {
+            $molecules[] = $this->createMoleculeInPublicCatalog([
+                'created_at' => now()->subMinutes($i),
+            ]);
+        }
+
+        $pageOne = $this->postJson('/api/v1/search/compounds?limit=2&page=1&sort=recent', [
+            'query' => '',
+        ]);
+        $pageTwo = $this->postJson('/api/v1/search/compounds?limit=2&page=2&sort=recent', [
+            'query' => '',
+        ]);
+
+        $pageOne->assertOk();
+        $pageTwo->assertOk();
+
+        $this->assertSame(5, $pageOne->json('total'));
+        $this->assertSame(
+            [$molecules[0]->id, $molecules[1]->id],
+            collect($pageOne->json('data'))->pluck('id')->all()
+        );
+        $this->assertSame(
+            [$molecules[2]->id, $molecules[3]->id],
+            collect($pageTwo->json('data'))->pluck('id')->all()
+        );
+    }
+
     public function test_search_validation_rejects_invalid_parameters()
     {
         $response = $this->postJson('/api/v1/search/compounds', [
@@ -329,6 +360,58 @@ class SearchControllerTest extends TestCase
         $this->assertSame(1, $row['workspace_samples_count']);
         $this->assertSame(1, $row['workspace_experiment_type_counts']['1H NMR - 1D']);
         $this->assertSame(1, $row['workspace_experiment_type_counts']['13C NMR - DEPT']);
+    }
+
+    public function test_search_counts_each_nmrium_spectrum_on_compound_card(): void
+    {
+        $study = Study::factory()->create([
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+        ]);
+
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $study->project_id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        ['info' => ['experiment' => '1D', 'nucleus' => '1H']],
+                        ['info' => ['experiment' => '2D', 'nucleus' => ['13C', '1H']]],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->postJson('/api/v1/search/compounds', [
+            'query' => '',
+        ]);
+
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('id', $molecule->id);
+
+        $this->assertNotNull($row);
+        $this->assertSame(1, $row['workspace_experiment_type_counts']['1H NMR - 1D']);
+        $this->assertSame(1, $row['workspace_experiment_type_counts']['13C-1H NMR - 2D']);
     }
 
     public function test_search_response_includes_iupac_name_when_present(): void
