@@ -61,6 +61,10 @@ export function normalizeMolfile(molblock) {
         return molblock.trim();
     }
 
+    if (/V3000/.test(lines[countsIdx])) {
+        return molblock.trim();
+    }
+
     const endIdx = lines.findIndex((line) => /^M\s+END/i.test(line.trim()));
     const end = endIdx >= 0 ? endIdx : lines.length - 1;
     const countsParts = lines[countsIdx].trim().split(/\s+/);

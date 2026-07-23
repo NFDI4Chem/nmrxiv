@@ -5,7 +5,6 @@ You need to install Helm first to use the charts. Please refer to the Helm's [do
 
 The chart comes with following optional dependencies which you can opt to have in your deployment if you wish to:
 
-- [Meilisearch](https://docs.meilisearch.com/) (Search Engine)
 - [RabbitMQ](https://www.rabbitmq.com/documentation.html) (Message Broker)
 - [Redis](https://redis.io/documentation) (Cache)
 

@@ -4,6 +4,7 @@ namespace App\Actions\Study;
 
 use App\Models\Study;
 use App\Services\ChemotionRepositoryTrackerService;
+use App\Support\Public\PublicMoleculeAggregates;
 use Illuminate\Support\Facades\Log;
 
 class PublishStudy
@@ -23,6 +24,8 @@ class PublishStudy
             $dataset->is_public = true;
             $dataset->save();
         }
+
+        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
 
         // Track publication if this is an ELN submission
         $this->trackStudyPublished($study);

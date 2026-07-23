@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
-use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
@@ -34,7 +33,6 @@ class Project extends Model implements Auditable
     use HasTags;
     use Markable;
     use \OwenIt\Auditing\Auditable;
-    use Searchable;
 
     protected $fillable = [
         'name',
@@ -332,18 +330,6 @@ class Project extends Model implements Auditable
     }
 
     /**
-     * Determine if the model should be searchable.
-     *
-     * @return bool
-     */
-    public function shouldBeSearchable()
-    {
-        if ($this->is_public && ! $this->is_archived) {
-            return true;
-        }
-    }
-
-    /**
      * Authors that belongs to project.
      */
     public function authors(): BelongsToMany
@@ -373,6 +359,14 @@ class Project extends Model implements Auditable
     public function citations(): BelongsToMany
     {
         return $this->belongsToMany(Citation::class);
+    }
+
+    /**
+     * Funding references linked to this project.
+     */
+    public function fundingReferences(): BelongsToMany
+    {
+        return $this->belongsToMany(FundingReference::class);
     }
 
     /**

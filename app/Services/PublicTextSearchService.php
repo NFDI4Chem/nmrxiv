@@ -9,6 +9,7 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
+use App\Support\Search\PublicDatasetScope;
 use App\Support\Search\TextSearchNormalizer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -79,7 +80,13 @@ class PublicTextSearchService
         $query = Project::query()
             ->where('is_public', true)
             ->where('is_archived', false)
-            ->where('is_deleted', false);
+            ->where('is_deleted', false)
+            ->whereHas('studies', function (Builder $studyQuery): void {
+                $studyQuery
+                    ->where('is_public', true)
+                    ->where('is_archived', false)
+                    ->where('is_deleted', false);
+            });
 
         $this->applyTokenSearch($query, $tokens, 'projects', ['name', 'description']);
         $this->applyRelevanceOrdering($query, $tokens, $normalizedQuery, 'projects', 'name');
@@ -117,21 +124,9 @@ class PublicTextSearchService
         int $page,
     ): LengthAwarePaginator {
         $query = Dataset::query()
-            ->with(['study', 'project'])
-            ->where('is_public', true)
-            ->where('is_archived', false)
-            ->where('is_deleted', false)
-            ->whereHas('study', function (Builder $studyQuery): void {
-                $studyQuery
-                    ->where('is_public', true)
-                    ->where('is_archived', false);
-            })
-            ->whereHas('project', function (Builder $projectQuery): void {
-                $projectQuery
-                    ->where('is_public', true)
-                    ->where('is_archived', false)
-                    ->where('is_deleted', false);
-            });
+            ->with(['study', 'project']);
+
+        PublicDatasetScope::apply($query);
 
         $this->applyTokenSearch($query, $tokens, 'datasets', ['name', 'description']);
         $this->applyRelevanceOrdering($query, $tokens, $normalizedQuery, 'datasets', 'name');

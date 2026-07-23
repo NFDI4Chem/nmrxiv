@@ -14,11 +14,11 @@ WORKDIR /var/www/html
 # Install system dependencies and build tools in fewer layers
 RUN /sbin/apk update && \
     /sbin/apk add --no-cache \
-        zip unzip git curl \
-        libpng-dev libzip-dev icu-dev oniguruma-dev \
-        postgresql-dev zlib-dev supervisor \
-        nodejs npm \
-        autoconf gcc g++ make && \
+    zip unzip git curl \
+    libpng-dev libzip-dev icu-dev oniguruma-dev \
+    postgresql-dev zlib-dev supervisor \
+    nodejs npm \
+    autoconf gcc g++ make && \
     rm -rf /var/cache/apk/*
 
 # Install PostgreSQL client
@@ -54,18 +54,18 @@ COPY . .
 
 # Create directories and set permissions in one layer
 RUN mkdir -p /var/www/html/config/caddy \
-             /var/log/supervisor \
-             /run/supervisor \
-             /data/caddy/data \
-             /data/caddy/config && \
+    /var/log/supervisor \
+    /run/supervisor \
+    /data/caddy/data \
+    /data/caddy/config && \
     chmod -R 775 /var/www/html/config \
-                 /var/www/html/public && \
+    /var/www/html/public && \
     chmod -R 755 /data/caddy && \
     chown -R www-data:www-data /var/www/html/storage \
-                               /var/www/html/bootstrap/cache \
-                               /var/www/html/config \
-                               /var/www/html/public \
-                               /data/caddy
+    /var/www/html/bootstrap/cache \
+    /var/www/html/config \
+    /var/www/html/public \
+    /data/caddy
 
 # Build frontend assets
 RUN npm run build && \
@@ -75,11 +75,12 @@ RUN npm run build && \
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/Caddyfile /etc/caddy/Caddyfile
 
-RUN php artisan l5-swagger:generate
+RUN L5_SWAGGER_USE_REFLECTION_ANALYSER=true php artisan l5-swagger:generate && \
+    cp storage/api-docs/api-docs.json public/api-docs.json
 
 # Add healthcheck - use Laravel health endpoint for broader compatibility
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost/up || exit 1
+    CMD curl -f http://localhost/up || exit 1
 
 # Expose port
 EXPOSE 80 443

@@ -272,19 +272,16 @@ class StudyIntegrationTest extends TestCase
             'is_archived' => false,
         ]);
 
-        // Study should be searchable when public and not archived
-        $this->assertTrue($study->shouldBeSearchable());
+        $this->assertTrue($study->is_public && ! $study->is_archived);
 
-        // Make study private
         $study->update(['is_public' => false]);
-        $study->refresh(); // Ensure we have fresh data
-        $this->assertFalse($study->shouldBeSearchable());
+        $study->refresh();
+        $this->assertFalse($study->is_public);
 
-        // Make study archived
         $study->update(['is_public' => true, 'is_archived' => true]);
-        $study->refresh(); // Ensure we have fresh data
+        $study->refresh();
 
-        $this->assertFalse($study->shouldBeSearchable());
+        $this->assertTrue($study->is_archived);
     }
 
     public function test_study_tag_system_integration(): void

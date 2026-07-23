@@ -47,7 +47,14 @@ export default defineConfig({
           { text: 'Data - Life cycle', link: '/submission-guides/data-lifecycle.md' },
           { text: 'Registration and Account', link: '/submission-guides/registration-and-account.md' },
           { text: 'Folder Structure', link: '/submission-guides/folder-structure.md'},
-          { text: 'Submission Process', link: '/submission-guides/submission-process.md'},
+          { text: 'Submission Process',
+            items: [
+              { text: 'Overview', link: '/submission-guides/submission-process.md'},
+              { text: 'Publication Deposition', link: '/submission-guides/publication-deposition.md'},
+              { text: 'Community Contribution', link: '/submission-guides/community-contribution.md'},
+            ]
+          },
+          { text: 'Embargo Publication', link: '/submission-guides/embargo.md'},
           { text: 'Dashboard', link: '/submission-guides/dashboard.md'},
           { text: 'Data Models',
             items: [

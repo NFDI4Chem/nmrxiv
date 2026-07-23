@@ -46,6 +46,7 @@ class ApplicationControllerTest extends TestCase
             'project_id' => $this->project->id,
             'owner_id' => $userId,
             'team_id' => $teamId,
+            'is_public' => true,
             'identifier' => 1,
         ]);
 
@@ -54,6 +55,7 @@ class ApplicationControllerTest extends TestCase
             'study_id' => $this->study->id,
             'owner_id' => $userId,
             'team_id' => $teamId,
+            'is_public' => true,
             'identifier' => 1,
         ]);
     }
@@ -210,6 +212,7 @@ class ApplicationControllerTest extends TestCase
             'project_id' => null,
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
+            'is_public' => true,
             'identifier' => 2,
         ]);
 
@@ -242,6 +245,7 @@ class ApplicationControllerTest extends TestCase
             'project_id' => null,
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
+            'is_public' => true,
             'identifier' => 3,
         ]);
 
@@ -250,6 +254,7 @@ class ApplicationControllerTest extends TestCase
             'study_id' => $studyWithoutProject->id,
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
+            'is_public' => true,
             'identifier' => 2,
         ]);
 
@@ -414,5 +419,49 @@ class ApplicationControllerTest extends TestCase
         $response = $this->get('/project/P1?tab=invalid_tab');
 
         $response->assertStatus(200);
+    }
+
+    public function test_guest_cannot_view_private_sample_on_public_project(): void
+    {
+        $this->study->update(['is_public' => false]);
+
+        $this->get('/sample/S1')->assertForbidden();
+    }
+
+    public function test_guest_cannot_view_private_sample_via_project_tab(): void
+    {
+        $this->study->update(['is_public' => false]);
+
+        $this->get('/project/P1?tab=study&study='.$this->study->id)->assertForbidden();
+    }
+
+    public function test_owner_can_view_private_sample_on_public_project(): void
+    {
+        $this->study->update(['is_public' => false]);
+        $this->study->users()->attach($this->user, ['role' => 'creator']);
+
+        $this->actingAs($this->user)
+            ->get('/sample/S1')
+            ->assertOk();
+    }
+
+    public function test_guest_cannot_view_private_standalone_sample(): void
+    {
+        $privateStudy = Study::factory()->create([
+            'project_id' => null,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'is_public' => false,
+            'identifier' => 4,
+        ]);
+
+        $this->get('/sample/S4')->assertForbidden();
+    }
+
+    public function test_guest_cannot_view_private_dataset_on_public_study(): void
+    {
+        $this->dataset->update(['is_public' => false]);
+
+        $this->get('/dataset/D1')->assertForbidden();
     }
 }

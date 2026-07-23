@@ -1,9 +1,7 @@
 <?php
 
+use App\Providers\AppServiceProvider;
 use L5Swagger\Generator;
-use OpenApi\Analysers\AttributeAnnotationFactory;
-use OpenApi\Analysers\DocBlockAnnotationFactory;
-use OpenApi\Analysers\ReflectionAnalyser;
 
 return [
     'default' => 'default',
@@ -119,12 +117,13 @@ return [
             'default_processors_configuration' => [],
 
             /**
-             * Supports PHP 8 attributes and legacy @OA\ docblock annotations.
+             * Must stay `null` here so this config file remains serializable for `config:cache`.
+             * When `L5_SWAGGER_USE_REFLECTION_ANALYSER` is enabled, the actual analyser instance
+             * is injected at runtime (not cached) right before `l5-swagger:generate` runs.
+             *
+             * @see AppServiceProvider::bootSwaggerReflectionAnalyser()
              */
-            'analyser' => new ReflectionAnalyser([
-                new AttributeAnnotationFactory,
-                new DocBlockAnnotationFactory,
-            ]),
+            'analyser' => null,
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .

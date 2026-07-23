@@ -86,20 +86,7 @@ class CspTest extends TestCase
 
         $policyString = $policy->getContents();
 
-        $this->assertStringContainsString('https://service.tib.eu', $policyString);
-    }
-
-    public function test_csp_allows_meilisearch_connections_and_uses_report_uri_from_env(): void
-    {
-        $policy = new Policy;
-        (new NmrxivPolicy)->configure($policy);
-
-        $policyString = $policy->getContents();
-
-        $this->assertStringContainsString(
-            rtrim((string) config('scout.meilisearch.host'), '/'),
-            $policyString
-        );
+        $this->assertStringContainsString('https://api.terminology.tib.eu', $policyString);
         $this->assertSame(env('CSP_REPORT_URI') ?: null, config('csp.report_uri'));
     }
 }

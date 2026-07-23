@@ -24,7 +24,6 @@ services:
     depends_on:
     - pgsql
     - redis
-    - meilisearch
     env_file:
     - ../.env
     environment:
@@ -103,8 +102,7 @@ services:
     labels:
     - traefik.enable=true
     - traefik.http.routers.nmrkit.rule=Host(`nmrkit.nmrxiv.org`)
-    - traefik.http.routers.nmrkit.entrypoints=websecure
-    - traefik.http.routers.nmrkit.tls=true
+    - traefik.http.routers.nmrkit.entrypoints=web
     - traefik.http.services.nmrkit.loadbalancer.server.port=80
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/latest/registration/health"]
@@ -189,33 +187,6 @@ services:
     volumes:
     - nmrkit_redis_data:/data
 
-  meilisearch:
-    image: getmeili/meilisearch:latest
-    env_file:
-    - ../.env
-    environment:
-    - MEILI_MASTER_KEY=${MEILISEARCH_KEY:-ThisIsALongSecureKeyWith32Chars}
-    - MEILI_NO_ANALYTICS=true
-    - MEILI_ENV=production
-    healthcheck:
-      interval: 30s
-      retries: 3
-      start_period: 30s
-      test:
-      - CMD
-      - wget
-      - --no-verbose
-      - --spider
-      - http://localhost:7700/health
-      timeout: 10s
-    networks:
-    - nmrxiv_net
-    ports:
-    - ${MEILISEARCH_PORT:-7700}:7700
-    restart: unless-stopped
-    volumes:
-    - meilisearch_data:/meili_data
-
   pgsql:
     image: informaticsmatters/rdkit-cartridge-debian:latest
     env_file:
@@ -267,8 +238,6 @@ volumes:
   app_storage:
     driver: local
   caddy_data:
-    driver: local
-  meilisearch_data:
     driver: local
   pgsql_data:
     driver: local

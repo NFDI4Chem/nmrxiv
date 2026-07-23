@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\NMRium;
+use App\Observers\NMRiumObserver;
 use App\Services\FileIntegrityService;
 use App\Services\FileSystemObjectService;
 use App\Services\PathGeneratorService;
 use App\Services\StorageSignedUrlService;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -13,6 +16,9 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Lab404\Impersonate\Events\LeaveImpersonation;
 use Lab404\Impersonate\Events\TakeImpersonation;
+use OpenApi\Analysers\AttributeAnnotationFactory;
+use OpenApi\Analysers\DocBlockAnnotationFactory;
+use OpenApi\Analysers\ReflectionAnalyser;
 
 /**
  * Application Service Provider
@@ -66,6 +72,38 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->bootEvent();
+        $this->bootSwaggerReflectionAnalyser();
+
+        NMRium::observe(NMRiumObserver::class);
+    }
+
+    /**
+     * Inject the reflection-based OpenAPI analyser only while the `l5-swagger:generate`
+     * command is running, and only when explicitly enabled via env.
+     *
+     * This value is intentionally kept out of `config/l5-swagger.php` (it is set to `null`
+     * there) because an analyser object cannot be serialized by `config:cache`. Setting it
+     * here, right before the generator command runs, keeps the config cache safe while still
+     * allowing PHP 8 attribute-based OpenAPI annotations to be scanned during docs generation.
+     */
+    protected function bootSwaggerReflectionAnalyser(): void
+    {
+        Event::listen(function (CommandStarting $event): void {
+            if ($event->command !== 'l5-swagger:generate') {
+                return;
+            }
+
+            if (! env('L5_SWAGGER_USE_REFLECTION_ANALYSER', false)) {
+                return;
+            }
+
+            config([
+                'l5-swagger.defaults.scanOptions.analyser' => new ReflectionAnalyser([
+                    new AttributeAnnotationFactory,
+                    new DocBlockAnnotationFactory,
+                ]),
+            ]);
+        });
     }
 
     /**

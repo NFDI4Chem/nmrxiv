@@ -280,12 +280,7 @@
                                     >View Notifications</span
                                 >
                             </div>
-                            <notification
-                                ref="notificationElement"
-                                :notification="
-                                    $page.props.auth.user?.notifications
-                                "
-                            />
+                            <notification ref="notificationElement" />
                         </span>
 
                         <div class="tooltip">
@@ -892,12 +887,6 @@ export default {
             return this.$page.props.auth.user?.all_teams.filter(
                 (t) => t.personal_team
             )[0];
-        },
-        MEILISEARCH_HOST() {
-            return this.$page.props.MEILISEARCH_HOST;
-        },
-        MEILISEARCH_PUBLICKEY() {
-            return this.$page.props.MEILISEARCH_PUBLICKEY;
         },
     },
     mounted() {

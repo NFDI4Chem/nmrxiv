@@ -585,6 +585,99 @@
                                             </div>
                                         </dd>
                                     </div>
+                                    <div id="project-funding" class="mb-2 pb-4">
+                                        <div class="relative pl-2">
+                                            <div
+                                                class="absolute inset-0 flex items-center"
+                                                aria-hidden="true"
+                                            >
+                                                <div
+                                                    class="w-full border-t border-gray-300"
+                                                ></div>
+                                            </div>
+                                            <div
+                                                class="relative flex items-center"
+                                            >
+                                                <span
+                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['(Optional)'] after:ml-0.5 after:text-gray-500"
+                                                >
+                                                    Funding
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <dd
+                                            class="mt-2 text-md text-gray-900 focus:pointer-events-auto"
+                                        >
+                                            <div
+                                                v-if="!hasFundingReferences"
+                                                class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-10 text-center sm:px-10"
+                                            >
+                                                <DocumentTextIcon
+                                                    class="mx-auto h-12 w-12 text-gray-300"
+                                                    aria-hidden="true"
+                                                />
+                                                <h4
+                                                    class="mt-4 text-sm font-semibold text-gray-900"
+                                                >
+                                                    No funding references yet
+                                                </h4>
+                                                <p
+                                                    class="mt-2 text-sm text-gray-500 max-w-md mx-auto leading-relaxed"
+                                                >
+                                                    Declare third-party funding
+                                                    such as DFG grants. This
+                                                    metadata is included in your
+                                                    DataCite DOI record.
+                                                </p>
+                                                <button
+                                                    type="button"
+                                                    class="mt-6 inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                                    @click="
+                                                        toggleManageFundingReference
+                                                    "
+                                                >
+                                                    <PlusIcon
+                                                        class="w-5 h-5 mr-2 -ml-0.5"
+                                                        aria-hidden="true"
+                                                    />
+                                                    Add funding reference
+                                                </button>
+                                            </div>
+                                            <div
+                                                v-else
+                                                class="mt-1 flex flex-col gap-3"
+                                            >
+                                                <funding-reference-card
+                                                    :funding-references="
+                                                        project.funding_references ||
+                                                        []
+                                                    "
+                                                    show-edit-delete
+                                                    @edit="
+                                                        onFundingReferenceCardEdit
+                                                    "
+                                                    @delete="
+                                                        onFundingReferenceCardDelete
+                                                    "
+                                                />
+                                                <div class="pt-1">
+                                                    <button
+                                                        type="button"
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                                        @click="
+                                                            toggleManageFundingReference
+                                                        "
+                                                    >
+                                                        <PlusIcon
+                                                            class="w-5 h-5 mr-2 -ml-0.5"
+                                                            aria-hidden="true"
+                                                        />
+                                                        Add funding reference
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </dd>
+                                    </div>
                                     <div
                                         id="project-authors"
                                         class="mb-2 pt-4 pb-4"
@@ -1232,6 +1325,10 @@
                             ref="manageCitationElement"
                             :project="project"
                         />
+                        <manage-funding-reference
+                            ref="manageFundingReferenceElement"
+                            :project="project"
+                        />
                     </div>
                 </div>
             </div>
@@ -1409,6 +1506,13 @@
                             able to change the data uploaded! If published as a
                             project, you may add more samples (spectra) to the
                             project later if desired.
+                            <a
+                                href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
+                                >Learn more</a
+                            >
                         </span>
                         <span v-else>
                             Individual samples publish with immediate public
@@ -1451,10 +1555,12 @@ import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
+import ManageFundingReference from "@/Shared/ManageFundingReference.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import FundingReferenceCard from "@/Shared/FundingReferenceCard.vue";
 import { PlusIcon } from "@heroicons/vue/24/solid";
 import {
     Bars3Icon,
@@ -1464,7 +1570,7 @@ import {
     UserGroupIcon,
 } from "@heroicons/vue/24/outline";
 import Draggable from "vuedraggable";
-import "ontology-elements/dist/index.js";
+import "@/lib/ontology-elements";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 
@@ -1473,6 +1579,7 @@ export default {
         ManageAuthor,
         AuthorCard,
         ManageCitation,
+        ManageFundingReference,
         Datepicker,
         VueTagsInput,
         SelectRich,
@@ -1488,6 +1595,7 @@ export default {
         Validation,
         StudyInfo,
         CitationCard,
+        FundingReferenceCard,
         Draggable,
         Bars3Icon,
         ChevronDownIcon,
@@ -1498,9 +1606,11 @@ export default {
     setup() {
         const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
+        const manageFundingReferenceElement = ref(null);
         return {
             manageAuthorElement,
             manageCitationElement,
+            manageFundingReferenceElement,
         };
     },
 
@@ -1612,6 +1722,12 @@ export default {
             return (
                 Array.isArray(this.project?.citations) &&
                 this.project.citations.length > 0
+            );
+        },
+        hasFundingReferences() {
+            return (
+                Array.isArray(this.project?.funding_references) &&
+                this.project.funding_references.length > 0
             );
         },
         hasPublicationAuthors() {
@@ -1959,6 +2075,9 @@ export default {
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
         },
+        toggleManageFundingReference() {
+            this.manageFundingReferenceElement.toggleDialog();
+        },
         onCitationCardEdit(citation) {
             const modal = this.manageCitationElement;
             if (!modal.showDialog) {
@@ -1970,6 +2089,20 @@ export default {
         },
         onCitationCardDelete(citation) {
             this.manageCitationElement.confirmDeletion(citation);
+        },
+        onFundingReferenceCardEdit(fundingReference) {
+            const modal = this.manageFundingReferenceElement;
+            if (!modal.showDialog) {
+                modal.toggleDialog();
+            }
+            this.$nextTick(() => {
+                modal.edit(fundingReference);
+            });
+        },
+        onFundingReferenceCardDelete(fundingReference) {
+            this.manageFundingReferenceElement.confirmDeletion(
+                fundingReference
+            );
         },
         onAuthorCardEdit(author) {
             const modal = this.manageAuthorElement;

@@ -9,7 +9,6 @@ import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import helpers from "./Mixins/Global.js";
 import Children from "@/Shared/Children.vue";
-import InstantSearch from "vue-instantsearch/vue3/es";
 import Vue3Tour from "vue3-tour";
 import mitt from "mitt";
 
@@ -35,7 +34,6 @@ createInertiaApp({
             .component("Children", Children)
             .mixin({ methods: { route } })
             .mixin(helpers)
-            .use(InstantSearch)
             .use(Vue3Tour);
         application.config.globalProperties.emitter = emitter;
         application.mount(el);

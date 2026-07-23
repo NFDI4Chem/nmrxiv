@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use App\Traits\ResolvesNmrxivRouteBinding;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -16,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
@@ -31,7 +31,7 @@ class Study extends Model implements Auditable
     use HasTags;
     use Markable;
     use \OwenIt\Auditing\Auditable;
-    use Searchable;
+    use ResolvesNmrxivRouteBinding;
 
     protected $fillable = [
         'name',
@@ -361,16 +361,6 @@ class Study extends Model implements Auditable
     }
 
     /**
-     * Determine if the model should be searchable.
-     *
-     * @return bool
-     */
-    public function shouldBeSearchable()
-    {
-        return $this->is_public && ! $this->is_archived;
-    }
-
-    /**
      * Get all of the users that belong to the study.
      */
     public function users(): BelongsToMany
@@ -445,5 +435,15 @@ class Study extends Model implements Auditable
         } else {
             return Bookmark::has($this, $user);
         }
+    }
+
+    protected static function nmrxivRouteBindingNamespace(): string
+    {
+        return 'Study';
+    }
+
+    protected static function nmrxivRouteBindingPrefix(): string
+    {
+        return 'S';
     }
 }

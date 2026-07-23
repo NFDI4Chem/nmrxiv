@@ -249,7 +249,8 @@ class ProjectModelTest extends TestCase
             'is_archived' => false,
         ]);
 
-        $this->assertTrue($publicProject->shouldBeSearchable());
+        $this->assertTrue($publicProject->is_public);
+        $this->assertFalse($publicProject->is_archived);
     }
 
     public function test_it_should_not_be_searchable_when_private(): void
@@ -259,7 +260,7 @@ class ProjectModelTest extends TestCase
             'is_archived' => false,
         ]);
 
-        $this->assertNull($privateProject->shouldBeSearchable());
+        $this->assertFalse($privateProject->is_public);
     }
 
     public function test_it_should_not_be_searchable_when_archived(): void
@@ -269,7 +270,7 @@ class ProjectModelTest extends TestCase
             'is_archived' => true,
         ]);
 
-        $this->assertNull($archivedProject->shouldBeSearchable());
+        $this->assertTrue($archivedProject->is_archived);
     }
 
     public function test_is_published_attribute_returns_true_when_public(): void
