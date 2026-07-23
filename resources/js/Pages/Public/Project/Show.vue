@@ -184,10 +184,10 @@
                                             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
                                             @click="toggleManageAuthor"
                                         >
-                                            <PencilIcon
+                                            <PlusIcon
                                                 class="h-3.5 w-3.5 mr-1"
                                             />
-                                            Edit
+                                            Add
                                         </button>
                                     </div>
 
@@ -227,10 +227,10 @@
                                             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
                                             @click="toggleManageCitation"
                                         >
-                                            <PencilIcon
+                                            <PlusIcon
                                                 class="h-3.5 w-3.5 mr-1"
                                             />
-                                            Edit
+                                            Add
                                         </button>
                                     </div>
 
@@ -279,10 +279,10 @@
                                                 toggleManageFundingReference
                                             "
                                         >
-                                            <PencilIcon
+                                            <PlusIcon
                                                 class="h-3.5 w-3.5 mr-1"
                                             />
-                                            Edit
+                                            Add
                                         </button>
                                     </div>
 
@@ -511,7 +511,7 @@ import Citation from "@/Shared/Citation.vue";
 import Tag from "@/Shared/Tag.vue";
 import "@/lib/ontology-elements";
 import { Head } from "@inertiajs/vue3";
-import { PencilIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
 export default {
     name: "ProjectShow",
@@ -529,6 +529,7 @@ export default {
         ProjectDetails,
         Publish,
         PencilIcon,
+        PlusIcon,
         Tag,
     },
 
