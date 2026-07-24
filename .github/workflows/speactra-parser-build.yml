@@ -1,7 +1,8 @@
 name: Build and Push Spectra Parser Images
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [spectra-parser]
 
 permissions:
   contents: read
