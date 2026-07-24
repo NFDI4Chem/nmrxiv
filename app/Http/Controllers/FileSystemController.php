@@ -237,7 +237,11 @@ class FileSystemController extends Controller
 
             foreach ($folders as $folder) {
                 if ($folder->type == 'directory') {
-                    if ($this->isBruker($folder)) {
+                    if ($this->isHiFSA($folder)) {
+                        $this->saveInstrumentType($folder, 'hifsa');
+                    } elseif ($this->isProcessedData($folder)) {
+                        $this->saveInstrumentType($folder, 'processed');
+                    } elseif ($this->isBruker($folder)) {
                         $this->saveInstrumentType($folder, 'bruker');
                     } elseif ($this->isVarian($folder)) {
                         $this->saveInstrumentType($folder, 'varian');
@@ -267,7 +271,11 @@ class FileSystemController extends Controller
                 }
 
                 if ($folder->type == 'directory') {
-                    if ($this->isBruker($folder)) {
+                    if ($this->isHiFSA($folder)) {
+                        $this->saveInstrumentType($folder, 'hifsa');
+                    } elseif ($this->isProcessedData($folder)) {
+                        $this->saveInstrumentType($folder, 'processed');
+                    } elseif ($this->isBruker($folder)) {
                         $this->saveInstrumentType($folder, 'bruker');
                         $this->saveModelType($folder->parent, 'study');
                     } elseif ($this->isVarian($folder)) {
@@ -331,6 +339,47 @@ class FileSystemController extends Controller
     {
         $folder->instrument_type = $type;
         $folder->save();
+    }
+
+    /**
+     * Check if folder is a HiFSA analysis folder.
+     *
+     * Detected by the presence of a Mnova/HiFSA blob file (`.blob`) or by a
+     * folder named `hifsa`. Such folders hold spin-system analysis artifacts,
+     * not a sample, so they are skipped during processing.
+     */
+    public function isHiFSA($folder): bool
+    {
+        if ($folder->type !== 'directory') {
+            return false;
+        }
+
+        if (strtolower((string) $folder->name) === 'hifsa') {
+            return true;
+        }
+
+        $extensions = $folder->children
+            ->pluck('name')
+            ->map(fn ($name) => strtolower(substr((string) $name, strrpos((string) $name, '.') + 1)))
+            ->all();
+
+        return in_array('blob', $extensions, true);
+    }
+
+    /**
+     * Check if folder is a processed-data folder.
+     *
+     * Detected by folder name (`proc` or `processed`). Processed folders are
+     * companion exports of a sample's raw data, not a sample themselves, so
+     * they are skipped during processing.
+     */
+    public function isProcessedData($folder): bool
+    {
+        if ($folder->type !== 'directory') {
+            return false;
+        }
+
+        return in_array(strtolower((string) $folder->name), ['proc', 'processed'], true);
     }
 
     /**

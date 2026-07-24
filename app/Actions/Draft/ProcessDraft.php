@@ -242,8 +242,7 @@ class ProcessDraft
     public function shouldCreateDataset(FileSystemObject $child): bool
     {
         return $child->model_type == 'dataset' || ($child->instrument_type != null
-            && $child->instrument_type != 'nmredata'
-            && $child->instrument_type != 'mol');
+            && ! in_array($child->instrument_type, ['nmredata', 'mol', 'hifsa', 'processed'], true));
     }
 
     /**
