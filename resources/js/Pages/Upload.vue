@@ -1686,7 +1686,7 @@
                                                                                     currentStep
                                                                                 "
                                                                                 id="spectra-editor-anchor"
-                                                                                class="relative my-7 min-h-[120px]"
+                                                                                class="relative mt-7 mb-3 min-h-[120px]"
                                                                             >
                                                                                 <div
                                                                                     v-if="
@@ -1750,416 +1750,484 @@
                                                                             </div>
                                                                         </div>
 
-                                                                        <ChemicalCompositionEditor
-                                                                            v-if="
-                                                                                selectedStudy
-                                                                            "
-                                                                            :study="
-                                                                                selectedStudy
-                                                                            "
-                                                                            :can-update-study="
-                                                                                true
-                                                                            "
-                                                                            :chemistry-standardize-url="
-                                                                                chemistryStandardizeUrl
-                                                                            "
-                                                                            :expanded="
-                                                                                chemicalCompositionExpanded
-                                                                            "
-                                                                            id-prefix="upload-chemical-composition"
-                                                                            @update:expanded="
-                                                                                chemicalCompositionExpanded =
-                                                                                    $event
-                                                                            "
-                                                                        />
-                                                                        <section
-                                                                            class="mx-auto mt-3 max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
+                                                                        <div
+                                                                            class="mx-auto flex max-w-7xl flex-col gap-3"
                                                                         >
-                                                                            <button
-                                                                                type="button"
-                                                                                class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
-                                                                                :aria-expanded="
-                                                                                    assignmentsExpanded
+                                                                            <section
+                                                                                v-if="
+                                                                                    selectedStudy &&
+                                                                                    selectedStudy.hifsa_pdf_url
                                                                                 "
-                                                                                aria-controls="upload-assignments-panel"
-                                                                                @click="
-                                                                                    assignmentsExpanded =
-                                                                                        !assignmentsExpanded
-                                                                                "
+                                                                                class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                             >
-                                                                                <div
-                                                                                    class="min-w-0 flex-1"
-                                                                                >
-                                                                                    <h3
-                                                                                        id="upload-assignments-heading"
-                                                                                        class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
-                                                                                    >
-                                                                                        Assignments
-                                                                                    </h3>
-                                                                                </div>
-                                                                                <ChevronRightIcon
-                                                                                    class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
-                                                                                    :class="{
-                                                                                        'rotate-90':
-                                                                                            assignmentsExpanded,
-                                                                                    }"
-                                                                                    aria-hidden="true"
-                                                                                />
-                                                                            </button>
-                                                                            <div
-                                                                                v-show="
-                                                                                    assignmentsExpanded
-                                                                                "
-                                                                                id="upload-assignments-panel"
-                                                                                class="space-y-4 px-3 pb-4 pt-3 sm:px-4"
-                                                                                role="region"
-                                                                                aria-labelledby="upload-assignments-heading"
-                                                                            >
-                                                                                <div
-                                                                                    class="rounded-md border border-teal-100 bg-teal-50/70 p-3 text-xs leading-relaxed text-teal-900 dark:border-teal-900/40 dark:bg-teal-950/40 dark:text-teal-100"
-                                                                                >
-                                                                                    <p
-                                                                                        class="font-medium"
-                                                                                    >
-                                                                                        Two
-                                                                                        ways
-                                                                                        to
-                                                                                        record
-                                                                                        assignments
-                                                                                    </p>
-                                                                                    <ol
-                                                                                        class="mt-1 list-decimal space-y-1 pl-5"
-                                                                                    >
-                                                                                        <li>
-                                                                                            Paste
-                                                                                            an
-                                                                                            <span
-                                                                                                class="font-semibold"
-                                                                                                >ACS-style
-                                                                                                assignment
-                                                                                                string</span
-                                                                                            >
-                                                                                            (or
-                                                                                            a
-                                                                                            list
-                                                                                            of
-                                                                                            atom-number
-                                                                                            /
-                                                                                            peak
-                                                                                            pairs)
-                                                                                            into
-                                                                                            the
-                                                                                            textarea
-                                                                                            for
-                                                                                            each
-                                                                                            spectrum
-                                                                                            below
-                                                                                            and
-                                                                                            hit
-                                                                                            <span
-                                                                                                class="font-semibold"
-                                                                                                >Save</span
-                                                                                            >.
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            Use
-                                                                                            the
-                                                                                            <span
-                                                                                                class="font-semibold"
-                                                                                                >NMRium
-                                                                                                viewer
-                                                                                                above</span
-                                                                                            >
-                                                                                            to
-                                                                                            assign
-                                                                                            atoms
-                                                                                            graphically:
-                                                                                            press
-                                                                                            <kbd
-                                                                                                class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800"
-                                                                                                >r</kbd
-                                                                                            >
-                                                                                            for
-                                                                                            ranges,
-                                                                                            click
-                                                                                            <span
-                                                                                                class="italic"
-                                                                                                >Auto
-                                                                                                Ranges
-                                                                                                Picking</span
-                                                                                            >,
-                                                                                            then
-                                                                                            drag
-                                                                                            a
-                                                                                            range
-                                                                                            link
-                                                                                            onto
-                                                                                            an
-                                                                                            atom
-                                                                                            in
-                                                                                            the
-                                                                                            structure.
-                                                                                            Diastereotopic
-                                                                                            atoms
-                                                                                            expand
-                                                                                            with
-                                                                                            <kbd
-                                                                                                class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800"
-                                                                                                >Shift</kbd
-                                                                                            >
-                                                                                            +
-                                                                                            click.
-                                                                                            Assigned
-                                                                                            atoms
-                                                                                            turn
-                                                                                            yellow.
-                                                                                            <a
-                                                                                                href="https://docs.nmrium.org/help/assignment/"
-                                                                                                target="_blank"
-                                                                                                rel="noopener"
-                                                                                                class="ml-1 underline decoration-dotted underline-offset-2 hover:no-underline"
-                                                                                                >Full
-                                                                                                guide
-                                                                                                ↗</a
-                                                                                            >
-                                                                                        </li>
-                                                                                    </ol>
-                                                                                </div>
-
-                                                                                <div
-                                                                                    v-if="
-                                                                                        !selectedStudy ||
-                                                                                        !(
-                                                                                            selectedStudy.datasets &&
-                                                                                            selectedStudy
-                                                                                                .datasets
-                                                                                                .length
-                                                                                        )
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
+                                                                                    :aria-expanded="
+                                                                                        hifsaExpanded
                                                                                     "
-                                                                                    class="rounded-md border border-dashed border-gray-300 bg-gray-50/70 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-slate-800/60 dark:text-slate-300"
+                                                                                    aria-controls="upload-hifsa-panel"
+                                                                                    @click="
+                                                                                        hifsaExpanded =
+                                                                                            !hifsaExpanded
+                                                                                    "
                                                                                 >
-                                                                                    No
-                                                                                    spectra
-                                                                                    are
-                                                                                    attached
-                                                                                    to
-                                                                                    this
-                                                                                    sample
-                                                                                    yet,
-                                                                                    so
-                                                                                    there
-                                                                                    is
-                                                                                    nothing
-                                                                                    to
-                                                                                    assign.
-                                                                                </div>
-
-                                                                                <div
-                                                                                    v-else
-                                                                                    class="space-y-3"
-                                                                                >
-                                                                                    <nav
-                                                                                        class="border-b border-gray-200 dark:border-slate-700"
-                                                                                        aria-label="Spectrum groups"
+                                                                                    <div
+                                                                                        class="min-w-0 flex-1"
                                                                                     >
-                                                                                        <ul
-                                                                                            role="tablist"
-                                                                                            class="-mb-px flex flex-wrap gap-x-4 gap-y-1"
+                                                                                        <h3
+                                                                                            id="upload-hifsa-heading"
+                                                                                            class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
                                                                                         >
-                                                                                            <li
-                                                                                                v-for="group in groupedAssignmentDatasets"
-                                                                                                :key="
-                                                                                                    'tab-' +
-                                                                                                    group.key
-                                                                                                "
+                                                                                            HiFSA
+                                                                                        </h3>
+                                                                                    </div>
+                                                                                    <ChevronRightIcon
+                                                                                        class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
+                                                                                        :class="{
+                                                                                            'rotate-90':
+                                                                                                hifsaExpanded,
+                                                                                        }"
+                                                                                        aria-hidden="true"
+                                                                                    />
+                                                                                </button>
+                                                                                <div
+                                                                                    v-show="
+                                                                                        hifsaExpanded
+                                                                                    "
+                                                                                    id="upload-hifsa-panel"
+                                                                                    class="p-3 sm:p-4"
+                                                                                    role="region"
+                                                                                    aria-labelledby="upload-hifsa-heading"
+                                                                                >
+                                                                                    <iframe
+                                                                                        title="HiFSA report"
+                                                                                        frameborder="0"
+                                                                                        class="block w-full rounded-md border"
+                                                                                        style="
+                                                                                            height: min(
+                                                                                                75vh,
+                                                                                                600px
+                                                                                            );
+                                                                                        "
+                                                                                        :src="
+                                                                                            selectedStudy.hifsa_pdf_url
+                                                                                        "
+                                                                                    ></iframe>
+                                                                                </div>
+                                                                            </section>
+
+                                                                            <ChemicalCompositionEditor
+                                                                                v-if="
+                                                                                    selectedStudy
+                                                                                "
+                                                                                :study="
+                                                                                    selectedStudy
+                                                                                "
+                                                                                :can-update-study="
+                                                                                    true
+                                                                                "
+                                                                                :chemistry-standardize-url="
+                                                                                    chemistryStandardizeUrl
+                                                                                "
+                                                                                :expanded="
+                                                                                    chemicalCompositionExpanded
+                                                                                "
+                                                                                id-prefix="upload-chemical-composition"
+                                                                                @update:expanded="
+                                                                                    chemicalCompositionExpanded =
+                                                                                        $event
+                                                                                "
+                                                                            />
+                                                                            <section
+                                                                                class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
+                                                                                    :aria-expanded="
+                                                                                        assignmentsExpanded
+                                                                                    "
+                                                                                    aria-controls="upload-assignments-panel"
+                                                                                    @click="
+                                                                                        assignmentsExpanded =
+                                                                                            !assignmentsExpanded
+                                                                                    "
+                                                                                >
+                                                                                    <div
+                                                                                        class="min-w-0 flex-1"
+                                                                                    >
+                                                                                        <h3
+                                                                                            id="upload-assignments-heading"
+                                                                                            class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
+                                                                                        >
+                                                                                            Assignments
+                                                                                        </h3>
+                                                                                    </div>
+                                                                                    <ChevronRightIcon
+                                                                                        class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
+                                                                                        :class="{
+                                                                                            'rotate-90':
+                                                                                                assignmentsExpanded,
+                                                                                        }"
+                                                                                        aria-hidden="true"
+                                                                                    />
+                                                                                </button>
+                                                                                <div
+                                                                                    v-show="
+                                                                                        assignmentsExpanded
+                                                                                    "
+                                                                                    id="upload-assignments-panel"
+                                                                                    class="space-y-4 px-3 pb-4 pt-3 sm:px-4"
+                                                                                    role="region"
+                                                                                    aria-labelledby="upload-assignments-heading"
+                                                                                >
+                                                                                    <div
+                                                                                        class="rounded-md border border-teal-100 bg-teal-50/70 p-3 text-xs leading-relaxed text-teal-900 dark:border-teal-900/40 dark:bg-teal-950/40 dark:text-teal-100"
+                                                                                    >
+                                                                                        <p
+                                                                                            class="font-medium"
+                                                                                        >
+                                                                                            Two
+                                                                                            ways
+                                                                                            to
+                                                                                            record
+                                                                                            assignments
+                                                                                        </p>
+                                                                                        <ol
+                                                                                            class="mt-1 list-decimal space-y-1 pl-5"
+                                                                                        >
+                                                                                            <li>
+                                                                                                Paste
+                                                                                                an
+                                                                                                <span
+                                                                                                    class="font-semibold"
+                                                                                                    >ACS-style
+                                                                                                    assignment
+                                                                                                    string</span
+                                                                                                >
+                                                                                                (or
+                                                                                                a
+                                                                                                list
+                                                                                                of
+                                                                                                atom-number
+                                                                                                /
+                                                                                                peak
+                                                                                                pairs)
+                                                                                                into
+                                                                                                the
+                                                                                                textarea
+                                                                                                for
+                                                                                                each
+                                                                                                spectrum
+                                                                                                below
+                                                                                                and
+                                                                                                hit
+                                                                                                <span
+                                                                                                    class="font-semibold"
+                                                                                                    >Save</span
+                                                                                                >.
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                Use
+                                                                                                the
+                                                                                                <span
+                                                                                                    class="font-semibold"
+                                                                                                    >NMRium
+                                                                                                    viewer
+                                                                                                    above</span
+                                                                                                >
+                                                                                                to
+                                                                                                assign
+                                                                                                atoms
+                                                                                                graphically:
+                                                                                                press
+                                                                                                <kbd
+                                                                                                    class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800"
+                                                                                                    >r</kbd
+                                                                                                >
+                                                                                                for
+                                                                                                ranges,
+                                                                                                click
+                                                                                                <span
+                                                                                                    class="italic"
+                                                                                                    >Auto
+                                                                                                    Ranges
+                                                                                                    Picking</span
+                                                                                                >,
+                                                                                                then
+                                                                                                drag
+                                                                                                a
+                                                                                                range
+                                                                                                link
+                                                                                                onto
+                                                                                                an
+                                                                                                atom
+                                                                                                in
+                                                                                                the
+                                                                                                structure.
+                                                                                                Diastereotopic
+                                                                                                atoms
+                                                                                                expand
+                                                                                                with
+                                                                                                <kbd
+                                                                                                    class="rounded border border-teal-300/70 bg-white px-1 py-0.5 text-[10px] font-mono dark:border-teal-700 dark:bg-slate-800"
+                                                                                                    >Shift</kbd
+                                                                                                >
+                                                                                                +
+                                                                                                click.
+                                                                                                Assigned
+                                                                                                atoms
+                                                                                                turn
+                                                                                                yellow.
+                                                                                                <a
+                                                                                                    href="https://docs.nmrium.org/help/assignment/"
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener"
+                                                                                                    class="ml-1 underline decoration-dotted underline-offset-2 hover:no-underline"
+                                                                                                    >Full
+                                                                                                    guide
+                                                                                                    ↗</a
+                                                                                                >
+                                                                                            </li>
+                                                                                        </ol>
+                                                                                    </div>
+
+                                                                                    <div
+                                                                                        v-if="
+                                                                                            !selectedStudy ||
+                                                                                            !(
+                                                                                                selectedStudy.datasets &&
+                                                                                                selectedStudy
+                                                                                                    .datasets
+                                                                                                    .length
+                                                                                            )
+                                                                                        "
+                                                                                        class="rounded-md border border-dashed border-gray-300 bg-gray-50/70 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-slate-800/60 dark:text-slate-300"
+                                                                                    >
+                                                                                        No
+                                                                                        spectra
+                                                                                        are
+                                                                                        attached
+                                                                                        to
+                                                                                        this
+                                                                                        sample
+                                                                                        yet,
+                                                                                        so
+                                                                                        there
+                                                                                        is
+                                                                                        nothing
+                                                                                        to
+                                                                                        assign.
+                                                                                    </div>
+
+                                                                                    <div
+                                                                                        v-else
+                                                                                        class="space-y-3"
+                                                                                    >
+                                                                                        <nav
+                                                                                            class="border-b border-gray-200 dark:border-slate-700"
+                                                                                            aria-label="Spectrum groups"
+                                                                                        >
+                                                                                            <ul
+                                                                                                role="tablist"
+                                                                                                class="-mb-px flex flex-wrap gap-x-4 gap-y-1"
                                                                                             >
-                                                                                                <button
-                                                                                                    type="button"
-                                                                                                    role="tab"
-                                                                                                    :aria-selected="
-                                                                                                        activeAssignmentGroup ===
+                                                                                                <li
+                                                                                                    v-for="group in groupedAssignmentDatasets"
+                                                                                                    :key="
+                                                                                                        'tab-' +
                                                                                                         group.key
-                                                                                                    "
-                                                                                                    class="-mb-px inline-flex items-center gap-2 rounded-t-md border-b-2 px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                                                                                                    :class="
-                                                                                                        activeAssignmentGroup ===
-                                                                                                        group.key
-                                                                                                            ? 'border-teal-600 text-gray-900 dark:border-teal-400 dark:text-slate-100'
-                                                                                                            : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200'
-                                                                                                    "
-                                                                                                    @click="
-                                                                                                        activeAssignmentGroup =
-                                                                                                            group.key
                                                                                                     "
                                                                                                 >
-                                                                                                    {{
-                                                                                                        group.label
-                                                                                                    }}
-                                                                                                    <span
-                                                                                                        class="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-slate-800 dark:text-slate-300"
-                                                                                                        >{{
-                                                                                                            group
-                                                                                                                .datasets
-                                                                                                                .length
-                                                                                                        }}</span
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        role="tab"
+                                                                                                        :aria-selected="
+                                                                                                            activeAssignmentGroup ===
+                                                                                                            group.key
+                                                                                                        "
+                                                                                                        class="-mb-px inline-flex items-center gap-2 rounded-t-md border-b-2 px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                                                                                                        :class="
+                                                                                                            activeAssignmentGroup ===
+                                                                                                            group.key
+                                                                                                                ? 'border-teal-600 text-gray-900 dark:border-teal-400 dark:text-slate-100'
+                                                                                                                : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200'
+                                                                                                        "
+                                                                                                        @click="
+                                                                                                            activeAssignmentGroup =
+                                                                                                                group.key
+                                                                                                        "
                                                                                                     >
-                                                                                                </button>
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </nav>
-                                                                                    <section
-                                                                                        v-for="group in groupedAssignmentDatasets"
-                                                                                        v-show="
-                                                                                            activeAssignmentGroup ===
-                                                                                            group.key
-                                                                                        "
-                                                                                        :key="
-                                                                                            'panel-' +
-                                                                                            group.key
-                                                                                        "
-                                                                                        role="tabpanel"
-                                                                                    >
-                                                                                        <div
-                                                                                            class="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-slate-900/60"
+                                                                                                        {{
+                                                                                                            group.label
+                                                                                                        }}
+                                                                                                        <span
+                                                                                                            class="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-slate-800 dark:text-slate-300"
+                                                                                                            >{{
+                                                                                                                group
+                                                                                                                    .datasets
+                                                                                                                    .length
+                                                                                                            }}</span
+                                                                                                        >
+                                                                                                    </button>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </nav>
+                                                                                        <section
+                                                                                            v-for="group in groupedAssignmentDatasets"
+                                                                                            v-show="
+                                                                                                activeAssignmentGroup ===
+                                                                                                group.key
+                                                                                            "
+                                                                                            :key="
+                                                                                                'panel-' +
+                                                                                                group.key
+                                                                                            "
+                                                                                            role="tabpanel"
                                                                                         >
                                                                                             <div
-                                                                                                class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-4 py-2.5 dark:border-gray-800"
+                                                                                                class="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-slate-900/60"
                                                                                             >
                                                                                                 <div
-                                                                                                    class="flex min-w-0 items-center gap-2.5"
+                                                                                                    class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-4 py-2.5 dark:border-gray-800"
                                                                                                 >
+                                                                                                    <div
+                                                                                                        class="flex min-w-0 items-center gap-2.5"
+                                                                                                    >
+                                                                                                        <span
+                                                                                                            class="inline-block h-2 w-2 shrink-0 rounded-full"
+                                                                                                            :class="
+                                                                                                                groupHasAssignments(
+                                                                                                                    group
+                                                                                                                )
+                                                                                                                    ? 'bg-emerald-500 ring-2 ring-emerald-500/20'
+                                                                                                                    : 'bg-gray-200 dark:bg-slate-700'
+                                                                                                            "
+                                                                                                            :title="
+                                                                                                                groupHasAssignments(
+                                                                                                                    group
+                                                                                                                )
+                                                                                                                    ? 'Assignment saved'
+                                                                                                                    : 'No assignment'
+                                                                                                            "
+                                                                                                            aria-hidden="true"
+                                                                                                        ></span>
+                                                                                                        <span
+                                                                                                            class="truncate text-base font-semibold tracking-tight text-gray-900 dark:text-slate-100"
+                                                                                                            >{{
+                                                                                                                group.label
+                                                                                                            }}</span
+                                                                                                        >
+                                                                                                        <span
+                                                                                                            class="hidden truncate text-xs text-gray-500 dark:text-slate-400 sm:inline"
+                                                                                                            >·
+                                                                                                            applies
+                                                                                                            to
+                                                                                                            <template
+                                                                                                                v-for="(
+                                                                                                                    ds,
+                                                                                                                    idx
+                                                                                                                ) in group.datasets"
+                                                                                                                :key="
+                                                                                                                    'expno-' +
+                                                                                                                    ds.id
+                                                                                                                "
+                                                                                                                ><span
+                                                                                                                    v-if="
+                                                                                                                        idx >
+                                                                                                                        0
+                                                                                                                    "
+                                                                                                                    >, </span
+                                                                                                                >{{
+                                                                                                                    ds.type &&
+                                                                                                                    ds.type.split(
+                                                                                                                        " - "
+                                                                                                                    )[1]
+                                                                                                                        ? ds.type.split(
+                                                                                                                              " - "
+                                                                                                                          )[1] +
+                                                                                                                          " (expno " +
+                                                                                                                          ds.name +
+                                                                                                                          ")"
+                                                                                                                        : "expno " +
+                                                                                                                          ds.name
+                                                                                                                }}</template
+                                                                                                            ></span
+                                                                                                        >
+                                                                                                    </div>
                                                                                                     <span
-                                                                                                        class="inline-block h-2 w-2 shrink-0 rounded-full"
-                                                                                                        :class="
-                                                                                                            groupHasAssignments(
-                                                                                                                group
-                                                                                                            )
-                                                                                                                ? 'bg-emerald-500 ring-2 ring-emerald-500/20'
-                                                                                                                : 'bg-gray-200 dark:bg-slate-700'
+                                                                                                        v-if="
+                                                                                                            groupAssignmentSavingKey ===
+                                                                                                            group.key
                                                                                                         "
-                                                                                                        :title="
-                                                                                                            groupHasAssignments(
-                                                                                                                group
-                                                                                                            )
-                                                                                                                ? 'Assignment saved'
-                                                                                                                : 'No assignment'
-                                                                                                        "
-                                                                                                        aria-hidden="true"
-                                                                                                    ></span>
+                                                                                                        class="text-xs italic text-gray-500 dark:text-slate-400"
+                                                                                                        >Saving…</span
+                                                                                                    >
                                                                                                     <span
-                                                                                                        class="truncate text-base font-semibold tracking-tight text-gray-900 dark:text-slate-100"
-                                                                                                        >{{
-                                                                                                            group.label
+                                                                                                        v-else-if="
+                                                                                                            groupAssignmentSavedAt[
+                                                                                                                group
+                                                                                                                    .key
+                                                                                                            ] &&
+                                                                                                            !groupAssignmentErrors[
+                                                                                                                group
+                                                                                                                    .key
+                                                                                                            ]
+                                                                                                        "
+                                                                                                        class="hidden text-xs text-gray-500 dark:text-slate-400 sm:inline"
+                                                                                                        >Saved
+                                                                                                        {{
+                                                                                                            groupAssignmentSavedAt[
+                                                                                                                group
+                                                                                                                    .key
+                                                                                                            ]
                                                                                                         }}</span
                                                                                                     >
-                                                                                                    <span
-                                                                                                        class="hidden truncate text-xs text-gray-500 dark:text-slate-400 sm:inline"
-                                                                                                        >·
-                                                                                                        applies
-                                                                                                        to
-                                                                                                        <template
-                                                                                                            v-for="(
-                                                                                                                ds,
-                                                                                                                idx
-                                                                                                            ) in group.datasets"
-                                                                                                            :key="
-                                                                                                                'expno-' +
-                                                                                                                ds.id
-                                                                                                            "
-                                                                                                            ><span
-                                                                                                                v-if="
-                                                                                                                    idx >
-                                                                                                                    0
-                                                                                                                "
-                                                                                                                >, </span
-                                                                                                            >{{
-                                                                                                                ds.type &&
-                                                                                                                ds.type.split(
-                                                                                                                    " - "
-                                                                                                                )[1]
-                                                                                                                    ? ds.type.split(
-                                                                                                                          " - "
-                                                                                                                      )[1] +
-                                                                                                                      " (expno " +
-                                                                                                                      ds.name +
-                                                                                                                      ")"
-                                                                                                                    : "expno " +
-                                                                                                                      ds.name
-                                                                                                            }}</template
-                                                                                                        ></span
-                                                                                                    >
                                                                                                 </div>
-                                                                                                <span
-                                                                                                    v-if="
-                                                                                                        groupAssignmentSavingKey ===
-                                                                                                        group.key
-                                                                                                    "
-                                                                                                    class="text-xs italic text-gray-500 dark:text-slate-400"
-                                                                                                    >Saving…</span
-                                                                                                >
-                                                                                                <span
-                                                                                                    v-else-if="
-                                                                                                        groupAssignmentSavedAt[
-                                                                                                            group
-                                                                                                                .key
-                                                                                                        ] &&
-                                                                                                        !groupAssignmentErrors[
-                                                                                                            group
-                                                                                                                .key
-                                                                                                        ]
-                                                                                                    "
-                                                                                                    class="hidden text-xs text-gray-500 dark:text-slate-400 sm:inline"
-                                                                                                    >Saved
-                                                                                                    {{
-                                                                                                        groupAssignmentSavedAt[
-                                                                                                            group
-                                                                                                                .key
-                                                                                                        ]
-                                                                                                    }}</span
-                                                                                                >
-                                                                                            </div>
 
-                                                                                            <div
-                                                                                                class="px-4 py-3"
-                                                                                            >
-                                                                                                <textarea
-                                                                                                    v-model="
-                                                                                                        groupAssignmentDraft[
-                                                                                                            group
-                                                                                                                .key
-                                                                                                        ]
-                                                                                                    "
-                                                                                                    rows="4"
-                                                                                                    class="block w-full resize-y rounded-md border-gray-300 bg-white px-3 py-2 font-mono text-xs text-gray-900 shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-800 dark:text-slate-100"
-                                                                                                    @blur="
-                                                                                                        autosaveAssignmentsForGroup(
-                                                                                                            group
-                                                                                                        )
-                                                                                                    "
-                                                                                                ></textarea>
-
-                                                                                                <p
-                                                                                                    v-if="
-                                                                                                        groupAssignmentErrors[
-                                                                                                            group
-                                                                                                                .key
-                                                                                                        ]
-                                                                                                    "
-                                                                                                    class="mt-2 text-xs text-red-600 dark:text-red-400"
+                                                                                                <div
+                                                                                                    class="px-4 py-3"
                                                                                                 >
-                                                                                                    {{
-                                                                                                        groupAssignmentErrors[
-                                                                                                            group
-                                                                                                                .key
-                                                                                                        ]
-                                                                                                    }}
-                                                                                                </p>
+                                                                                                    <textarea
+                                                                                                        v-model="
+                                                                                                            groupAssignmentDraft[
+                                                                                                                group
+                                                                                                                    .key
+                                                                                                            ]
+                                                                                                        "
+                                                                                                        rows="4"
+                                                                                                        class="block w-full resize-y rounded-md border-gray-300 bg-white px-3 py-2 font-mono text-xs text-gray-900 shadow-sm focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-slate-800 dark:text-slate-100"
+                                                                                                        @blur="
+                                                                                                            autosaveAssignmentsForGroup(
+                                                                                                                group
+                                                                                                            )
+                                                                                                        "
+                                                                                                    ></textarea>
+
+                                                                                                    <p
+                                                                                                        v-if="
+                                                                                                            groupAssignmentErrors[
+                                                                                                                group
+                                                                                                                    .key
+                                                                                                            ]
+                                                                                                        "
+                                                                                                        class="mt-2 text-xs text-red-600 dark:text-red-400"
+                                                                                                    >
+                                                                                                        {{
+                                                                                                            groupAssignmentErrors[
+                                                                                                                group
+                                                                                                                    .key
+                                                                                                            ]
+                                                                                                        }}
+                                                                                                    </p>
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                    </section>
+                                                                                        </section>
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        </section>
+                                                                            </section>
+                                                                        </div>
                                                                         <section
                                                                             class="mx-auto mt-3 max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                         >
@@ -3018,6 +3086,7 @@ export default {
             processingStuckTimer: null,
             processingStuckThresholdMs: 90 * 1000,
             selectedStudy: null,
+            hifsaExpanded: true,
             studyNameDraft: "",
 
             /**
