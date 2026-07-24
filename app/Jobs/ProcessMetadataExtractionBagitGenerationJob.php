@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 use whikloj\BagItTools\Bag;
 use ZipArchive;
 
@@ -47,6 +48,17 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         $this->tries = config('nmrxiv.spectra_parsing.job_tries', 3);
         $this->timeout = config('nmrxiv.spectra_parsing.job_timeout', 600);
         $this->retries = config('nmrxiv.spectra_parsing.retry_count', 3);
+        $this->onQueue(config('nmrxiv.spectra_parsing.queue', 'metadata-extraction'));
+    }
+
+    /**
+     * Determine the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return config('nmrxiv.spectra_parsing.backoff', [60, 300, 900]);
     }
 
     /**
@@ -54,18 +66,19 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     public function handle(): void
     {
+        $study = Study::with('datasets')->find($this->studyId);
+
+        if (! $study) {
+            throw new \RuntimeException("Study {$this->studyId} not found");
+        }
+
         try {
-            $study = Study::with('datasets')->find($this->studyId);
-
-            if (! $study) {
-                throw new \Exception("Study {$this->studyId} not found");
-            }
-
             // Mark as processing
             $study->update([
                 'metadata_bagit_generation_status' => 'processing',
                 'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
-                    'started_at' => now()->toIso8601String(),
+                    'started_at' => data_get($study->metadata_bagit_generation_logs, 'started_at', now()->toIso8601String()),
+                    'attempt' => $this->attempts(),
                 ]),
             ]);
 
@@ -85,23 +98,42 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             ]);
 
             Log::info("Successfully processed study {$study->id} ({$study->identifier}): {$result['imageCount']} images saved to {$result['location']}");
-        } catch (\Exception $e) {
-            Log::error("Failed to process study {$this->studyId}: {$e->getMessage()}");
+        } catch (Throwable $e) {
+            Log::warning("Attempt {$this->attempts()} failed for study {$this->studyId}: {$e->getMessage()}");
 
-            // Mark as failed with error message
-            $study = Study::find($this->studyId);
-            if ($study) {
-                $study->update([
-                    'metadata_bagit_generation_status' => 'failed',
-                    'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
-                        'failed_at' => now()->toIso8601String(),
-                        'error_message' => $e->getMessage(),
-                    ]),
-                ]);
-            }
+            $study->update([
+                'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
+                    'last_error_at' => now()->toIso8601String(),
+                    'last_error_message' => $e->getMessage(),
+                    'last_error_attempt' => $this->attempts(),
+                ]),
+            ]);
 
-            // Don't rethrow - let the job complete so it doesn't retry infinitely
+            throw $e;
         }
+    }
+
+    /**
+     * Handle a job failure after all retry attempts have been exhausted.
+     */
+    public function failed(Throwable $exception): void
+    {
+        Log::error("Failed to process study {$this->studyId} after {$this->attempts()} attempts: {$exception->getMessage()}");
+
+        $study = Study::find($this->studyId);
+
+        if (! $study) {
+            return;
+        }
+
+        $study->update([
+            'metadata_bagit_generation_status' => 'failed',
+            'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
+                'failed_at' => now()->toIso8601String(),
+                'error_message' => $exception->getMessage(),
+                'attempts' => $this->attempts(),
+            ]),
+        ]);
     }
 
     /**

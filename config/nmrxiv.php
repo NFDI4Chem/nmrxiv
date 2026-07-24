@@ -33,6 +33,10 @@ return [
         'storage_disk' => env('SPECTRA_STORAGE_DISK', 'local'),
         'storage_path' => env('SPECTRA_STORAGE_PATH', 'spectra_parse'),
 
+        // Queue Configuration
+        'queue' => env('SPECTRA_QUEUE', 'metadata-extraction'),
+        'backoff' => array_map('intval', explode(',', env('SPECTRA_BACKOFF', '60,300,900'))),
+
         // Job Configuration
         'job_tries' => (int) env('SPECTRA_JOB_TRIES', 3),
         'job_timeout' => (int) env('SPECTRA_JOB_TIMEOUT', 600),

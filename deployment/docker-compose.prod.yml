@@ -31,8 +31,9 @@ services:
       octane:start --server=frankenphp --host=0.0.0.0 --admin-port=2019 --port=80"
     - HTTP_PROXY=${HTTP_PROXY}
     - HTTPS_PROXY=${HTTPS_PROXY}
-    - NO_PROXY=${NO_PROXY}
+    - NO_PROXY=${NO_PROXY},nmrkit,nmrkit_pgsql,nmrkit_redis,pgsql,redis,app,worker,traefik
     - APP_URL=https://nmrxiv.org
+    - NMRKIT_API_URL=http://nmrkit/latest/spectra/parse/url
     - TRUSTED_PROXIES="*"
     healthcheck:
       interval: 30s
@@ -70,7 +71,10 @@ services:
     environment:
     - HTTP_PROXY=${HTTP_PROXY}
     - HTTPS_PROXY=${HTTPS_PROXY}
-    - NO_PROXY=${NO_PROXY}
+    - NO_PROXY=${NO_PROXY},nmrkit,nmrkit_pgsql,nmrkit_redis,pgsql,redis,app,worker,traefik
+    - NMRKIT_API_URL=http://nmrkit/latest/spectra/parse/url
+    - SPECTRA_QUEUE=metadata-extraction
+    - SPECTRA_HORIZON_MAX_PROCESSES=1
     healthcheck:
       test: ["CMD", "pgrep", "-f", "artisan horizon"]
       interval: 10s
