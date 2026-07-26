@@ -10,8 +10,7 @@ permissions:
 env:
   REPOSITORY_NAME: nmrxiv
   REPOSITORY_NAMESPACE: nfdi4chem
-  IMAGE_TAG: speactra-parser
-  IMAGE_TAG_ALIAS: spectra-parser
+  IMAGE_TAG: spectra-parser
 
 jobs:
   build-and-push:
@@ -48,6 +47,5 @@ jobs:
             RELEASE_VERSION=${{ env.IMAGE_TAG }}
           tags: |
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:${{ matrix.image.name }}-${{ env.IMAGE_TAG }}
-            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:${{ matrix.image.name }}-${{ env.IMAGE_TAG_ALIAS }}
           cache-from: type=gha,scope=${{ matrix.image.name }}-${{ env.IMAGE_TAG }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image.name }}-${{ env.IMAGE_TAG }}
