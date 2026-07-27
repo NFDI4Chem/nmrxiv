@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
+use App\Support\Draft\HifsaPdfResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,7 +29,8 @@ class ProcessDraft
         private CreateNewProject $createNewProject,
         private UpdateProject $updateProject,
         private CreateDraftStudy $createDraftStudy,
-        private FindOrCreateDraftStudy $findOrCreateDraftStudy
+        private FindOrCreateDraftStudy $findOrCreateDraftStudy,
+        private HifsaPdfResolver $hifsaPdfResolver,
     ) {}
 
     /**
@@ -366,6 +368,8 @@ class ProcessDraft
         $draft->save();
 
         $studies = $project->studies()->orderBy('name')->get()->load(['datasets', 'sample.molecules', 'tags']);
+        $this->hifsaPdfResolver->persistCsvData($studies);
+        $studies = $this->hifsaPdfResolver->enrichStudies($studies, $draft);
 
         if (count($studies) == 0) {
             return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);

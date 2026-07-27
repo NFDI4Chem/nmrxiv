@@ -1756,7 +1756,9 @@
                                                                             <section
                                                                                 v-if="
                                                                                     selectedStudy &&
-                                                                                    selectedStudy.hifsa_pdf_url
+                                                                                    hasHifsaPanel(
+                                                                                        selectedStudy
+                                                                                    )
                                                                                 "
                                                                                 class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                             >
@@ -1800,7 +1802,20 @@
                                                                                     role="region"
                                                                                     aria-labelledby="upload-hifsa-heading"
                                                                                 >
+                                                                                    <HifsaScoresPanel
+                                                                                        v-if="
+                                                                                            hasHifsaScores(
+                                                                                                selectedStudy
+                                                                                            )
+                                                                                        "
+                                                                                        :hifsa-data="
+                                                                                            selectedStudy.hifsa_data
+                                                                                        "
+                                                                                    />
                                                                                     <iframe
+                                                                                        v-else-if="
+                                                                                            selectedStudy.hifsa_pdf_url
+                                                                                        "
                                                                                         title="HiFSA report"
                                                                                         frameborder="0"
                                                                                         class="block w-full rounded-md border"
@@ -2942,7 +2957,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
-import { ref } from "vue";
+import { markRaw, ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import Validation from "@/Shared/Validation.vue";
@@ -2970,6 +2985,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ChemicalCompositionEditor from "@/Shared/ChemicalCompositionEditor.vue";
+import HifsaScoresPanel from "@/Shared/HifsaScoresPanel.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
@@ -3012,6 +3028,7 @@ export default {
         Validation,
         SpectraEditor,
         ChemicalCompositionEditor,
+        HifsaScoresPanel,
         Depictor,
         Depictor2D,
         slider,
@@ -3201,6 +3218,10 @@ export default {
 
             /** Populated from parallel GET /info during mounted deep-link (step 2). */
             prefetchedStepTwoPayload: null,
+            /** Avoid duplicate nmredata-driven standardize bursts per study. */
+            autoImportMolecularDataStartedFor: markRaw(new Set()),
+            /** Per-session molfile -> standardize axios promise. */
+            standardizeRequestCache: markRaw(new Map()),
         };
     },
     computed: {
@@ -3697,6 +3718,12 @@ export default {
         this.clearProcessingStuckTimer();
     },
     methods: {
+        hasHifsaScores(study) {
+            return Boolean(study?.hifsa_data?.scores);
+        },
+        hasHifsaPanel(study) {
+            return this.hasHifsaScores(study) || Boolean(study?.hifsa_pdf_url);
+        },
         startProcessingStuckTimer() {
             this.clearProcessingStuckTimer();
             this.isProcessingStuck = false;
@@ -5142,7 +5169,16 @@ export default {
         },
         formatMixtureValue,
         standardizeMolecules(mol) {
-            return axios.post(this.chemistryStandardizeUrl, mol);
+            const key = String(mol ?? "").trim();
+            if (!key) {
+                return Promise.reject(new Error("Empty molfile"));
+            }
+            if (this.standardizeRequestCache.has(key)) {
+                return this.standardizeRequestCache.get(key);
+            }
+            const promise = axios.post(this.chemistryStandardizeUrl, key);
+            this.standardizeRequestCache.set(key, promise);
+            return promise;
         },
         /**
          * Normalize the NMRKit `/latest/spectra/parse/url` payload into the
@@ -5192,6 +5228,11 @@ export default {
             }
         },
         autoImportMolecularData(study) {
+            if (this.autoImportMolecularDataStartedFor.has(study.id)) {
+                return;
+            }
+            this.autoImportMolecularDataStartedFor.add(study.id);
+
             const baseUrl = String(
                 this.$page.props.url ?? this.url ?? ""
             ).replace(/\/+$/, "");
