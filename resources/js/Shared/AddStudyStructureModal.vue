@@ -796,7 +796,7 @@ async function saveStructure() {
             ? props.molecule?.pivot?.percentage_composition ?? 0
             : 0;
 
-        const { data: molecules } = await axios.post(
+        const { data } = await axios.post(
             `/dashboard/studies/${props.study.id}/molecule`,
             {
                 InChI: standardized.inchi,
@@ -807,7 +807,7 @@ async function saveStructure() {
             }
         );
 
-        emit("saved", molecules);
+        emit("saved", Array.isArray(data) ? data : data.molecules);
         resetForm();
         destroyEditor();
         emit("close");
