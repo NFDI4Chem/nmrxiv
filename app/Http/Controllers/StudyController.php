@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\License\GetLicense;
+use App\Actions\Sample\SyncMixtureComposition;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
+use App\Http\Requests\StoreStudyMoleculeRequest;
+use App\Http\Requests\UpdateMixtureCompositionRequest;
+use App\Http\Resources\SampleMoleculeResource;
 use App\Http\Resources\StudyResource;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
@@ -20,6 +24,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
@@ -74,7 +79,7 @@ class StudyController extends Controller
 
         $study = $study->fresh();
 
-        $study->load(['datasets', 'sample.molecules', 'tags']);
+        $study->load(['datasets', 'sample.molecules', 'sample.mixtureComposition.components.molecule', 'tags']);
 
         return $request->wantsJson()
             ? new JsonResponse($study, 200)
@@ -150,7 +155,7 @@ class StudyController extends Controller
         switch ($tab) {
             case 'About':
                 return Inertia::render('Study/About', [
-                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules', 'studyAuthors'),
+                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules', 'sample.mixtureComposition.components.molecule', 'studyAuthors'),
                     'team' => $team ? $team->load('users', 'owner') : null,
                     'project' => $project ? $project->load('users', 'owner', 'authors') : null,
                     'members' => $study->allUsers(),
@@ -207,38 +212,89 @@ class StudyController extends Controller
         }
     }
 
-    public function moleculeStore(Request $request, Study $study)
-    {
-        Gate::forUser($request->user())->authorize('updateStudy', $study);
+    public function moleculeStore(
+        StoreStudyMoleculeRequest $request,
+        Study $study,
+        SyncMixtureComposition $syncMixtureComposition
+    ): SampleMoleculeResource {
+        $validated = $request->validated();
+        $compositionMode = $validated['composition_mode'] ?? 'pure';
 
+        $sample = DB::transaction(function () use ($study, $request, $validated, $compositionMode, $syncMixtureComposition) {
+            $sample = $study->sample;
+            if (! $sample) {
+                $sample = Sample::create([
+                    'name' => $study->name.'_sample',
+                    'slug' => Str::slug($study->name.'_sample', '-'),
+                    'study_id' => $study->id,
+                    'project_id' => $study->project ? $study->project->id : null,
+                ]);
+                $study->sample()->save($sample);
+            }
+
+            $sample->load('molecules');
+            $inchi = $validated['InChI'];
+            $molecule = $sample->molecules->firstWhere('standard_inchi', $inchi);
+
+            if ($molecule === null) {
+                $molecule = Molecule::firstOrCreate([
+                    'standard_inchi' => $inchi,
+                ], [
+                    'molecular_formula' => $validated['formula'] ?? '',
+                    'inchi_key' => $validated['InChIKey'] ?? '',
+                    'sdf' => isset($validated['mol'])
+                        ? Sample::ensureMolfileHeader((string) $validated['mol'], (string) ($validated['iupac_name'] ?? ''))
+                        : '',
+                    'canonical_smiles' => $validated['canonical_smiles'] ?? '',
+                ]);
+            }
+
+            $pivotPercentage = match ($compositionMode) {
+                'unknown', 'mixture' => null,
+                default => $validated['percentage'] ?? null,
+            };
+
+            $sample->molecules()->syncWithPivotValues(
+                [$molecule->id],
+                ['percentage_composition' => $pivotPercentage],
+                false
+            );
+
+            if ($compositionMode === 'mixture') {
+                $syncMixtureComposition->syncMetadata($sample, [
+                    'basis' => $validated['basis'],
+                    'determination_method' => $validated['determination_method'] ?? null,
+                    'nucleus' => $validated['nucleus'] ?? null,
+                    'relaxation_delay_s' => $validated['relaxation_delay_s'] ?? null,
+                    'has_residual' => $request->boolean('has_residual'),
+                ]);
+
+                $syncMixtureComposition->upsertComponent($sample, $molecule->id, [
+                    'value' => $validated['value'],
+                    'integrated_signal' => $validated['integrated_signal'] ?? null,
+                    'n_nuclei' => $validated['n_nuclei'] ?? null,
+                ]);
+            }
+
+            return $sample->fresh();
+        });
+
+        return new SampleMoleculeResource($sample);
+    }
+
+    public function mixtureCompositionUpdate(
+        UpdateMixtureCompositionRequest $request,
+        Study $study,
+        SyncMixtureComposition $syncMixtureComposition
+    ): SampleMoleculeResource {
         $sample = $study->sample;
         if (! $sample) {
-            $sample = Sample::create([
-                'name' => $study->name.'_sample',
-                'slug' => Str::slug($study->name.'_sample', '-'),
-                'study_id' => $study->id,
-                'project_id' => $study->project ? $study->project->id : null,
-            ]);
-            $study->sample()->save($sample);
+            abort(404, 'Sample not found');
         }
-        $inchi = $request->get('InChI');
-        $molecule = $sample->molecules->where('standard_inchi', $inchi)->first();
-        if (is_null($molecule)) {
-            $molecule = Molecule::firstOrCreate([
-                'standard_inchi' => $inchi,
-            ], [
-                'molecular_formula' => $request->get('formula') ? $request->get('formula') : '',
-                'inchi_key' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
-                'sdf' => $request->get('mol')
-                    ? Sample::ensureMolfileHeader((string) $request->get('mol'), (string) $request->get('iupac_name', ''))
-                    : '',
-                'canonical_smiles' => $request->get('canonical_smiles') ? $request->get('canonical_smiles') : '',
-            ]);
-            $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
-        }
-        $sample = $sample->fresh();
 
-        return $sample->molecules;
+        $syncMixtureComposition->updateMetadata($sample, $request->validated());
+
+        return new SampleMoleculeResource($sample->fresh());
     }
 
     public function fetchPublicNMRium(Request $request, Study $study)
@@ -388,15 +444,27 @@ class StudyController extends Controller
         }
     }
 
-    public function moleculeDetach(Request $request, Study $study, Molecule $molecule)
-    {
-        if ($molecule) {
-            $sample = $study->sample;
-            $sample->molecules()->detach([$molecule->id]);
-            $sample = $sample->fresh();
+    public function moleculeDetach(
+        Request $request,
+        Study $study,
+        Molecule $molecule,
+        SyncMixtureComposition $syncMixtureComposition
+    ): SampleMoleculeResource {
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
 
-            return $sample->molecules;
+        $sample = $study->sample;
+        if (! $sample) {
+            abort(404, 'Sample not found');
         }
+
+        DB::transaction(function () use ($sample, $molecule, $syncMixtureComposition): void {
+            if ($sample->molecules()->whereKey($molecule->id)->exists()) {
+                $sample->molecules()->detach($molecule->id);
+                $syncMixtureComposition->removeComponent($sample, $molecule->id);
+            }
+        });
+
+        return new SampleMoleculeResource($sample->fresh());
     }
 
     public function files(Request $request, Study $study)

@@ -106,7 +106,11 @@ class ApplicationController extends Controller
                 return $this->renderProjectForRequest($request, $model, $getLicense);
             } elseif ($namespace == 'Study') {
                 $study = $model;
-                $study->load(['studyAuthors', 'linkedCitations']);
+                $study->load([
+                    'studyAuthors',
+                    'linkedCitations',
+                    'sample.mixtureComposition.components.molecule',
+                ]);
                 $project = $study->project;
 
                 return $this->renderProjectForRequest(
