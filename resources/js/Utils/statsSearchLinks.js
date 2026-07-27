@@ -35,6 +35,9 @@ export function statsLegendSearchParams(distributionKey, value) {
             return { nmr_method: String(value) };
         case "measuring_frequency_mhz":
             return { proton_frequency: String(value) };
+        case "experiment_category":
+        case "probe_type":
+            return null;
         case "manufacturer":
             return { manufacturer: String(value) };
         case "temperature_k":
