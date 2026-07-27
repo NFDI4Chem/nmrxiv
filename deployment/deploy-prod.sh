@@ -284,7 +284,7 @@ build_or_restart_services() {
     cleanup
     log_message "Services restarted successfully!"
     log_message " nmrXiv application is available at: https://nmrxiv.org"
-    log_message " nmrKit application is available at: https://nmrkit.nmrxiv.org
+    log_message " nmrKit application is available at: https://nmrkit.nmrxiv.org"
 }
 
 # === Display Help ===
