@@ -20,7 +20,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Handle draft management operations including file processing, validation, and project conversion.
@@ -207,11 +209,96 @@ class DraftController extends Controller
         }
 
         $project->load(['owner']);
-        $studies = $this->draftWorkspaceStudies($project, $draft);
+        $studies = $this->draftWorkspaceStudies($project, $draft)
+            ->each(function (Study $study) use ($draft): void {
+                $pdf = $this->resolveHifsaPdf($study);
+                $study->setAttribute(
+                    'hifsa_pdf_url',
+                    $pdf ? route('dashboard.draft.hifsa', ['draft' => $draft->id, 'filesystemobject' => $pdf->id]) : null,
+                );
+            });
 
         return response()->json([
             'project' => $project,
             'studies' => $studies,
+        ]);
+    }
+
+    /**
+     * Resolve the HiFSA report PDF for a study, if a detected HiFSA folder is
+     * associated with it. The HiFSA folder is not linked to the study (it is
+     * skipped during processing), so it is matched structurally: it is either
+     * a child of the study's folder or a sibling of it.
+     */
+    private function resolveHifsaPdf(Study $study): ?FileSystemObject
+    {
+        $studyFs = $study->fsObject;
+
+        if (! $studyFs) {
+            return null;
+        }
+
+        $hifsaFolder = FileSystemObject::query()
+            ->where('draft_id', $study->draft_id)
+            ->where('instrument_type', 'hifsa')
+            ->where(function ($query) use ($studyFs): void {
+                $query->where('parent_id', $studyFs->id);
+
+                if ($studyFs->parent_id === null) {
+                    $query->orWhereNull('parent_id');
+                } else {
+                    $query->orWhere('parent_id', $studyFs->parent_id);
+                }
+            })
+            ->with('children')
+            ->first();
+
+        if (! $hifsaFolder) {
+            return null;
+        }
+
+        return $hifsaFolder->children
+            ->first(fn (FileSystemObject $child): bool => $child->type === 'file'
+                && str_ends_with(strtolower((string) $child->name), '.pdf'));
+    }
+
+    /**
+     * Stream a HiFSA PDF from a draft folder inline for in-browser preview.
+     */
+    public function hifsaFile(Request $request, Draft $draft, FileSystemObject $filesystemobject): StreamedResponse
+    {
+        $this->authorize('updateDraft', $draft);
+
+        if ($filesystemobject->draft_id !== $draft->id) {
+            abort(403);
+        }
+
+        if ($filesystemobject->type !== 'file'
+            || ! str_ends_with(strtolower((string) $filesystemobject->name), '.pdf')) {
+            abort(404);
+        }
+
+        $path = ltrim((string) $filesystemobject->path, '/');
+        $disk = Storage::disk(config('filesystems.default'));
+
+        if ($path === '' || ! $disk->exists($path)) {
+            abort(404);
+        }
+
+        $stream = $disk->readStream($path);
+
+        if (! is_resource($stream)) {
+            abort(404);
+        }
+
+        $filename = str_replace('"', '', (string) $filesystemobject->name);
+
+        return response()->stream(function () use ($stream): void {
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
         ]);
     }
 
