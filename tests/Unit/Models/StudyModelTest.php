@@ -405,12 +405,10 @@ class StudyModelTest extends TestCase
         $this->assertStringStartsWith($baseUrl, str_replace(':80', '', $study->private_url));
     }
 
-    public function test_it_has_one_fs_object(): void
+    public function test_it_resolves_fs_object_through_canonical_fs_id(): void
     {
-        // Test the fsObject relationship - covers line 191
         $study = Study::factory()->create();
 
-        // Create FileSystemObject with required fields
         $fsObject = FileSystemObject::create([
             'name' => 'study-file.txt',
             'slug' => 'study-file-txt',
@@ -419,9 +417,31 @@ class StudyModelTest extends TestCase
             'study_id' => $study->id,
         ]);
 
-        $study->refresh();
-        $this->assertInstanceOf(FileSystemObject::class, $study->fsObject);
-        $this->assertEquals($fsObject->id, $study->fsObject->id);
+        $study->update(['fs_id' => $fsObject->id]);
+
+        $this->assertInstanceOf(FileSystemObject::class, $study->fresh()->fsObject);
+        $this->assertEquals($fsObject->id, $study->fresh()->fsObject->id);
+    }
+
+    public function test_fs_object_resolves_to_root_when_children_share_study_id(): void
+    {
+        $studyRoot = FileSystemObject::factory()->directory()->create([
+            'name' => 'StudyRoot',
+            'relative_url' => '/StudyRoot',
+        ]);
+
+        $study = Study::factory()->create(['fs_id' => $studyRoot->id]);
+        $studyRoot->update(['study_id' => $study->id]);
+
+        FileSystemObject::factory()->directory()->create([
+            'name' => 'proton',
+            'relative_url' => '/StudyRoot/proton',
+            'parent_id' => $studyRoot->id,
+            'study_id' => $study->id,
+        ]);
+
+        $this->assertEquals($studyRoot->id, $study->fresh()->fsObject->id);
+        $this->assertSame('StudyRoot', $study->fresh()->fsObject->name);
     }
 
     public function test_it_belongs_to_a_validation(): void
