@@ -35,6 +35,7 @@ use App\Http\Controllers\StudyMemberController;
 use App\Http\Controllers\SupportBubbleController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\UserPreferencesController;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
@@ -203,6 +204,10 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::post('/primer/skip', [DashboardController::class, 'skipPrimer'])
         ->name('primer.skip');
+
+    Route::put('/user/preferences', [UserPreferencesController::class, 'update'])
+        ->middleware('throttle:30,1')
+        ->name('user.preferences.update');
 
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
         ->name('project.status');

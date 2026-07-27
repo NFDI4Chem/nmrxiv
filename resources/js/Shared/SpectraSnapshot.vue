@@ -13,6 +13,13 @@
 </template>
 
 <script>
+import {
+    getDefaultSpectrumTab,
+    postNmriumLoad,
+    requestSelectTab,
+    resolveNmriumTargetOrigin,
+} from "@/Utils/nmriumTabPreference.js";
+
 export default {
     components: {},
     props: {
@@ -24,6 +31,7 @@ export default {
         return {
             spectraError: null,
             loadingTimeout: null,
+            defaultTabApplied: false,
         };
     },
     computed: {
@@ -48,6 +56,22 @@ export default {
         }
     },
     methods: {
+        nmriumTargetOrigin() {
+            return resolveNmriumTargetOrigin(this.$page.props.nmriumURL);
+        },
+        applyDefaultSpectrumTab() {
+            const tab = getDefaultSpectrumTab(this.$page);
+            if (!tab || this.defaultTabApplied) {
+                return;
+            }
+
+            this.defaultTabApplied = true;
+            requestSelectTab(
+                window.frames.snapshotNMRiumIframe,
+                tab,
+                this.nmriumTargetOrigin()
+            );
+        },
         registerEvents() {
             const saveNMRiumUpdates = (e) => {
                 const { data, type } = e.data;
@@ -84,6 +108,7 @@ export default {
                         if (state.data.spectra.length > 0) {
                             console.log(actionType);
                             if (actionType == "INITIATE") {
+                                this.applyDefaultSpectrumTab();
                                 this.exportPreview();
                                 return;
                             }
@@ -112,7 +137,7 @@ export default {
                             type: `nmr-wrapper:action-request`,
                             data,
                         },
-                        "*"
+                        this.nmriumTargetOrigin()
                     );
                 }
             }, 1000);
@@ -120,6 +145,7 @@ export default {
         loadSpectra() {
             const iframe = window.frames.snapshotNMRiumIframe;
             this.spectraError = null;
+            this.defaultTabApplied = false;
 
             if (this.loadingTimeout) {
                 clearTimeout(this.loadingTimeout);
@@ -132,13 +158,14 @@ export default {
                     .then((response) => {
                         let nmrium_info = response.data;
                         if (nmrium_info) {
-                            let data = {
-                                data: nmrium_info,
-                                type: "nmrium",
-                            };
-                            iframe.postMessage(
-                                { type: `nmr-wrapper:load`, data },
-                                "*"
+                            postNmriumLoad(
+                                iframe,
+                                {
+                                    data: nmrium_info,
+                                    type: "nmrium",
+                                },
+                                this.nmriumTargetOrigin(),
+                                getDefaultSpectrumTab(this.$page)
                             );
 
                             this.loadingTimeout = setTimeout(() => {
