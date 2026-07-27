@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Sample extends Model
 {
@@ -28,6 +30,16 @@ class Sample extends Model
         return $this->belongsToMany(Molecule::class)
             ->withPivot('percentage_composition')
             ->withTimestamps();
+    }
+
+    public function mixtureComposition(): HasOne
+    {
+        return $this->hasOne(MixtureComposition::class);
+    }
+
+    public function mixtureComponents(): HasMany
+    {
+        return $this->hasMany(MixtureComponent::class)->orderBy('sort_order');
     }
 
     /**
