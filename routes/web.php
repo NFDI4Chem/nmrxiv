@@ -334,6 +334,8 @@ Route::middleware('auth', 'verified')->group(function () {
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
+        Route::put('studies/{study}/mixture-composition', [StudyController::class, 'mixtureCompositionUpdate'])
+            ->name('study-mixture-composition.update');
         Route::delete('studies/{study}/molecule/{molecule}', [StudyController::class, 'moleculeDetach'])
             ->name('study-molecule.delete');
 
