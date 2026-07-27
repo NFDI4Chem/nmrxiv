@@ -204,7 +204,7 @@ class StudyModelTest extends TestCase
             'external_url', 'processing_logs', 'tracking_item_name',
             'doi', 'identifier', 'validation_id',
             'metadata_bagit_generation_status', 'metadata_bagit_generation_logs',
-            'has_nmrium', 'has_nmredata',
+            'has_nmrium', 'has_nmredata', 'hifsa_data',
         ];
 
         $study = new Study;
