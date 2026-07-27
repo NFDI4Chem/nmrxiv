@@ -4223,17 +4223,17 @@
                                         },
                                         "source": {
                                             "type": "string",
+                                            "example": "index",
                                             "enum": [
                                                 "index",
                                                 "live"
-                                            ],
-                                            "example": "index"
+                                            ]
                                         },
                                         "computed_at": {
                                             "type": "string",
                                             "format": "date-time",
-                                            "nullable": true,
-                                            "example": "2026-07-16T00:00:00+00:00"
+                                            "example": "2026-07-16T00:00:00+00:00",
+                                            "nullable": true
                                         },
                                         "totals": {
                                             "properties": {
@@ -4258,10 +4258,106 @@
                                             "type": "object"
                                         },
                                         "distributions": {
+                                            "properties": {
+                                                "dimension": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "nucleus": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "solvent": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "experiment": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "experiment_category": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "measuring_frequency_mhz": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "manufacturer": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "temperature_k": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "pulse_sequence": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "tube_diameter_mm": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "number_of_scans": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "probe_type": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "instrument_model": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsBucket"
+                                                    }
+                                                },
+                                                "dimension_experiment_breakdown": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsDimensionExperimentGroup"
+                                                    }
+                                                },
+                                                "nucleus_measuring_frequency_mhz": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MetadataStatsNucleusFrequencyGroup"
+                                                    }
+                                                }
+                                            },
                                             "type": "object"
                                         },
                                         "missing": {
-                                            "type": "object"
+                                            "description": "Indexed spectra lacking each metadata field, keyed by distribution name",
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -4744,6 +4840,89 @@
         }
     },
     "components": {
+        "schemas": {
+            "MetadataStatsBucket": {
+                "description": "Single distribution bucket with its spectra count.",
+                "properties": {
+                    "value": {
+                        "description": "Reusable OpenAPI schemas for the metadata statistics endpoint.",
+                        "type": "string",
+                        "example": "1H"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "example": 7420
+                    }
+                },
+                "type": "object"
+            },
+            "MetadataStatsDimensionExperimentGroup": {
+                "description": "Spectra per dimension (1D / 2D), broken down by nucleus (1D) or experiment (2D).",
+                "properties": {
+                    "dimension": {
+                        "type": "string",
+                        "example": "1D"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "example": 9260
+                    },
+                    "breakdown": {
+                        "type": "string",
+                        "example": "nucleus",
+                        "enum": [
+                            "nucleus",
+                            "experiment"
+                        ]
+                    },
+                    "segments": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "value": {
+                                    "type": "string",
+                                    "example": "1H"
+                                },
+                                "count": {
+                                    "type": "integer",
+                                    "example": 5720
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "example": "nucleus",
+                                    "enum": [
+                                        "nucleus",
+                                        "experiment"
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "MetadataStatsNucleusFrequencyGroup": {
+                "description": "Spectra per nucleus, broken down by observed measuring frequency (MHz).",
+                "properties": {
+                    "nucleus": {
+                        "type": "string",
+                        "example": "1H"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "example": 7420
+                    },
+                    "frequencies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MetadataStatsBucket"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        },
         "parameters": {
             "metadataSearchQ": {
                 "name": "q",
@@ -4850,7 +5029,7 @@
             "metadataSearchManufacturer": {
                 "name": "manufacturer",
                 "in": "query",
-                "description": "Instrument manufacturer (`spectra_manufacturer`).",
+                "description": "Instrument vendor from the sample folder type (`instrument_type`: Bruker, JEOL, Magritek, JCAMP) stored in `spectra_manufacturer`.",
                 "required": false,
                 "schema": {
                     "type": "string",
