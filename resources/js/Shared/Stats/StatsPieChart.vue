@@ -168,9 +168,7 @@ const slices = computed(() => {
                 </svg>
             </div>
 
-            <ul
-                class="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 sm:max-h-52"
-            >
+            <ul class="min-h-0 max-h-52 flex-1 space-y-2 overflow-y-auto pr-1">
                 <li
                     v-for="slice in slices"
                     :key="`${slice.value}-legend`"
