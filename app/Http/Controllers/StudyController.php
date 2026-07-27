@@ -19,6 +19,7 @@ use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use App\Support\Nmr\JcampDatasetClassifier;
+use App\Support\Public\PublicEntityAccess;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -294,6 +295,13 @@ class StudyController extends Controller
         $syncMixtureComposition->updateMetadata($sample, $request->validated());
 
         return new SampleMoleculeResource($sample->fresh());
+    }
+
+    public function fetchPublicNMRium(Request $request, Study $study)
+    {
+        PublicEntityAccess::authorizeStudyAccess($request, $study);
+
+        return $this->fetchNMRium($request, $study);
     }
 
     public function fetchNMRium(Request $request, Study $study)

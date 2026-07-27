@@ -12,19 +12,28 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @php
-            $nmriumHref = config('external-links.nmrium_url');
-            $nmriumParsed = is_string($nmriumHref) ? parse_url($nmriumHref) : false;
+            $externalOrigins = [];
+            foreach ([config('external-links.nmrium_url'), config('external-links.nmrkit_url')] as $externalHref) {
+                $parsed = is_string($externalHref) ? parse_url($externalHref) : false;
+                if (! is_array($parsed) || ! isset($parsed['host'])) {
+                    continue;
+                }
+
+                $scheme = $parsed['scheme'] ?? 'https';
+                $externalOrigins[$scheme.'://'.$parsed['host']] = true;
+            }
             $nmriumOrigin = null;
+            $nmriumParsed = is_string(config('external-links.nmrium_url')) ? parse_url(config('external-links.nmrium_url')) : false;
             if (is_array($nmriumParsed) && isset($nmriumParsed['host'])) {
-                $scheme = $nmriumParsed['scheme'] ?? 'https';
-                $nmriumOrigin = $scheme.'://'.$nmriumParsed['host'];
+                $nmriumOrigin = ($nmriumParsed['scheme'] ?? 'https').'://'.$nmriumParsed['host'];
             }
         @endphp
         @if ($nmriumOrigin)
             <link rel="preconnect" href="{{ $nmriumOrigin }}" crossorigin>
-            <link rel="dns-prefetch" href="{{ $nmriumOrigin }}">
         @endif
-        <link rel="dns-prefetch" href="https://nodejs.nmrxiv.org">
+        @foreach (array_keys($externalOrigins) as $externalOrigin)
+            <link rel="dns-prefetch" href="{{ $externalOrigin }}">
+        @endforeach
 
         <!-- Styles / Scripts -->
         @vite(['resources/js/app.js'])

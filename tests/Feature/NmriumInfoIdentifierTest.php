@@ -145,4 +145,18 @@ class NmriumInfoIdentifierTest extends TestCase
         $this->getJson('/sample/S99999/nmriumInfo')->assertNotFound();
         $this->getJson('/dataset/D99999/nmriumInfo')->assertNotFound();
     }
+
+    public function test_web_nmrium_info_returns_403_for_private_sample(): void
+    {
+        $this->study->update(['is_public' => false]);
+
+        $this->getJson('/sample/S7/nmriumInfo')->assertForbidden();
+    }
+
+    public function test_web_nmrium_info_returns_403_for_private_dataset(): void
+    {
+        $this->dataset->update(['is_public' => false]);
+
+        $this->getJson('/dataset/D9/nmriumInfo')->assertForbidden();
+    }
 }

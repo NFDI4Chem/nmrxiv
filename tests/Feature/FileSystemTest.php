@@ -335,6 +335,245 @@ class FileSystemTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function test_is_hifsa_identifies_folder_with_blob_file(): void
+    {
+        $directory = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'analysis',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $directory->id,
+            'name' => 'wolf2020_export.blob',
+        ]);
+
+        $directory->load('children');
+
+        $controller = app(FileSystemController::class);
+
+        $this->assertTrue($controller->isHiFSA($directory));
+    }
+
+    public function test_is_hifsa_identifies_folder_named_hifsa(): void
+    {
+        $directory = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'HiFSA',
+        ]);
+
+        $directory->load('children');
+
+        $controller = app(FileSystemController::class);
+
+        $this->assertTrue($controller->isHiFSA($directory));
+    }
+
+    public function test_is_hifsa_returns_false_for_regular_folder(): void
+    {
+        $directory = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'raw',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $directory->id,
+            'name' => 'spectrum.jdx',
+        ]);
+
+        $directory->load('children');
+
+        $controller = app(FileSystemController::class);
+
+        $this->assertFalse($controller->isHiFSA($directory));
+    }
+
+    public function test_is_processed_data_identifies_proc_and_processed_folders(): void
+    {
+        $controller = app(FileSystemController::class);
+
+        foreach (['proc', 'Processed'] as $name) {
+            $directory = FileSystemObject::factory()->directory()->create([
+                'draft_id' => $this->draft->id,
+                'name' => $name,
+            ]);
+
+            $directory->load('children');
+
+            $this->assertTrue($controller->isProcessedData($directory));
+        }
+    }
+
+    public function test_is_processed_data_returns_false_for_other_folders(): void
+    {
+        $directory = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'raw',
+        ]);
+
+        $directory->load('children');
+
+        $controller = app(FileSystemController::class);
+
+        $this->assertFalse($controller->isProcessedData($directory));
+    }
+
+    public function test_process_folder_skips_hifsa_folder(): void
+    {
+        $parentFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'level' => 0,
+            'model_type' => null,
+        ]);
+
+        $hifsaFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $parentFolder->id,
+            'level' => 1,
+            'name' => 'hifsa',
+        ]);
+
+        $jcampInsideHifsa = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $hifsaFolder->id,
+            'name' => 'analysis.jdx',
+        ]);
+
+        $hifsaFolder->load('children');
+        $parentFolder->load('children.children');
+
+        $controller = app(FileSystemController::class);
+        $controller->processFolder($parentFolder->children);
+
+        $hifsaFolder->refresh();
+        $this->assertEquals('hifsa', $hifsaFolder->instrument_type);
+
+        $parentFolder->refresh();
+        $this->assertNull($parentFolder->model_type);
+
+        $jcampInsideHifsa->refresh();
+        $this->assertNull($jcampInsideHifsa->instrument_type);
+    }
+
+    public function test_process_folder_skips_proc_folder(): void
+    {
+        $parentFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'level' => 0,
+            'model_type' => null,
+        ]);
+
+        $procFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $parentFolder->id,
+            'level' => 1,
+            'name' => 'proc',
+        ]);
+
+        $jcampInsideProc = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $procFolder->id,
+            'name' => 'processed.jdx',
+        ]);
+
+        $procFolder->load('children');
+        $parentFolder->load('children.children');
+
+        $controller = app(FileSystemController::class);
+        $controller->processFolder($parentFolder->children);
+
+        $procFolder->refresh();
+        $this->assertEquals('processed', $procFolder->instrument_type);
+
+        $parentFolder->refresh();
+        $this->assertNull($parentFolder->model_type);
+
+        $jcampInsideProc->refresh();
+        $this->assertNull($jcampInsideProc->instrument_type);
+    }
+
+    public function test_process_folder_single_sample_with_raw_proc_hifsa(): void
+    {
+        $sampleFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'level' => 0,
+            'name' => 'Compound',
+            'model_type' => null,
+        ]);
+
+        $rawFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $sampleFolder->id,
+            'level' => 1,
+            'name' => 'raw',
+        ]);
+
+        $brukerFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $rawFolder->id,
+            'level' => 2,
+            'name' => '10',
+        ]);
+
+        foreach (['acqus', 'acqu', 'pdata'] as $name) {
+            FileSystemObject::factory()->file()->create([
+                'draft_id' => $this->draft->id,
+                'parent_id' => $brukerFolder->id,
+                'name' => $name,
+            ]);
+        }
+
+        $procFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $sampleFolder->id,
+            'level' => 1,
+            'name' => 'proc',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $procFolder->id,
+            'name' => 'processed.jdx',
+        ]);
+
+        $hifsaFolder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $sampleFolder->id,
+            'level' => 1,
+            'name' => 'hifsa',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $hifsaFolder->id,
+            'name' => 'analysis.blob',
+        ]);
+
+        $sampleFolder->load('children.children.children');
+
+        $controller = app(FileSystemController::class);
+        $controller->processFolder($sampleFolder->children);
+
+        $studyCount = FileSystemObject::where('draft_id', $this->draft->id)
+            ->where('model_type', 'study')
+            ->count();
+
+        $this->assertEquals(1, $studyCount);
+
+        $rawFolder->refresh();
+        $this->assertEquals('study', $rawFolder->model_type);
+
+        $brukerFolder->refresh();
+        $this->assertEquals('bruker', $brukerFolder->instrument_type);
+
+        $procFolder->refresh();
+        $this->assertEquals('processed', $procFolder->instrument_type);
+
+        $hifsaFolder->refresh();
+        $this->assertEquals('hifsa', $hifsaFolder->instrument_type);
+    }
+
     public function test_is_varian_identifies_varian_folder(): void
     {
         $directory = FileSystemObject::factory()->directory()->create([

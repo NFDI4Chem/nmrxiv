@@ -18,6 +18,8 @@ class ProcessELNSpectraTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const PARSER_URL = 'https://nmrkit.example/latest/spectra/parse/url';
+
     private Project $project;
 
     private Study $study;
@@ -25,6 +27,8 @@ class ProcessELNSpectraTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => self::PARSER_URL]);
 
         $user = User::factory()->create();
         $this->project = Project::factory()->create([
@@ -113,7 +117,7 @@ class ProcessELNSpectraTest extends TestCase
         ];
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response($mockResponse, 200),
+            self::PARSER_URL => Http::response($mockResponse, 200),
         ]);
 
         Log::shouldReceive('info')->atLeast()->once();
@@ -148,7 +152,7 @@ class ProcessELNSpectraTest extends TestCase
         ];
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response($mockResponse, 200),
+            self::PARSER_URL => Http::response($mockResponse, 200),
         ]);
 
         Log::shouldReceive('info')->atLeast()->once();
@@ -187,7 +191,7 @@ class ProcessELNSpectraTest extends TestCase
         ];
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response($mockResponse, 200),
+            self::PARSER_URL => Http::response($mockResponse, 200),
         ]);
 
         Log::shouldReceive('info')->atLeast()->once();
@@ -208,7 +212,7 @@ class ProcessELNSpectraTest extends TestCase
         $this->study->save();
 
         Http::fake([
-            'https://nodejs.nmrxiv.org/spectra-parser' => Http::response([
+            self::PARSER_URL => Http::response([
                 'data' => [
                     'spectra' => [],
                     'version' => '1.0',
@@ -223,10 +227,107 @@ class ProcessELNSpectraTest extends TestCase
         $job->handle();
 
         Http::assertSent(function ($request) {
-            return $request->url() === 'https://nodejs.nmrxiv.org/spectra-parser' &&
-                   $request['snapshot'] === false &&
-                   is_array($request['urls']);
+            return $request->url() === self::PARSER_URL &&
+                   $request['capture_snapshot'] === false &&
+                   $request['url'] === 'https://example.com/test-spectra.zip';
         });
+    }
+
+    public function test_handle_logs_error_when_parser_url_not_configured(): void
+    {
+        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => '']);
+
+        $this->study->download_url = 'https://example.com/spectra.zip';
+        $this->study->save();
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('NMRKit spectra parser URL is not configured.');
+        Log::shouldReceive('info')->atLeast()->once();
+        Log::shouldReceive('warning')->atLeast()->once();
+
+        $job = new ProcessELNSpectra($this->project->id);
+        $job->handle();
+
+        $this->study->refresh();
+        $this->assertFalse($this->study->has_nmrium);
+    }
+
+    public function test_handle_logs_error_when_api_returns_unsuccessful_response(): void
+    {
+        $this->study->download_url = 'https://example.com/spectra.zip';
+        $this->study->save();
+
+        Http::fake([
+            self::PARSER_URL => Http::response('Server error', 500),
+        ]);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(function ($message) {
+                return str_contains($message, 'Spectra processing service returned error: 500');
+            });
+        Log::shouldReceive('info')->atLeast()->once();
+        Log::shouldReceive('warning')->atLeast()->once();
+
+        $job = new ProcessELNSpectra($this->project->id);
+        $job->handle();
+
+        $this->study->refresh();
+        $this->assertFalse($this->study->has_nmrium);
+    }
+
+    public function test_handle_skips_study_when_api_returns_invalid_data(): void
+    {
+        $this->study->download_url = 'https://example.com/spectra.zip';
+        $this->study->save();
+
+        Http::fake([
+            self::PARSER_URL => Http::response([
+                'nmriumState' => [
+                    'data' => 'not-an-array',
+                ],
+            ], 200),
+        ]);
+
+        Log::shouldReceive('info')->atLeast()->once();
+        Log::shouldReceive('warning')->atLeast()->once();
+
+        $job = new ProcessELNSpectra($this->project->id);
+        $job->handle();
+
+        $this->study->refresh();
+        $this->assertFalse($this->study->has_nmrium);
+    }
+
+    public function test_handle_processes_nmrium_state_wrapped_response_with_top_level_version(): void
+    {
+        $this->study->download_url = 'https://example.com/spectra.zip';
+        $this->study->save();
+
+        Http::fake([
+            self::PARSER_URL => Http::response([
+                'nmriumState' => [
+                    'data' => [
+                        'spectra' => [
+                            ['id' => '1', 'info' => ['experiment' => '1H']],
+                        ],
+                    ],
+                    'version' => '4.0',
+                ],
+            ], 200),
+        ]);
+
+        Log::shouldReceive('info')->atLeast()->once();
+
+        $job = new ProcessELNSpectra($this->project->id);
+        $job->handle();
+
+        $this->study->refresh();
+        $this->assertTrue($this->study->has_nmrium);
+
+        $nmriumData = json_decode($this->study->nmrium->nmrium_info, true);
+        $this->assertEquals('4.0', $nmriumData['version']);
     }
 
     public function test_it_can_be_pushed_to_different_queues(): void
