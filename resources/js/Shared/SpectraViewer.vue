@@ -30,6 +30,12 @@
                 </div>
             </div>
         </div>
+        <div class="mb-2 clearfix">
+            <DefaultSpectrumTabSelect
+                v-if="!viewerLoading"
+                @changed="onDefaultSpectrumTabChanged"
+            />
+        </div>
         <iframe
             name="NMRiumIframe"
             frameborder="0"
@@ -290,10 +296,18 @@
 
 <script>
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
+import DefaultSpectrumTabSelect from "./DefaultSpectrumTabSelect.vue";
+import {
+    getDefaultSpectrumTab,
+    postNmriumLoad,
+    requestSelectTab,
+    resolveNmriumTargetOrigin,
+} from "@/Utils/nmriumTabPreference.js";
 
 export default {
     components: {
         ExclamationTriangleIcon,
+        DefaultSpectrumTabSelect,
     },
     props: {
         dataset: {
@@ -323,6 +337,9 @@ export default {
             selectedSpectraData: null,
             currentMolecules: [],
             info: null,
+            defaultTabApplied: false,
+            nmriumMessageHandler: null,
+            viewerLoading: false,
         };
     },
     computed: {
@@ -344,12 +361,101 @@ export default {
         //     },
         // },
     },
+    mounted() {
+        this.attachNmriumMessageListener();
+    },
+    beforeUnmount() {
+        this.detachNmriumMessageListener();
+    },
     methods: {
+        attachNmriumMessageListener() {
+            if (this.nmriumMessageHandler) {
+                return;
+            }
+
+            this.nmriumMessageHandler = (event) => {
+                this.handleNmriumWindowMessage(event);
+            };
+            window.addEventListener("message", this.nmriumMessageHandler);
+        },
+        detachNmriumMessageListener() {
+            if (!this.nmriumMessageHandler) {
+                return;
+            }
+
+            window.removeEventListener("message", this.nmriumMessageHandler);
+            this.nmriumMessageHandler = null;
+        },
+        isAllowedNmriumOrigin(origin) {
+            const allowed = [
+                resolveNmriumTargetOrigin(this.$page.props.nmriumURL),
+                "https://nmriumdev.nmrxiv.org",
+                "https://nmrium.nmrxiv.org",
+            ];
+
+            return allowed.includes(origin);
+        },
+        handleNmriumWindowMessage(event) {
+            const { data, type } = event.data ?? {};
+
+            if (!this.isAllowedNmriumOrigin(event.origin)) {
+                return;
+            }
+
+            if (type === "nmr-wrapper:error") {
+                this.spectraError = data;
+                this.updateLoadingStatus(false);
+
+                return;
+            }
+
+            if (type !== "nmr-wrapper:data-change" || data?.source !== "data") {
+                return;
+            }
+
+            const state = data.state;
+            const actionType = state?.data?.actionType;
+
+            if (actionType === "INITIATE" && state?.data?.spectra?.length > 0) {
+                this.applyDefaultSpectrumTab();
+                this.updateLoadingStatus(false);
+            }
+        },
+        nmriumTargetOrigin() {
+            return resolveNmriumTargetOrigin(this.$page.props.nmriumURL);
+        },
+        applyDefaultSpectrumTab() {
+            const tab = getDefaultSpectrumTab(this.$page);
+            if (!tab || this.defaultTabApplied) {
+                return;
+            }
+
+            this.defaultTabApplied = true;
+            requestSelectTab(
+                window.frames.NMRiumIframe,
+                tab,
+                this.nmriumTargetOrigin()
+            );
+        },
+        onDefaultSpectrumTabChanged() {
+            this.defaultTabApplied = false;
+            this.applyDefaultSpectrumTab();
+        },
+        postLoadToIframe(iframe, payload) {
+            this.defaultTabApplied = false;
+            postNmriumLoad(
+                iframe,
+                payload,
+                this.nmriumTargetOrigin(),
+                getDefaultSpectrumTab(this.$page)
+            );
+        },
         loadSpectra() {
             if (this.study) {
                 const iframe = window.frames.NMRiumIframe;
                 this.spectraError = null;
                 this.currentMolecules = [];
+                this.defaultTabApplied = false;
                 this.updateLoadingStatus(true);
 
                 if (iframe) {
@@ -360,14 +466,10 @@ export default {
                             .then((response) => {
                                 let nmrium_info = response.data;
                                 if (nmrium_info) {
-                                    let data = {
+                                    this.postLoadToIframe(iframe, {
                                         data: nmrium_info,
                                         type: "nmrium",
-                                    };
-                                    iframe.postMessage(
-                                        { type: `nmr-wrapper:load`, data },
-                                        "*"
-                                    );
+                                    });
                                 } else {
                                     let urls = [];
                                     urls.push(this.study.download_url);
@@ -384,14 +486,10 @@ export default {
                                 .then((response) => {
                                     let nmrium_info = response.data;
                                     if (nmrium_info) {
-                                        let data = {
+                                        this.postLoadToIframe(iframe, {
                                             data: nmrium_info,
                                             type: "nmrium",
-                                        };
-                                        iframe.postMessage(
-                                            { type: `nmr-wrapper:load`, data },
-                                            "*"
-                                        );
+                                        });
                                     } else {
                                         let urls = [];
                                         urls.push(this.study.download_url);
@@ -412,11 +510,10 @@ export default {
         loadFromURL(urls) {
             this.infoLog("Loading Spectra from URL..");
             const iframe = window.frames.NMRiumIframe;
-            let data = {
+            this.postLoadToIframe(iframe, {
                 data: urls,
                 type: "url",
-            };
-            iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+            });
         },
         loadMol(molFile) {
             let svgString = null;
@@ -435,6 +532,7 @@ export default {
             }
         },
         updateLoadingStatus(status) {
+            this.viewerLoading = status === true;
             this.$emit("loading", status);
         },
         infoLog(message, reset) {
