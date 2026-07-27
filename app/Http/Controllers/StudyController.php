@@ -184,13 +184,15 @@ class StudyController extends Controller
                     ],
                     'file' => [
                         'name' => '/',
-                        'children' => FileSystemObject::with('children')
-                            ->where([
-                                ['study_id', $study->id],
-                                ['level', $studyFSObject->level],
-                            ])
-                            ->orderBy('type')
-                            ->get(),
+                        'children' => $studyFSObject
+                            ? FileSystemObject::with('children')
+                                ->where([
+                                    ['study_id', $study->id],
+                                    ['level', $studyFSObject->level],
+                                ])
+                                ->orderBy('type')
+                                ->get()
+                            : collect(),
                     ],
                 ]);
                 break;

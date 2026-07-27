@@ -38,10 +38,7 @@ class StudyAuthorizationTest extends TestCase
         ]);
 
         // Create filesystem object for the study
-        FileSystemObject::factory()->forStudy($this->study)->directory()->create([
-            'level' => 0,
-            'is_root' => true,
-        ]);
+        FileSystemObject::factory()->asStudyRoot($this->study)->create();
 
         // Set up roles
         $this->study->users()->attach($this->owner, ['role' => 'creator']);

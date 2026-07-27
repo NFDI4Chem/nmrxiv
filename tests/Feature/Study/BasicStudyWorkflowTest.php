@@ -285,10 +285,7 @@ class BasicStudyWorkflowTest extends TestCase
         ]);
 
         // Create a filesystem object for the study
-        FileSystemObject::factory()->forStudy($study)->directory()->create([
-            'level' => 0,
-            'is_root' => true,
-        ]);
+        FileSystemObject::factory()->asStudyRoot($study)->create();
 
         $this->actingAs($this->user)
             ->get(route('dashboard.study.files', $study))
