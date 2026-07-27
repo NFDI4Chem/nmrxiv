@@ -25,7 +25,10 @@ Schedule::command('nmrxiv:index-spectra-metadata-stats')->daily();
 Schedule::command('nmrxiv:delete-citations')->weekly();
 Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {
-    Schedule::command('nmrxiv:backup-postgres-dump')->daily();
+    Schedule::command('nmrxiv:backup-postgres-dump')
+        ->daily()
+        ->onOneServer()
+        ->withoutOverlapping();
 }
 Schedule::command('nmrxiv:backup-cleanup')->monthly()->onOneServer();
 Schedule::command('nmrxiv:repair-missing-compound-info')
