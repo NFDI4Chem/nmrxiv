@@ -377,6 +377,8 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.sample-folder.reset');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
+        Route::get('drafts/{draft}/hifsa/{filesystemobject}', [DraftController::class, 'hifsaFile'])
+            ->name('dashboard.draft.hifsa');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
             ->name('dashboard.draft.process');
         Route::post('drafts/{draft}/complete', [DraftController::class, 'complete'])
