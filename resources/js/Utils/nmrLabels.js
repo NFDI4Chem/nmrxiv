@@ -81,6 +81,20 @@ export function formatTemperatureLabel(value) {
     return `${normalized} K`;
 }
 
+export function formatManufacturerLabel(value) {
+    if (value === null || value === undefined || value === "") {
+        return "";
+    }
+
+    const normalized = String(value).trim();
+
+    if (normalized.toLowerCase() === "jcamp") {
+        return "Generic (JCAMP)";
+    }
+
+    return normalized;
+}
+
 export function formatDistributionLabel(value, format = "default") {
     if (format === "nucleus") {
         return formatNmrIsotopeLabel(value);
@@ -96,6 +110,10 @@ export function formatDistributionLabel(value, format = "default") {
 
     if (format === "temperature") {
         return formatTemperatureLabel(value);
+    }
+
+    if (format === "manufacturer") {
+        return formatManufacturerLabel(value);
     }
 
     return value === null || value === undefined ? "" : String(value);

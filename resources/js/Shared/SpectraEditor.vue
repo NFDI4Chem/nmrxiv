@@ -232,6 +232,14 @@ export default {
             silentPreviewAttemptedFor: markRaw(new Set()),
             /** True while the in-flight blob save should suppress the visible "Saved" banner. */
             previewSilent: false,
+            /**
+             * False while NMRium is still hydrating after a load/reset. Internal
+             * data-change events during this window must not fan out chemistry
+             * standardize requests for every embedded molecule.
+             */
+            nmriumLoadSettled: false,
+            /** Per-session molfile -> standardize response promise. */
+            standardizeRequestCache: markRaw(new Map()),
         };
     },
     computed: {
@@ -486,6 +494,7 @@ export default {
                             dbg(
                                 "INITIATE on existing nmrium -> skip storing payload (avoids Vue deep-reactivity on huge NMRium state)"
                             );
+                            this.nmriumLoadSettled = true;
                             this.updateLoadingStatus(false);
                             this.applyDefaultSpectrumTab();
 
@@ -611,6 +620,7 @@ export default {
                 dbg(
                     `handoff fired after ${NMRIUM_HANDOFF_MS}ms -> hiding parent overlay (NMRium continues internally)`
                 );
+                this.nmriumLoadSettled = true;
                 this.updateLoadingStatus(false);
             }, NMRIUM_HANDOFF_MS);
         },
@@ -681,6 +691,7 @@ export default {
                 has_nmrium: this.study?.has_nmrium,
                 iframeReady: this.iframeReady,
             });
+            this.nmriumLoadSettled = false;
             const iframe = window.frames.submissionNMRiumIframe;
             this.spectraError = null;
             this.spectraErrorsCollapsed = true;
@@ -828,6 +839,9 @@ export default {
          */
         updateStudyNMRiumInfo(options) {
             const silent = !!(options && options.silent);
+            const shouldSyncMolecules =
+                options?.syncMolecules !== false &&
+                (!silent || this.nmriumLoadSettled);
             if (this.study != null && this.selectedSpectraData) {
                 let _version = this.version ? this.version : 4;
                 const t0 = performance.now();
@@ -848,9 +862,11 @@ export default {
                         this.infoLog("Spectra saved successfully", true);
                         this.study.has_nmrium = response.data.has_nmrium;
                         this.nmriumInfoCache.delete(this.study.id);
-                        this.syncMissingMolecules(
-                            this.selectedSpectraData.molecules
-                        );
+                        if (shouldSyncMolecules) {
+                            this.syncMissingMolecules(
+                                this.selectedSpectraData.molecules
+                            );
+                        }
                     })
                     .catch((err) => {
                         const dur = (performance.now() - t0).toFixed(0);
@@ -880,6 +896,20 @@ export default {
             }
             return mol;
         },
+        requestStandardizedMolecule(molfile) {
+            const key = String(molfile ?? "").trim();
+            if (!key) {
+                return Promise.reject(new Error("Empty molfile"));
+            }
+            if (this.standardizeRequestCache.has(key)) {
+                return this.standardizeRequestCache.get(key);
+            }
+            const promise = axios
+                .post(this.chemistryStandardizeUrl, key)
+                .then((response) => response.data);
+            this.standardizeRequestCache.set(key, promise);
+            return promise;
+        },
         /**
          * Standardize and persist any new molecules from NMRium that are not
          * already linked to this study. Uses InChI as the equality key (after
@@ -902,13 +932,11 @@ export default {
             molecules.forEach((mol, idx) => {
                 mol = this.fixLineError(mol);
                 const tStandardize = performance.now();
-                axios
-                    .post(this.chemistryStandardizeUrl, mol.molfile)
-                    .then((res) => {
+                this.requestStandardizedMolecule(mol.molfile)
+                    .then((_mol) => {
                         const stdDur = (
                             performance.now() - tStandardize
                         ).toFixed(0);
-                        const _mol = res.data;
                         if (knownInchis.has(_mol.inchi)) {
                             dbg(
                                 `mol[${idx}] standardize ${stdDur}ms -> already known, skipping POST /molecule`

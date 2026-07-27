@@ -268,4 +268,86 @@ class BioschemasHelperGetNMRiumInfoTest extends TestCase
         $this->assertNull($info);
         $this->assertFalse((bool) $dataset->fresh()->has_nmrium);
     }
+
+    public function test_partial_fs_object_eager_load_can_false_positive_study_match(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+        ]);
+
+        $studyRootFs = FileSystemObject::factory()->directory()->create([
+            'name' => 'StudyRoot',
+            'relative_url' => '/StudyRoot',
+            'study_id' => null,
+            'project_id' => $project->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+            'project_id' => $project->id,
+            'fs_id' => $studyRootFs->id,
+        ]);
+
+        $studyRootFs->update(['study_id' => $study->id]);
+
+        $datasetFs = FileSystemObject::factory()->directory()->create([
+            'name' => 'proton',
+            'relative_url' => '/StudyRoot/stored-alias',
+            'parent_id' => $studyRootFs->id,
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+            'project_id' => $project->id,
+            'study_id' => $study->id,
+            'fs_id' => $datasetFs->id,
+            'has_nmrium' => false,
+        ]);
+
+        NMRium::factory()->forStudy($study)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'sourceSelector' => [
+                                'files' => [
+                                    'https://example.org/files/StudyRoot/proton/acqus',
+                                ],
+                            ],
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataset->load(['fsObject', 'study.fsObject', 'study.nmrium']);
+
+        $this->assertNull(BioschemasHelper::getNMRiumInfo($dataset));
+
+        $dataset->unsetRelation('fsObject');
+        $dataset->setRelation(
+            'fsObject',
+            FileSystemObject::query()->select(['id', 'name'])->findOrFail($datasetFs->id),
+        );
+
+        $info = BioschemasHelper::getNMRiumInfo($dataset);
+
+        $this->assertNotNull($info);
+        $this->assertSame('CDCl3', $info->solvent);
+    }
 }

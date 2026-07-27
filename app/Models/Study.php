@@ -70,6 +70,7 @@ class Study extends Model implements Auditable
         'metadata_bagit_generation_logs',
         'has_nmrium',
         'has_nmredata',
+        'hifsa_data',
     ];
 
     /**
@@ -82,6 +83,7 @@ class Study extends Model implements Auditable
             'molecules' => 'array',
             'processing_logs' => 'array',
             'metadata_bagit_generation_logs' => 'array',
+            'hifsa_data' => 'array',
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'is_archived' => 'boolean',

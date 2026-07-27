@@ -345,23 +345,41 @@ class SearchController extends Controller
      *             @OA\Property(
      *                 property="distributions",
      *                 type="object",
+     *                 @OA\Property(property="dimension", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="nucleus", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="solvent", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="experiment", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="experiment_category", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="measuring_frequency_mhz", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="manufacturer", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="temperature_k", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="pulse_sequence", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="tube_diameter_mm", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="number_of_scans", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="probe_type", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
+     *                 @OA\Property(property="instrument_model", type="array", @OA\Items(ref="#/components/schemas/MetadataStatsBucket")),
      *                 @OA\Property(
-     *                     property="dimension",
+     *                     property="dimension_experiment_breakdown",
      *                     type="array",
      *
-     *                     @OA\Items(
-     *                         type="object",
-     *
-     *                         @OA\Property(property="value", type="string", example="1D"),
-     *                         @OA\Property(property="count", type="integer", example=800)
-     *                     )
+     *                     @OA\Items(ref="#/components/schemas/MetadataStatsDimensionExperimentGroup")
      *                 ),
-     *                 @OA\Property(property="nucleus", type="array", @OA\Items(type="object")),
-     *                 @OA\Property(property="solvent", type="array", @OA\Items(type="object")),
-     *                 @OA\Property(property="experiment", type="array", @OA\Items(type="object")),
-     *                 @OA\Property(property="measuring_frequency_mhz", type="array", @OA\Items(type="object"))
+     *
+     *                 @OA\Property(
+     *                     property="nucleus_measuring_frequency_mhz",
+     *                     type="array",
+     *
+     *                     @OA\Items(ref="#/components/schemas/MetadataStatsNucleusFrequencyGroup")
+     *                 )
      *             ),
-     *             @OA\Property(property="missing", type="object", description="Indexed spectra lacking each metadata field")
+     *
+     *             @OA\Property(
+     *                 property="missing",
+     *                 type="object",
+     *                 description="Indexed spectra lacking each metadata field, keyed by distribution name",
+     *
+     *                 @OA\AdditionalProperties(type="integer")
+     *             )
      *         )
      *     ),
      *

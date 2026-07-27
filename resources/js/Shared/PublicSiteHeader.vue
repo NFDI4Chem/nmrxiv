@@ -44,12 +44,24 @@
                         $page.props.auth.user &&
                         $page.props.auth.user?.first_name != null
                     "
-                    class="hidden md:flex items-center"
+                    class="hidden md:flex items-center gap-2"
                 >
+                    <Link :href="'/dashboard'" :class="authLinkClass">
+                        Dashboard
+                    </Link>
                     <NavDepositDataLink />
                 </div>
                 <div v-else class="hidden md:flex items-center gap-2">
-                    <Link :href="'/login'" :class="authLinkClass"> Login </Link>
+                    <Link
+                        v-if="$page.props.auth.user"
+                        :href="'/dashboard'"
+                        :class="authLinkClass"
+                    >
+                        Dashboard
+                    </Link>
+                    <Link v-else :href="'/login'" :class="authLinkClass">
+                        Login
+                    </Link>
                     <NavDepositDataLink />
                 </div>
             </div>
@@ -111,10 +123,17 @@
                             <div class="mt-6">
                                 <NavDepositDataLink full-width />
                                 <p
-                                    v-if="!$page.props.auth.user"
                                     class="mt-5 text-center text-[0.9375rem] font-medium text-gray-500"
                                 >
                                     <Link
+                                        v-if="$page.props.auth.user"
+                                        href="/dashboard"
+                                        class="text-gray-900 hover:text-gray-700 transition-colors"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        v-else
                                         href="/login"
                                         class="text-gray-900 hover:text-gray-700 transition-colors"
                                     >

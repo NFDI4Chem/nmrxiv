@@ -234,6 +234,75 @@ class DatasetSpectraInfoExtractorTest extends TestCase
         $this->assertSame('JEOL', $payload['spectra_manufacturer']);
     }
 
+    public function test_extract_uses_nmrium_vendor_when_folder_only_identifies_jcamp(): void
+    {
+        $dataset = $this->makeDataset();
+
+        $folder = FileSystemObject::factory()->directory()->create([
+            'study_id' => $dataset->study_id,
+            'instrument_type' => 'jcamp',
+        ]);
+
+        $dataset->update(['fs_id' => $folder->id]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H'],
+                                'experiment' => 'proton',
+                                'manufacturer' => 'Bruker',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataset->refresh();
+
+        $payload = $this->extractor->extractForDataset($dataset);
+
+        $this->assertSame('Bruker', $payload['spectra_manufacturer']);
+    }
+
+    public function test_extract_falls_back_to_jcamp_when_no_vendor_metadata(): void
+    {
+        $dataset = $this->makeDataset();
+
+        $folder = FileSystemObject::factory()->directory()->create([
+            'study_id' => $dataset->study_id,
+            'instrument_type' => 'jcamp',
+        ]);
+
+        $dataset->update(['fs_id' => $folder->id]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H'],
+                                'experiment' => 'proton',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataset->refresh();
+
+        $payload = $this->extractor->extractForDataset($dataset);
+
+        $this->assertSame('JCAMP', $payload['spectra_manufacturer']);
+    }
+
     public function test_extract_returns_empty_payload_when_no_nmrium_info(): void
     {
         $dataset = $this->makeDataset();

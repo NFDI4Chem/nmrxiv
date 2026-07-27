@@ -59,4 +59,44 @@ class ApiDocumentationTest extends TestCase
         $this->assertSame('searchMetadataFacets', $spec['paths']['/api/v1/search/metadata/facets']['get']['operationId']);
         $this->assertSame('searchMetadataStats', $spec['paths']['/api/v1/search/metadata/stats']['get']['operationId']);
     }
+
+    public function test_openapi_spec_documents_all_stats_distributions(): void
+    {
+        $specPath = storage_path('api-docs/api-docs.json');
+
+        if (! is_file($specPath)) {
+            $this->markTestSkipped('OpenAPI spec file is not present.');
+        }
+
+        $spec = json_decode((string) file_get_contents($specPath), true, 512, JSON_THROW_ON_ERROR);
+
+        $statsResponse = $spec['paths']['/api/v1/search/metadata/stats']['get']['responses']['200'];
+        $distributions = $statsResponse['content']['application/json']['schema']['properties']['distributions']['properties'];
+
+        $expectedDistributions = [
+            'dimension',
+            'nucleus',
+            'solvent',
+            'experiment',
+            'experiment_category',
+            'measuring_frequency_mhz',
+            'manufacturer',
+            'temperature_k',
+            'pulse_sequence',
+            'tube_diameter_mm',
+            'number_of_scans',
+            'probe_type',
+            'instrument_model',
+            'dimension_experiment_breakdown',
+            'nucleus_measuring_frequency_mhz',
+        ];
+
+        foreach ($expectedDistributions as $key) {
+            $this->assertArrayHasKey($key, $distributions, "Stats endpoint docs are missing the `{$key}` distribution.");
+        }
+
+        $this->assertArrayHasKey('MetadataStatsBucket', $spec['components']['schemas']);
+        $this->assertArrayHasKey('MetadataStatsDimensionExperimentGroup', $spec['components']['schemas']);
+        $this->assertArrayHasKey('MetadataStatsNucleusFrequencyGroup', $spec['components']['schemas']);
+    }
 }
