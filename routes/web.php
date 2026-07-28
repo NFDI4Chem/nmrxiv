@@ -20,6 +20,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\FundingReferenceController;
+use App\Http\Controllers\InteractionTrackingController;
 use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
@@ -131,6 +132,11 @@ Route::get('/project/{id}', [ApplicationController::class, 'resolveProject'])->w
 
 Route::get('/dataset/{id}', [ApplicationController::class, 'resolveDataset'])->where('id', '(D|d)[0-9]+')
     ->name('public.dataset.id');
+
+Route::post('/track/download/{identifier}', [InteractionTrackingController::class, 'trackDownload'])
+    ->middleware('throttle:30,1')
+    ->where('identifier', '(P|p|S|s|D|d)[0-9]+')
+    ->name('track.download');
 
 Route::get('/dataset/{dataset}/nmriumInfo', [DatasetController::class, 'fetchPublicNMRium'])
     ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
