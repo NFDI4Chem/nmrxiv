@@ -20,6 +20,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\FundingReferenceController;
+use App\Http\Controllers\InteractionTrackingController;
 use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
@@ -34,6 +35,7 @@ use App\Http\Controllers\StudyMemberController;
 use App\Http\Controllers\SupportBubbleController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\UserPreferencesController;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
@@ -131,6 +133,11 @@ Route::get('/project/{id}', [ApplicationController::class, 'resolveProject'])->w
 Route::get('/dataset/{id}', [ApplicationController::class, 'resolveDataset'])->where('id', '(D|d)[0-9]+')
     ->name('public.dataset.id');
 
+Route::post('/track/download/{identifier}', [InteractionTrackingController::class, 'trackDownload'])
+    ->middleware('throttle:30,1')
+    ->where('identifier', '(P|p|S|s|D|d)[0-9]+')
+    ->name('track.download');
+
 Route::get('/dataset/{dataset}/nmriumInfo', [DatasetController::class, 'fetchPublicNMRium'])
     ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
     ->name('public.dataset.nmrium');
@@ -197,6 +204,10 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::post('/primer/skip', [DashboardController::class, 'skipPrimer'])
         ->name('primer.skip');
+
+    Route::put('/user/preferences', [UserPreferencesController::class, 'update'])
+        ->middleware('throttle:30,1')
+        ->name('user.preferences.update');
 
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
         ->name('project.status');
@@ -328,6 +339,8 @@ Route::middleware('auth', 'verified')->group(function () {
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
+        Route::put('studies/{study}/mixture-composition', [StudyController::class, 'mixtureCompositionUpdate'])
+            ->name('study-mixture-composition.update');
         Route::delete('studies/{study}/molecule/{molecule}', [StudyController::class, 'moleculeDetach'])
             ->name('study-molecule.delete');
 

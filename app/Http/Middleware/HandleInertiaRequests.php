@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\DefaultSpectrumDimension;
+use App\Enums\DefaultSpectrumTab;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -91,6 +93,9 @@ class HandleInertiaRequests extends Middleware
             'CM_API' => config('external-links.cm_api'),
             'CROSSREF_API' => config('external-links.crossref_api'),
             'DATACITE_API' => config('external-links.datacite_api'),
+            'defaultSpectrumTabs' => DefaultSpectrumTab::values(),
+            'defaultSpectrumTabs1D' => DefaultSpectrumTab::valuesForDimension(DefaultSpectrumDimension::OneD),
+            'defaultSpectrumTabs2D' => DefaultSpectrumTab::valuesForDimension(DefaultSpectrumDimension::TwoD),
         ]);
     }
 }

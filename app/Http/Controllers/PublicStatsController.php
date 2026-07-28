@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\PublicMetadataSearchService;
+use App\Support\Public\PublicMoleculeAggregates;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,6 +22,7 @@ class PublicStatsController extends Controller
 
         return Inertia::render('Stats', [
             'statistics' => $statistics,
+            'compoundsWithSpectra' => PublicMoleculeAggregates::publicCatalogTotal(),
         ]);
     }
 }

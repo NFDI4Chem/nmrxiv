@@ -7,6 +7,7 @@ use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Sample;
 use App\Models\User;
+use App\Services\InteractionTracker;
 use App\Support\Public\PublicEntityAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,8 @@ class DatasetController extends Controller
                 'message' => 'Unauthorized',
             ], 401);
         }
+
+        app(InteractionTracker::class)->recordView($request, false, $dataset);
 
         return Inertia::render('Public/Dataset', [
             'dataset' => $dataset,

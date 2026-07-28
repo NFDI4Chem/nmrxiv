@@ -188,6 +188,23 @@ SQL;
     }
 
     /**
+     * Total molecules in the public compounds catalog (identifier + public spectra).
+     */
+    public static function publicCatalogTotal(): int
+    {
+        $exists = self::hasPublicSpectraExistsSql('molecules.id');
+
+        return self::countIds(
+            'FROM molecules',
+            "WHERE molecules.identifier IS NOT NULL AND {$exists}",
+            'molecules.id',
+            [],
+            self::PUBLIC_CATALOG_TOTAL_CACHE_KEY,
+            self::PUBLIC_CATALOG_TOTAL_CACHE_SECONDS,
+        );
+    }
+
+    /**
      * @param  Builder<Molecule>  $query
      */
     public static function scopePublicCatalog(Builder $query): Builder

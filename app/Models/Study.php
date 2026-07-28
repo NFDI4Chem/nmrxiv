@@ -70,6 +70,7 @@ class Study extends Model implements Auditable
         'metadata_bagit_generation_logs',
         'has_nmrium',
         'has_nmredata',
+        'hifsa_data',
     ];
 
     /**
@@ -82,6 +83,7 @@ class Study extends Model implements Auditable
             'molecules' => 'array',
             'processing_logs' => 'array',
             'metadata_bagit_generation_logs' => 'array',
+            'hifsa_data' => 'array',
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'is_archived' => 'boolean',
@@ -124,6 +126,11 @@ class Study extends Model implements Auditable
         }
 
         return false;
+    }
+
+    public function likesCount(): int
+    {
+        return Like::count($this);
     }
 
     /**
@@ -199,9 +206,17 @@ class Study extends Model implements Auditable
         return $this->belongsTo(Draft::class, 'draft_id');
     }
 
-    public function fsObject(): HasOne
+    /**
+     * The directory backing this study.
+     *
+     * The canonical link is `studies.fs_id -> file_system_objects.id`,
+     * set when the study is created from its root folder. Multiple child
+     * folders also carry `study_id`, so a `hasOne` on that back-pointer
+     * is ambiguous — resolve via `fs_id` instead (same pattern as Dataset).
+     */
+    public function fsObject(): BelongsTo
     {
-        return $this->hasOne(FileSystemObject::class);
+        return $this->belongsTo(FileSystemObject::class, 'fs_id');
     }
 
     public function validation(): BelongsTo

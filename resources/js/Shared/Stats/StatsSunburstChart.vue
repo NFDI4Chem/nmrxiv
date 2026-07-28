@@ -232,9 +232,7 @@ const chart = computed(() => {
                 </svg>
             </div>
 
-            <ul
-                class="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1 sm:max-h-52"
-            >
+            <ul class="min-h-0 max-h-52 flex-1 space-y-3 overflow-y-auto pr-1">
                 <li
                     v-for="group in chart.legendGroups"
                     :key="group.key"

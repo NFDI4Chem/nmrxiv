@@ -32,6 +32,9 @@ services:
     - HTTP_PROXY=${HTTP_PROXY}
     - HTTPS_PROXY=${HTTPS_PROXY}
     - NO_PROXY=${NO_PROXY}
+    - http_proxy=${HTTP_PROXY}
+    - https_proxy=${HTTPS_PROXY}
+    - no_proxy=${NO_PROXY}
     - APP_URL=https://dev.nmrxiv.org
     - TRUSTED_PROXIES="*"
     healthcheck:
@@ -71,6 +74,9 @@ services:
     - HTTP_PROXY=${HTTP_PROXY}
     - HTTPS_PROXY=${HTTPS_PROXY}
     - NO_PROXY=${NO_PROXY}
+    - http_proxy=${HTTP_PROXY}
+    - https_proxy=${HTTPS_PROXY}
+    - no_proxy=${NO_PROXY}
     healthcheck:
       test: ["CMD", "pgrep", "-f", "artisan horizon"]
       interval: 10s

@@ -9,6 +9,9 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\SpectraMetadataStatsIndex;
 use App\Models\Study;
+use App\Support\Nmr\ExperimentCategoryClassifier;
+use App\Support\Nmr\ProbeClassifier;
+use App\Support\Nmr\SpectrometerFrequencyBinner;
 use App\Support\Search\PublicDatasetScope;
 use App\Support\Search\TextSearchNormalizer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -260,6 +263,35 @@ class PublicMetadataSearchService
                 ->count(),
         );
 
+        $distributions['experiment_category'] = $this->experimentCategoryDistribution(
+            $criteria,
+            $freeTextTokens,
+            $effectiveLimit,
+        );
+        $missing['experiment_category'] = max(
+            0,
+            $spectraIndexed - (clone $indexedQuery)
+                ->where(function (Builder $query): void {
+                    $query
+                        ->whereNotNull('spectra_pulse_sequence')
+                        ->orWhereNotNull('spectra_experiment')
+                        ->orWhereNotNull('spectra_nucleus');
+                })
+                ->count(),
+        );
+
+        $distributions['probe_type'] = $this->probeTypeDistribution(
+            $criteria,
+            $freeTextTokens,
+            $effectiveLimit,
+        );
+        $missing['probe_type'] = max(
+            0,
+            $spectraIndexed - (clone $indexedQuery)
+                ->whereNotNull('spectra_probe_name')
+                ->count(),
+        );
+
         return [
             'scope' => self::STATS_SCOPE_PUBLIC_INDEXED,
             'totals' => [
@@ -452,8 +484,10 @@ class PublicMetadataSearchService
         }
 
         if (filled($criteria['proton_frequency'] ?? null)) {
-            $frequency = (float) $criteria['proton_frequency'];
-            $query->whereBetween('spectra_base_frequency', [$frequency - 0.5, $frequency + 0.5]);
+            $range = SpectrometerFrequencyBinner::rangeForNominal($criteria['proton_frequency']);
+            if ($range !== null) {
+                $query->whereBetween('spectra_base_frequency', $range);
+            }
         }
 
         if (filled($criteria['nmr_method'] ?? null)) {
@@ -638,7 +672,9 @@ class PublicMetadataSearchService
         }
 
         if ($column === 'spectra_base_frequency') {
-            return (string) (int) round((float) $value);
+            $binned = SpectrometerFrequencyBinner::bin($value);
+
+            return $binned === null ? '' : (string) $binned;
         }
 
         return trim((string) $value);
@@ -665,19 +701,22 @@ class PublicMetadataSearchService
             default => $column,
         };
 
+        // Frequency bins are merged in PHP; load all rounded buckets before limiting.
+        $applySqlLimit = $limit < PHP_INT_MAX && $field !== 'measuring_frequency_mhz';
+
         $rows = $query
             ->selectRaw($bucketExpression.' as bucket, COUNT(*) as aggregate_count')
             ->whereNotNull($column)
             ->groupByRaw($bucketExpression)
             ->orderByDesc('aggregate_count');
 
-        if ($limit < PHP_INT_MAX) {
+        if ($applySqlLimit) {
             $rows->limit($limit);
         }
 
         $rows = $rows->get();
 
-        return $rows
+        $distribution = $rows
             ->map(function (object $row) use ($field): array {
                 return [
                     'value' => $this->normalizeDistributionValue($field, $row->bucket),
@@ -687,6 +726,48 @@ class PublicMetadataSearchService
             ->filter(fn (array $row): bool => $row['value'] !== '')
             ->values()
             ->all();
+
+        if ($field === 'measuring_frequency_mhz') {
+            $distribution = $this->mergeBinnedFrequencyCounts($distribution);
+            $distribution = $this->limitDistribution($distribution, $limit);
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * @param  list<array{value: string, count: int}>  $rows
+     * @return list<array{value: string, count: int}>
+     */
+    private function mergeBinnedFrequencyCounts(array $rows): array
+    {
+        /** @var array<string, int> $merged */
+        $merged = [];
+
+        foreach ($rows as $row) {
+            $binned = SpectrometerFrequencyBinner::bin($row['value']);
+            if ($binned === null) {
+                continue;
+            }
+
+            $key = (string) $binned;
+            $merged[$key] = ($merged[$key] ?? 0) + $row['count'];
+        }
+
+        $distribution = [];
+        foreach ($merged as $value => $count) {
+            $distribution[] = [
+                'value' => (string) $value,
+                'count' => $count,
+            ];
+        }
+
+        usort(
+            $distribution,
+            static fn (array $left, array $right): int => $right['count'] <=> $left['count']
+        );
+
+        return $distribution;
     }
 
     /**
@@ -716,16 +797,18 @@ class PublicMetadataSearchService
             ->orderByDesc('aggregate_count')
             ->get();
 
-        /** @var array<string, array{nucleus: string, count: int, frequencies: list<array{value: string, count: int}>}> $grouped */
+        /** @var array<string, array{nucleus: string, count: int, frequencies: array<string, int>}> $grouped */
         $grouped = [];
 
         foreach ($rows as $row) {
             $nucleus = trim((string) $row->nucleus);
-            $frequency = (string) (int) $row->frequency;
+            $binned = SpectrometerFrequencyBinner::bin($row->frequency);
 
-            if ($nucleus === '' || $frequency === '') {
+            if ($nucleus === '' || $binned === null) {
                 continue;
             }
+
+            $frequency = (string) $binned;
 
             if (! array_key_exists($nucleus, $grouped)) {
                 $grouped[$nucleus] = [
@@ -737,16 +820,130 @@ class PublicMetadataSearchService
 
             $count = (int) $row->aggregate_count;
             $grouped[$nucleus]['count'] += $count;
-            $grouped[$nucleus]['frequencies'][] = [
-                'value' => $frequency,
+            $grouped[$nucleus]['frequencies'][$frequency] = ($grouped[$nucleus]['frequencies'][$frequency] ?? 0) + $count;
+        }
+
+        $distribution = [];
+        foreach ($grouped as $group) {
+            $frequencies = [];
+            foreach ($group['frequencies'] as $value => $count) {
+                $frequencies[] = [
+                    'value' => (string) $value,
+                    'count' => $count,
+                ];
+            }
+
+            usort(
+                $frequencies,
+                static fn (array $left, array $right): int => $right['count'] <=> $left['count']
+            );
+
+            $distribution[] = [
+                'nucleus' => $group['nucleus'],
+                'count' => $group['count'],
+                'frequencies' => $frequencies,
+            ];
+        }
+
+        usort(
+            $distribution,
+            static fn (array $left, array $right): int => $right['count'] <=> $left['count']
+        );
+
+        return $this->limitDistribution($distribution, $limit);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     * @return list<array{value: string, count: int}>
+     */
+    private function experimentCategoryDistribution(
+        array $criteria,
+        array $freeTextTokens,
+        int $limit,
+    ): array {
+        $query = $this->indexedPublicDatasetQuery($criteria, $freeTextTokens);
+
+        $rows = $query
+            ->selectRaw(
+                'spectra_pulse_sequence, spectra_experiment, spectra_nucleus, spectra_dimension, COUNT(*) as aggregate_count'
+            )
+            ->where(function (Builder $builder): void {
+                $builder
+                    ->whereNotNull('spectra_pulse_sequence')
+                    ->orWhereNotNull('spectra_experiment')
+                    ->orWhereNotNull('spectra_nucleus');
+            })
+            ->groupByRaw('spectra_pulse_sequence, spectra_experiment, spectra_nucleus, spectra_dimension')
+            ->get();
+
+        /** @var array<string, int> $merged */
+        $merged = [];
+
+        foreach ($rows as $row) {
+            $category = ExperimentCategoryClassifier::classify(
+                pulseSequence: $row->spectra_pulse_sequence !== null ? (string) $row->spectra_pulse_sequence : null,
+                experiment: $row->spectra_experiment !== null ? (string) $row->spectra_experiment : null,
+                nucleus: $row->spectra_nucleus !== null ? (string) $row->spectra_nucleus : null,
+                dimension: $row->spectra_dimension !== null ? (int) $row->spectra_dimension : null,
+            );
+
+            $merged[$category] = ($merged[$category] ?? 0) + (int) $row->aggregate_count;
+        }
+
+        return $this->sortedLimitedDistribution($merged, $limit);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @param  list<string>  $freeTextTokens
+     * @return list<array{value: string, count: int}>
+     */
+    private function probeTypeDistribution(
+        array $criteria,
+        array $freeTextTokens,
+        int $limit,
+    ): array {
+        $query = $this->indexedPublicDatasetQuery($criteria, $freeTextTokens);
+
+        $rows = $query
+            ->selectRaw('spectra_probe_name as probe_name, COUNT(*) as aggregate_count')
+            ->whereNotNull('spectra_probe_name')
+            ->groupBy('spectra_probe_name')
+            ->get();
+
+        /** @var array<string, int> $merged */
+        $merged = [];
+
+        foreach ($rows as $row) {
+            $category = ProbeClassifier::classify(
+                $row->probe_name !== null ? (string) $row->probe_name : null
+            );
+            $merged[$category] = ($merged[$category] ?? 0) + (int) $row->aggregate_count;
+        }
+
+        return $this->sortedLimitedDistribution($merged, $limit);
+    }
+
+    /**
+     * @param  array<string, int>  $merged
+     * @return list<array{value: string, count: int}>
+     */
+    private function sortedLimitedDistribution(array $merged, int $limit): array
+    {
+        $distribution = [];
+        foreach ($merged as $value => $count) {
+            $distribution[] = [
+                'value' => (string) $value,
                 'count' => $count,
             ];
         }
 
-        $distribution = collect($grouped)
-            ->sortByDesc('count')
-            ->values()
-            ->all();
+        usort(
+            $distribution,
+            static fn (array $left, array $right): int => $right['count'] <=> $left['count']
+        );
 
         return $this->limitDistribution($distribution, $limit);
     }

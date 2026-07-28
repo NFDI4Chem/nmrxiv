@@ -1756,7 +1756,9 @@
                                                                             <section
                                                                                 v-if="
                                                                                     selectedStudy &&
-                                                                                    selectedStudy.hifsa_pdf_url
+                                                                                    hasHifsaPanel(
+                                                                                        selectedStudy
+                                                                                    )
                                                                                 "
                                                                                 class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                             >
@@ -1800,7 +1802,20 @@
                                                                                     role="region"
                                                                                     aria-labelledby="upload-hifsa-heading"
                                                                                 >
+                                                                                    <HifsaScoresPanel
+                                                                                        v-if="
+                                                                                            hasHifsaScores(
+                                                                                                selectedStudy
+                                                                                            )
+                                                                                        "
+                                                                                        :hifsa-data="
+                                                                                            selectedStudy.hifsa_data
+                                                                                        "
+                                                                                    />
                                                                                     <iframe
+                                                                                        v-else-if="
+                                                                                            selectedStudy.hifsa_pdf_url
+                                                                                        "
                                                                                         title="HiFSA report"
                                                                                         frameborder="0"
                                                                                         class="block w-full rounded-md border"
@@ -2228,6 +2243,7 @@
                                                                                 </div>
                                                                             </section>
                                                                         </div>
+
                                                                         <section
                                                                             class="mx-auto mt-3 max-w-7xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
                                                                         >
@@ -2926,6 +2942,11 @@
                 </div>
             </div>
         </div>
+
+        <MixtureCompositionHelpModal
+            :show="showCompositionHelpModal"
+            @close="showCompositionHelpModal = false"
+        />
     </app-layout>
 </template>
 
@@ -2936,7 +2957,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
-import { ref } from "vue";
+import { markRaw, ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import Validation from "@/Shared/Validation.vue";
@@ -2964,6 +2985,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ChemicalCompositionEditor from "@/Shared/ChemicalCompositionEditor.vue";
+import HifsaScoresPanel from "@/Shared/HifsaScoresPanel.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
@@ -2978,6 +3000,13 @@ import {
     resolveStructureForEditorWithStandardize,
 } from "@/Utils/structureImport";
 import { createStructureEditor } from "@/Utils/structureEditor";
+import MixtureCompositionForm from "@/Shared/MixtureCompositionForm.vue";
+import MixtureCompositionHelpModal from "@/Shared/MixtureCompositionHelpModal.vue";
+import {
+    applySampleMoleculeResponse,
+    basisUnitLabel,
+    formatMixtureValue,
+} from "@/Utils/mixtureComposition";
 
 export default {
     components: {
@@ -2999,6 +3028,7 @@ export default {
         Validation,
         SpectraEditor,
         ChemicalCompositionEditor,
+        HifsaScoresPanel,
         Depictor,
         Depictor2D,
         slider,
@@ -3014,6 +3044,8 @@ export default {
         ChevronDownIcon,
         ArrowsPointingOutIcon,
         ArrowsPointingInIcon,
+        MixtureCompositionForm,
+        MixtureCompositionHelpModal,
     },
     mixins: [Global],
     props: ["draft_id", "deposition"],
@@ -3119,6 +3151,11 @@ export default {
             percentage: 99.99,
             /** 'pure' | 'mixture' | 'unknown' — unknown stores no pivot percentage */
             compositionSampleType: "pure",
+            mixtureDraft: {
+                value: null,
+                integrated_signal: null,
+                n_nuclei: null,
+            },
             editor: null,
             editorHasStructure: false,
 
@@ -3170,6 +3207,7 @@ export default {
             }),
             showSummary: true,
             showLogsDialog: false,
+            showCompositionHelpModal: false,
             selectedDraftForLogs: null,
 
             needsReservedDoi: false,
@@ -3180,6 +3218,10 @@ export default {
 
             /** Populated from parallel GET /info during mounted deep-link (step 2). */
             prefetchedStepTwoPayload: null,
+            /** Avoid duplicate nmredata-driven standardize bursts per study. */
+            autoImportMolecularDataStartedFor: markRaw(new Set()),
+            /** Per-session molfile -> standardize axios promise. */
+            standardizeRequestCache: markRaw(new Map()),
         };
     },
     computed: {
@@ -3349,6 +3391,18 @@ export default {
             const m = this.getMax;
 
             return m < 0 ? 0 : m;
+        },
+        mixtureBasisUnitLabel() {
+            return basisUnitLabel(
+                this.selectedStudy?.sample?.mixture_composition?.basis ??
+                    this.$refs.mixtureCompositionForm?.localBasis ??
+                    "mole_percent"
+            );
+        },
+        canAddMixtureComponent() {
+            return (
+                this.$refs.mixtureCompositionForm?.canAddComponent?.() ?? false
+            );
         },
         spectraImportStepCurrent() {
             const m = this.loader.importMeta;
@@ -3664,6 +3718,12 @@ export default {
         this.clearProcessingStuckTimer();
     },
     methods: {
+        hasHifsaScores(study) {
+            return Boolean(study?.hifsa_data?.scores);
+        },
+        hasHifsaPanel(study) {
+            return this.hasHifsaScores(study) || Boolean(study?.hifsa_pdf_url);
+        },
         startProcessingStuckTimer() {
             this.clearProcessingStuckTimer();
             this.isProcessingStuck = false;
@@ -4541,10 +4601,7 @@ export default {
                     }
                     this.editor = null;
                     this.editorHasStructure = false;
-                    this.compositionSampleType =
-                        this.selectedStudy.sample.molecules.length > 0
-                            ? "mixture"
-                            : "pure";
+                    this.syncCompositionSampleType(this.selectedStudy.sample);
                     this.seedAssignmentsDraft(this.selectedStudy);
                     this.$nextTick(() => {
                         const el = document.getElementById(
@@ -4928,16 +4985,19 @@ export default {
                         mol.id
                 )
                 .then((res) => {
-                    this.selectedStudy.sample.molecules = res.data;
+                    applySampleMoleculeResponse(
+                        this.selectedStudy.sample,
+                        res.data
+                    );
                     this.smiles = "";
                     this.percentage = 0;
-                    this.compositionSampleType =
-                        res.data.length > 0 ? "mixture" : "pure";
+                    this.syncCompositionSampleType(this.selectedStudy.sample);
                     this.$nextTick(() => {
                         this.percentage = Math.min(
                             99.99,
                             this.compositionSliderMax
                         );
+                        this.$refs.mixtureCompositionForm?.resetDraft?.();
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
@@ -4946,13 +5006,36 @@ export default {
                 });
         },
         editMolecule(mol) {
-            const raw = mol.pivot?.percentage_composition;
-            if (this.isCompositionPercentUnknown(raw)) {
-                this.compositionSampleType = "unknown";
-            } else {
+            this.activeInputTab = "editor";
+            const mixtureComponent = this.getMixtureComponentForMolecule(mol);
+            if (mixtureComponent) {
                 this.compositionSampleType = "mixture";
-                this.percentage =
-                    parseFloat(mol.pivot.percentage_composition) || 0;
+                this.$nextTick(() => {
+                    this.$refs.mixtureCompositionForm?.resetDraft?.();
+                    if (this.$refs.mixtureCompositionForm) {
+                        this.$refs.mixtureCompositionForm.draft = {
+                            value: mixtureComponent.value,
+                            integrated_signal:
+                                mixtureComponent.integrated_signal ?? "",
+                            n_nuclei: mixtureComponent.n_nuclei ?? "",
+                        };
+                        if (
+                            mixtureComponent.integrated_signal ||
+                            mixtureComponent.n_nuclei
+                        ) {
+                            this.$refs.mixtureCompositionForm.expandDetails?.();
+                        }
+                    }
+                });
+            } else {
+                const raw = mol.pivot?.percentage_composition;
+                if (this.isCompositionPercentUnknown(raw)) {
+                    this.compositionSampleType = "unknown";
+                } else {
+                    this.compositionSampleType = "mixture";
+                    this.percentage =
+                        parseFloat(mol.pivot.percentage_composition) || 0;
+                }
             }
             this.ensureStructureSearchEditor(() => {
                 if (this.editor) {
@@ -4967,7 +5050,10 @@ export default {
                             mol.id
                     )
                     .then((res) => {
-                        this.selectedStudy.sample.molecules = res.data;
+                        applySampleMoleculeResponse(
+                            this.selectedStudy.sample,
+                            res.data
+                        );
                     });
             });
         },
@@ -4990,26 +5076,40 @@ export default {
             this.associateMoleculeToStudy(mol, study);
         },
         associateMoleculeToStudy(mol, study) {
+            const payload = {
+                InChI: mol.inchi,
+                InChIKey: mol.inchikey,
+                mol: mol.standardized_mol,
+                canonical_smiles: mol.canonical_smiles,
+                composition_mode: this.compositionSampleType,
+            };
+
+            if (this.compositionSampleType === "unknown") {
+                payload.percentage = null;
+            } else if (this.compositionSampleType === "mixture") {
+                const mixturePayload =
+                    this.$refs.mixtureCompositionForm?.mixturePayload?.();
+                if (!mixturePayload?.basis || mixturePayload.value == null) {
+                    return;
+                }
+                Object.assign(payload, mixturePayload);
+            } else {
+                payload.percentage = this.percentage;
+            }
+
             axios
-                .post("/dashboard/studies/" + study.id + "/molecule", {
-                    InChI: mol.inchi,
-                    InChIKey: mol.inchikey,
-                    percentage:
-                        this.compositionSampleType === "unknown"
-                            ? null
-                            : this.percentage,
-                    mol: mol.standardized_mol,
-                    canonical_smiles: mol.canonical_smiles,
-                })
+                .post("/dashboard/studies/" + study.id + "/molecule", payload)
                 .then((res) => {
-                    study.sample.molecules = res.data;
-                    this.compositionSampleType =
-                        res.data.length > 0 ? "mixture" : "pure";
+                    applySampleMoleculeResponse(study.sample, res.data);
+                    this.chemicalInput = "";
+                    this.detectedFormat = "";
+                    this.syncCompositionSampleType(study.sample);
                     this.$nextTick(() => {
                         this.percentage = Math.min(
                             99.99,
                             this.compositionSliderMax
                         );
+                        this.$refs.mixtureCompositionForm?.resetDraft?.();
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
@@ -5017,8 +5117,68 @@ export default {
                     }
                 });
         },
+        saveMixtureMetadata(metadata) {
+            if (
+                !this.selectedStudy?.sample?.mixture_composition ||
+                !metadata?.basis
+            ) {
+                return;
+            }
+
+            axios
+                .put(
+                    "/dashboard/studies/" +
+                        this.selectedStudy.id +
+                        "/mixture-composition",
+                    metadata
+                )
+                .then((res) => {
+                    applySampleMoleculeResponse(
+                        this.selectedStudy.sample,
+                        res.data
+                    );
+                });
+        },
+        getMixtureComponentForMolecule(molecule) {
+            const components =
+                this.selectedStudy?.sample?.mixture_composition?.components ??
+                [];
+
+            return components.find(
+                (component) => component.molecule_id === molecule.id
+            );
+        },
+        syncCompositionSampleType(sample) {
+            const molecules = sample?.molecules ?? [];
+            if (molecules.length === 0) {
+                this.compositionSampleType = "pure";
+                return;
+            }
+
+            if (sample?.mixture_composition) {
+                this.compositionSampleType = "mixture";
+                return;
+            }
+
+            const allUnknown = molecules.every((molecule) =>
+                this.isCompositionPercentUnknown(
+                    molecule.pivot?.percentage_composition
+                )
+            );
+            this.compositionSampleType = allUnknown ? "unknown" : "mixture";
+        },
+        formatMixtureValue,
         standardizeMolecules(mol) {
-            return axios.post(this.chemistryStandardizeUrl, mol);
+            const key = String(mol ?? "").trim();
+            if (!key) {
+                return Promise.reject(new Error("Empty molfile"));
+            }
+            if (this.standardizeRequestCache.has(key)) {
+                return this.standardizeRequestCache.get(key);
+            }
+            const promise = axios.post(this.chemistryStandardizeUrl, key);
+            this.standardizeRequestCache.set(key, promise);
+            return promise;
         },
         /**
          * Normalize the NMRKit `/latest/spectra/parse/url` payload into the
@@ -5068,6 +5228,11 @@ export default {
             }
         },
         autoImportMolecularData(study) {
+            if (this.autoImportMolecularDataStartedFor.has(study.id)) {
+                return;
+            }
+            this.autoImportMolecularDataStartedFor.add(study.id);
+
             const baseUrl = String(
                 this.$page.props.url ?? this.url ?? ""
             ).replace(/\/+$/, "");

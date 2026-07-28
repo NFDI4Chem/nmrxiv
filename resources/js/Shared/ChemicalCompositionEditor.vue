@@ -76,7 +76,23 @@
                                     <span
                                         class="inline-flex shrink-0 items-center rounded-md bg-teal-50 px-2 py-0.5 text-xs font-semibold tabular-nums text-teal-800 dark:bg-teal-900/50 dark:text-teal-200"
                                     >
-                                        <template v-if="molecule.pivot">
+                                        <template
+                                            v-if="
+                                                getMixtureComponentForMolecule(
+                                                    molecule
+                                                )
+                                            "
+                                        >
+                                            {{
+                                                formatMixtureValue(
+                                                    getMixtureComponentForMolecule(
+                                                        molecule
+                                                    ).value
+                                                )
+                                            }}
+                                            {{ mixtureBasisUnitLabel }}
+                                        </template>
+                                        <template v-else-if="molecule.pivot">
                                             <template
                                                 v-if="
                                                     isCompositionPercentUnknown(
@@ -228,11 +244,24 @@
                     v-if="editorHasStructure"
                     class="mb-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm ring-1 ring-gray-900/5 dark:border-gray-600 dark:bg-slate-900/50 dark:ring-white/5"
                 >
-                    <p
-                        class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400"
-                    >
-                        Composition share
-                    </p>
+                    <div class="flex items-center justify-between gap-3">
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400"
+                        >
+                            Composition share
+                        </p>
+                        <button
+                            type="button"
+                            class="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-teal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:text-slate-400 dark:hover:text-teal-400 dark:focus-visible:ring-offset-slate-900"
+                            @click="showCompositionHelpModal = true"
+                        >
+                            Need help
+                            <InformationCircleIcon
+                                class="h-4 w-4"
+                                aria-hidden="true"
+                            />
+                        </button>
+                    </div>
                     <div
                         class="mt-3 flex flex-wrap rounded-lg bg-gray-100 p-1 dark:bg-slate-800/90"
                         role="radiogroup"
@@ -305,27 +334,11 @@
                         v-show="compositionSampleType === 'mixture'"
                         class="mt-4 border-t border-gray-100 pt-4 dark:border-gray-700"
                     >
-                        <div class="mb-3 flex justify-end">
-                            <span
-                                :id="percentageLabelId"
-                                class="text-xl font-semibold tabular-nums text-teal-800 dark:text-teal-200"
-                                aria-live="polite"
-                                >{{
-                                    formatCompositionPercent(percentage)
-                                }}%</span
-                            >
-                        </div>
-                        <slider
-                            v-if="compositionSliderMax > 0"
-                            v-model="percentage"
-                            class="block w-full"
-                            :min="0"
-                            :max="compositionSliderMax"
-                            :step="0.001"
-                            :height="10"
-                            color="#0d9488"
-                            track-color="#cbd5e1"
-                            :aria-labelledby="percentageLabelId"
+                        <MixtureCompositionForm
+                            ref="mixtureCompositionForm"
+                            :composition="study?.sample?.mixture_composition"
+                            @update:draft="mixtureDraft = $event"
+                            @metadata-change="saveMixtureMetadata"
                         />
                     </div>
                 </div>
@@ -333,24 +346,43 @@
                 <button
                     v-if="editorHasStructure"
                     type="button"
-                    class="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 sm:w-auto"
+                    class="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-slate-900 sm:w-auto"
+                    :disabled="
+                        compositionSampleType === 'mixture' &&
+                        !canAddMixtureComponent
+                    "
                     @click="saveMolecule()"
                 >
                     Add compound
                 </button>
             </div>
         </div>
+
+        <MixtureCompositionHelpModal
+            :show="showCompositionHelpModal"
+            @close="showCompositionHelpModal = false"
+        />
     </section>
 </template>
 
 <script>
 import axios from "axios";
 import OCL from "openchemlib";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import {
+    TrashIcon,
+    PencilIcon,
+    InformationCircleIcon,
+} from "@heroicons/vue/24/solid";
 import { ChevronRightIcon } from "@heroicons/vue/24/outline";
-import slider from "vue3-slider";
 import Depictor from "@/Shared/Depictor.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
+import MixtureCompositionForm from "@/Shared/MixtureCompositionForm.vue";
+import MixtureCompositionHelpModal from "@/Shared/MixtureCompositionHelpModal.vue";
+import {
+    applySampleMoleculeResponse,
+    basisUnitLabel,
+    formatMixtureValue,
+} from "@/Utils/mixtureComposition";
 import {
     detectStructureInputFormat,
     detectStructureInputType,
@@ -366,7 +398,9 @@ export default {
         ChevronRightIcon,
         Depictor,
         JetInputError,
-        slider,
+        MixtureCompositionForm,
+        MixtureCompositionHelpModal,
+        InformationCircleIcon,
     },
     props: {
         study: {
@@ -398,6 +432,8 @@ export default {
             structureLoadCounter: 0,
             percentage: 99.99,
             compositionSampleType: "pure",
+            mixtureDraft: null,
+            showCompositionHelpModal: false,
             editor: null,
             editorHasStructure: false,
             errorMessage: "",
@@ -440,6 +476,18 @@ export default {
             const max = this.getMax;
 
             return max < 0 ? 0 : max;
+        },
+        mixtureBasisUnitLabel() {
+            return basisUnitLabel(
+                this.study?.sample?.mixture_composition?.basis ??
+                    this.$refs.mixtureCompositionForm?.localBasis ??
+                    "mole_percent"
+            );
+        },
+        canAddMixtureComponent() {
+            return (
+                this.$refs.mixtureCompositionForm?.canAddComponent?.() ?? false
+            );
         },
     },
     watch: {
@@ -500,8 +548,7 @@ export default {
         initializeCompositionState() {
             this.errorMessage = "";
             this.structureLoadCounter = 0;
-            this.compositionSampleType =
-                this.selectedStudyMoleculeCount > 0 ? "mixture" : "pure";
+            this.syncCompositionSampleType(this.study?.sample);
             this.percentage = Math.min(99.99, this.compositionSliderMax);
             if (this.editor) {
                 this.editor.setSmiles("");
@@ -819,14 +866,17 @@ export default {
                         molecule.id
                 )
                 .then((response) => {
-                    this.study.sample.molecules = response.data;
-                    this.compositionSampleType =
-                        response.data.length > 0 ? "mixture" : "pure";
+                    applySampleMoleculeResponse(
+                        this.study.sample,
+                        response.data
+                    );
+                    this.syncCompositionSampleType(this.study.sample);
                     this.$nextTick(() => {
                         this.percentage = Math.min(
                             99.99,
                             this.compositionSliderMax
                         );
+                        this.$refs.mixtureCompositionForm?.resetDraft?.();
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
@@ -836,12 +886,35 @@ export default {
                 });
         },
         editMolecule(molecule) {
-            const raw = molecule.pivot?.percentage_composition;
-            if (this.isCompositionPercentUnknown(raw)) {
-                this.compositionSampleType = "unknown";
-            } else {
+            const mixtureComponent =
+                this.getMixtureComponentForMolecule(molecule);
+            if (mixtureComponent) {
                 this.compositionSampleType = "mixture";
-                this.percentage = parseFloat(raw) || 0;
+                this.$nextTick(() => {
+                    this.$refs.mixtureCompositionForm?.resetDraft?.();
+                    if (this.$refs.mixtureCompositionForm) {
+                        this.$refs.mixtureCompositionForm.draft = {
+                            value: mixtureComponent.value,
+                            integrated_signal:
+                                mixtureComponent.integrated_signal ?? "",
+                            n_nuclei: mixtureComponent.n_nuclei ?? "",
+                        };
+                        if (
+                            mixtureComponent.integrated_signal ||
+                            mixtureComponent.n_nuclei
+                        ) {
+                            this.$refs.mixtureCompositionForm.expandDetails?.();
+                        }
+                    }
+                });
+            } else {
+                const raw = molecule.pivot?.percentage_composition;
+                if (this.isCompositionPercentUnknown(raw)) {
+                    this.compositionSampleType = "unknown";
+                } else {
+                    this.compositionSampleType = "mixture";
+                    this.percentage = parseFloat(raw) || 0;
+                }
             }
 
             this.ensureStructureSearchEditor(() => {
@@ -857,7 +930,10 @@ export default {
                             molecule.id
                     )
                     .then((response) => {
-                        this.study.sample.molecules = response.data;
+                        applySampleMoleculeResponse(
+                            this.study.sample,
+                            response.data
+                        );
                         this.$emit("study-updated", this.study);
                     });
             });
@@ -877,26 +953,44 @@ export default {
             return axios.post(this.chemistryStandardizeUrl, molfile);
         },
         associateMoleculeToStudy(molecule) {
+            const payload = {
+                InChI: molecule.inchi,
+                InChIKey: molecule.inchikey,
+                mol: molecule.standardized_mol,
+                canonical_smiles: molecule.canonical_smiles,
+                composition_mode: this.compositionSampleType,
+            };
+
+            if (this.compositionSampleType === "unknown") {
+                payload.percentage = null;
+            } else if (this.compositionSampleType === "mixture") {
+                const mixturePayload =
+                    this.$refs.mixtureCompositionForm?.mixturePayload?.();
+                if (!mixturePayload?.basis || mixturePayload.value == null) {
+                    return;
+                }
+                Object.assign(payload, mixturePayload);
+            } else {
+                payload.percentage = this.percentage;
+            }
+
             axios
-                .post("/dashboard/studies/" + this.study.id + "/molecule", {
-                    InChI: molecule.inchi,
-                    InChIKey: molecule.inchikey,
-                    percentage:
-                        this.compositionSampleType === "unknown"
-                            ? null
-                            : this.percentage,
-                    mol: molecule.standardized_mol,
-                    canonical_smiles: molecule.canonical_smiles,
-                })
+                .post(
+                    "/dashboard/studies/" + this.study.id + "/molecule",
+                    payload
+                )
                 .then((response) => {
-                    this.study.sample.molecules = response.data;
-                    this.compositionSampleType =
-                        response.data.length > 0 ? "mixture" : "pure";
+                    applySampleMoleculeResponse(
+                        this.study.sample,
+                        response.data
+                    );
+                    this.syncCompositionSampleType(this.study.sample);
                     this.$nextTick(() => {
                         this.percentage = Math.min(
                             99.99,
                             this.compositionSliderMax
                         );
+                        this.$refs.mixtureCompositionForm?.resetDraft?.();
                     });
                     if (this.editor) {
                         this.editor.setSmiles("");
@@ -905,6 +999,54 @@ export default {
                     this.$emit("study-updated", this.study);
                 });
         },
+        saveMixtureMetadata(metadata) {
+            if (!this.study?.sample?.mixture_composition || !metadata?.basis) {
+                return;
+            }
+
+            axios
+                .put(
+                    "/dashboard/studies/" +
+                        this.study.id +
+                        "/mixture-composition",
+                    metadata
+                )
+                .then((response) => {
+                    applySampleMoleculeResponse(
+                        this.study.sample,
+                        response.data
+                    );
+                    this.$emit("study-updated", this.study);
+                });
+        },
+        getMixtureComponentForMolecule(molecule) {
+            const components =
+                this.study?.sample?.mixture_composition?.components ?? [];
+
+            return components.find(
+                (component) => component.molecule_id === molecule.id
+            );
+        },
+        syncCompositionSampleType(sample) {
+            const molecules = sample?.molecules ?? [];
+            if (molecules.length === 0) {
+                this.compositionSampleType = "pure";
+                return;
+            }
+
+            if (sample?.mixture_composition) {
+                this.compositionSampleType = "mixture";
+                return;
+            }
+
+            const allUnknown = molecules.every((entry) =>
+                this.isCompositionPercentUnknown(
+                    entry.pivot?.percentage_composition
+                )
+            );
+            this.compositionSampleType = allUnknown ? "unknown" : "mixture";
+        },
+        formatMixtureValue,
     },
 };
 </script>
