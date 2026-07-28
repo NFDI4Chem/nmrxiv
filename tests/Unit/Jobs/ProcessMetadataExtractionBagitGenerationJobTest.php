@@ -10,7 +10,10 @@ use App\Models\User;
 use App\Models\Validation;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Tests\TestCase;
+use ZipArchive;
 
 class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 {
@@ -62,6 +65,41 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'failed_at'));
     }
 
+    public function test_extract_zip_handles_root_placeholder_entry_conflict(): void
+    {
+        $zipPath = tempnam(sys_get_temp_dir(), 'nmrxiv_zip_');
+        $extractTo = sys_get_temp_dir().'/nmrxiv_extract_'.uniqid('', true);
+
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true);
+        $zip->addFromString('study_root', '');
+        $zip->addFromString('study_root/1/acqu', 'test data');
+        $zip->close();
+
+        $job = new class(1) extends ProcessMetadataExtractionBagitGenerationJob
+        {
+            public function extractForTest(string $zipPath, string $extractTo): string
+            {
+                return $this->extractZip($zipPath, $extractTo);
+            }
+        };
+
+        try {
+            $studyName = $job->extractForTest($zipPath, $extractTo);
+
+            $this->assertSame('study_root', $studyName);
+            $this->assertDirectoryExists($extractTo.'/study_root');
+            $this->assertFileExists($extractTo.'/study_root/1/acqu');
+            $this->assertSame('test data', file_get_contents($extractTo.'/study_root/1/acqu'));
+        } finally {
+            if (is_file($zipPath)) {
+                @unlink($zipPath);
+            }
+
+            $this->removeDirectory($extractTo);
+        }
+    }
+
     private function makeStudy(): Study
     {
         $user = User::factory()->withPersonalTeam()->create();
@@ -86,5 +124,27 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'is_public' => true,
             'download_url' => 'https://example.com/study.zip',
         ]);
+    }
+
+    private function removeDirectory(string $directory): void
+    {
+        if (! is_dir($directory)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isDir()) {
+                @rmdir($item->getPathname());
+            } else {
+                @unlink($item->getPathname());
+            }
+        }
+
+        @rmdir($directory);
     }
 }

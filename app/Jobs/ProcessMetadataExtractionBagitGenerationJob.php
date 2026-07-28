@@ -295,23 +295,127 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             throw new \Exception("Failed to open ZIP file: {$zipPath}");
         }
 
-        // Get the root folder name from first entry
+        $this->ensureDirectoryPath($extractTo);
+
+        $entries = [];
         $studyName = null;
-        if ($zip->numFiles > 0) {
-            $firstEntry = $zip->getNameIndex(0);
-            $parts = explode('/', $firstEntry);
-            $studyName = $parts[0];
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $rawName = $zip->getNameIndex($i);
+
+            if (! is_string($rawName) || $rawName === '') {
+                continue;
+            }
+
+            $normalizedName = ltrim(str_replace('\\', '/', $rawName), '/');
+
+            if ($normalizedName === '') {
+                continue;
+            }
+
+            if ($studyName === null) {
+                $studyName = explode('/', rtrim($normalizedName, '/'))[0] ?: null;
+            }
+
+            $entries[] = [
+                'index' => $i,
+                'raw' => $rawName,
+                'normalized' => $normalizedName,
+            ];
         }
 
         if (! $studyName) {
+            $zip->close();
             throw new \Exception('Could not determine study name from ZIP');
         }
 
-        // Extract all files
-        $zip->extractTo($extractTo);
+        $hasRootPlaceholderFile = false;
+        $hasRootChildren = false;
+
+        foreach ($entries as $entry) {
+            if ($entry['normalized'] === $studyName) {
+                $hasRootPlaceholderFile = true;
+            }
+
+            if (str_starts_with($entry['normalized'], $studyName.'/')) {
+                $hasRootChildren = true;
+            }
+        }
+
+        foreach ($entries as $entry) {
+            $entryName = $entry['normalized'];
+
+            if (str_contains($entryName, "\0") || str_starts_with($entryName, '../') || str_contains($entryName, '/../')) {
+                $zip->close();
+                throw new \RuntimeException("Unsafe ZIP entry path: {$entryName}");
+            }
+
+            if ($hasRootPlaceholderFile && $hasRootChildren && $entryName === $studyName) {
+                continue;
+            }
+
+            $isDirectory = $this->isDirectoryEntry($zip, $entry['index'], $entryName);
+            $targetPath = rtrim($extractTo, '/').'/'.$entryName;
+
+            if ($isDirectory) {
+                $this->ensureDirectoryPath($targetPath);
+
+                continue;
+            }
+
+            $this->ensureDirectoryPath(dirname($targetPath));
+
+            $stream = $zip->getStream($entry['raw']);
+            if ($stream === false) {
+                $zip->close();
+                throw new \RuntimeException("Failed to read ZIP entry stream: {$entry['raw']}");
+            }
+
+            $target = fopen($targetPath, 'wb');
+            if ($target === false) {
+                fclose($stream);
+                $zip->close();
+                throw new \RuntimeException("Failed to create extracted file: {$targetPath}");
+            }
+
+            stream_copy_to_stream($stream, $target);
+            fclose($target);
+            fclose($stream);
+        }
+
         $zip->close();
 
         return $studyName;
+    }
+
+    protected function isDirectoryEntry(ZipArchive $zip, int $entryIndex, string $entryName): bool
+    {
+        if (str_ends_with($entryName, '/')) {
+            return true;
+        }
+
+        $opsys = null;
+        $attributes = null;
+
+        if ($zip->getExternalAttributesIndex($entryIndex, $opsys, $attributes)) {
+            $fileTypeMask = 0xF000;
+            $directoryFlag = 0x4000;
+
+            return (($attributes >> 16) & $fileTypeMask) === $directoryFlag;
+        }
+
+        return false;
+    }
+
+    protected function ensureDirectoryPath(string $path): void
+    {
+        if (is_file($path) && ! @unlink($path)) {
+            throw new \RuntimeException("Failed to remove file blocking directory path: {$path}");
+        }
+
+        if (! is_dir($path) && ! @mkdir($path, 0755, true) && ! is_dir($path)) {
+            throw new \RuntimeException("Failed to create directory: {$path}");
+        }
     }
 
     /**
