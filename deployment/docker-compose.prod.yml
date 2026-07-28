@@ -36,7 +36,6 @@ services:
     - https_proxy=${HTTPS_PROXY}
     - no_proxy=${NO_PROXY}
     - APP_URL=https://nmrxiv.org
-    - NMRKIT_API_URL=http://nmrkit/latest/spectra/parse/url
     - TRUSTED_PROXIES="*"
     healthcheck:
       interval: 30s
