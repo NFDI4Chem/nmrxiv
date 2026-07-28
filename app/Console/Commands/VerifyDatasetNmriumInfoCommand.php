@@ -42,8 +42,14 @@ class VerifyDatasetNmriumInfoCommand extends Command
         $exceptionSamples = [];
 
         $query = Dataset::query()
-            ->select(['id', 'study_id', 'fs_id'])
-            ->with(['nmrium', 'study.nmrium', 'fsObject:id,name'])
+            ->with([
+                'nmrium',
+                'study.nmrium',
+                'study.sample',
+                'study.draft',
+                'fsObject',
+                'study.fsObject',
+            ])
             ->orderBy('id');
 
         $query->chunkById($chunkSize, function ($datasets) use (

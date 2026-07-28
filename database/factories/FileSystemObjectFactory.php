@@ -139,4 +139,22 @@ class FileSystemObjectFactory extends Factory
             'study_id' => $study->id,
         ]);
     }
+
+    /**
+     * Create the study's canonical root directory and wire studies.fs_id.
+     */
+    public function asStudyRoot(Study $study): static
+    {
+        return $this->directory()
+            ->state(fn (array $attributes) => [
+                'study_id' => $study->id,
+                'project_id' => $study->project_id,
+                'level' => 0,
+                'is_root' => true,
+                'parent_id' => null,
+            ])
+            ->afterCreating(function (FileSystemObject $fsObject) use ($study): void {
+                $study->forceFill(['fs_id' => $fsObject->id])->save();
+            });
+    }
 }

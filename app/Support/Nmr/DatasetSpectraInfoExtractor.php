@@ -45,8 +45,7 @@ class DatasetSpectraInfoExtractor
             'spectra_base_frequency' => $baseFrequency,
             'spectra_number_of_scans' => $this->normalizeInteger($this->property($infoArray, 'numberOfScans')),
             'spectra_probe_name' => $this->normalizeString($this->property($infoArray, 'probeName')),
-            'spectra_manufacturer' => InstrumentTypeManufacturerResolver::forDataset($dataset)
-                ?? $this->extractManufacturer($infoArray),
+            'spectra_manufacturer' => $this->resolveManufacturer($dataset, $infoArray),
             'spectra_field_strength' => $this->normalizeDecimal($this->property($infoArray, 'fieldStrength')),
             'spectra_spectral_width' => $this->normalizeDecimal($this->property($infoArray, 'spectralWidth')),
             'spectra_number_of_points' => $this->normalizeInteger($this->property($infoArray, 'numberOfPoints')),
@@ -265,6 +264,29 @@ class DatasetSpectraInfoExtractor
             'false', 'no', 'n', '0' => false,
             default => null,
         };
+    }
+
+    /**
+     * Prefer a concrete vendor from the sample folder, but when the folder only
+     * identifies JCAMP (generic exchange format), still try NMRium metadata
+     * before falling back to the JCAMP label.
+     *
+     * @param  array<string, mixed>  $info
+     */
+    private function resolveManufacturer(Dataset $dataset, array $info): ?string
+    {
+        $fromFolder = InstrumentTypeManufacturerResolver::forDataset($dataset);
+
+        if ($fromFolder !== null && $fromFolder !== 'JCAMP') {
+            return $fromFolder;
+        }
+
+        $fromNmrium = $this->extractManufacturer($info);
+        if ($fromNmrium !== null) {
+            return $fromNmrium;
+        }
+
+        return $fromFolder;
     }
 
     /**

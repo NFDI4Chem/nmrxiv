@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DefaultSpectrumTab;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -68,7 +69,28 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'preferences' => 'array',
         ];
+    }
+
+    public function defaultSpectrumTab(): ?DefaultSpectrumTab
+    {
+        $value = $this->preferences['default_spectrum_tab'] ?? null;
+
+        return is_string($value) ? DefaultSpectrumTab::tryFrom($value) : null;
+    }
+
+    public function setDefaultSpectrumTab(?DefaultSpectrumTab $tab): void
+    {
+        $preferences = $this->preferences ?? [];
+
+        if ($tab === null) {
+            unset($preferences['default_spectrum_tab']);
+        } else {
+            $preferences['default_spectrum_tab'] = $tab->value;
+        }
+
+        $this->preferences = $preferences === [] ? null : $preferences;
     }
 
     /**

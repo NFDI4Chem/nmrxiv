@@ -1,8 +1,12 @@
 <template>
     <div>
         <div>
-            <div class="mb-2 float-right">
-                <small>
+            <div class="mb-2 clearfix">
+                <DefaultSpectrumTabSelect
+                    v-if="!isViewerLoading"
+                    @changed="onDefaultSpectrumTabChanged"
+                />
+                <small class="float-right">
                     <a
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
                         href="https://docs.nmrxiv.org/advanced-guides/nmrium/nmrium.html"
@@ -114,6 +118,13 @@
 
 <script>
 import Versions from "./Versions.vue";
+import DefaultSpectrumTabSelect from "./DefaultSpectrumTabSelect.vue";
+import {
+    getDefaultSpectrumTab,
+    postNmriumLoad,
+    requestSelectTab,
+    resolveNmriumTargetOrigin,
+} from "@/Utils/nmriumTabPreference.js";
 import {
     ArrowPathIcon,
     ChevronDownIcon,
@@ -162,6 +173,7 @@ function buildNmriumIframeSrc(nmriumURLProp, sessionKey) {
 export default {
     components: {
         Versions,
+        DefaultSpectrumTabSelect,
         ArrowPathIcon,
         ChevronDownIcon,
         ExclamationTriangleIcon,
@@ -207,6 +219,7 @@ export default {
             nmriumHandoffTimeoutId: null,
             nmriumMessageHandler: null,
             nmriumPostLoadAt: null,
+            defaultTabApplied: false,
             nmriumInfoCache: markRaw(new Map()),
             /** Mirrors last status sent on the `loading` event so we can skip duplicate emits. */
             lastEmittedLoadingStatus: null,
@@ -219,6 +232,14 @@ export default {
             silentPreviewAttemptedFor: markRaw(new Set()),
             /** True while the in-flight blob save should suppress the visible "Saved" banner. */
             previewSilent: false,
+            /**
+             * False while NMRium is still hydrating after a load/reset. Internal
+             * data-change events during this window must not fan out chemistry
+             * standardize requests for every embedded molecule.
+             */
+            nmriumLoadSettled: false,
+            /** Per-session molfile -> standardize response promise. */
+            standardizeRequestCache: markRaw(new Map()),
         };
     },
     computed: {
@@ -250,6 +271,9 @@ export default {
                 }
             });
             return Array.from(groups.values());
+        },
+        isViewerLoading() {
+            return this.lastEmittedLoadingStatus === true;
         },
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
@@ -470,7 +494,9 @@ export default {
                             dbg(
                                 "INITIATE on existing nmrium -> skip storing payload (avoids Vue deep-reactivity on huge NMRium state)"
                             );
+                            this.nmriumLoadSettled = true;
                             this.updateLoadingStatus(false);
+                            this.applyDefaultSpectrumTab();
 
                             // Auto-imports come in via the parse-url backend
                             // path which never gets the chance to capture a
@@ -514,6 +540,7 @@ export default {
                                 resetInProgress: this.resetInProgress,
                                 has_nmrium: this.study?.has_nmrium,
                             });
+                            this.applyDefaultSpectrumTab();
                             if (
                                 !this.study.has_nmrium ||
                                 this.resetInProgress
@@ -593,6 +620,7 @@ export default {
                 dbg(
                     `handoff fired after ${NMRIUM_HANDOFF_MS}ms -> hiding parent overlay (NMRium continues internally)`
                 );
+                this.nmriumLoadSettled = true;
                 this.updateLoadingStatus(false);
             }, NMRIUM_HANDOFF_MS);
         },
@@ -639,10 +667,13 @@ export default {
                 type: "nmrium",
             };
             this.nmriumPostLoadAt = performance.now();
+            this.defaultTabApplied = false;
             dbg("iframe.postMessage(nmr-wrapper:load) -> sent");
-            iframe.postMessage(
-                { type: `nmr-wrapper:load`, data: payload },
-                "*"
+            postNmriumLoad(
+                iframe,
+                payload,
+                this.nmriumTargetOrigin(),
+                getDefaultSpectrumTab(this.$page)
             );
             this.scheduleNmriumHandoff();
 
@@ -660,11 +691,13 @@ export default {
                 has_nmrium: this.study?.has_nmrium,
                 iframeReady: this.iframeReady,
             });
+            this.nmriumLoadSettled = false;
             const iframe = window.frames.submissionNMRiumIframe;
             this.spectraError = null;
             this.spectraErrorsCollapsed = true;
             this.currentMolecules = [];
             this.nmriumLoadError = null;
+            this.defaultTabApplied = false;
             if (!iframe || !this.study) {
                 dbg("loadSpectra: aborted (no iframe or study)");
                 return;
@@ -767,9 +800,35 @@ export default {
             };
 
             this.nmriumPostLoadAt = performance.now();
+            this.defaultTabApplied = false;
             dbg("iframe.postMessage(nmr-wrapper:load url) -> sent");
-            iframe.postMessage({ type: `nmr-wrapper:load`, data: data }, "*");
+            postNmriumLoad(
+                iframe,
+                data,
+                this.nmriumTargetOrigin(),
+                getDefaultSpectrumTab(this.$page)
+            );
             this.scheduleNmriumHandoff();
+        },
+        nmriumTargetOrigin() {
+            return resolveNmriumTargetOrigin(this.$page.props.nmriumURL);
+        },
+        applyDefaultSpectrumTab() {
+            const tab = getDefaultSpectrumTab(this.$page);
+            if (!tab || this.defaultTabApplied) {
+                return;
+            }
+
+            this.defaultTabApplied = true;
+            requestSelectTab(
+                window.frames.submissionNMRiumIframe,
+                tab,
+                this.nmriumTargetOrigin()
+            );
+        },
+        onDefaultSpectrumTabChanged() {
+            this.defaultTabApplied = false;
+            this.applyDefaultSpectrumTab();
         },
         /**
          * Persist the current NMRium project to the study.
@@ -780,6 +839,9 @@ export default {
          */
         updateStudyNMRiumInfo(options) {
             const silent = !!(options && options.silent);
+            const shouldSyncMolecules =
+                options?.syncMolecules !== false &&
+                (!silent || this.nmriumLoadSettled);
             if (this.study != null && this.selectedSpectraData) {
                 let _version = this.version ? this.version : 4;
                 const t0 = performance.now();
@@ -800,9 +862,11 @@ export default {
                         this.infoLog("Spectra saved successfully", true);
                         this.study.has_nmrium = response.data.has_nmrium;
                         this.nmriumInfoCache.delete(this.study.id);
-                        this.syncMissingMolecules(
-                            this.selectedSpectraData.molecules
-                        );
+                        if (shouldSyncMolecules) {
+                            this.syncMissingMolecules(
+                                this.selectedSpectraData.molecules
+                            );
+                        }
                     })
                     .catch((err) => {
                         const dur = (performance.now() - t0).toFixed(0);
@@ -832,6 +896,20 @@ export default {
             }
             return mol;
         },
+        requestStandardizedMolecule(molfile) {
+            const key = String(molfile ?? "").trim();
+            if (!key) {
+                return Promise.reject(new Error("Empty molfile"));
+            }
+            if (this.standardizeRequestCache.has(key)) {
+                return this.standardizeRequestCache.get(key);
+            }
+            const promise = axios
+                .post(this.chemistryStandardizeUrl, key)
+                .then((response) => response.data);
+            this.standardizeRequestCache.set(key, promise);
+            return promise;
+        },
         /**
          * Standardize and persist any new molecules from NMRium that are not
          * already linked to this study. Uses InChI as the equality key (after
@@ -854,13 +932,11 @@ export default {
             molecules.forEach((mol, idx) => {
                 mol = this.fixLineError(mol);
                 const tStandardize = performance.now();
-                axios
-                    .post(this.chemistryStandardizeUrl, mol.molfile)
-                    .then((res) => {
+                this.requestStandardizedMolecule(mol.molfile)
+                    .then((_mol) => {
                         const stdDur = (
                             performance.now() - tStandardize
                         ).toFixed(0);
-                        const _mol = res.data;
                         if (knownInchis.has(_mol.inchi)) {
                             dbg(
                                 `mol[${idx}] standardize ${stdDur}ms -> already known, skipping POST /molecule`
@@ -961,7 +1037,7 @@ export default {
                         type: `nmr-wrapper:action-request`,
                         data,
                     },
-                    "*"
+                    this.nmriumTargetOrigin()
                 );
             }
         },

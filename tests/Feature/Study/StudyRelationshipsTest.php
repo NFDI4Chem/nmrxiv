@@ -159,14 +159,16 @@ class StudyRelationshipsTest extends TestCase
         }
     }
 
-    public function test_study_has_one_file_system_object(): void
+    public function test_study_belongs_to_file_system_object_via_fs_id(): void
     {
         $fsObject = FileSystemObject::factory()->create([
             'study_id' => $this->study->id,
         ]);
 
-        $this->assertInstanceOf(FileSystemObject::class, $this->study->fsObject);
-        $this->assertEquals($fsObject->id, $this->study->fsObject->id);
+        $this->study->update(['fs_id' => $fsObject->id]);
+
+        $this->assertInstanceOf(FileSystemObject::class, $this->study->fresh()->fsObject);
+        $this->assertEquals($fsObject->id, $this->study->fresh()->fsObject->id);
     }
 
     public function test_study_belongs_to_draft(): void

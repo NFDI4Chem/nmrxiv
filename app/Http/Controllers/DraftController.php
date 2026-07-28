@@ -12,6 +12,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use App\Support\Draft\HifsaPdfResolver;
 use App\Support\ProvisionalDoi;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -40,7 +41,8 @@ class DraftController extends Controller
         private UserDrafts $userDrafts,
         private ProcessDraft $processDraft,
         private DraftFiles $draftFiles,
-        private ResetSampleFolder $resetSampleFolder
+        private ResetSampleFolder $resetSampleFolder,
+        private HifsaPdfResolver $hifsaPdfResolver,
     ) {}
 
     /**
@@ -209,57 +211,14 @@ class DraftController extends Controller
         }
 
         $project->load(['owner']);
-        $studies = $this->draftWorkspaceStudies($project, $draft)
-            ->each(function (Study $study) use ($draft): void {
-                $pdf = $this->resolveHifsaPdf($study);
-                $study->setAttribute(
-                    'hifsa_pdf_url',
-                    $pdf ? route('dashboard.draft.hifsa', ['draft' => $draft->id, 'filesystemobject' => $pdf->id]) : null,
-                );
-            });
+        $studies = $this->draftWorkspaceStudies($project, $draft);
+        $this->hifsaPdfResolver->persistCsvData($studies);
+        $studies = $this->hifsaPdfResolver->enrichStudies($studies, $draft);
 
         return response()->json([
             'project' => $project,
             'studies' => $studies,
         ]);
-    }
-
-    /**
-     * Resolve the HiFSA report PDF for a study, if a detected HiFSA folder is
-     * associated with it. The HiFSA folder is not linked to the study (it is
-     * skipped during processing), so it is matched structurally: it is either
-     * a child of the study's folder or a sibling of it.
-     */
-    private function resolveHifsaPdf(Study $study): ?FileSystemObject
-    {
-        $studyFs = $study->fsObject;
-
-        if (! $studyFs) {
-            return null;
-        }
-
-        $hifsaFolder = FileSystemObject::query()
-            ->where('draft_id', $study->draft_id)
-            ->where('instrument_type', 'hifsa')
-            ->where(function ($query) use ($studyFs): void {
-                $query->where('parent_id', $studyFs->id);
-
-                if ($studyFs->parent_id === null) {
-                    $query->orWhereNull('parent_id');
-                } else {
-                    $query->orWhere('parent_id', $studyFs->parent_id);
-                }
-            })
-            ->with('children')
-            ->first();
-
-        if (! $hifsaFolder) {
-            return null;
-        }
-
-        return $hifsaFolder->children
-            ->first(fn (FileSystemObject $child): bool => $child->type === 'file'
-                && str_ends_with(strtolower((string) $child->name), '.pdf'));
     }
 
     /**

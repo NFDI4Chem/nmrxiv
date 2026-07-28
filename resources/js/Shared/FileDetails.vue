@@ -291,9 +291,12 @@
 
             <!-- Download section -->
             <div v-if="downloadURL" class="pt-3 border-t border-gray-100">
-                <a
-                    :href="downloadURL"
+                <button
+                    type="button"
                     class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors"
+                    @click="
+                        requestDownload(downloadURL, downloadTrackingIdentifier)
+                    "
                 >
                     <svg
                         class="h-4 w-4 mr-2"
@@ -309,9 +312,17 @@
                         />
                     </svg>
                     Download File
-                </a>
+                </button>
             </div>
         </div>
+
+        <DownloadTermsModal
+            :show="showDownloadTerms"
+            :download-url="pendingDownloadUrl"
+            :download-identifier="pendingDownloadIdentifier"
+            :license-title="project?.license?.title || study?.license?.title"
+            @close="closeDownloadTerms"
+        />
     </div>
 </template>
 
@@ -332,13 +343,20 @@
  * - Date/time formatting for upload timestamps
  */
 
+import DownloadTermsModal from "@/Shared/DownloadTermsModal.vue";
+import DownloadTerms from "@/Mixins/DownloadTerms.js";
+
 export default {
     name: "FileDetails",
 
     /**
      * Component dependencies
      */
-    components: {},
+    components: {
+        DownloadTermsModal,
+    },
+
+    mixins: [DownloadTerms],
 
     /**
      * Component props
@@ -416,6 +434,18 @@ export default {
          */
         url() {
             return String(this.$page.props.url);
+        },
+
+        downloadTrackingIdentifier() {
+            if (this.project) {
+                return this.trackingIdentifier(this.project);
+            }
+
+            if (this.study) {
+                return this.trackingIdentifier(this.study);
+            }
+
+            return null;
         },
 
         /**

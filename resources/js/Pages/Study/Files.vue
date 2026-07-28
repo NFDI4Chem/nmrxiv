@@ -214,12 +214,18 @@
                                                         />
                                                     </button>
                                                 </div>
-                                                <a
-                                                    :href="downloadURL"
+                                                <button
+                                                    type="button"
                                                     class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                                    @click="
+                                                        requestDownload(
+                                                            downloadURL,
+                                                            downloadTrackingIdentifier
+                                                        )
+                                                    "
                                                 >
                                                     Download
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -416,33 +422,29 @@
                                                             formatFileSize(file)
                                                         }}
                                                     </p>
-                                                    <a
+                                                    <button
                                                         v-if="
                                                             file.type !==
                                                                 'directory' &&
                                                             project?.owner &&
                                                             project?.slug
                                                         "
-                                                        :href="
-                                                            url +
-                                                            '/' +
-                                                            project.owner
-                                                                .username +
-                                                            '/download/' +
-                                                            project.slug +
-                                                            '?key=' +
-                                                            file.key +
-                                                            '&uuid=' +
-                                                            file.uuid
-                                                        "
+                                                        type="button"
                                                         class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
                                                         title="Download file"
-                                                        @click.stop
+                                                        @click.stop="
+                                                            requestDownload(
+                                                                getFileDownloadURL(
+                                                                    file
+                                                                ),
+                                                                downloadTrackingIdentifier
+                                                            )
+                                                        "
                                                     >
                                                         <ArrowDownTrayIcon
                                                             class="h-4 w-4"
                                                         />
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </template>
 
@@ -539,32 +541,29 @@
                                                     <div
                                                         class="col-span-1 flex justify-center"
                                                     >
-                                                        <a
+                                                        <button
                                                             v-if="
                                                                 file.type !==
                                                                     'directory' &&
                                                                 project?.owner &&
                                                                 project?.slug
                                                             "
-                                                            :href="
-                                                                url +
-                                                                '/' +
-                                                                project.owner
-                                                                    .username +
-                                                                '/download/' +
-                                                                project.slug +
-                                                                '?key=' +
-                                                                file.key +
-                                                                '&uuid=' +
-                                                                file.uuid
-                                                            "
+                                                            type="button"
                                                             class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
                                                             title="Download file"
+                                                            @click.stop="
+                                                                requestDownload(
+                                                                    getFileDownloadURL(
+                                                                        file
+                                                                    ),
+                                                                    downloadTrackingIdentifier
+                                                                )
+                                                            "
                                                         >
                                                             <ArrowDownTrayIcon
                                                                 class="h-5 w-5"
                                                             />
-                                                        </a>
+                                                        </button>
                                                         <!-- No download icon for folders -->
                                                     </div>
                                                 </div>
@@ -630,6 +629,14 @@
                 </div>
             </template>
         </study-content>
+
+        <DownloadTermsModal
+            :show="showDownloadTerms"
+            :download-url="pendingDownloadUrl"
+            :download-identifier="pendingDownloadIdentifier"
+            :license-title="study?.license?.title || project?.license?.title"
+            @close="closeDownloadTerms"
+        />
     </div>
 </template>
 
@@ -638,6 +645,8 @@ import { Dropzone } from "dropzone";
 import { router } from "@inertiajs/vue3";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
+import DownloadTermsModal from "@/Shared/DownloadTermsModal.vue";
+import DownloadTerms from "@/Mixins/DownloadTerms.js";
 import axiosRetry from "axios-retry";
 import OCL from "openchemlib";
 
@@ -658,6 +667,7 @@ export default {
         FolderIcon,
         DocumentTextIcon,
         FileDetails,
+        DownloadTermsModal,
         ChevronRightIcon,
         HomeIcon,
         Squares2X2Icon,
@@ -666,6 +676,7 @@ export default {
         ChevronDownIcon,
         ArrowDownTrayIcon,
     },
+    mixins: [DownloadTerms],
     props: [
         "study",
         "project",
@@ -714,6 +725,17 @@ export default {
                     this.$page.props.selectedFileSystemObject.uuid
                 );
             }
+            return null;
+        },
+        downloadTrackingIdentifier() {
+            if (this.project) {
+                return this.trackingIdentifier(this.project);
+            }
+
+            if (this.study) {
+                return this.trackingIdentifier(this.study);
+            }
+
             return null;
         },
         canUpdateFiles() {
