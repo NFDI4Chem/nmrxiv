@@ -86,7 +86,7 @@
                                 rel="noreferrer"
                                 class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
                             >
-                                Learn more.
+                                Click to learn more about embargo.
                             </a>
                         </p>
                         <button
@@ -124,6 +124,14 @@
                             >
                                 Edit release date
                             </button>
+                            <a
+                                href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                class="whitespace-nowrap font-semibold text-teal-800 underline decoration-teal-600/45 underline-offset-2 hover:text-teal-950 dark:text-teal-200 dark:decoration-teal-300/50 dark:hover:text-white"
+                            >
+                                Click to learn more about embargo
+                            </a>
                         </p>
                     </div>
                     <template v-else-if="dashboardProject.is_public">

@@ -265,8 +265,36 @@ For project publication, complete the publication metadata:
 -   Citation - this field contains the article to which the submitted data is attached. You can either enter the citation details manually or import it directly from the DOI.
 -   Author - enter the details of the authors who are linked with the creation of the data. Again, these details can be entered manually or imported via ORCID IDs
 -   License - license is mandatory for making your data public. If you are not sure which license to use, please check the link [How to choose the right license?](/submission-guides/licenses).
+-   Funding (Optional) - declare third-party funding such as grants from research organizations. Funding references are included in your DataCite DOI metadata and improve discoverability. You can add or update funding references at any time; changes sync automatically when a DOI exists.
 
 The project name must be meaningful and cannot remain the default draft name.
+
+### Adding Funding References
+
+Funding references help document the sources of financial support for your research. They are particularly useful when your work was supported by grants or research funding organizations.
+
+**When to add funding references:**
+
+-   Your research was supported by a grant or award
+-   You want to acknowledge funding organizations in your DOI metadata
+-   Your funder requires data deposition with funding information
+
+**How to add a funding reference:**
+
+Click the **Add funding reference** button to open the funding reference form. You will be prompted to enter:
+
+-   **Funder name** (required) - the name of the organization or institution providing the funding, such as "Deutsche Forschungsgemeinschaft" or "National Science Foundation"
+-   **Funder identifier (Optional)** - a unique identifier for the funder, such as a ROR (Research Organization Registry) ID or DOI
+-   **Funder identifier type (Optional)** - the type of identifier provided (e.g., ROR, DOI, Crossref)
+-   **Award number (Optional)** - the grant or award number assigned by the funder
+-   **Award title (Optional)** - the name or title of the grant or award
+-   **Award URI (Optional)** - a link to the grant record or project page, such as a GEPRIS entry for DFG grants
+
+You can search for funding organizations by their name or ROR identifier. Funding references can be edited or deleted at any time before publication.
+
+<p align="center">
+<img src="/img/submission-process/publication-deposition/13.png" width="1000"/>
+</p>
 
 <p align="center">
 <video width="1000" controls autoplay loop muted playsinline>
@@ -278,6 +306,10 @@ The project name must be meaningful and cannot remain the default draft name.
 ## Release Date and Embargo
 
 If you choose today as the release date, nmrXiv queues the submission for immediate publication. If you choose a future release date, the project is kept under embargo and published automatically when the release date arrives. [Click on the link to learn complete details about the **Embargo** feature.](/submission-guides/embargo)
+
+**Funding references and embargo:**
+
+Funding references can be added or modified at any time during the embargo period. If your project has a reserved DOI, any updates to funding references will sync automatically to the DOI metadata, ensuring your funding information is always current.
 
 After publication, nmrXiv assigns identifiers and DOI metadata, moves files from draft storage to permanent publication storage, rebuilds public archives, and sends notifications.
 

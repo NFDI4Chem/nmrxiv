@@ -38,6 +38,14 @@
                                     reviewing this section and adding any
                                     missing DOIs before making the project
                                     public.
+                                    <a
+                                        href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        class="font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900"
+                                    >
+                                        Click to learn more about embargo.
+                                    </a>
                                 </p>
                             </div>
                         </div>
