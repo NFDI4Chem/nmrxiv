@@ -1027,6 +1027,7 @@
                                             <a
                                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
                                                 target="_blank"
+                                                rel="noopener noreferrer"
                                                 class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
                                                 >Read more</a
                                             >
@@ -1110,6 +1111,7 @@
                                                 >
                                                     <a
                                                         target="_blank"
+                                                        rel="noopener noreferrer"
                                                         href="https://docs.nmrxiv.org/submission-guides/licenses"
                                                         class="text-primary-600 hover:text-primary-800 underline"
                                                         >How to choose the right
@@ -1184,6 +1186,7 @@
                                             I agree to the
                                             <a
                                                 target="_blank"
+                                                rel="noopener noreferrer"
                                                 :href="route('terms.show')"
                                                 class="text-sm font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 hover:decoration-primary-500"
                                                 >Terms of Service</a
@@ -1191,6 +1194,7 @@
                                             and
                                             <a
                                                 target="_blank"
+                                                rel="noopener noreferrer"
                                                 :href="route('policy.show')"
                                                 class="text-sm font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 hover:decoration-primary-500"
                                                 >Privacy Policy</a
@@ -1397,6 +1401,7 @@
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
                                 >Click to read more.</a
                             >
@@ -1509,7 +1514,7 @@
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/embargo.html"
                                 target="_blank"
-                                rel="noreferrer"
+                                rel="noopener noreferrer"
                                 class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
                                 >Learn more</a
                             >

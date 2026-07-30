@@ -224,6 +224,7 @@
                                 <a
                                     :href="study.data.external_url"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600"
                                 >
                                     <span

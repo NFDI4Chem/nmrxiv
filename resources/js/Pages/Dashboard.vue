@@ -718,6 +718,7 @@
                                     id="tour-step-submission-guide"
                                     href="https://docs.nmrxiv.org/introduction/intro"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     <span
                                         class="absolute inset-0"
@@ -780,6 +781,7 @@
                                     id="tour-step-api"
                                     href="https://docs.nmrxiv.org/developer-guides/api.html"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     <span
                                         class="absolute inset-0"

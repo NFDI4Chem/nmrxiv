@@ -1293,6 +1293,7 @@
                                                                             <a
                                                                                 href="https://docs.nmrxiv.org/submission-guides/submission/editor"
                                                                                 target="_blank"
+                                                                                rel="noopener noreferrer"
                                                                                 >Need
                                                                                 help?
                                                                             </a>

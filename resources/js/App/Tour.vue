@@ -15,7 +15,7 @@ export default {
                     header: {
                         title: "Get Started",
                     },
-                    content: `Click to start uploading <br/> your datasets to nmrXiv. <br/> <small>Check out our guides  <br/>to prepare datasets <br/>for uploading <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org" target="_blank">here</a>.</small>`,
+                    content: `Click to start uploading <br/> your datasets to nmrXiv. <br/> <small>Check out our guides  <br/>to prepare datasets <br/>for uploading <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org" target="_blank" rel="noopener noreferrer">here</a>.</small>`,
                 },
                 {
                     target: "#tour-step-dashboard",
@@ -147,7 +147,7 @@ export default {
                     header: {
                         title: "Upload Spectra files",
                     },
-                    content: `<small>Lets start uploading your spectra data. <a class="text-green-400 hover:text-decoration-line" href="https://drive.google.com/drive/folders/1PS9jYkjCl_2iwwpod7rkxsmiH32QSgCM" target="_blank">Here</a> is an example dataset. Download and then drag and drop the files here.</small>`,
+                    content: `<small>Lets start uploading your spectra data. <a class="text-green-400 hover:text-decoration-line" href="https://drive.google.com/drive/folders/1PS9jYkjCl_2iwwpod7rkxsmiH32QSgCM" target="_blank" rel="noopener noreferrer">Here</a> is an example dataset. Download and then drag and drop the files here.</small>`,
                 },
                 {
                     target: "#tour-step-proceed-from-step-1",
@@ -182,7 +182,7 @@ export default {
                     header: {
                         title: "NMRium",
                     },
-                    content: `<small>Visualize and analyse your spectra data using NMRium.<br/> You can visualize both 1D and 2D spectra, do smart peak picking and much more. <br/>Click <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org/introduction/nmrium" target="_blank">here</a> to learn more about NMRium.</small> `,
+                    content: `<small>Visualize and analyse your spectra data using NMRium.<br/> You can visualize both 1D and 2D spectra, do smart peak picking and much more. <br/>Click <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org/introduction/nmrium" target="_blank" rel="noopener noreferrer">here</a> to learn more about NMRium.</small> `,
                 },
                 {
                     target: "#tour-step-spectra-info",

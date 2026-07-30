@@ -83,6 +83,7 @@
                                 I agree to the
                                 <a
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="route('terms.show')"
                                     class="text-sm font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 hover:decoration-primary-500"
                                     >Terms of Service</a
@@ -90,6 +91,7 @@
                                 and
                                 <a
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="route('policy.show')"
                                     class="text-sm font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:text-primary-900 hover:decoration-primary-500"
                                     >Privacy Policy</a

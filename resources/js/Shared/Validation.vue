@@ -5,6 +5,7 @@
             ><span v-else>samples meta-data</span> compares to
             <a
                 target="_blank"
+                rel="noopener noreferrer"
                 class="text-primary-700 hover:text-primary-800"
                 :href="$page.props.michiStandardsUrl"
                 >recommended community standards</a
@@ -69,7 +70,7 @@
                 class="divide-y border-t divide-gray-200"
             >
                 <li v-if="mode != 'study'">
-                    <a target="_blank" class="block">
+                    <a target="_blank" rel="noopener noreferrer" class="block">
                         <div class="px-4 py-4 sm:px-6">
                             <div class="flex items-center border-b">
                                 <ValidationStatus
@@ -99,6 +100,7 @@
                                         !getStatus(validation.project.title)
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=title#project-details'
@@ -128,6 +130,7 @@
                                         )
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=description#project-details'
@@ -155,6 +158,7 @@
                                         !getStatus(validation.project.keywords)
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=keywords#project-details'
@@ -182,6 +186,7 @@
                                         !getStatus(validation.project.citations)
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=citation#project-details'
@@ -209,6 +214,7 @@
                                         !getStatus(validation.project.authors)
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=authors#project-details'
@@ -236,6 +242,7 @@
                                         !getStatus(validation.project.license)
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=license#publish-details'
@@ -263,6 +270,7 @@
                                         !getStatus(validation.project.image)
                                     "
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     :href="
                                         route('publish', effectiveDraftId) +
                                         '?edit=profile_image#publish-details'
@@ -276,7 +284,7 @@
                     </a>
                 </li>
                 <li>
-                    <a target="_blank" class="block">
+                    <a target="_blank" rel="noopener noreferrer" class="block">
                         <div class="px-4 py-4 sm:px-6">
                             <div
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -450,6 +458,7 @@
                                                             )
                                                         "
                                                         target="_blank"
+                                                        rel="noopener noreferrer"
                                                         :href="
                                                             route(
                                                                 'dashboard.study.datasets',
@@ -600,6 +609,7 @@
                                                                         )
                                                                     "
                                                                     target="_blank"
+                                                                    rel="noopener noreferrer"
                                                                     :href="
                                                                         route(
                                                                             'dashboard.study.datasets',
@@ -682,7 +692,11 @@
                     </a>
                 </li>
                 <li v-if="validation.errors && validation.errors.length > 0">
-                    <a target="_blank" class="block hover:bg-gray-50">
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="block hover:bg-gray-50"
+                    >
                         <div class="px-4 py-4 sm:px-6">
                             <div
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -702,7 +716,11 @@
                     </a>
                 </li>
                 <li v-if="validation.missing && validation.missing.length > 0">
-                    <a target="_blank" class="block hover:bg-gray-50">
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="block hover:bg-gray-50"
+                    >
                         <div class="px-4 py-4 sm:px-6">
                             <div
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"

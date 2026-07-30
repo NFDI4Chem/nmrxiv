@@ -76,6 +76,7 @@
                                 <a
                                     href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="inline-flex items-center justify-center gap-1.5 mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200"
                                 >
                                     <svg
@@ -136,6 +137,7 @@
                                 <a
                                     href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="group flex items-center justify-center w-12 h-12 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
                                     title="Need help?"
                                 >
@@ -199,6 +201,7 @@
                         <a
                             href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                             target="_blank"
+                            rel="noopener noreferrer"
                             class="inline-flex items-center justify-center gap-1.5 mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200"
                         >
                             <svg
@@ -288,6 +291,7 @@
                                 id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 class="flex items-center justify-center h-9 w-9 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
                                 ><svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -315,7 +319,7 @@
                             <a
                                 id="tour-step-tour"
                                 class="cursor-pointer text-gray-600"
-                                target="_blank"
+                                target="_blank" rel="noopener noreferrer"
                                 @click="startTour"
                                 ><svg
                                     xmlns="http://www.w3.org/2000/svg"
