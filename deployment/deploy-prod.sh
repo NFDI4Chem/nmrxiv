@@ -215,10 +215,10 @@ prompt_release_number() {
 
     read -r -p "Enter the CURRENT release number being upgraded FROM (i.e. the version still running before this deployment, e.g. 1.6.0): " RELEASE_NUMBER
 
-    if [[ -z "$RELEASE_NUMBER" ]]; then
-        log_message "❌ Release number cannot be empty. Aborting deployment."
-        exit 1
-    fi
+     if [[ ! "$RELEASE_NUMBER" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+         log_message "❌ Release number contains invalid characters. Use only letters/numbers plus . _ - (e.g. 1.6.0). Aborting deployment."
+         exit 1
+     fi
 }
 
 # Creates a fresh database dump, zips it, and copies it to Ceph storage under a
@@ -247,14 +247,16 @@ backup_and_upload_to_ceph() {
         exit 1
     fi
 
-    local zip_name="nmrxiv-data-dump-v${RELEASE_NUMBER}-$(date +%Y-%m-%d).zip"
+    local zip_name="nmrxiv-data-dump-v${RELEASE_NUMBER}-$(date +%Y-%m-%d_%H%M%S).zip"
     local zip_path="$BACKUP_DIR/$zip_name"
 
     if ! zip -j "$zip_path" "$backup_file" >/dev/null; then
         log_message "❌ Failed to zip pre-deployment release backup. Aborting deployment."
-        rm -f "$zip_path"
+        rm -f "$zip_path" "$backup_file"
         exit 1
     fi
+
+    rm -f "$backup_file"
 
     local ceph_target="${CEPH_REMOTE}:${CEPH_BUCKET}/${CEPH_BACKUP_PREFIX}/${zip_name}"
     log_message "☁️  Copying release backup to Ceph: ${ceph_target}"
@@ -341,7 +343,7 @@ build_services() {
     fi
 
     log_message "🧹 Pruning unused images and build cache system-wide (volumes preserved)..."
-    docker system prune -af
+    docker builder prune -af    
 
     log_message "🔨 Building app containers from scratch (--no-cache --pull)..."
     docker compose -f "$COMPOSE_FILE" build --no-cache --pull
