@@ -70,7 +70,7 @@
                 class="divide-y border-t divide-gray-200"
             >
                 <li v-if="mode != 'study'">
-                    <a target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="block">
                         <div class="px-4 py-4 sm:px-6">
                             <div class="flex items-center border-b">
                                 <ValidationStatus
@@ -281,10 +281,10 @@
                                 </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </li>
                 <li>
-                    <a target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="block">
                         <div class="px-4 py-4 sm:px-6">
                             <div
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -689,14 +689,10 @@
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </li>
                 <li v-if="validation.errors && validation.errors.length > 0">
-                    <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="block hover:bg-gray-50"
-                    >
+                    <div class="block hover:bg-gray-50">
                         <div class="px-4 py-4 sm:px-6">
                             <div
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -713,14 +709,10 @@
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </li>
                 <li v-if="validation.missing && validation.missing.length > 0">
-                    <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="block hover:bg-gray-50"
-                    >
+                    <div class="block hover:bg-gray-50">
                         <div class="px-4 py-4 sm:px-6">
                             <div
                                 class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -732,7 +724,7 @@
                                 </p>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </li>
             </ul>
         </div>
