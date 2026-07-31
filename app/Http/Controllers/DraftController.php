@@ -12,6 +12,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use App\Support\Draft\HifsaPdfResolver;
 use App\Support\ProvisionalDoi;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Handle draft management operations including file processing, validation, and project conversion.
@@ -38,7 +41,8 @@ class DraftController extends Controller
         private UserDrafts $userDrafts,
         private ProcessDraft $processDraft,
         private DraftFiles $draftFiles,
-        private ResetSampleFolder $resetSampleFolder
+        private ResetSampleFolder $resetSampleFolder,
+        private HifsaPdfResolver $hifsaPdfResolver,
     ) {}
 
     /**
@@ -208,10 +212,52 @@ class DraftController extends Controller
 
         $project->load(['owner']);
         $studies = $this->draftWorkspaceStudies($project, $draft);
+        $this->hifsaPdfResolver->persistCsvData($studies);
+        $studies = $this->hifsaPdfResolver->enrichStudies($studies, $draft);
 
         return response()->json([
             'project' => $project,
             'studies' => $studies,
+        ]);
+    }
+
+    /**
+     * Stream a HiFSA PDF from a draft folder inline for in-browser preview.
+     */
+    public function hifsaFile(Request $request, Draft $draft, FileSystemObject $filesystemobject): StreamedResponse
+    {
+        $this->authorize('updateDraft', $draft);
+
+        if ($filesystemobject->draft_id !== $draft->id) {
+            abort(403);
+        }
+
+        if ($filesystemobject->type !== 'file'
+            || ! str_ends_with(strtolower((string) $filesystemobject->name), '.pdf')) {
+            abort(404);
+        }
+
+        $path = ltrim((string) $filesystemobject->path, '/');
+        $disk = Storage::disk(config('filesystems.default'));
+
+        if ($path === '' || ! $disk->exists($path)) {
+            abort(404);
+        }
+
+        $stream = $disk->readStream($path);
+
+        if (! is_resource($stream)) {
+            abort(404);
+        }
+
+        $filename = str_replace('"', '', (string) $filesystemobject->name);
+
+        return response()->stream(function () use ($stream): void {
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
         ]);
     }
 

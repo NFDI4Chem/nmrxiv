@@ -68,6 +68,7 @@
                                 <a
                                     href="https://docs.nmrxiv.org"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
                                 >
                                     <svg
@@ -84,6 +85,7 @@
                                 <a
                                     href="https://github.com/NFDI4Chem/nmrxiv"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
                                 >
                                     <svg
@@ -100,6 +102,7 @@
                                 <a
                                     href="https://nmrxiv.org/api/documentation"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
                                 >
                                     <svg

@@ -160,6 +160,21 @@
                         class="text-xl font-extrabold text-blue-gray-900 dark:text-gray-100"
                     >
                         Spectrum info
+                        <span
+                            v-if="michiStandardsUrl"
+                            class="ml-2 text-sm font-medium normal-case"
+                        >
+                            (
+                            <a
+                                :href="michiStandardsUrl"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-teal-700 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
+                            >
+                                MIChI
+                            </a>
+                            )
+                        </span>
                     </h2>
                     <button
                         v-if="hasMoreSpectrumInfo"
@@ -306,7 +321,11 @@ import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import Citation from "@/Shared/Citation.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import Tag from "@/Shared/Tag.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
+import {
+    extractMichiRows,
+    MICHI_CONSUMED_INFO_KEYS,
+} from "@/Utils/michiSpectrumInfo.js";
 
 const SPECTRUM_INFO_PRIORITY = [
     "nucleus",
@@ -378,12 +397,22 @@ export default {
             default: null,
         },
     },
+    setup() {
+        const page = usePage();
+
+        return {
+            page,
+        };
+    },
     data() {
         return {
             showAllSpectrumInfo: false,
         };
     },
     computed: {
+        michiStandardsUrl() {
+            return this.page?.props?.michiStandardsUrl ?? null;
+        },
         shareURL() {
             return this.dataset.data.public_url;
         },
@@ -435,41 +464,46 @@ export default {
                 this.dataset?.data?.is_public && this.dataset?.data?.doi != null
             );
         },
-        firstSpectrumInfo() {
+        firstSpectrum() {
             const spectra = this.dataset?.data?.nmrium_info?.data?.spectra;
             if (!Array.isArray(spectra) || spectra.length === 0) {
                 return null;
             }
-            const raw = spectra[0]?.info;
-            if (raw == null || typeof raw !== "object") {
-                return null;
-            }
 
-            return raw;
+            return spectra[0] ?? null;
         },
-        spectrumInfoRows() {
-            const info = this.firstSpectrumInfo;
-            if (!info) {
+        michiSpectrumInfoRows() {
+            return extractMichiRows(this.firstSpectrum);
+        },
+        rawSpectrumInfoRows() {
+            const info = this.firstSpectrum?.info;
+            if (info == null || typeof info !== "object") {
                 return [];
             }
 
-            return Object.keys(info).map((key) => ({
-                key,
-                label: SPECTRUM_INFO_LABELS[key] ?? key,
-                value: this.formatSpectrumInfoCell(info[key]),
-            }));
+            const consumedKeys = new Set(MICHI_CONSUMED_INFO_KEYS);
+
+            return Object.keys(info)
+                .filter((key) => !consumedKeys.has(key))
+                .map((key) => ({
+                    key,
+                    label: SPECTRUM_INFO_LABELS[key] ?? key,
+                    value: this.formatSpectrumInfoCell(info[key]),
+                    source: "nmrium",
+                }));
         },
         orderedSpectrumInfoRows() {
-            const rows = this.spectrumInfoRows;
+            const michiRows = this.michiSpectrumInfoRows;
+            const rawRows = this.rawSpectrumInfoRows;
             const prioritized = SPECTRUM_INFO_PRIORITY.map((key) =>
-                rows.find((row) => row.key === key)
+                rawRows.find((row) => row.key === key)
             ).filter(Boolean);
             const prioritizedKeys = new Set(prioritized.map((row) => row.key));
+            const remainingRawRows = rawRows.filter(
+                (row) => !prioritizedKeys.has(row.key)
+            );
 
-            return [
-                ...prioritized,
-                ...rows.filter((row) => !prioritizedKeys.has(row.key)),
-            ];
+            return [...michiRows, ...prioritized, ...remainingRawRows];
         },
         visibleSpectrumInfoRows() {
             if (this.showAllSpectrumInfo) {

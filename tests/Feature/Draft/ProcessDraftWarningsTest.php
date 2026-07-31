@@ -144,6 +144,32 @@ class ProcessDraftWarningsTest extends TestCase
         $this->assertSame([], $warnings);
     }
 
+    public function test_should_create_dataset_excludes_hifsa_and_processed_markers(): void
+    {
+        $action = app(ProcessDraft::class);
+
+        foreach (['hifsa', 'processed', 'nmredata', 'mol'] as $instrumentType) {
+            $child = FileSystemObject::factory()->directory()->create([
+                'draft_id' => $this->draft->id,
+                'instrument_type' => $instrumentType,
+                'model_type' => null,
+            ]);
+
+            $this->assertFalse(
+                $action->shouldCreateDataset($child),
+                "Expected instrument_type [{$instrumentType}] to be excluded from dataset creation"
+            );
+        }
+
+        $bruker = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'instrument_type' => 'bruker',
+            'model_type' => null,
+        ]);
+
+        $this->assertTrue($action->shouldCreateDataset($bruker));
+    }
+
     public function test_reports_each_nested_pair_only_once_for_deep_nesting(): void
     {
         $rootStudy = Study::factory()->create([

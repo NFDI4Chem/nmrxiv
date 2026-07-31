@@ -1293,6 +1293,7 @@
                                                                             <a
                                                                                 href="https://docs.nmrxiv.org/submission-guides/submission/editor"
                                                                                 target="_blank"
+                                                                                rel="noopener noreferrer"
                                                                                 >Need
                                                                                 help?
                                                                             </a>
@@ -1768,6 +1769,7 @@ import {
     CheckIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
+import { applySampleMoleculeResponse } from "@/Utils/mixtureComposition";
 
 export default {
     components: {
@@ -2108,7 +2110,10 @@ export default {
                         mol.id
                 )
                 .then((res) => {
-                    this.selectedStudy.sample.molecules = res.data;
+                    applySampleMoleculeResponse(
+                        this.selectedStudy.sample,
+                        res.data
+                    );
                     this.smiles = "";
                     this.percentage = 0;
                     this.editor.setSmiles("");
@@ -2199,7 +2204,10 @@ export default {
                         mol.id
                 )
                 .then((res) => {
-                    this.selectedStudy.sample.molecules = res.data;
+                    applySampleMoleculeResponse(
+                        this.selectedStudy.sample,
+                        res.data
+                    );
                 });
         },
 
@@ -2230,7 +2238,10 @@ export default {
                             }
                         )
                         .then((res) => {
-                            this.selectedStudy.sample.molecules = res.data;
+                            applySampleMoleculeResponse(
+                                this.selectedStudy.sample,
+                                res.data
+                            );
                             this.smiles = "";
                             this.percentage = 0;
                             this.editor.setSmiles("");

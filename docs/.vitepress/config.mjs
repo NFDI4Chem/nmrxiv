@@ -45,7 +45,7 @@ export default defineConfig({
         text: 'Submission Guides',
         items: [
           { text: 'Data - Life cycle', link: '/submission-guides/data-lifecycle.md' },
-          { text: 'Registration', link: '/submission-guides/registration.md' },
+          { text: 'Registration and Account', link: '/submission-guides/registration-and-account.md' },
           { text: 'Folder Structure', link: '/submission-guides/folder-structure.md'},
           { text: 'Submission Process',
             items: [
@@ -158,7 +158,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'Source code released under the MIT License | Data are provided under the Creative Commons Attribution (aka CC-BY 4.0) <br/> Funded by the <a href="https://www.dfg.de/en/index.jsp" style="color: blue" target="_blank">Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)</a> under the <a href="https://www.nfdi4chem.de/" style="color: blue" target="_blank">National Research Data Infrastructure – NFDI4Chem</a> – Projektnummer <b>441958208.</b>',
+      message: 'Source code released under the MIT License | Data are provided under the Creative Commons Attribution (aka CC-BY 4.0) <br/> Funded by the <a href="https://www.dfg.de/en/index.jsp" style="color: blue" target="_blank" rel="noopener noreferrer">Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)</a> under the <a href="https://www.nfdi4chem.de/" style="color: blue" target="_blank" rel="noopener noreferrer">National Research Data Infrastructure – NFDI4Chem</a> – Projektnummer <b>441958208.</b>',
       copyright: `© ${new Date().getFullYear()} nmrXiv, Inc. All rights reserved.`
     }
   }

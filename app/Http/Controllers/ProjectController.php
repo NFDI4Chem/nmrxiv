@@ -18,6 +18,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
+use App\Services\InteractionTracker;
 use App\Support\ProjectWorkspace;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -54,24 +55,30 @@ class ProjectController extends Controller
             ProjectWorkspace::inertiaPropsForPublicProject($request, $project, $getLicense)
         ));
 
+        $trackAndRender = function (string $component, array $props, Project|Study|null $trackable = null) use ($request, $render) {
+            app(InteractionTracker::class)->recordView($request, false, $trackable);
+
+            return $render($component, $props);
+        };
+
         $tab = $request->get('tab');
         if ($tab == 'info') {
-            return $render('Public/Project/Show', [
+            return $trackAndRender('Public/Project/Show', [
                 'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
                 'tab' => $tab,
-            ]);
+            ], $project);
         }
         if ($tab == 'samples') {
-            return $render('Public/Project/Samples', [
+            return $trackAndRender('Public/Project/Samples', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
-            ]);
+            ], $project);
         }
         if ($tab == 'files') {
-            return $render('Public/Project/Files', [
+            return $trackAndRender('Public/Project/Files', [
                 'project' => (new ProjectResource($project))->lite(false, ['files']),
                 'tab' => $tab,
-            ]);
+            ], $project);
         }
         if ($tab == 'study') {
             $studyId = $request->get('id');
@@ -81,17 +88,17 @@ class ProjectController extends Controller
                 ['project_id', $project->id],
             ])->firstOrFail();
 
-            return $render('Public/Project/Study', [
+            return $trackAndRender('Public/Project/Study', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
                 'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'citations']),
-            ]);
+            ], $study);
         }
 
-        return $render('Public/Project/Show', [
+        return $trackAndRender('Public/Project/Show', [
             'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations', 'fundingReferences']),
             'tab' => 'info',
-        ]);
+        ], $project);
     }
 
     public function publicProjectsView(Request $request)

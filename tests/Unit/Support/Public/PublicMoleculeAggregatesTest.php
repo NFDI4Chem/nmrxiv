@@ -72,6 +72,18 @@ class PublicMoleculeAggregatesTest extends TestCase
         $this->assertFalse(Cache::has(PublicMoleculeAggregates::PUBLIC_CATALOG_TOTAL_CACHE_KEY));
     }
 
+    public function test_public_catalog_total_counts_molecules_with_public_spectra(): void
+    {
+        Cache::forget(PublicMoleculeAggregates::PUBLIC_CATALOG_TOTAL_CACHE_KEY);
+
+        $this->createMoleculeInPublicCatalog();
+        $this->createMoleculeInPublicCatalog();
+        Molecule::factory()->create();
+
+        $this->assertSame(2, PublicMoleculeAggregates::publicCatalogTotal());
+        $this->assertTrue(Cache::has(PublicMoleculeAggregates::PUBLIC_CATALOG_TOTAL_CACHE_KEY));
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */

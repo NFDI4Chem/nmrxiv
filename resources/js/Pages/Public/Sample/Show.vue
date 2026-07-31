@@ -224,6 +224,7 @@
                                 <a
                                     :href="study.data.external_url"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600"
                                 >
                                     <span
@@ -569,7 +570,13 @@
                                 </div>
                             </div>
 
-                            <div v-if="hasMolecularCompositionSidebar">
+                            <div v-if="hasMixtureComposition">
+                                <MixtureCompositionDisplay
+                                    :composition="mixtureComposition"
+                                />
+                            </div>
+
+                            <div v-else-if="hasMolecularCompositionSidebar">
                                 <h3
                                     class="text-sm font-bold text-gray-900 dark:text-gray-100"
                                 >
@@ -610,6 +617,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
+import MixtureCompositionDisplay from "@/Shared/MixtureCompositionDisplay.vue";
 import Tag from "@/Shared/Tag.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
@@ -627,6 +635,7 @@ export default {
         SpectraViewer,
         DOIBadge,
         MolecularInfoPanel,
+        MixtureCompositionDisplay,
         Tag,
         Head,
         Citation,
@@ -650,6 +659,16 @@ export default {
          * Molecules for composition UI: prefer nested sample.molecules, fall back
          * to study.data.molecules (StudyResource always exposes the latter).
          */
+        mixtureComposition() {
+            return (
+                this.study?.data?.sample?.mixture_composition ??
+                this.study?.data?.mixture_composition ??
+                null
+            );
+        },
+        hasMixtureComposition() {
+            return (this.mixtureComposition?.components?.length ?? 0) > 0;
+        },
         compositionMolecules() {
             const fromSample = this.study?.data?.sample?.molecules;
             if (Array.isArray(fromSample) && fromSample.length > 0) {
@@ -693,6 +712,7 @@ export default {
             return (
                 Boolean(this.studyIdentifier) ||
                 this.showDoiCitation ||
+                this.hasMixtureComposition ||
                 this.hasMolecularCompositionSidebar ||
                 this.hasKeywords ||
                 Boolean(this.study?.data?.release_date) ||

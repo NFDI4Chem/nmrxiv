@@ -54,6 +54,11 @@ class StudyResource extends JsonResource
             'external_id' => $this->external_id,
             'external_url' => $this->external_url,
             'processing_logs' => $this->processing_logs,
+            'stats' => [
+                'likes' => $this->likesCount(),
+                'views' => (int) $this->views,
+                'downloads' => (int) $this->downloads,
+            ],
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(

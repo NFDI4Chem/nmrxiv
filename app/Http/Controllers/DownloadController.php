@@ -11,6 +11,7 @@ use Aws\S3\S3Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use ZipStream;
 
 class DownloadController extends Controller
@@ -83,16 +84,24 @@ class DownloadController extends Controller
         $key = $key ?: $request->get('key');
         $uuid = $request->get('uuid');
 
+        if (! is_string($uuid) || ! Str::isUuid($uuid)) {
+            return Response::make(null, 404);
+        }
+
         $fsObj = $fsObj ?: FileSystemObject::with('study')->where([
             ['uuid', $uuid],
         ])->first();
+
+        if (! $fsObj) {
+            return Response::make(null, 404);
+        }
 
         if ($fsObj->key == $key) {
             $path = $fsObj->path;
 
             $s3Client = $this->storageClient();
 
-            $bucket = $request->input('bucket') ?: config('filesystems.disks.'.config('filesystems.default').'.bucket');
+            $bucket = config('filesystems.disks.'.config('filesystems.default').'.bucket');
 
             $s3keys = [];
 

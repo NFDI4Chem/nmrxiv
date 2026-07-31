@@ -610,10 +610,8 @@ class StudyDataManagementTest extends TestCase
 
     public function test_can_view_study_files(): void
     {
-        $fsObject = FileSystemObject::factory()->create([
-            'study_id' => $this->study->id,
+        FileSystemObject::factory()->asStudyRoot($this->study)->create([
             'name' => 'study_data',
-            'type' => 'directory',
         ]);
 
         $response = $this->actingAs($this->user)
