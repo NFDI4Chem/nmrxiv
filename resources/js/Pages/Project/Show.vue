@@ -27,6 +27,14 @@
                 <b>Info: </b> This project is in embargo and set to be released
                 on {{ formatDate(project.release_date) }}. You cannot edit the
                 project, please create a new version to update the project.
+                <a
+                    href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="font-medium text-green-800 underline decoration-green-600/45 underline-offset-2 hover:text-green-950"
+                >
+                    Click to learn more about embargo.
+                </a>
             </div>
             <div v-if="project.is_public">
                 <div
