@@ -1077,7 +1077,14 @@
                                                 <span
                                                     >Modify the release date or
                                                     publish instantly from your
-                                                    dashboard</span
+                                                    dashboard
+                                                </span>
+                                                <a
+                                                    href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
+                                                    target="_blank"
+                                                    class="font-small text-primary-400 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500 ml-1"
+                                                    >Click to learn more about
+                                                    embargo.</a
                                                 >
                                             </li>
                                         </ul>
@@ -1511,7 +1518,7 @@
                                 target="_blank"
                                 rel="noreferrer"
                                 class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
-                                >Learn more</a
+                                >Click to learn more about embargo</a
                             >
                         </span>
                         <span v-else>

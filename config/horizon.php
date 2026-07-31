@@ -85,6 +85,7 @@ return [
 
     'waits' => [
         'redis:default' => 60,
+        'redis:metadata-extraction' => 300,
     ],
 
     /*
@@ -187,6 +188,18 @@ return [
                 'balanceCooldown' => 3,
                 'timeout' => 9000,
             ],
+            'supervisor-metadata-extraction' => [
+                'connection' => 'redis',
+                'queue' => [env('SPECTRA_QUEUE', 'metadata-extraction')],
+                'balance' => 'simple',
+                'maxProcesses' => (int) env('SPECTRA_HORIZON_MAX_PROCESSES', 1),
+                'maxTime' => 0,
+                'maxJobs' => 0,
+                'memory' => 256,
+                'tries' => (int) env('SPECTRA_JOB_TRIES', 3),
+                'timeout' => (int) env('SPECTRA_JOB_TIMEOUT', 600),
+                'nice' => 0,
+            ],
         ],
 
         'development' => [
@@ -196,11 +209,35 @@ return [
                 'balanceCooldown' => 3,
                 'timeout' => 9000,
             ],
+            'supervisor-metadata-extraction' => [
+                'connection' => 'redis',
+                'queue' => [env('SPECTRA_QUEUE', 'metadata-extraction')],
+                'balance' => 'simple',
+                'maxProcesses' => (int) env('SPECTRA_HORIZON_MAX_PROCESSES', 1),
+                'maxTime' => 0,
+                'maxJobs' => 0,
+                'memory' => 256,
+                'tries' => (int) env('SPECTRA_JOB_TRIES', 3),
+                'timeout' => (int) env('SPECTRA_JOB_TIMEOUT', 600),
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
             'supervisor-1' => [
                 'maxProcesses' => 3,
+            ],
+            'supervisor-metadata-extraction' => [
+                'connection' => 'redis',
+                'queue' => [env('SPECTRA_QUEUE', 'metadata-extraction')],
+                'balance' => 'simple',
+                'maxProcesses' => (int) env('SPECTRA_HORIZON_MAX_PROCESSES', 1),
+                'maxTime' => 0,
+                'maxJobs' => 0,
+                'memory' => 256,
+                'tries' => (int) env('SPECTRA_JOB_TRIES', 3),
+                'timeout' => (int) env('SPECTRA_JOB_TIMEOUT', 600),
+                'nice' => 0,
             ],
         ],
     ],
