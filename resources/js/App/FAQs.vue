@@ -56,6 +56,7 @@
                     <a
                         href="https://docs.nmrxiv.org/FAQs.html"
                         target="_blank"
+                        rel="noopener noreferrer"
                         class="text-teal-600 font-medium hover:text-teal-700"
                     >
                         View all FAQs
@@ -64,6 +65,7 @@
                     <a
                         href="https://www.nfdi4chem.de/helpdesk/"
                         target="_blank"
+                        rel="noopener noreferrer"
                         class="text-teal-600 font-medium hover:text-teal-700"
                     >
                         contact support

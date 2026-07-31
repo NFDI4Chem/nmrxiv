@@ -9,6 +9,7 @@
                     <a
                         href="https://docs.nmrxiv.org/submission-guides/data-model/sample.html"
                         target="_blank"
+                        rel="noopener noreferrer"
                         >Learn more about samples
                     </a>
                 </div>
@@ -58,6 +59,7 @@
                     <a
                         href="https://docs.nmrxiv.org/submission-guides/data-model/project.html#manage-samples"
                         target="_blank"
+                        rel="noopener noreferrer"
                         >Need help?
                     </a>
                 </div>

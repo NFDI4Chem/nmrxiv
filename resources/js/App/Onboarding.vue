@@ -160,6 +160,7 @@
                                                             class="text-indigo-600 font-bold"
                                                             href="https://nfdi4chem.de"
                                                             target="_blank"
+                                                            rel="noopener noreferrer"
                                                             >NFDI4Chem</a
                                                         >, focuses on the
                                                         implementation and
@@ -174,6 +175,7 @@
                                                         <a
                                                             class="text-indigo-600"
                                                             target="_blank"
+                                                            rel="noopener noreferrer"
                                                             href="https://www.chemotion.net/chemotionsaurus/index.html"
                                                             >Chemotion</a
                                                         >
@@ -183,6 +185,7 @@
                                                             href="https://github.com/NFDI4Chem/nmrxiv-cli"
                                                             class="text-indigo-600"
                                                             target="_blank"
+                                                            rel="noopener noreferrer"
                                                             >nmrXiv&nbsp;CLI </a
                                                         >(Command Line
                                                         Interface) for a
@@ -262,6 +265,7 @@
                                                 <div class="inline-flex">
                                                     <a
                                                         target="_blank"
+                                                        rel="noopener noreferrer"
                                                         href="https://github.com/NFDI4Chem/nmrxiv"
                                                         class="inline-flex mr-4 items-center justify-center px-5 py-3 border text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
                                                     >
@@ -273,6 +277,7 @@
                                                     </a>
                                                     <a
                                                         target="_blank"
+                                                        rel="noopener noreferrer"
                                                         href="https://docs.nmrxiv.org"
                                                         class="inline-flex items-center justify-center px-5 py-3 border text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
                                                     >

@@ -292,6 +292,7 @@
                                 <a
                                     href="https://docs.nmrxiv.org"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     class="hidden sm:inline-flex items-center gap-1 text-brand font-medium text-brand-hover transition-colors text-sm"
                                 >
                                     Learn more
@@ -512,6 +513,7 @@
                                                         selectedFeature.learnMoreUrl
                                                     "
                                                     target="_blank"
+                                                    rel="noopener noreferrer"
                                                     class="inline-flex items-center gap-2 text-brand font-medium text-brand-hover transition-colors"
                                                 >
                                                     Learn more
@@ -649,6 +651,7 @@
                                 <a
                                     href="https://pharmacy.uic.edu/profiles/gfp/"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >Guido Pauli</a
                                 >
                             </h3>
@@ -670,6 +673,7 @@
                                 <a
                                     href="https://friedolin.uni-jena.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfoPerson&publishSubDir=personal&keep=y&personal.pid=16242"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >Nils Schlörer</a
                                 >
                             </h3>
@@ -691,6 +695,7 @@
                                 <a
                                     href="https://researchportal.murdoch.edu.au/esploro/profile/julien_wist/overview"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >Julien Wist</a
                                 >
                             </h3>
@@ -712,6 +717,7 @@
                                 <a
                                     href="https://www.linkedin.com/in/lpatiny/"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >Luc Patiny</a
                                 >
                             </h3>
@@ -733,6 +739,7 @@
                                 <a
                                     href="https://www.linkedin.com/in/stefan-kuhn-756bb74/?originalSubdomain=ee"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >Stephan Kuhn</a
                                 >
                             </h3>
@@ -754,6 +761,7 @@
                                 <a
                                     href="https://personen.uni-mainz.de/public/person/1737"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >Johannes&nbsp;Liermann</a
                                 >
                             </h3>
@@ -800,6 +808,7 @@
                                         <a
                                             href="https://nmrxiv.org"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
                                         >
                                             <div
@@ -859,6 +868,7 @@
                                         <a
                                             href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
                                         >
                                             <div
@@ -906,6 +916,7 @@
                                         <a
                                             href="https://www.nmrium.org/"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
                                         >
                                             <div
@@ -953,6 +964,7 @@
                                         <a
                                             href="https://qnmr.org"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
                                         >
                                             <div
@@ -1000,6 +1012,7 @@
                                         <a
                                             href="https://nobs.naturalproducts.net/"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             class="group relative bg-white rounded-[28px] overflow-hidden transition-transform duration-300 aspect-[3/4] block border border-gray-200"
                                         >
                                             <div

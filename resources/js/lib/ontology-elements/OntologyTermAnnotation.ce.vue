@@ -20,7 +20,12 @@ const source = computed(() =>
 </script>
 
 <template>
-    <a v-if="annotation && annotation !== ''" :href="iri" target="_blank">
+    <a
+        v-if="annotation && annotation !== ''"
+        :href="iri"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
         {{ source }}: {{ term }}
     </a>
 </template>

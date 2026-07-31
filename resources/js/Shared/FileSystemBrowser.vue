@@ -39,7 +39,7 @@
                             >
                                 <ToolTip
                                     class="text-blue-600"
-                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank' rel='noopener noreferrer'>documentation</a>."
                                 />
                                 <a
                                     class="text-blue-600 underline decoration-blue-300/70 underline-offset-2 transition hover:text-blue-800 hover:decoration-blue-500"
@@ -261,6 +261,7 @@
                                             class="text-blue-800 hover:underline"
                                             href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                         >
                                             submission guides
                                         </a>

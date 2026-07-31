@@ -35,6 +35,7 @@
                                 class="text-teal-900"
                                 href="https://docs.nmrxiv.org/introduction/intro"
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 >spectra</a
                             >.
                         </p>

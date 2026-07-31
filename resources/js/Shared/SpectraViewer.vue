@@ -347,10 +347,17 @@ export default {
             return String(this.$page.props.url);
         },
         nmriumURL() {
-            return this.$page.props.nmriumURL
-                ? String(this.$page.props.nmriumURL + "&id=" + Math.random())
-                : "https://nmriumdev.nmrxiv.org?defaultEmptyMessage=''&workspace=embedded&id=" +
-                      Math.random();
+            const raw = this.$page.props.nmriumURL;
+            if (!raw) {
+                return (
+                    "https://nmriumdev.nmrxiv.org?defaultEmptyMessage=''&workspace=embedded&id=" +
+                    Math.random()
+                );
+            }
+            const base = String(raw);
+            const sep = base.includes("?") ? "&" : "?";
+
+            return `${base}${sep}id=${Math.random()}`;
         },
     },
     watch: {

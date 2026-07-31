@@ -1,4 +1,4 @@
-<p align="center"><a href="https://dev.nmrxiv.org" target="_blank"><img src="/public/img/logo.svg" width="400"></a></p>
+<p align="center"><a href="https://dev.nmrxiv.org" target="_blank" rel="noopener noreferrer"><img src="/public/img/logo.svg" width="400"></a></p>
 
 [![License](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](https://opensource.org/licenses/MIT)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-blue.svg)](https://GitHub.com/NFDI4Chem/nmrxiv/graphs/commit-activity)
@@ -36,12 +36,12 @@ Licensed under the [MIT license](https://opensource.org/licenses/MIT).
 The code for this web application is released under the [MIT license](https://opensource.org/licenses/MIT).
 
 
-<p align="left"><a href="https://nfdi4chem.de/" target="_blank"><img src="https://www.nfdi4chem.de/wp-content/themes/wptheme/assets/img/logo.svg" width="50%" alt="NFDI4Chem Logo"></a></p>
+<p align="left"><a href="https://nfdi4chem.de/" target="_blank" rel="noopener noreferrer"><img src="https://www.nfdi4chem.de/wp-content/themes/wptheme/assets/img/logo.svg" width="50%" alt="NFDI4Chem Logo"></a></p>
 
 ## Acknowledgments
 
 Funded by the [Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)](https://www.dfg.de/) under the [National Research Data Infrastructure – NFDI4Chem](https://nfdi4chem.de/) – Projektnummer **441958208**.
 
-<p align="left"><a href="https://www.dfg.de/" target="_blank"><img src="./public/img/dfg_logo_schriftzug_blau_foerderung_en.gif" width="50%" alt="DFG Logo"></a></p>
+<p align="left"><a href="https://www.dfg.de/" target="_blank" rel="noopener noreferrer"><img src="./public/img/dfg_logo_schriftzug_blau_foerderung_en.gif" width="50%" alt="DFG Logo"></a></p>
 
 
