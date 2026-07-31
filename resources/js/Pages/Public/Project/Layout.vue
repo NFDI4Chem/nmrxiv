@@ -83,7 +83,7 @@
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/embargo.html"
                                 target="_blank"
-                                rel="noreferrer"
+                                rel="noopener noreferrer"
                                 class="font-medium text-primary-600 underline decoration-primary-300 underline-offset-2 hover:text-primary-800 hover:decoration-primary-500"
                             >
                                 Click to learn more about embargo.

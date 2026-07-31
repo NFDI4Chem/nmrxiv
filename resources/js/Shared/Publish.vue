@@ -250,7 +250,7 @@
                                                     <div class="ml-2 text-sm">
                                                         I agree to the
                                                         <a
-                                                            target="_blank"
+                                                            target="_blank" rel="noopener noreferrer"
                                                             :href="
                                                                 route(
                                                                     'terms.show'
@@ -261,7 +261,7 @@
                                                         >
                                                         and
                                                         <a
-                                                            target="_blank"
+                                                            target="_blank" rel="noopener noreferrer"
                                                             :href="
                                                                 route(
                                                                     'policy.show'
