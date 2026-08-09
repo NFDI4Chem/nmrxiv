@@ -48,6 +48,7 @@
                         <a
                             href="https://docs.nmrxiv.org/introduction/intro"
                             target="_blank"
+                            rel="noopener noreferrer"
                             class="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
                         >
                             documentation </a

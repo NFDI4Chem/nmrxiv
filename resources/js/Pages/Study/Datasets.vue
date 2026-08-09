@@ -109,7 +109,7 @@
                                 >
                                     <a
                                         href="https://docs.nmrxiv.org/submission-guides/data-model/dataset"
-                                        target="_blank"
+                                        target="_blank" rel="noopener noreferrer"
                                         >Learn more about spectra
                                     </a>
                                 </div>
@@ -175,7 +175,7 @@
                                 >
                                     <a
                                         href="https://docs.nmrxiv.org/submission-guides/submission/upload/#manage-studies-and-datasets"
-                                        target="_blank"
+                                        target="_blank" rel="noopener noreferrer"
                                         >Need help?
                                     </a>
                                 </div>
@@ -221,7 +221,7 @@
                                                     ''
                                                 )
                                             "
-                                            target="_blank"
+                                            target="_blank" rel="noopener noreferrer"
                                         > -->
                                         <!-- <div
                                             class="flex w-16 flex-shrink-0 items-center justify-center bg-pink-600 rounded-l-md text-sm font-medium text-white"

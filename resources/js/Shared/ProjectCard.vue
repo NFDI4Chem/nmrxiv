@@ -150,21 +150,29 @@
                                             v-slot="{ active }"
                                             class="border-b border-gray-100"
                                         >
-                                            <a
-                                                :href="project.download_url"
+                                            <button
+                                                type="button"
                                                 :class="[
                                                     active
                                                         ? 'bg-gray-50 text-gray-900'
                                                         : 'text-gray-700',
-                                                    'flex items-center gap-2 px-4 py-3 text-sm',
+                                                    'flex w-full items-center gap-2 px-4 py-3 text-left text-sm',
                                                 ]"
+                                                @click="
+                                                    requestDownload(
+                                                        project.download_url,
+                                                        trackingIdentifier(
+                                                            project
+                                                        )
+                                                    )
+                                                "
                                             >
                                                 <ArrowDownTrayIcon
                                                     class="h-5 w-5 shrink-0"
                                                     aria-hidden="true"
                                                 />
                                                 Download
-                                            </a>
+                                            </button>
                                         </MenuItem>
 
                                         <MenuItem v-if="licenseTitle">
@@ -197,18 +205,18 @@
             >
                 <Link
                     :href="project.public_url"
-                    class="relative shrink-0 overflow-hidden rounded-lg border border-gray-200"
+                    class="relative h-28 w-28 shrink-0 self-start overflow-hidden rounded-lg border border-gray-200 sm:h-32 sm:w-32"
                 >
                     <img
                         v-if="project.photo_url && project.photo_url != ''"
                         :src="project.photo_url"
                         :alt="project.name"
-                        class="h-28 w-28 object-cover sm:h-32 sm:w-32"
+                        class="h-full w-full object-cover"
                     />
                     <SeededCoverBackground
                         v-else
                         :seed="project"
-                        container-class="h-28 w-28 sm:h-32 sm:w-32"
+                        container-class="h-full w-full"
                     />
                 </Link>
 
@@ -303,16 +311,22 @@
                                 v-if="project.download_url"
                                 class="flex items-center"
                             >
-                                <a
-                                    :href="project.download_url"
+                                <button
+                                    type="button"
                                     class="inline-flex items-center gap-1 text-teal-700 hover:text-teal-900"
+                                    @click="
+                                        requestDownload(
+                                            project.download_url,
+                                            trackingIdentifier(project)
+                                        )
+                                    "
                                 >
                                     <ArrowDownTrayIcon
                                         class="h-4 w-4"
                                         aria-hidden="true"
                                     />
                                     Download
-                                </a>
+                                </button>
                             </p>
                             <p class="flex items-center gap-1.5">
                                 <svg
@@ -337,6 +351,14 @@
                 </div>
             </li>
         </div>
+
+        <DownloadTermsModal
+            :show="showDownloadTerms"
+            :download-url="pendingDownloadUrl"
+            :download-identifier="pendingDownloadIdentifier"
+            :license-title="licenseTitle"
+            @close="closeDownloadTerms"
+        />
     </div>
 </template>
 
@@ -351,6 +373,8 @@ import { router } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
 import Tag from "@/Shared/Tag.vue";
 import SeededCoverBackground from "@/Shared/SeededCoverBackground.vue";
+import DownloadTermsModal from "@/Shared/DownloadTermsModal.vue";
+import DownloadTerms from "@/Mixins/DownloadTerms.js";
 
 export default {
     name: "ProjectCard",
@@ -366,7 +390,10 @@ export default {
         ScaleIcon,
         Tag,
         SeededCoverBackground,
+        DownloadTermsModal,
     },
+
+    mixins: [DownloadTerms],
 
     props: ["project", "mode"],
 

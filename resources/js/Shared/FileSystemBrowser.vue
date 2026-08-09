@@ -39,7 +39,7 @@
                             >
                                 <ToolTip
                                     class="text-blue-600"
-                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank' rel='noopener noreferrer'>documentation</a>."
                                 />
                                 <a
                                     class="text-blue-600 underline decoration-blue-300/70 underline-offset-2 transition hover:text-blue-800 hover:decoration-blue-500"
@@ -261,6 +261,7 @@
                                             class="text-blue-800 hover:underline"
                                             href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                         >
                                             submission guides
                                         </a>
@@ -829,18 +830,24 @@
                                         />
                                         Delete
                                     </button>
-                                    <a
+                                    <button
                                         v-if="
                                             $page.props.selectedFileSystemObject
                                                 .id &&
                                             readonly &&
                                             downloadURL
                                         "
-                                        :href="downloadURL"
+                                        type="button"
                                         class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                        @click="
+                                            requestDownload(
+                                                downloadURL,
+                                                downloadTrackingIdentifier
+                                            )
+                                        "
                                     >
                                         Download
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1104,23 +1111,28 @@
                                                     {{ formatFileSize(file) }}
                                                 </p>
                                                 <span v-else></span>
-                                                <a
+                                                <button
                                                     v-if="
                                                         file.type !==
                                                             'directory' &&
                                                         readonly
                                                     "
-                                                    :href="
-                                                        getFileDownloadURL(file)
-                                                    "
+                                                    type="button"
                                                     class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
                                                     title="Download file"
-                                                    @click.stop
+                                                    @click.stop="
+                                                        requestDownload(
+                                                            getFileDownloadURL(
+                                                                file
+                                                            ),
+                                                            downloadTrackingIdentifier
+                                                        )
+                                                    "
                                                 >
                                                     <ArrowDownTrayIcon
                                                         class="h-4 w-4"
                                                     />
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     </template>
@@ -1212,22 +1224,28 @@
                                             <div
                                                 class="col-span-1 flex justify-center"
                                             >
-                                                <a
+                                                <button
                                                     v-if="
                                                         file.type !==
                                                             'directory' &&
                                                         readonly
                                                     "
-                                                    :href="
-                                                        getFileDownloadURL(file)
-                                                    "
+                                                    type="button"
                                                     class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
                                                     title="Download file"
+                                                    @click.stop="
+                                                        requestDownload(
+                                                            getFileDownloadURL(
+                                                                file
+                                                            ),
+                                                            downloadTrackingIdentifier
+                                                        )
+                                                    "
                                                 >
                                                     <ArrowDownTrayIcon
                                                         class="h-5 w-5"
                                                     />
-                                                </a>
+                                                </button>
                                                 <!-- No download icon for folders -->
                                             </div>
                                         </div>
@@ -1319,18 +1337,24 @@
                                         />
                                         Delete
                                     </button>
-                                    <a
+                                    <button
                                         v-if="
                                             $page.props.selectedFileSystemObject
                                                 .id &&
                                             readonly &&
                                             downloadURL
                                         "
-                                        :href="downloadURL"
+                                        type="button"
                                         class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                        @click="
+                                            requestDownload(
+                                                downloadURL,
+                                                downloadTrackingIdentifier
+                                            )
+                                        "
                                     >
                                         Download
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1539,6 +1563,14 @@
             folder.
         </p>
     </div>
+
+    <DownloadTermsModal
+        :show="showDownloadTerms"
+        :download-url="pendingDownloadUrl"
+        :download-identifier="pendingDownloadIdentifier"
+        :license-title="project?.license?.title || study?.license?.title"
+        @close="closeDownloadTerms"
+    />
 </template>
 
 <script>
@@ -1577,6 +1609,8 @@ import axiosRetry from "axios-retry";
 // Shared component imports
 import FileDetails from "@/Shared/FileDetails.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
+import DownloadTermsModal from "@/Shared/DownloadTermsModal.vue";
+import DownloadTerms from "@/Mixins/DownloadTerms.js";
 
 // Icon imports from Heroicons
 import {
@@ -1629,6 +1663,7 @@ export default {
         DocumentTextIcon, // Document icon for files
         InformationCircleIcon, // Information icon for logs
         FileDetails, // File details display component
+        DownloadTermsModal,
         JetDialogModal, // Modal dialog component
         JetSecondaryButton, // Secondary button component
         EllipsisVerticalIcon, // More options icon
@@ -1659,6 +1694,8 @@ export default {
         ArrowsPointingOutIcon,
         ArrowsPointingInIcon,
     },
+
+    mixins: [DownloadTerms],
 
     /**
      * Component props
@@ -1873,6 +1910,17 @@ export default {
                     return null;
                 }
             }
+        },
+
+        downloadTrackingIdentifier() {
+            if (this.project) {
+                return this.trackingIdentifier(this.project);
+            }
+
+            const study =
+                this.$page.props.study?.data ?? this.$page.props.study;
+
+            return study ? this.trackingIdentifier(study) : null;
         },
 
         /**

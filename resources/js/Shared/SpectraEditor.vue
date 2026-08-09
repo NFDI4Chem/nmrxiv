@@ -11,6 +11,7 @@
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
                         href="https://docs.nmrxiv.org/advanced-guides/nmrium/nmrium.html"
                         target="_blank"
+                        rel="noopener noreferrer"
                         >Learn more
                     </a>
                     <a

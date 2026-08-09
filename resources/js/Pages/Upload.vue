@@ -1998,7 +1998,7 @@
                                                                                                 <a
                                                                                                     href="https://docs.nmrium.org/help/assignment/"
                                                                                                     target="_blank"
-                                                                                                    rel="noopener"
+                                                                                                    rel="noopener noreferrer"
                                                                                                     class="ml-1 underline decoration-dotted underline-offset-2 hover:no-underline"
                                                                                                     >Full
                                                                                                     guide
@@ -4291,7 +4291,7 @@ export default {
                         "Please upload spectral data to proceed.";
                 } else if (!this.studiesExist) {
                     this.filesErrorMessage =
-                        "Please organize the spectral data into folders corresponding to the given samples and re-upload. Refer to the <a href='https://docs.nmrxiv.org/submission-guides/folder-structure.html' style='color:blue' target='_blank'>documentation</a> for more details.";
+                        "Please organize the spectral data into folders corresponding to the given samples and re-upload. Refer to the <a href='https://docs.nmrxiv.org/submission-guides/folder-structure.html' style='color:blue' target='_blank' rel='noopener noreferrer'>documentation</a> for more details.";
                 } else {
                     this.filesErrorMessage =
                         "Please make sure you fill in all the required data before you proceed";

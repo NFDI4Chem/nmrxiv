@@ -9,6 +9,7 @@ use App\Http\Resources\StudyResource;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
+use App\Services\InteractionTracker;
 use App\Support\ProjectWorkspace;
 use App\Support\Public\PublicEntityAccess;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -183,7 +184,8 @@ class ApplicationController extends Controller
                     $request,
                     $project,
                     $getLicense,
-                    $reviewerPreview
+                    $reviewerPreview,
+                    $project
                 );
             case 'samples':
                 return $this->renderPublicProject(
@@ -195,7 +197,8 @@ class ApplicationController extends Controller
                     $request,
                     $project,
                     $getLicense,
-                    $reviewerPreview
+                    $reviewerPreview,
+                    $project
                 );
             case 'files':
                 return $this->renderPublicProject(
@@ -207,7 +210,8 @@ class ApplicationController extends Controller
                     $request,
                     $project,
                     $getLicense,
-                    $reviewerPreview
+                    $reviewerPreview,
+                    $project
                 );
             case 'study':
                 $studyForView = $study ?? $this->resolveStudyForProjectTab($request, $project);
@@ -227,11 +231,14 @@ class ApplicationController extends Controller
                         $request,
                         $project,
                         $getLicense,
-                        $reviewerPreview
+                        $reviewerPreview,
+                        $studyForView
                     );
                 }
 
                 if ($studyForView) {
+                    $this->recordPageView($request, $reviewerPreview, $studyForView);
+
                     return Inertia::render('Public/Sample/Show', [
                         'tab' => $tab,
                         'study' => (new StudyResource($studyForView))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license', 'authors', 'citations']),
@@ -251,7 +258,8 @@ class ApplicationController extends Controller
                     $request,
                     $project,
                     $getLicense,
-                    $reviewerPreview
+                    $reviewerPreview,
+                    $project
                 );
             case 'dataset':
                 $studyForView = $study ?? $this->resolveStudyForProjectTab($request, $project);
@@ -275,7 +283,8 @@ class ApplicationController extends Controller
                         $request,
                         $project,
                         $getLicense,
-                        $reviewerPreview
+                        $reviewerPreview,
+                        $project
                     );
                 }
 
@@ -296,9 +305,12 @@ class ApplicationController extends Controller
                         $request,
                         $project,
                         $getLicense,
-                        $reviewerPreview
+                        $reviewerPreview,
+                        $datasetForView
                     );
                 }
+
+                $this->recordPageView($request, $reviewerPreview, $datasetForView);
 
                 return Inertia::render('Public/Sample/Dataset', [
                     'tab' => $tab,
@@ -315,7 +327,8 @@ class ApplicationController extends Controller
                     $request,
                     $project,
                     $getLicense,
-                    $reviewerPreview
+                    $reviewerPreview,
+                    $project
                 );
         }
     }
@@ -354,6 +367,7 @@ class ApplicationController extends Controller
         ?Project $project,
         GetLicense $getLicense,
         bool $reviewerPreview = false,
+        Project|Study|Dataset|null $trackable = null,
     ): InertiaResponse {
         $mergedProps = $props;
 
@@ -371,7 +385,17 @@ class ApplicationController extends Controller
             );
         }
 
+        $this->recordPageView($request, $reviewerPreview, $trackable);
+
         return Inertia::render($component, $mergedProps);
+    }
+
+    private function recordPageView(
+        Request $request,
+        bool $reviewerPreview,
+        Project|Study|Dataset|null $entity,
+    ): void {
+        app(InteractionTracker::class)->recordView($request, $reviewerPreview, $entity);
     }
 
     /**

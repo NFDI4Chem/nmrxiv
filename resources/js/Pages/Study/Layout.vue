@@ -24,6 +24,14 @@
                 on {{ formatDate(study.release_date) }}. You cannot edit the
                 sample. Contact us at info.nmrxiv@uni-jena.de if you need to
                 make changes.
+                <a
+                    href="https://docs.nmrxiv.org/submission-guides/embargo.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="font-medium text-green-800 underline decoration-green-600/45 underline-offset-2 hover:text-green-950"
+                >
+                    Click to learn more about embargo.
+                </a>
             </div>
             <div>
                 <div

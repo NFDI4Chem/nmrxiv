@@ -55,6 +55,8 @@ class ProjectResource extends JsonResource
             'release_date' => $this->release_date,
             'stats' => [
                 'likes' => $this->likesCount(),
+                'views' => (int) $this->views,
+                'downloads' => (int) $this->downloads,
             ],
             'samples_count' => $this->samplesCountForTab($request),
             'license' => new LicenseResource(

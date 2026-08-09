@@ -52,6 +52,7 @@
                             <h3 class="text-lg font-medium">
                                 <a
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     href="/horizon"
                                     class="focus:outline-none"
                                 >

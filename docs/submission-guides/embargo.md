@@ -8,6 +8,40 @@ With embargo, nmrXiv keeps your project fully private (identifiers and a DOI are
 Embargo is only available for **project-level publications** ("Group as one publication"). Sample-level publications ("Publish each sample on its own") are always released immediately and cannot be embargoed. See [Publication Deposition](/submission-guides/publication-deposition.html) for the difference between the two modes.
 :::
 
+## When to Choose Embargo Publication
+
+Choose **Embargo** instead of an immediate public release when:
+
+-   your data supports a manuscript, thesis, or preprint that is **still under review or not yet published**, and you want to reserve a citable DOI for it now,
+-   a journal, funder, or institution **requires a fixed public release date** rather than immediate publication,
+-   you want your submission fully finalized, validated, and DOI-assigned today, but the actual public availability tied to a specific future date (e.g. an article's publication date or an agreed release window).
+
+Choose **immediate (public) release** instead when your manuscript/thesis is already published and there is no reason to delay public access to the data.
+
+::: warning
+Embargo only delays **public visibility** - it does not delay validation, identifier/DOI assignment, or finalization. Once submitted, your project, samples, and datasets are locked in as described below, exactly as they would be for an immediate release. Make sure everything is correct before submitting.
+:::
+
+## What You Can and Cannot Edit
+
+Submitting with embargo finalizes your samples, datasets, and files right away - only the **public visibility** is delayed. In short:
+
+**You can still edit** (until the project is public):
+
+-   project title, description, keywords, organism information,
+-   authors, citations and funding references (including adding a missing citation DOI),
+-   license,
+-   the scheduled release date, or release the project early with **Publish Now**.
+
+**Locked as soon as you submit** (embargoed or not):
+
+-   sample (study) details - name, description, keywords, structure/composition,
+-   spectra information - NMRium processing, peak picking, and assignments,
+-   dataset/assay metadata - technique, solvent, reference, temperature,
+-   files - no new files can be added, and existing files cannot be deleted.
+
+See [What You Can Still Edit](#what-you-can-still-edit) and [What Is Locked Once You Submit](#what-is-locked-once-you-submit) below for full details.
+
 ## Where This Fits in the Submission Flow
 
 Embargo is chosen in **Step 3 - Publish Data** of the [Publication Deposition](/submission-guides/publication-deposition.html) workflow, right after you have entered the project metadata (name, description, keywords, citations, authors, license).
@@ -60,16 +94,30 @@ Embargoed projects are visible to their owner and collaborators from the dashboa
 <img src="/img/embargo/4.png" width="1000"/>
 </p>
 
-On the project page itself, an **Embargo** banner shows the scheduled release date and an **Edit release date** link. While embargoed, you can still:
-
--   share reviewer access links for confidential peer review,
--   edit project/study/dataset metadata, authors, citations, and license,
--   change the scheduled release date (move it earlier or later),
--   release the project immediately using **Publish Now**.
+On the project page itself, an **Embargo** banner shows the scheduled release date and an **Edit release date** link.
 
 <p align="center">
 <img src="/img/embargo/7.png" width="1000"/>
 </p>
+
+### What You Can Still Edit
+
+While a project is embargoed, you can still:
+
+-   share reviewer access links for confidential peer review,
+-   edit **project-level** metadata: project title, description, keywords, organism information, authors, citations, funding references (including adding a missing citation DOI), and license,
+-   change the scheduled release date - move it earlier, later, or release immediately with **Publish Now**.
+
+### What Is Locked Once You Submit
+
+nmrXiv assigns permanent identifiers and DOIs to every sample and dataset as soon as your submission is processed - even during an embargo, before the project is public. To keep those identifiers meaningful and citable, the underlying scientific content they describe is frozen from that point on. This means the following can **no longer be changed**, whether the project is embargoed or already public:
+
+-   **sample (study) details** - name, description, keywords, chemical structure/composition,
+-   **spectra information** - NMRium processing state, peak picking, and atom/peak assignments,
+-   **dataset/assay metadata** - technique, solvent, reference, temperature,
+-   **raw or processed NMR files** - no new files can be added to a sample, and existing files cannot be deleted.
+
+If you spot an error in a sample, dataset, or file after submission, contact us at info.nmrxiv@uni-jena.de rather than trying to edit it directly.
 
 ::: danger
 Once a project becomes public (automatically on the release date, or manually via **Publish Now**), it can no longer be reverted to private or embargoed. Review your metadata carefully before the release date arrives.
