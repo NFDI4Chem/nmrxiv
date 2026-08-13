@@ -20,13 +20,14 @@ Artisan::command('nmrxiv', function () {
 
 Schedule::command('nmrxiv:publish-embargo-projects')->daily();
 Schedule::command('nmrxiv:delete-projects')->daily();
-Schedule::command('nmrxiv:index-molecules')->daily();
+// Staggered away from the backup dump (both defaulted to ->daily(), i.e. midnight) since this rebuilds the mols/fps RDKit tables via DROP/CREATE DDL
+Schedule::command('nmrxiv:index-molecules')->dailyAt('02:00');
 Schedule::command('nmrxiv:index-spectra-metadata-stats')->daily();
 Schedule::command('nmrxiv:delete-citations')->weekly();
 Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {
     Schedule::command('nmrxiv:backup-postgres-dump')
-        ->daily()
+        ->dailyAt('04:00')
         ->onOneServer()
         ->withoutOverlapping();
 }
