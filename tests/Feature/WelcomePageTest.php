@@ -15,7 +15,7 @@ class WelcomePageTest extends TestCase
         $this->get('/')
             ->assertInertia(fn ($page) => $page
                 ->component('Welcome')
-                ->where('auth.user.id', null));
+                ->missing('auth.user.id'));
     }
 
     public function test_authenticated_users_receive_their_authentication_details_on_the_welcome_page(): void
