@@ -346,6 +346,9 @@ export default {
         url() {
             return String(this.$page.props.url);
         },
+        reviewerObfuscationCode() {
+            return this.$page.props.reviewerPreview?.obfuscationcode ?? null;
+        },
         nmriumURL() {
             const raw = this.$page.props.nmriumURL;
             if (!raw) {
@@ -457,6 +460,45 @@ export default {
                 getDefaultSpectrumTab(this.$page)
             );
         },
+        nmriumInfoUrl(path) {
+            if (!this.reviewerObfuscationCode) {
+                return path;
+            }
+
+            const separator = path.includes("?") ? "&" : "?";
+
+            return (
+                path +
+                separator +
+                "obfuscationcode=" +
+                encodeURIComponent(this.reviewerObfuscationCode)
+            );
+        },
+        loadNmriumInfo(iframe, path) {
+            this.infoLog("Loading Spectra from NMRium JSON..");
+            axios
+                .get(this.nmriumInfoUrl(path))
+                .then((response) => {
+                    let nmrium_info = response.data;
+                    if (nmrium_info) {
+                        this.postLoadToIframe(iframe, {
+                            data: nmrium_info,
+                            type: "nmrium",
+                        });
+                    } else if (this.study.download_url) {
+                        this.loadFromURL([this.study.download_url]);
+                    } else {
+                        this.updateLoadingStatus(false);
+                    }
+                })
+                .catch((error) => {
+                    this.updateLoadingStatus(false);
+                    this.spectraError =
+                        error?.response?.status === 403
+                            ? "You do not have permission to view these spectra."
+                            : "Unable to load spectra.";
+                });
+        },
         loadSpectra() {
             if (this.study) {
                 const iframe = window.frames.NMRiumIframe;
@@ -467,42 +509,16 @@ export default {
 
                 if (iframe) {
                     if (this.dataset && this.dataset.has_nmrium) {
-                        this.infoLog("Loading Spectra from NMRium JSON..");
-                        axios
-                            .get("/datasets/" + this.dataset.id + "/nmriumInfo")
-                            .then((response) => {
-                                let nmrium_info = response.data;
-                                if (nmrium_info) {
-                                    this.postLoadToIframe(iframe, {
-                                        data: nmrium_info,
-                                        type: "nmrium",
-                                    });
-                                } else {
-                                    let urls = [];
-                                    urls.push(this.study.download_url);
-                                    this.loadFromURL(urls);
-                                }
-                            });
+                        this.loadNmriumInfo(
+                            iframe,
+                            "/datasets/" + this.dataset.id + "/nmriumInfo"
+                        );
                     } else {
                         if (this.study.has_nmrium) {
-                            this.infoLog("Loading Spectra from NMRium JSON..");
-                            axios
-                                .get(
-                                    "/studies/" + this.study.id + "/nmriumInfo"
-                                )
-                                .then((response) => {
-                                    let nmrium_info = response.data;
-                                    if (nmrium_info) {
-                                        this.postLoadToIframe(iframe, {
-                                            data: nmrium_info,
-                                            type: "nmrium",
-                                        });
-                                    } else {
-                                        let urls = [];
-                                        urls.push(this.study.download_url);
-                                        this.loadFromURL(urls);
-                                    }
-                                });
+                            this.loadNmriumInfo(
+                                iframe,
+                                "/studies/" + this.study.id + "/nmriumInfo"
+                            );
                         } else {
                             if (this.study.download_url) {
                                 let urls = [];
