@@ -38,11 +38,13 @@ export default {
         };
     },
     mounted() {
-        axios
-            .get(route("bioschemas.id", this.dataset.data.identifier))
-            .then((response) => {
-                this.schema = response.data;
-            });
+        if (this.dataset?.data?.identifier) {
+            axios
+                .get(route("bioschemas.id", this.dataset.data.identifier))
+                .then((response) => {
+                    this.schema = response.data;
+                });
+        }
     },
 };
 </script>
