@@ -14,6 +14,12 @@ class DraftPolicy
     {
         [$user_id] = $user->getUserTeamData();
 
-        return $draft->owner_id === $user_id;
+        if ($draft->owner_id === $user_id) {
+            return true;
+        }
+
+        $project = $draft->project;
+
+        return $project !== null && $user->canUpdateProject($project);
     }
 }

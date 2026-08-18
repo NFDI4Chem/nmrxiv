@@ -708,6 +708,10 @@ export default {
                 if (project.draft_id) {
                     if (project.is_deleted) {
                         return router.visit(this.projectHomeHref(project));
+                    } else if (project.viewer_role === "reviewer") {
+                        // Reviewers cannot edit drafts, so send them to the
+                        // read-only project page instead of the draft editor.
+                        return router.visit(this.projectHomeHref(project));
                     } else {
                         if (
                             project.draft.current_step &&

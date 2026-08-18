@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Models\Dataset;
+use App\Models\FileSystemObject;
 use App\Models\NMRium;
 use Illuminate\Support\Facades\DB;
 use Spatie\SchemaOrg\Schema;
@@ -241,7 +242,9 @@ class BioschemasHelper
 
     /**
      * Collect spectra from a study-level NMRium JSON payload that belong to
-     * this dataset (robust path match on `FileSystemObject::relative_url`).
+     * this dataset. Matches on study/dataset folder names first (same as the
+     * study NMRium save path) because selector files often use archive/S3
+     * prefixes that do not share `FileSystemObject::relative_url`.
      *
      * @param  array<string, mixed>  $nmriumInfo
      * @return list<array<string, mixed>>
@@ -270,15 +273,13 @@ class BioschemasHelper
             return [];
         }
 
-        $datasetRelativeUrl = $datasetFSObject->relative_url;
-        if (! is_string($datasetRelativeUrl) || $datasetRelativeUrl === '') {
-            $datasetRelativeUrl = $isChemotion
-                ? '/'.$studyFSObject->name.'/'.$parentName.'/'.$datasetFSObject->name
-                : '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
-        }
-        $path = rtrim($datasetRelativeUrl, '/');
+        $matchPaths = self::datasetSpectrumMatchPaths(
+            $studyFSObject,
+            $datasetFSObject,
+            $isChemotion,
+            $parentName,
+        );
         $isDatasetFile = $datasetFSObject->type === 'file';
-        $needle = $isDatasetFile ? $path : $path.'/';
 
         $matchedSpectra = [];
         foreach ($nmriumInfo['data']['spectra'] as $spectra) {
@@ -295,12 +296,11 @@ class BioschemasHelper
                 if (! is_string($file)) {
                     continue;
                 }
-                $pathsMatch = $isDatasetFile
-                    ? str_ends_with($file, $needle)
-                    : str_contains($file, $needle);
-                if ($pathsMatch) {
-                    $hit = true;
-                    break;
+                foreach ($matchPaths as $path) {
+                    if (self::spectrumFileMatchesDatasetPath($file, $path, $isDatasetFile)) {
+                        $hit = true;
+                        break 2;
+                    }
                 }
             }
             if ($hit) {
@@ -309,6 +309,51 @@ class BioschemasHelper
         }
 
         return $matchedSpectra;
+    }
+
+    /**
+     * Build path needles for matching NMRium selector files to a dataset.
+     *
+     * @return list<string>
+     */
+    private static function datasetSpectrumMatchPaths(
+        FileSystemObject $studyFSObject,
+        FileSystemObject $datasetFSObject,
+        bool $isChemotion,
+        ?string $chemotionParentName,
+    ): array {
+        $namePath = $isChemotion
+            ? '/'.$studyFSObject->name.'/'.$chemotionParentName.'/'.$datasetFSObject->name
+            : '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+
+        $paths = [rtrim($namePath, '/')];
+
+        $relativeUrl = $datasetFSObject->relative_url;
+        if (is_string($relativeUrl) && $relativeUrl !== '') {
+            $trimmed = rtrim($relativeUrl, '/');
+            if (! in_array($trimmed, $paths, true)) {
+                $paths[] = $trimmed;
+            }
+        }
+
+        return $paths;
+    }
+
+    private static function spectrumFileMatchesDatasetPath(
+        string $file,
+        string $path,
+        bool $isDatasetFile,
+    ): bool {
+        $path = rtrim($path, '/');
+        if ($path === '') {
+            return false;
+        }
+
+        if ($isDatasetFile) {
+            return str_contains($file, $path) || str_ends_with($file, $path);
+        }
+
+        return str_contains($file, $path.'/') || str_contains($file, $path);
     }
 
     /**

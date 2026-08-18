@@ -269,7 +269,79 @@ class BioschemasHelperGetNMRiumInfoTest extends TestCase
         $this->assertFalse((bool) $dataset->fresh()->has_nmrium);
     }
 
-    public function test_partial_fs_object_eager_load_can_false_positive_study_match(): void
+    public function test_get_nmrium_info_matches_archive_selector_paths_via_fs_names(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+        ]);
+
+        $studyRootFs = FileSystemObject::factory()->directory()->create([
+            'name' => 'compound_01',
+            'relative_url' => '/uuid-folder/compound_01',
+            'study_id' => null,
+            'project_id' => $project->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+            'project_id' => $project->id,
+            'fs_id' => $studyRootFs->id,
+        ]);
+
+        $studyRootFs->update(['study_id' => $study->id]);
+
+        $datasetFs = FileSystemObject::factory()->file()->create([
+            'name' => '1f HC.jcamp',
+            'relative_url' => '/uuid-folder/compound_01/1f HC.jcamp',
+            'parent_id' => $studyRootFs->id,
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+            'project_id' => $project->id,
+            'study_id' => $study->id,
+            'fs_id' => $datasetFs->id,
+            'has_nmrium' => false,
+        ]);
+
+        NMRium::factory()->forStudy($study)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'sourceSelector' => [
+                                'files' => [
+                                    '/nmrxiv-staging/archive/ff199cea/compound_01.zip/compound_01/1f HC.jcamp',
+                                ],
+                            ],
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $info = BioschemasHelper::getNMRiumInfo($dataset->fresh());
+
+        $this->assertNotNull($info);
+        $this->assertSame('CDCl3', $info->solvent);
+    }
+
+    public function test_get_nmrium_info_prefers_dataset_fs_name_over_mismatched_relative_url(): void
     {
         $project = Project::factory()->create([
             'owner_id' => $this->user->id,
@@ -337,7 +409,81 @@ class BioschemasHelperGetNMRiumInfoTest extends TestCase
 
         $dataset->load(['fsObject', 'study.fsObject', 'study.nmrium']);
 
-        $this->assertNull(BioschemasHelper::getNMRiumInfo($dataset));
+        $info = BioschemasHelper::getNMRiumInfo($dataset);
+
+        $this->assertNotNull($info);
+        $this->assertSame('CDCl3', $info->solvent);
+    }
+
+    public function test_partial_fs_object_eager_load_still_matches_via_dataset_name(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+        ]);
+
+        $studyRootFs = FileSystemObject::factory()->directory()->create([
+            'name' => 'StudyRoot',
+            'relative_url' => '/StudyRoot',
+            'study_id' => null,
+            'project_id' => $project->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+            'project_id' => $project->id,
+            'fs_id' => $studyRootFs->id,
+        ]);
+
+        $studyRootFs->update(['study_id' => $study->id]);
+
+        $datasetFs = FileSystemObject::factory()->directory()->create([
+            'name' => 'proton',
+            'relative_url' => '/StudyRoot/stored-alias',
+            'parent_id' => $studyRootFs->id,
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'license_id' => $this->license->id,
+            'validation_id' => $this->validation->id,
+            'project_id' => $project->id,
+            'study_id' => $study->id,
+            'fs_id' => $datasetFs->id,
+            'has_nmrium' => false,
+        ]);
+
+        NMRium::factory()->forStudy($study)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'sourceSelector' => [
+                                'files' => [
+                                    'https://example.org/files/StudyRoot/proton/acqus',
+                                ],
+                            ],
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataset->load(['fsObject', 'study.fsObject', 'study.nmrium']);
+
+        $this->assertNotNull(BioschemasHelper::getNMRiumInfo($dataset));
 
         $dataset->unsetRelation('fsObject');
         $dataset->setRelation(
