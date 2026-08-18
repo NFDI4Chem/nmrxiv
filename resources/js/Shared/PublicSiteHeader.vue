@@ -40,27 +40,17 @@
                 </div>
 
                 <div
-                    v-if="
-                        $page.props.auth.user &&
-                        $page.props.auth.user?.first_name != null
-                    "
+                    v-if="isAuthenticated"
                     class="hidden md:flex items-center gap-2"
                 >
-                    <Link :href="'/dashboard'" :class="authLinkClass">
+                    <Link :href="route('dashboard')" :class="authLinkClass">
                         Dashboard
                     </Link>
                     <NavDepositDataLink />
                 </div>
                 <div v-else class="hidden md:flex items-center gap-2">
-                    <Link
-                        v-if="$page.props.auth.user"
-                        :href="'/dashboard'"
-                        :class="authLinkClass"
-                    >
-                        Dashboard
-                    </Link>
-                    <Link v-else :href="'/login'" :class="authLinkClass">
-                        Login
+                    <Link :href="route('login')" :class="authLinkClass">
+                        Login/Register
                     </Link>
                     <NavDepositDataLink />
                 </div>
@@ -126,19 +116,20 @@
                                     class="mt-5 text-center text-[0.9375rem] font-medium text-gray-500"
                                 >
                                     <Link
-                                        v-if="$page.props.auth.user"
-                                        href="/dashboard"
+                                        v-if="isAuthenticated"
+                                        :href="route('dashboard')"
                                         class="text-gray-900 hover:text-gray-700 transition-colors"
                                     >
                                         Dashboard
                                     </Link>
-                                    <Link
-                                        v-else
-                                        href="/login"
-                                        class="text-gray-900 hover:text-gray-700 transition-colors"
-                                    >
-                                        Login
-                                    </Link>
+                                    <template v-else>
+                                        <Link
+                                            :href="route('login')"
+                                            class="text-gray-900 hover:text-gray-700 transition-colors"
+                                        >
+                                            Login/Register
+                                        </Link>
+                                    </template>
                                 </p>
                             </div>
                         </div>
@@ -176,6 +167,8 @@ const props = defineProps({
 });
 
 const page = usePage();
+
+const isAuthenticated = computed(() => Boolean(page.props.auth?.user?.id));
 
 const popoverClass = computed(() => {
     if (!props.bordered) {

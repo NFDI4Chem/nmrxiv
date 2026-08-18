@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.2.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.1.0...v2.2.0) (2026-07-31)
+
+
+### Features
+
+* **draft:** ignore hifsa and proc folders during sample detection ([92dbdea](https://github.com/NFDI4Chem/nmrxiv/commit/92dbdeaef12fba6ef401ca10bba607ba4919132f))
+* **draft:** persist HiFSA export data and surface scores in upload UI ([46c930b](https://github.com/NFDI4Chem/nmrxiv/commit/46c930b605e673ac3fc0b68b2d7208b85c03c338))
+* **nav:** show Dashboard link for signed-in users on public header ([73e6ee3](https://github.com/NFDI4Chem/nmrxiv/commit/73e6ee34b198e92671d2ddf065e470beb382067d))
+* **profile:** add default spectrum tab preference for NMRium viewers ([#1467](https://github.com/NFDI4Chem/nmrxiv/issues/1467)) ([cbdaad0](https://github.com/NFDI4Chem/nmrxiv/commit/cbdaad02de87ecd4e137373f5bba4954f95561ba))
+* **public:** display MIChI spectrum metadata on dataset page ([#1470](https://github.com/NFDI4Chem/nmrxiv/issues/1470)) ([9c8c8b3](https://github.com/NFDI4Chem/nmrxiv/commit/9c8c8b31e52461a888f4a692d48b3c0ec6344613)), closes [#993](https://github.com/NFDI4Chem/nmrxiv/issues/993)
+* **sample:** basis-explicit mixture composition ([#1457](https://github.com/NFDI4Chem/nmrxiv/issues/1457)) ([949101b](https://github.com/NFDI4Chem/nmrxiv/commit/949101b96d1aa9315dc4fd741702e848d7148356))
+* **search:** add advanced NMR metadata search ([#1462](https://github.com/NFDI4Chem/nmrxiv/issues/1462)) ([6c6f607](https://github.com/NFDI4Chem/nmrxiv/commit/6c6f607a1d8fc6b25125b493583d23773149898b))
+* **stats:** add summary totals strip and fix mobile legend overflow ([9e84b31](https://github.com/NFDI4Chem/nmrxiv/commit/9e84b31db5a39d6d8321efbde2f6f2fd6cc3f888))
+* **stats:** bin spectrometer frequencies and categorize experiments and probes ([f7da816](https://github.com/NFDI4Chem/nmrxiv/commit/f7da8169819d3d122618bb79f481d42091abb993))
+* **stats:** redesign statistics page with sectioned layout ([71c079e](https://github.com/NFDI4Chem/nmrxiv/commit/71c079e236692b3ee58b6c369b4bb6680587edf2))
+* **tracking:** view/download counters and download terms modal ([#1468](https://github.com/NFDI4Chem/nmrxiv/issues/1468)) ([c1c8a2f](https://github.com/NFDI4Chem/nmrxiv/commit/c1c8a2f0c58a85f33f760a88ce2aecf6ada8390a))
+* update retry/failure logic and add separate queue for metadata extraction job. ([#1484](https://github.com/NFDI4Chem/nmrxiv/issues/1484)) ([044aca3](https://github.com/NFDI4Chem/nmrxiv/commit/044aca319e0a2fb4cda1ea06d34cd8a0d2e2cf2a))
+* **upload:** show HiFSA PDF panel in submission step 2 ([3859025](https://github.com/NFDI4Chem/nmrxiv/commit/38590254f5a1b598c1814d249fb3ef0ba7ad2c6c))
+
+
+### Bug Fixes
+
+* **backup:** prevent duplicate backup dispatch and normalize proxy vars for app/worker ([#1485](https://github.com/NFDI4Chem/nmrxiv/issues/1485)) ([bafc071](https://github.com/NFDI4Chem/nmrxiv/commit/bafc071cae3543021f75f229aebf946067a59a99))
+* **console:** align verify-dataset-nmrium-info eager loads with extract ([30ca8d2](https://github.com/NFDI4Chem/nmrxiv/commit/30ca8d2c6c040ca1acac758781ea35905c16494f))
+* include hifsa_data in the expected fillable attributes ([0114d1f](https://github.com/NFDI4Chem/nmrxiv/commit/0114d1f2d239cb16b792d18fde440d6f0dd8e4a7))
+* **nmr:** attribute JCAMP spectra to their vendor when metadata is available ([a293b64](https://github.com/NFDI4Chem/nmrxiv/commit/a293b645488c7d4e1d72aa0a2f44948e22f0670c))
+* **security:** add rel="noopener noreferrer" to all target="_blank" ([#1492](https://github.com/NFDI4Chem/nmrxiv/issues/1492)) ([7bd9704](https://github.com/NFDI4Chem/nmrxiv/commit/7bd9704c726c56e85fc454a76ba6bc4c0dadd900))
+* **study:** resolve fsObject via canonical fs_id ([876b09e](https://github.com/NFDI4Chem/nmrxiv/commit/876b09e6a652a46ce79acadbbe383ae14d70cbe5))
+* **study:** wire study root fs_id in files views and tests ([fc468e9](https://github.com/NFDI4Chem/nmrxiv/commit/fc468e9a0a0b2de621327429613ebfbe6d4edf2f))
+
 ## [2.1.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.0.0...v2.1.0) (2026-07-23)
 
 
