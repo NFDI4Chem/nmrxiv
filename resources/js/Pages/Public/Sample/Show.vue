@@ -723,11 +723,13 @@ export default {
         },
     },
     mounted() {
-        axios
-            .get(route("bioschemas.id", this.study.data.identifier))
-            .then((response) => {
-                this.schema = response.data;
-            });
+        if (this.study?.data?.identifier) {
+            axios
+                .get(route("bioschemas.id", this.study.data.identifier))
+                .then((response) => {
+                    this.schema = response.data;
+                });
+        }
     },
     methods: {
         datasetHref(dataset) {
