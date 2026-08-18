@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.3.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.2.0...v2.3.0) (2026-08-18)
+
+
+### Features
+
+* **console:** add nmrxiv:sync-dataset-nmrium-from-study command ([e988c8d](https://github.com/NFDI4Chem/nmrxiv/commit/e988c8d3d3233958f043e10a30c0e07d28bbc95c))
+
+
+### Bug Fixes
+
+* backup failure overlap issue ([#1514](https://github.com/NFDI4Chem/nmrxiv/issues/1514)) ([9db035a](https://github.com/NFDI4Chem/nmrxiv/commit/9db035a6c197dd8456189fa53a997ad279c21b8a))
+* **bioschemas:** match study NMRium spectra to datasets via fs names ([61f7430](https://github.com/NFDI4Chem/nmrxiv/commit/61f74306afb366e9cb99a7b46b0423d79d50feb7))
+* **draft:** allow shared project members to open the draft flow ([ef4278e](https://github.com/NFDI4Chem/nmrxiv/commit/ef4278eb2002612d8b5822ceaaa474ef6bd19772))
+* increase memory limit for node container to avoid out of memory errors ([#1516](https://github.com/NFDI4Chem/nmrxiv/issues/1516)) ([6b80de1](https://github.com/NFDI4Chem/nmrxiv/commit/6b80de19ec5fff99c3ec7dfcdc60f8c6a7264fa6))
+* packages updates ([fb81a89](https://github.com/NFDI4Chem/nmrxiv/commit/fb81a89b44f45bb76e65ac83686e032540a47492))
+* **public:** skip bioschemas fetch when identifier is missing ([273db36](https://github.com/NFDI4Chem/nmrxiv/commit/273db36e1bca64083af1710025ed555b9593b6bd))
+* redirect spectrum preference saves to user profile ([#1519](https://github.com/NFDI4Chem/nmrxiv/issues/1519)) ([d75be04](https://github.com/NFDI4Chem/nmrxiv/commit/d75be041396d25ee65cc9ce8b4feae0af60196a6))
+* **reviewer:** allow NMRium spectra on reviewer-only project links ([b4c001b](https://github.com/NFDI4Chem/nmrxiv/commit/b4c001bdb01c56387a8f4a820a17c9987eca4abf))
+* welcome page login link ([#1518](https://github.com/NFDI4Chem/nmrxiv/issues/1518)) ([3fb17ef](https://github.com/NFDI4Chem/nmrxiv/commit/3fb17ef39bf8dc12cd3f52c3623b22543ffef555))
+
 ## [2.2.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.1.0...v2.2.0) (2026-07-31)
 
 
