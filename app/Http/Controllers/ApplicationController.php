@@ -372,6 +372,8 @@ class ApplicationController extends Controller
         $mergedProps = $props;
 
         if ($reviewerPreview && $project) {
+            PublicEntityAccess::rememberReviewerPreview($request, $project);
+
             $mergedProps['reviewerPreview'] = [
                 'obfuscationcode' => $project->obfuscationcode,
                 'samples_count' => $project->studies()->count(),

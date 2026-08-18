@@ -19,7 +19,8 @@ return [
             'dump' => [
                 'use_single_transaction',
                 'timeout' => 620 * 100, // 51 minute timeout
-                'exclude_tables' => ['versions'],
+                // mols/fps are ephemeral RDKit search caches dropped & rebuilt daily by nmrxiv:index-molecules, excluded to avoid pg_dump racing that DDL
+                'exclude_tables' => ['versions', 'mols', 'fps'],
             ],
             'search_path' => 'public',
         ],

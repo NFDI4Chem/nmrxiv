@@ -44,7 +44,7 @@ class UserPreferencesTest extends TestCase
             'default_spectrum_tab' => DefaultSpectrumTab::C13->value,
         ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('profile.show'));
         $this->assertSame(
             DefaultSpectrumTab::C13->value,
             $user->fresh()->preferences['default_spectrum_tab']
