@@ -628,11 +628,13 @@ export default {
     },
 
     mounted() {
-        axios
-            .get(route("bioschemas.id", this.project.data.identifier))
-            .then((response) => {
-                this.schema = response.data;
-            });
+        if (this.project?.data?.identifier) {
+            axios
+                .get(route("bioschemas.id", this.project.data.identifier))
+                .then((response) => {
+                    this.schema = response.data;
+                });
+        }
 
         this.handleEditQueryParam();
     },
