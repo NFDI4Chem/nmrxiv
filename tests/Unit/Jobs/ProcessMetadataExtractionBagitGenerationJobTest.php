@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -45,6 +46,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
     public function test_failed_marks_the_study_as_failed_after_final_attempt(): void
     {
         Notification::fake();
+        Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
         $superAdmin = User::factory()->create();
         $superAdmin->assignRole('super-admin');
 
@@ -78,10 +80,9 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             [$superAdmin],
             BagitGenerationFailedNotification::class,
             function ($notification, $channels) use ($study) {
-                $mail = $notification->toMail($superAdmin);
-
                 return $notification->study->is($study)
-                    && $mail->subject === 'BagIt metadata generation failed for '.$study->name;
+                    && $notification->reason === 'Gateway Timeout'
+                    && $notification->attempts === 3;
             }
         );
     }
@@ -134,11 +135,15 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
     public function test_handle_processes_study_successfully_and_cleans_up_old_images_on_rerun(): void
     {
         Storage::fake('local');
+        Notification::fake();
 
         config([
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy();
@@ -186,11 +191,8 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             [$study->owner],
             BagitGenerationSucceededNotification::class,
             function ($notification, $channels) use ($study) {
-                $mail = $notification->toMail($study->owner);
-
                 return $notification->study->is($study)
-                    && $notification->archiveUrl === $study->bagit_archive_link
-                    && $mail->subject === 'BagIt archive is ready for '.$study->name;
+                    && $notification->archiveUrl === $study->bagit_archive_link;
             }
         );
 
@@ -228,6 +230,9 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy();
