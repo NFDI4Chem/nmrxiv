@@ -44,7 +44,7 @@
                                     class="mr-2 h-4 w-4"
                                     aria-hidden="true"
                                 />
-                                Download Bagit Archive
+                                Download BagIt Archive
                             </a>
                             <button
                                 v-else
@@ -60,7 +60,7 @@
                                     class="mr-2 h-4 w-4"
                                     aria-hidden="true"
                                 />
-                                Download Bagit Archive
+                                Download BagIt Archive
                             </button>
                         </div>
 

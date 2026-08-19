@@ -50,7 +50,6 @@ class StudyResource extends JsonResource
             'experiment_types' => $this->study_experiment_types,
             'download_url' => $this->download_url,
             'metadata_bagit_generation_status' => $this->metadata_bagit_generation_status,
-            'metadata_bagit_generation_logs' => $this->metadata_bagit_generation_logs,
             'bagit_archive_link' => $this->bagit_archive_link,
             'has_nmrium' => $this->has_nmrium,
             'submitted_through' => $this->submitted_through,
