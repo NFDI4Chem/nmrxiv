@@ -8,9 +8,12 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
+use App\Notifications\BagitGenerationFailedNotification;
+use App\Notifications\BagitGenerationSucceededNotification;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -41,6 +44,10 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
     public function test_failed_marks_the_study_as_failed_after_final_attempt(): void
     {
+        Notification::fake();
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super-admin');
+
         $study = $this->makeStudy();
         $study->update([
             'metadata_bagit_generation_status' => 'processing',
@@ -66,6 +73,17 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertSame('Gateway Timeout', data_get($study->metadata_bagit_generation_logs, 'error_message'));
         $this->assertSame(3, data_get($study->metadata_bagit_generation_logs, 'attempts'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'failed_at'));
+
+        Notification::assertSentTo(
+            [$superAdmin],
+            BagitGenerationFailedNotification::class,
+            function ($notification, $channels) use ($study) {
+                $mail = $notification->toMail($superAdmin);
+
+                return $notification->study->is($study)
+                    && $mail->subject === 'BagIt metadata generation failed for '.$study->name;
+            }
+        );
     }
 
     public function test_extract_zip_handles_root_placeholder_entry_conflict(): void
@@ -163,6 +181,18 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertSame(1, data_get($study->metadata_bagit_generation_logs, 'image_count'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'storage_path'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'completed_at'));
+
+        Notification::assertSentTo(
+            [$study->owner],
+            BagitGenerationSucceededNotification::class,
+            function ($notification, $channels) use ($study) {
+                $mail = $notification->toMail($study->owner);
+
+                return $notification->study->is($study)
+                    && $notification->archiveUrl === $study->bagit_archive_link
+                    && $mail->subject === 'BagIt archive is ready for '.$study->name;
+            }
+        );
 
         $disk = Storage::disk('local');
         $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';

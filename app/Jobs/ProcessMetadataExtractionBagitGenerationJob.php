@@ -3,6 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Study;
+use App\Models\User;
+use App\Notifications\BagitGenerationFailedNotification;
+use App\Notifications\BagitGenerationSucceededNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -10,7 +13,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Throwable;
 use whikloj\BagItTools\Bag;
 use ZipArchive;
@@ -98,6 +104,13 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             ]);
 
             Log::info("Successfully processed study {$study->id} ({$study->identifier}): {$result['imageCount']} images saved to {$result['location']}");
+
+            if ($study->owner) {
+                Notification::send($study->owner, new BagitGenerationSucceededNotification(
+                    $study->fresh(),
+                    $study->fresh()->bagit_archive_link,
+                ));
+            }
         } catch (Throwable $e) {
             Log::warning("Attempt {$this->attempts()} failed for study {$this->studyId}: {$e->getMessage()}");
 
@@ -134,6 +147,17 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 'attempts' => $this->attempts(),
             ]),
         ]);
+
+        $admins = User::role(['super-admin'])->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new BagitGenerationFailedNotification(
+                $study,
+                $exception->getMessage(),
+                $exception,
+                $this->attempts(),
+            ));
+        }
     }
 
     /**
@@ -235,9 +259,34 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             Log::info('Step 6/7: Generating BagIt manifests...');
             $this->generateBagItManifests($disk->path($baseDir));
 
+            $archiveZipPath = $this->createBagItArchive($disk->path($baseDir), $studyIdentifier);
+            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
+            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
+            $archiveStream = fopen($archiveZipPath, 'rb');
+            if ($archiveStream === false) {
+                throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
+            }
+
+            $archiveDisk->put($archiveKey, $archiveStream, 'public');
+            fclose($archiveStream);
+
+            $archiveUrl = $archiveDisk->url($archiveKey);
+            $study->update([
+                'bagit_archive_link' => $archiveUrl,
+                'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
+                    'bagit_archive_link' => $archiveUrl,
+                    'archive_path' => $archiveKey,
+                ]),
+            ]);
+
+            if (file_exists($archiveZipPath)) {
+                @unlink($archiveZipPath);
+            }
+
             return [
                 'imageCount' => $imageCount,
                 'location' => $disk->path($baseDir),
+                'archiveUrl' => $archiveUrl,
             ];
         } finally {
             // Step 7: Cleanup temporary files (always runs, even on exception)
@@ -548,9 +597,9 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         $dataPath = $bagPath.'/data';
 
         if (is_dir($dataPath)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dataPath),
-                \RecursiveIteratorIterator::LEAVES_ONLY
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dataPath),
+                RecursiveIteratorIterator::LEAVES_ONLY
             );
 
             foreach ($files as $file) {
@@ -593,9 +642,9 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         $totalFiles = 0;
 
         if (is_dir($dataPath)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dataPath),
-                \RecursiveIteratorIterator::LEAVES_ONLY
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dataPath),
+                RecursiveIteratorIterator::LEAVES_ONLY
             );
 
             foreach ($files as $file) {
@@ -607,5 +656,36 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         }
 
         return "{$totalBytes}.{$totalFiles}";
+    }
+
+    /**
+     * Create a ZIP archive for the generated BagIt directory and return the local path.
+     */
+    protected function createBagItArchive(string $bagPath, string $studyIdentifier): string
+    {
+        $archivePath = storage_path('app/temp_'.uniqid().'_'.$studyIdentifier.'.zip');
+        $zip = new ZipArchive;
+
+        if ($zip->open($archivePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new \RuntimeException("Failed to create archive for study {$studyIdentifier}: {$archivePath}");
+        }
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($bagPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
+            $relativePath = ltrim(str_replace($bagPath.'/', '', $file->getPathname()), '/');
+            $zip->addFile($file->getPathname(), $relativePath);
+        }
+
+        $zip->close();
+
+        return $archivePath;
     }
 }
