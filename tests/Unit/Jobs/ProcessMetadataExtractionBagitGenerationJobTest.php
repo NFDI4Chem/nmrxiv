@@ -8,13 +8,17 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
+use App\Notifications\BagitGenerationFailedNotification;
+use App\Notifications\BagitGenerationSucceededNotification;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -41,6 +45,11 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
     public function test_failed_marks_the_study_as_failed_after_final_attempt(): void
     {
+        Notification::fake();
+        Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super-admin');
+
         $study = $this->makeStudy();
         $study->update([
             'metadata_bagit_generation_status' => 'processing',
@@ -66,6 +75,16 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertSame('Gateway Timeout', data_get($study->metadata_bagit_generation_logs, 'error_message'));
         $this->assertSame(3, data_get($study->metadata_bagit_generation_logs, 'attempts'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'failed_at'));
+
+        Notification::assertSentTo(
+            [$superAdmin],
+            BagitGenerationFailedNotification::class,
+            function ($notification, $channels) use ($study) {
+                return $notification->study->is($study)
+                    && $notification->reason === 'Gateway Timeout'
+                    && $notification->attempts === 3;
+            }
+        );
     }
 
     public function test_extract_zip_handles_root_placeholder_entry_conflict(): void
@@ -116,11 +135,15 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
     public function test_handle_processes_study_successfully_and_cleans_up_old_images_on_rerun(): void
     {
         Storage::fake('local');
+        Notification::fake();
 
         config([
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy();
@@ -164,6 +187,15 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'storage_path'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'completed_at'));
 
+        Notification::assertSentTo(
+            [$study->owner],
+            BagitGenerationSucceededNotification::class,
+            function ($notification, $channels) use ($study) {
+                return $notification->study->is($study)
+                    && $notification->archiveUrl === $study->bagit_archive_link;
+            }
+        );
+
         $disk = Storage::disk('local');
         $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';
 
@@ -198,6 +230,9 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy();
