@@ -3,7 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use App\Support\Public\PublicMoleculeAggregates;
+use App\Support\Public\PublicMoleculeCatalogIndexer;
 
 class PublishProject
 {
@@ -28,6 +28,6 @@ class PublishProject
             }
         }
 
-        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
+        app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
     }
 }

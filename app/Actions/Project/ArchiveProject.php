@@ -3,7 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use App\Support\Public\PublicMoleculeAggregates;
+use App\Support\Public\PublicMoleculeCatalogIndexer;
 
 class ArchiveProject
 {
@@ -36,7 +36,7 @@ class ArchiveProject
         }
         $project->save();
 
-        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
+        app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
     }
 
     /**

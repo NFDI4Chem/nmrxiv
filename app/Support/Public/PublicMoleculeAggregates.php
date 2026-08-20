@@ -22,7 +22,16 @@ final class PublicMoleculeAggregates
     private const PUBLIC_CATALOG_TOTAL_CACHE_SECONDS = 300;
 
     /**
+     * Indexed public-catalog membership written by PublicMoleculeCatalogIndexer.
+     */
+    public static function hasPublicSpectraColumnSql(string $table = 'molecules'): string
+    {
+        return "{$table}.has_public_spectra = true";
+    }
+
+    /**
      * Correlated EXISTS: molecule has ≥1 spectrum in the public catalog.
+     * Used by the catalog indexer, not by request-path search.
      */
     public static function hasPublicSpectraExistsSql(string $moleculeIdColumn = 'molecules.id'): string
     {
@@ -133,12 +142,12 @@ SQL;
         int $offset,
         bool $orderByRecent = true,
     ): array {
-        $exists = self::hasPublicSpectraExistsSql('molecules.id');
+        $public = self::hasPublicSpectraColumnSql();
 
         return self::paginateIds(
             [
                 'from' => 'FROM molecules',
-                'where' => "WHERE molecules.identifier IS NOT NULL AND {$exists}",
+                'where' => "WHERE molecules.identifier IS NOT NULL AND {$public}",
                 'id' => 'molecules.id',
                 'order' => $orderByRecent ? 'ORDER BY molecules.created_at DESC' : '',
             ],
@@ -192,11 +201,11 @@ SQL;
      */
     public static function publicCatalogTotal(): int
     {
-        $exists = self::hasPublicSpectraExistsSql('molecules.id');
+        $public = self::hasPublicSpectraColumnSql();
 
         return self::countIds(
             'FROM molecules',
-            "WHERE molecules.identifier IS NOT NULL AND {$exists}",
+            "WHERE molecules.identifier IS NOT NULL AND {$public}",
             'molecules.id',
             [],
             self::PUBLIC_CATALOG_TOTAL_CACHE_KEY,
@@ -211,7 +220,7 @@ SQL;
     {
         return $query
             ->whereNotNull('identifier')
-            ->whereRaw(self::hasPublicSpectraExistsSql($query->getModel()->getTable().'.id'));
+            ->where('has_public_spectra', true);
     }
 
     /**
@@ -224,19 +233,9 @@ SQL;
             return $molecules;
         }
 
-        $ids = array_values(array_unique(array_map(
-            fn ($molecule) => $molecule instanceof Molecule ? (int) $molecule->id : (int) $molecule->id,
-            $molecules,
-        )));
-
-        $sampleCounts = self::sampleCountsByMoleculeId($ids);
-        $experimentCounts = (new MoleculeExperimentTypeCounts)->forPublicCatalog($ids);
-
         foreach ($molecules as $molecule) {
-            $id = $molecule instanceof Molecule ? (int) $molecule->id : (int) $molecule->id;
-
-            $samples = $sampleCounts[$id] ?? 0;
-            $experiments = $experimentCounts[$id] ?? [];
+            $samples = self::publicSamplesCountFromRow($molecule);
+            $experiments = self::publicExperimentTypeCountsFromRow($molecule);
 
             if ($molecule instanceof Molecule) {
                 $molecule->setAttribute('workspace_samples_count', $samples);
@@ -248,6 +247,20 @@ SQL;
         }
 
         return $molecules;
+    }
+
+    /**
+     * Sample and experiment-type badge payload for the catalog indexer.
+     *
+     * @param  list<int>  $moleculeIds
+     * @return array{sample_counts: array<int, int>, experiment_counts: array<int, array<string, int>>}
+     */
+    public static function catalogCardPayload(array $moleculeIds): array
+    {
+        return [
+            'sample_counts' => self::sampleCountsByMoleculeId($moleculeIds),
+            'experiment_counts' => (new MoleculeExperimentTypeCounts)->forPublicCatalog($moleculeIds),
+        ];
     }
 
     /**
@@ -275,6 +288,29 @@ SQL;
         }
 
         return (int) Cache::remember($totalCacheKey, $totalCacheSeconds, $resolve);
+    }
+
+    private static function publicSamplesCountFromRow(object|Molecule $molecule): int
+    {
+        return (int) ($molecule->public_samples_count ?? 0);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private static function publicExperimentTypeCountsFromRow(object|Molecule $molecule): array
+    {
+        $value = $molecule->public_experiment_type_counts ?? [];
+
+        if (is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
+        if (is_object($value)) {
+            $value = json_decode(json_encode($value), true);
+        }
+
+        return is_array($value) ? $value : [];
     }
 
     /**
