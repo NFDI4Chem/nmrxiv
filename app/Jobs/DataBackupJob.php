@@ -18,6 +18,19 @@ class DataBackupJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Number of times the job may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * Delay (in seconds) between retry attempts, to ride out transient
+     * pg_dump failures caused by concurrent schema changes (e.g. deployments).
+     *
+     * @var array<int, int>
+     */
+    public array $backoff = [60, 300];
+
+    /**
      * Execute the job.
      */
     public function handle(): void

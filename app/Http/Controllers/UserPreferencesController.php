@@ -23,6 +23,6 @@ class UserPreferencesController extends Controller
             'preferences' => $preferences === [] ? null : $preferences,
         ])->save();
 
-        return back();
+        return to_route('profile.show');
     }
 }

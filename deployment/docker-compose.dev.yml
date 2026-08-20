@@ -128,6 +128,9 @@ services:
     entrypoint: /bin/sh
     stdin_open: true
     tty: true
+    environment:
+      NODE_OPTIONS: "--max-old-space-size=12288"
+    mem_limit: 16g
     networks:
     - nmrxiv_net
     volumes:
