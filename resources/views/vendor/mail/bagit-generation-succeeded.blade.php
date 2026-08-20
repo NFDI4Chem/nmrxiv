@@ -1,6 +1,6 @@
 @component('mail::message')
 
-Dear {{ $study->owner->name ?? 'researcher' }},
+Dear nmrXiv user,
 
 Your BagIt archive for sample **{{ $study->name }}** is ready.
 
