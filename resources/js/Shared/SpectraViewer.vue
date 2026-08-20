@@ -340,6 +340,7 @@ export default {
             defaultTabApplied: false,
             nmriumMessageHandler: null,
             viewerLoading: false,
+            nmriumInstanceId: Math.random(),
         };
     },
     computed: {
@@ -354,13 +355,13 @@ export default {
             if (!raw) {
                 return (
                     "https://nmriumdev.nmrxiv.org?defaultEmptyMessage=''&workspace=embedded&id=" +
-                    Math.random()
+                    this.nmriumInstanceId
                 );
             }
             const base = String(raw);
             const sep = base.includes("?") ? "&" : "?";
 
-            return `${base}${sep}id=${Math.random()}`;
+            return `${base}${sep}id=${this.nmriumInstanceId}`;
         },
     },
     watch: {
