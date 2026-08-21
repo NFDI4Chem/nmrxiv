@@ -271,8 +271,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
             }
 
-            $archiveDisk->put($archiveKey, $archiveStream, 'public');
-            fclose($archiveStream);
+            $uploaded = $archiveDisk->put($archiveKey, $archiveStream, 'public');
+            if (is_resource($archiveStream)) {
+                fclose($archiveStream);
+            }
+
+            if (! $uploaded) {
+                throw new \RuntimeException("Failed to upload BagIt archive to disk for {$studyIdentifier}: {$archiveKey}");
+            }
 
             $archiveUrl = $archiveDisk->url($archiveKey);
             $study->update([
