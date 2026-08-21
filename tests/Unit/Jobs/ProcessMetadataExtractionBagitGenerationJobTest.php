@@ -11,10 +11,16 @@ use App\Models\Validation;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
 use Exception;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Config;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemAdapter as FlysystemAdapterContract;
+use League\Flysystem\UnableToWriteFile;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
@@ -277,6 +283,58 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $disk = Storage::disk('local');
         $this->assertFalse($disk->exists('spectra_parse/S213/data/S213/nmrxiv-meta/bio-schema.json'));
         $this->assertTrue($disk->exists('spectra_parse/S213/data/S213/nmrxiv-meta/S213.nmrium'));
+    }
+
+    /**
+     * Guards against the archive being silently reported as "completed" (and a
+     * success email sent) when the public disk actually rejects the upload -
+     * exactly what happened with a Ceph disk that swallowed a failed write.
+     */
+    public function test_handle_marks_study_as_failed_when_archive_upload_is_rejected_by_the_disk(): void
+    {
+        Storage::fake('local');
+
+        Storage::extend('always-fails', function () {
+            $adapter = new RejectingFlysystemAdapter;
+
+            return new FilesystemAdapter(
+                new Filesystem($adapter),
+                $adapter
+            );
+        });
+
+        config([
+            'filesystems.disks.always-fails' => ['driver' => 'always-fails'],
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'always-fails',
+        ]);
+
+        $study = $this->makeStudy();
+        $zipBinary = $this->buildZipBinary('S213', ['1/acqu' => 'acquisition data']);
+
+        Http::fake([
+            $study->download_url => Http::response($zipBinary, 200),
+            'https://nmrkit.test/parse' => Http::response(['images' => [], 'data' => ['spectra' => []]], 200),
+            'https://bioschema.test/schemas/S213' => Http::response('server error', 500),
+        ]);
+
+        $job = new ProcessMetadataExtractionBagitGenerationJob($study->id);
+
+        try {
+            $job->handle();
+            $this->fail('Expected an exception to be thrown when the archive upload is rejected.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('Failed to upload BagIt archive', $e->getMessage());
+        }
+
+        $study->refresh();
+
+        $this->assertNotSame('completed', $study->metadata_bagit_generation_status);
+        $this->assertNull($study->bagit_archive_link);
     }
 
     public function test_handle_logs_error_and_rethrows_when_download_fails(): void
@@ -556,4 +614,78 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
         @rmdir($directory);
     }
+}
+
+/**
+ * A Flysystem adapter whose writes always fail, simulating a storage backend
+ * (e.g. Ceph RGW) that rejects an upload without Laravel's put() throwing by default.
+ */
+class RejectingFlysystemAdapter implements FlysystemAdapterContract
+{
+    public function fileExists(string $path): bool
+    {
+        return false;
+    }
+
+    public function directoryExists(string $path): bool
+    {
+        return false;
+    }
+
+    public function write(string $path, string $contents, Config $config): void
+    {
+        throw UnableToWriteFile::atLocation($path, 'simulated failure');
+    }
+
+    public function writeStream(string $path, $contents, Config $config): void
+    {
+        throw UnableToWriteFile::atLocation($path, 'simulated failure');
+    }
+
+    public function read(string $path): string
+    {
+        throw new RuntimeException('not supported');
+    }
+
+    public function readStream(string $path)
+    {
+        throw new RuntimeException('not supported');
+    }
+
+    public function delete(string $path): void {}
+
+    public function deleteDirectory(string $path): void {}
+
+    public function createDirectory(string $path, Config $config): void {}
+
+    public function setVisibility(string $path, string $visibility): void {}
+
+    public function visibility(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function mimeType(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function lastModified(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function fileSize(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function listContents(string $path, bool $deep): iterable
+    {
+        return [];
+    }
+
+    public function move(string $source, string $destination, Config $config): void {}
+
+    public function copy(string $source, string $destination, Config $config): void {}
 }

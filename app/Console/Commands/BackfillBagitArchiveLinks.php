@@ -134,13 +134,14 @@ class BackfillBagitArchiveLinks extends Command
 
             $archiveKey = "archive/{$folderName}/{$folderName}.zip";
             $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
-            $stream = fopen($zipPath, 'rb');
-            if ($stream === false) {
-                throw new \RuntimeException("Failed to open generated zip for {$folderName}");
+            $archiveContents = file_get_contents($zipPath);
+            if ($archiveContents === false) {
+                throw new \RuntimeException("Failed to read generated zip for {$folderName}");
             }
 
-            $archiveDisk->put($archiveKey, $stream, 'public');
-            fclose($stream);
+            if (! $archiveDisk->put($archiveKey, $archiveContents, 'public')) {
+                throw new \RuntimeException("Failed to upload archive to disk for {$folderName}: {$archiveKey}");
+            }
 
             $archiveUrl = $archiveDisk->url($archiveKey);
 

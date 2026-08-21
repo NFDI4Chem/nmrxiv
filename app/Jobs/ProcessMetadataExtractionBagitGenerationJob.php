@@ -262,13 +262,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             $archiveZipPath = $this->createBagItArchive($localBagDir, $studyIdentifier);
             $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
             $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
-            $archiveStream = fopen($archiveZipPath, 'rb');
-            if ($archiveStream === false) {
-                throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
+            $archiveContents = file_get_contents($archiveZipPath);
+            if ($archiveContents === false) {
+                throw new \RuntimeException("Failed to read generated archive for upload: {$archiveZipPath}");
             }
 
-            $archiveDisk->put($archiveKey, $archiveStream, 'public');
-            fclose($archiveStream);
+            if (! $archiveDisk->put($archiveKey, $archiveContents, 'public')) {
+                throw new \RuntimeException("Failed to upload BagIt archive to disk for study {$studyIdentifier}: {$archiveKey}");
+            }
 
             $archiveUrl = $archiveDisk->url($archiveKey);
             $study->update([
@@ -315,13 +316,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             }
 
             $relativePath = ltrim(str_replace($localDir.'/', '', $file->getPathname()), '/');
-            $stream = fopen($file->getPathname(), 'rb');
-            if ($stream === false) {
+            $contents = file_get_contents($file->getPathname());
+            if ($contents === false) {
                 continue;
             }
 
-            $disk->put("{$diskBaseDir}/{$relativePath}", $stream);
-            fclose($stream);
+            if (! $disk->put("{$diskBaseDir}/{$relativePath}", $contents)) {
+                throw new \RuntimeException("Failed to mirror file to disk: {$diskBaseDir}/{$relativePath}");
+            }
         }
     }
 
