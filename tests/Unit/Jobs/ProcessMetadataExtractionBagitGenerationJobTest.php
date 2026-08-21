@@ -251,6 +251,69 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertCount(1, $disk->files("{$metaDir}/images"));
     }
 
+    /**
+     * Regression test for the "No such file or directory" bug: when the configured
+     * storage disk is a non-local driver (e.g. Ceph/S3), the job must assemble the
+     * bag on a real local working directory and then upload the finished structure
+     * to that disk, rather than mixing Storage::disk()->path() with raw file writes.
+     */
+    public function test_handle_processes_study_successfully_on_a_non_local_storage_disk(): void
+    {
+        Storage::fake('local');
+        Notification::fake();
+
+        Storage::extend('fake-remote', function () {
+            $adapter = new InMemoryFlysystemAdapter;
+
+            return new FilesystemAdapter(new Filesystem($adapter), $adapter);
+        });
+
+        config([
+            'filesystems.disks.fake-remote' => ['driver' => 'fake-remote'],
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'fake-remote',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
+        ]);
+
+        $study = $this->makeStudy();
+        $zipBinary = $this->buildZipBinary('S213', ['1/acqu' => 'acquisition data']);
+        $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+        Http::fake([
+            $study->download_url => Http::response($zipBinary, 200),
+            'https://nmrkit.test/parse' => Http::response([
+                'images' => [
+                    ['id' => 'img1', 'image' => 'data:image/png;base64,'.$pngBase64],
+                ],
+                'data' => ['spectra' => []],
+            ], 200),
+            'https://bioschema.test/schemas/S213' => Http::response([
+                '@context' => 'https://schema.org',
+                'name' => 'Test study',
+            ], 200),
+        ]);
+
+        $job = new ProcessMetadataExtractionBagitGenerationJob($study->id);
+        $job->handle();
+
+        $study->refresh();
+
+        $this->assertSame('completed', $study->metadata_bagit_generation_status);
+        $this->assertSame(1, data_get($study->metadata_bagit_generation_logs, 'image_count'));
+
+        $remoteDisk = Storage::disk('fake-remote');
+        $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';
+
+        $this->assertTrue($remoteDisk->exists("{$metaDir}/images/img1.png"));
+        $this->assertTrue($remoteDisk->exists("{$metaDir}/S213.nmrium"));
+        $this->assertTrue($remoteDisk->exists("{$metaDir}/bio-schema.json"));
+        $this->assertTrue($remoteDisk->exists('spectra_parse/S213/bagit.txt'));
+        $this->assertTrue($remoteDisk->exists('spectra_parse/S213/manifest-sha256.txt'));
+    }
+
     public function test_handle_continues_without_bio_schema_when_fetch_fails(): void
     {
         Storage::fake('local');
@@ -688,4 +751,113 @@ class RejectingFlysystemAdapter implements FlysystemAdapterContract
     public function move(string $source, string $destination, Config $config): void {}
 
     public function copy(string $source, string $destination, Config $config): void {}
+}
+
+/**
+ * A minimal in-memory Flysystem adapter used to simulate a working non-local
+ * storage disk (e.g. Ceph/S3) whose Storage::path() does not resolve to a real
+ * local filesystem path, without requiring a real S3-compatible endpoint.
+ */
+class InMemoryFlysystemAdapter implements FlysystemAdapterContract
+{
+    /** @var array<string, string> */
+    private array $files = [];
+
+    public function fileExists(string $path): bool
+    {
+        return array_key_exists($path, $this->files);
+    }
+
+    public function directoryExists(string $path): bool
+    {
+        $prefix = rtrim($path, '/').'/';
+
+        foreach (array_keys($this->files) as $existingPath) {
+            if (str_starts_with($existingPath, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function write(string $path, string $contents, Config $config): void
+    {
+        $this->files[$path] = $contents;
+    }
+
+    public function writeStream(string $path, $contents, Config $config): void
+    {
+        $this->files[$path] = stream_get_contents($contents);
+    }
+
+    public function read(string $path): string
+    {
+        return $this->files[$path] ?? throw new RuntimeException("File not found: {$path}");
+    }
+
+    public function readStream(string $path)
+    {
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, $this->read($path));
+        rewind($stream);
+
+        return $stream;
+    }
+
+    public function delete(string $path): void
+    {
+        unset($this->files[$path]);
+    }
+
+    public function deleteDirectory(string $path): void
+    {
+        $prefix = rtrim($path, '/').'/';
+
+        foreach (array_keys($this->files) as $existingPath) {
+            if (str_starts_with($existingPath, $prefix)) {
+                unset($this->files[$existingPath]);
+            }
+        }
+    }
+
+    public function createDirectory(string $path, Config $config): void {}
+
+    public function setVisibility(string $path, string $visibility): void {}
+
+    public function visibility(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function mimeType(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function lastModified(string $path): FileAttributes
+    {
+        return new FileAttributes($path);
+    }
+
+    public function fileSize(string $path): FileAttributes
+    {
+        return new FileAttributes($path, strlen($this->files[$path] ?? ''));
+    }
+
+    public function listContents(string $path, bool $deep): iterable
+    {
+        return [];
+    }
+
+    public function move(string $source, string $destination, Config $config): void
+    {
+        $this->files[$destination] = $this->files[$source] ?? '';
+        unset($this->files[$source]);
+    }
+
+    public function copy(string $source, string $destination, Config $config): void
+    {
+        $this->files[$destination] = $this->files[$source] ?? '';
+    }
 }
