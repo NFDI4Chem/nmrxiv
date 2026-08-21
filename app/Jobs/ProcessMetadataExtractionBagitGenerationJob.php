@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -171,15 +170,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         $disk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
         $basePath = config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse');
         $baseDir = "{$basePath}/{$studyIdentifier}";
-
-        // All processing happens on a real local path first: $disk->path() only
-        // returns a genuine filesystem path for the 'local' driver. For remote
-        // disks (e.g. S3/Ceph) it returns the raw key, which breaks every native
-        // filesystem call (file_put_contents, mkdir, ZipArchive, ...) used below.
-        $localBagDir = storage_path('app/bagit_work_'.$studyIdentifier.'_'.uniqid());
-        $localDataDir = "{$localBagDir}/data";
+        $dataDir = "{$baseDir}/data";
         $zipPath = null;
-        $archiveZipPath = null;
 
         try {
             // Step 1: Download ZIP file
@@ -188,7 +180,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Step 2: Extract ZIP to data directory
             Log::info('Step 2/7: Extracting ZIP archive...');
-            $studyName = $this->extractZip($zipPath, $localDataDir);
+            $studyName = $this->extractZip($zipPath, $disk->path($dataDir));
 
             // Step 3: Call NMRKit API
             Log::info('Step 3/7: Calling NMRKit API...');
@@ -205,9 +197,24 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Step 5: Create nmrxiv-meta structure
             Log::info('Step 5/7: Creating nmrxiv-meta structure...');
-            $metaDir = "{$localDataDir}/{$studyName}/nmrxiv-meta";
+            $metaDir = "{$dataDir}/{$studyName}/nmrxiv-meta";
             $imagesDir = "{$metaDir}/images";
-            $this->ensureDirectoryPath($imagesDir);
+
+            if (! $disk->exists($metaDir)) {
+                $disk->makeDirectory($metaDir, 0755, true);
+            }
+
+            // Clean up old images directory to prevent duplicates from previous runs
+            if ($disk->exists($imagesDir)) {
+                // Delete all PNG files in the images directory
+                $oldImages = $disk->files($imagesDir);
+                foreach ($oldImages as $oldImage) {
+                    $disk->delete($oldImage);
+                }
+                Log::info('Cleaned up '.count($oldImages).' old image files');
+            } else {
+                $disk->makeDirectory($imagesDir, 0755, true);
+            }
 
             // Clean up spectra data
             if (isset($jsonData['data']['spectra']) && is_array($jsonData['data']['spectra'])) {
@@ -230,7 +237,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
                         // Save PNG file
                         $pngPath = "{$imagesDir}/{$imageId}.png";
-                        $this->savePNGFromBase64($base64Data, $pngPath);
+                        $this->savePNGFromBase64($base64Data, $disk->path($pngPath));
                         $imageCount++;
                     }
                 }
@@ -239,37 +246,29 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             // Save S{identifier}.nmrium (full API response with base64 images intact)
             $nmriumPath = "{$metaDir}/{$studyIdentifier}.nmrium";
             $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            file_put_contents($nmriumPath, $formattedJson);
+            $disk->put($nmriumPath, $formattedJson);
 
             // Save bio-schema.json
             if ($bioSchema !== null) {
                 $bioSchemaPath = "{$metaDir}/bio-schema.json";
                 $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-                file_put_contents($bioSchemaPath, $bioSchemaJson);
+                $disk->put($bioSchemaPath, $bioSchemaJson);
             }
 
             // Step 6: Generate BagIt manifests
             Log::info('Step 6/7: Generating BagIt manifests...');
-            $this->generateBagItManifests($localBagDir);
+            $this->generateBagItManifests($disk->path($baseDir));
 
-            // Mirror the freshly generated bag onto the configured storage disk,
-            // replacing any stale copy left over from a previous run/attempt.
-            if ($disk->exists($baseDir)) {
-                $disk->deleteDirectory($baseDir);
-            }
-            $this->mirrorDirectoryToDisk($localBagDir, $disk, $baseDir);
-
-            $archiveZipPath = $this->createBagItArchive($localBagDir, $studyIdentifier);
+            $archiveZipPath = $this->createBagItArchive($disk->path($baseDir), $studyIdentifier);
             $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
             $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
-            $archiveContents = file_get_contents($archiveZipPath);
-            if ($archiveContents === false) {
-                throw new \RuntimeException("Failed to read generated archive for upload: {$archiveZipPath}");
+            $archiveStream = fopen($archiveZipPath, 'rb');
+            if ($archiveStream === false) {
+                throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
             }
 
-            if (! $archiveDisk->put($archiveKey, $archiveContents, 'public')) {
-                throw new \RuntimeException("Failed to upload BagIt archive to disk for study {$studyIdentifier}: {$archiveKey}");
-            }
+            $archiveDisk->put($archiveKey, $archiveStream, 'public');
+            fclose($archiveStream);
 
             $archiveUrl = $archiveDisk->url($archiveKey);
             $study->update([
@@ -280,9 +279,13 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 ]),
             ]);
 
+            if (file_exists($archiveZipPath)) {
+                @unlink($archiveZipPath);
+            }
+
             return [
                 'imageCount' => $imageCount,
-                'location' => $baseDir,
+                'location' => $disk->path($baseDir),
                 'archiveUrl' => $archiveUrl,
             ];
         } finally {
@@ -291,61 +294,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 Log::info('Step 7/7: Cleaning up temporary ZIP file...');
                 @unlink($zipPath);
             }
-
-            if ($archiveZipPath && file_exists($archiveZipPath)) {
-                @unlink($archiveZipPath);
-            }
-
-            $this->removeLocalDirectory($localBagDir);
         }
-    }
-
-    /**
-     * Upload every file in a local directory to the given disk, mirroring its relative structure.
-     */
-    protected function mirrorDirectoryToDisk(string $localDir, Filesystem $disk, string $diskBaseDir): void
-    {
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($localDir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $file) {
-            if (! $file->isFile()) {
-                continue;
-            }
-
-            $relativePath = ltrim(str_replace($localDir.'/', '', $file->getPathname()), '/');
-            $contents = file_get_contents($file->getPathname());
-            if ($contents === false) {
-                continue;
-            }
-
-            if (! $disk->put("{$diskBaseDir}/{$relativePath}", $contents)) {
-                throw new \RuntimeException("Failed to mirror file to disk: {$diskBaseDir}/{$relativePath}");
-            }
-        }
-    }
-
-    /**
-     * Recursively remove a local directory and all of its contents.
-     */
-    protected function removeLocalDirectory(string $directory): void
-    {
-        if (! is_dir($directory)) {
-            return;
-        }
-
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($files as $file) {
-            $file->isDir() ? @rmdir($file->getPathname()) : @unlink($file->getPathname());
-        }
-
-        @rmdir($directory);
     }
 
     /**
