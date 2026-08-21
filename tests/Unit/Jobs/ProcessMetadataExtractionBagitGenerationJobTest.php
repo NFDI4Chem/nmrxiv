@@ -43,6 +43,29 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertSame(1200, $job->timeout);
     }
 
+    /**
+     * Documents the root cause of the "No such file or directory" bug reported
+     * for S3/Ceph-backed storage disks: Storage::disk()->path() only resolves
+     * to a real filesystem path for the 'local' driver. For 's3' disks (no
+     * 'root' config, matching the app's ceph disk) it returns the raw,
+     * unprefixed key, which is not usable with native filesystem functions.
+     */
+    public function test_path_on_a_non_local_disk_does_not_resolve_to_a_real_filesystem_path(): void
+    {
+        config()->set('filesystems.disks.fake-ceph', [
+            'driver' => 's3',
+            'key' => 'test',
+            'secret' => 'test',
+            'region' => 'us-east-1',
+            'bucket' => 'test-bucket',
+        ]);
+
+        $this->assertSame(
+            'spectra_parse/S213',
+            Storage::disk('fake-ceph')->path('spectra_parse/S213')
+        );
+    }
+
     public function test_failed_marks_the_study_as_failed_after_final_attempt(): void
     {
         Notification::fake();
