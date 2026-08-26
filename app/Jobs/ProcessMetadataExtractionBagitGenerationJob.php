@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Throwable;
@@ -25,6 +25,11 @@ use ZipArchive;
 class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * Delay in milliseconds between network retry attempts.
+     */
+    private const RETRY_DELAY_MS = 2000;
 
     /**
      * The number of times the job may be attempted.
@@ -168,14 +173,10 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     {
         // Remove NMRXIV: prefix if present (e.g., "NMRXIV:S1295" -> "S1295")
         $studyIdentifier = str_replace('NMRXIV:', '', $study->identifier);
-        $diskName = config('nmrxiv.spectra_parsing.storage_disk', 'local');
-        $disk = Storage::disk($diskName);
-        // Remote disks (S3/Ceph) don't expose real local paths, so the bag must always be
-        // assembled on a genuine local directory; only local-driver disks can be used in place.
-        $isLocalDisk = config("filesystems.disks.{$diskName}.driver", 'local') === 'local';
+        $disk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
         $basePath = config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse');
         $baseDir = "{$basePath}/{$studyIdentifier}";
-        $workDir = $isLocalDisk ? $disk->path($baseDir) : storage_path('app/bagit_work_'.uniqid());
+        $dataDir = "{$baseDir}/data";
         $zipPath = null;
 
         try {
@@ -185,7 +186,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Step 2: Extract ZIP to data directory
             Log::info('Step 2/7: Extracting ZIP archive...');
-            $studyName = $this->extractZip($zipPath, "{$workDir}/data");
+            $studyName = $this->extractZip($zipPath, $disk->path($dataDir));
 
             // Step 3: Call NMRKit API
             Log::info('Step 3/7: Calling NMRKit API...');
@@ -202,22 +203,23 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Step 5: Create nmrxiv-meta structure
             Log::info('Step 5/7: Creating nmrxiv-meta structure...');
-            $metaDir = "{$workDir}/data/{$studyName}/nmrxiv-meta";
+            $metaDir = "{$dataDir}/{$studyName}/nmrxiv-meta";
             $imagesDir = "{$metaDir}/images";
 
-            $this->ensureDirectoryPath($metaDir);
+            if (! $disk->exists($metaDir)) {
+                $disk->makeDirectory($metaDir, 0755, true);
+            }
 
             // Clean up old images directory to prevent duplicates from previous runs
-            if (is_dir($imagesDir)) {
-                $oldImages = glob("{$imagesDir}/*") ?: [];
+            if ($disk->exists($imagesDir)) {
+                // Delete all PNG files in the images directory
+                $oldImages = $disk->files($imagesDir);
                 foreach ($oldImages as $oldImage) {
-                    if (is_file($oldImage)) {
-                        @unlink($oldImage);
-                    }
+                    $disk->delete($oldImage);
                 }
                 Log::info('Cleaned up '.count($oldImages).' old image files');
             } else {
-                $this->ensureDirectoryPath($imagesDir);
+                $disk->makeDirectory($imagesDir, 0755, true);
             }
 
             // Clean up spectra data
@@ -241,29 +243,33 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
                         // Save PNG file
                         $pngPath = "{$imagesDir}/{$imageId}.png";
-                        $this->savePNGFromBase64($base64Data, $pngPath);
+                        $this->savePNGFromBase64($base64Data, $disk->path($pngPath));
                         $imageCount++;
                     }
                 }
+
+                // Images live in nmrxiv-meta/images as PNGs; keeping the base64 copies here
+                // would inflate the bag by roughly a third for no benefit.
+                unset($jsonData['images'], $imageData, $base64Data);
             }
 
-            // Save S{identifier}.nmrium (full API response with base64 images intact)
+            // Save S{identifier}.nmrium
             $nmriumPath = "{$metaDir}/{$studyIdentifier}.nmrium";
-            $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            file_put_contents($nmriumPath, $formattedJson);
+            $disk->put($nmriumPath, json_encode($jsonData, JSON_UNESCAPED_SLASHES));
+            unset($jsonData);
 
             // Save bio-schema.json
             if ($bioSchema !== null) {
                 $bioSchemaPath = "{$metaDir}/bio-schema.json";
                 $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-                file_put_contents($bioSchemaPath, $bioSchemaJson);
+                $disk->put($bioSchemaPath, $bioSchemaJson);
             }
 
             // Step 6: Generate BagIt manifests
             Log::info('Step 6/7: Generating BagIt manifests...');
-            $this->generateBagItManifests($workDir);
+            $this->generateBagItManifests($disk->path($baseDir));
 
-            $archiveZipPath = $this->createBagItArchive($workDir, $studyIdentifier);
+            $archiveZipPath = $this->createBagItArchive($disk->path($baseDir), $studyIdentifier);
             $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
             $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
             $archiveStream = fopen($archiveZipPath, 'rb');
@@ -271,14 +277,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
             }
 
-            $uploaded = $archiveDisk->put($archiveKey, $archiveStream, 'public');
-            if (is_resource($archiveStream)) {
-                fclose($archiveStream);
-            }
-
-            if (! $uploaded) {
-                throw new \RuntimeException("Failed to upload BagIt archive to disk for {$studyIdentifier}: {$archiveKey}");
-            }
+            $archiveDisk->put($archiveKey, $archiveStream, 'public');
+            fclose($archiveStream);
 
             $archiveUrl = $archiveDisk->url($archiveKey);
             $study->update([
@@ -293,15 +293,9 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 @unlink($archiveZipPath);
             }
 
-            // Persist the assembled bag structure to the configured disk if it isn't already local
-            if (! $isLocalDisk) {
-                Log::info("Uploading assembled BagIt structure to disk '{$diskName}'...");
-                $this->uploadDirectory($disk, $workDir, $baseDir);
-            }
-
             return [
                 'imageCount' => $imageCount,
-                'location' => $isLocalDisk ? $workDir : "{$diskName}:{$baseDir}",
+                'location' => $disk->path($baseDir),
                 'archiveUrl' => $archiveUrl,
             ];
         } finally {
@@ -309,10 +303,6 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             if ($zipPath && file_exists($zipPath)) {
                 Log::info('Step 7/7: Cleaning up temporary ZIP file...');
                 @unlink($zipPath);
-            }
-
-            if (! $isLocalDisk && is_dir($workDir)) {
-                $this->removeDirectoryRecursive($workDir);
             }
         }
     }
@@ -322,35 +312,28 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function downloadWithRetry(string $url, int $retries): string
     {
-        $attempt = 0;
-        $lastException = null;
+        $tempPath = storage_path('app/temp_'.uniqid().'.zip');
+        $this->ensureDirectoryPath(dirname($tempPath));
 
-        while ($attempt < $retries) {
-            try {
-                $attempt++;
-                Log::debug("Download attempt {$attempt}/{$retries}...");
+        try {
+            // Streamed straight to disk: study archives are too large to buffer in memory.
+            $response = Http::timeout(config('nmrxiv.spectra_parsing.download_timeout', 300))
+                ->retry($retries, self::RETRY_DELAY_MS, throw: false)
+                ->sink($tempPath)
+                ->get($url);
 
-                $tempPath = storage_path('app/temp_'.uniqid().'.zip');
-                $timeout = config('nmrxiv.spectra_parsing.download_timeout', 300);
-                $response = Http::timeout($timeout)->get($url);
-
-                if (! $response->successful()) {
-                    throw new \Exception("Download failed with status {$response->status()}");
-                }
-
-                file_put_contents($tempPath, $response->body());
-
-                return $tempPath;
-            } catch (\Exception $e) {
-                $lastException = $e;
-                if ($attempt < $retries) {
-                    Log::warning("Download failed: {$e->getMessage()}. Retrying...");
-                    sleep(2);
-                }
+            if (! $response->successful()) {
+                throw new \Exception("Download failed with status {$response->status()}");
             }
+        } catch (Throwable $e) {
+            if (file_exists($tempPath)) {
+                @unlink($tempPath);
+            }
+
+            throw new \Exception("Download failed after {$retries} attempts: ".$e->getMessage(), 0, $e);
         }
 
-        throw new \Exception("Download failed after {$retries} attempts: ".$lastException->getMessage());
+        return $tempPath;
     }
 
     /**
@@ -488,95 +471,28 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     }
 
     /**
-     * Recursively upload a local directory tree to the given disk, preserving relative paths.
-     */
-    protected function uploadDirectory(Filesystem $disk, string $localDir, string $remoteBaseDir): void
-    {
-        if (! is_dir($localDir)) {
-            return;
-        }
-
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($localDir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $file) {
-            if (! $file->isFile()) {
-                continue;
-            }
-
-            $relativePath = ltrim(str_replace($localDir, '', $file->getPathname()), '/');
-            $stream = fopen($file->getPathname(), 'rb');
-            if ($stream === false) {
-                throw new \RuntimeException("Failed to open file for upload: {$file->getPathname()}");
-            }
-
-            $disk->put("{$remoteBaseDir}/{$relativePath}", $stream);
-            fclose($stream);
-        }
-    }
-
-    /**
-     * Recursively remove a local directory and its contents.
-     */
-    protected function removeDirectoryRecursive(string $directory): void
-    {
-        if (! is_dir($directory)) {
-            return;
-        }
-
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($files as $file) {
-            $file->isDir() ? @rmdir($file->getPathname()) : @unlink($file->getPathname());
-        }
-
-        @rmdir($directory);
-    }
-
-    /**
      * Call NMRKit API with retry logic.
      */
     protected function callNMRKitAPI(string $url, int $retries): array
     {
-        $attempt = 0;
-        $lastException = null;
+        try {
+            $response = Http::timeout(config('nmrxiv.spectra_parsing.api_timeout', 300))
+                ->retry($retries, self::RETRY_DELAY_MS, throw: false)
+                ->post(config('nmrxiv.spectra_parsing.nmrkit_api_url'), [
+                    'url' => $url,
+                    'capture_snapshot' => true,
+                    'auto_processing' => true,
+                    'auto_detection' => true,
+                ]);
 
-        while ($attempt < $retries) {
-            try {
-                $attempt++;
-                Log::debug("NMRKit API attempt {$attempt}/{$retries}...");
-
-                $timeout = config('nmrxiv.spectra_parsing.api_timeout', 300);
-                $apiUrl = config('nmrxiv.spectra_parsing.nmrkit_api_url');
-
-                $response = Http::timeout($timeout)
-                    ->post($apiUrl, [
-                        'url' => $url,
-                        'capture_snapshot' => true,
-                        'auto_processing' => true,
-                        'auto_detection' => true,
-                    ]);
-
-                if (! $response->successful()) {
-                    throw new \Exception("API request failed with status {$response->status()}: {$response->body()}");
-                }
-
-                return $response->json();
-            } catch (\Exception $e) {
-                $lastException = $e;
-                if ($attempt < $retries) {
-                    Log::warning("API call failed: {$e->getMessage()}. Retrying...");
-                    sleep(2);
-                }
+            if (! $response->successful()) {
+                throw new \Exception("API request failed with status {$response->status()}: ".Str::limit($response->body(), 500));
             }
+        } catch (Throwable $e) {
+            throw new \Exception("API call failed after {$retries} attempts: ".$e->getMessage(), 0, $e);
         }
 
-        throw new \Exception("API call failed after {$retries} attempts: ".$lastException->getMessage());
+        return $response->json();
     }
 
     /**
@@ -584,33 +500,21 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function fetchBioSchema(string $studyIdentifier, int $retries): array
     {
-        $attempt = 0;
-        $lastException = null;
         $baseUrl = config('nmrxiv.spectra_parsing.bioschema_api_url');
-        $url = "{$baseUrl}/{$studyIdentifier}";
 
-        while ($attempt < $retries) {
-            try {
-                $attempt++;
-                Log::debug("Bio-schema attempt {$attempt}/{$retries}...");
+        try {
+            $response = Http::timeout(60)
+                ->retry($retries, self::RETRY_DELAY_MS, throw: false)
+                ->get("{$baseUrl}/{$studyIdentifier}");
 
-                $response = Http::timeout(60)->get($url);
-
-                if (! $response->successful()) {
-                    throw new \Exception("Bio-schema request failed with status {$response->status()}");
-                }
-
-                return $response->json();
-            } catch (\Exception $e) {
-                $lastException = $e;
-                if ($attempt < $retries) {
-                    Log::warning("Bio-schema fetch failed: {$e->getMessage()}. Retrying...");
-                    sleep(2);
-                }
+            if (! $response->successful()) {
+                throw new \Exception("Bio-schema request failed with status {$response->status()}");
             }
+        } catch (Throwable $e) {
+            throw new \Exception("Bio-schema fetch failed after {$retries} attempts: ".$e->getMessage(), 0, $e);
         }
 
-        throw new \Exception("Bio-schema fetch failed after {$retries} attempts: ".$lastException->getMessage());
+        return $response->json();
     }
 
     /**
@@ -618,8 +522,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function savePNGFromBase64(string $base64Data, string $outputPath): void
     {
-        // Remove data:image/png;base64, prefix if present
-        $base64Data = preg_replace('/^data:image\/[a-z]+;base64,/', '', $base64Data);
+        // Prefix is stripped with substr rather than a regex to avoid copying large payloads.
+        if (str_starts_with($base64Data, 'data:')) {
+            $commaPosition = strpos($base64Data, ',');
+
+            if ($commaPosition !== false) {
+                $base64Data = substr($base64Data, $commaPosition + 1);
+            }
+        }
 
         $imageData = base64_decode($base64Data);
 

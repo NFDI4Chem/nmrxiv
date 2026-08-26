@@ -182,7 +182,8 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
         Http::fake([
-            $study->download_url => Http::response($zipBinary, 200),
+            // A fresh response per call: the sink stub handler drains the body stream without rewinding it.
+            $study->download_url => fn () => Http::response($zipBinary, 200),
             'https://nmrkit.test/parse' => Http::response([
                 'images' => [
                     ['id' => 'img1', 'image' => 'data:image/png;base64,'.$pngBase64],
