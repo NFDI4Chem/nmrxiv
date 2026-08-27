@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Throwable;
@@ -25,11 +24,6 @@ use ZipArchive;
 class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    /**
-     * Delay in milliseconds between network retry attempts.
-     */
-    private const RETRY_DELAY_MS = 2000;
 
     /**
      * The number of times the job may be attempted.
@@ -247,16 +241,12 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                         $imageCount++;
                     }
                 }
-
-                // Images live in nmrxiv-meta/images as PNGs; keeping the base64 copies here
-                // would inflate the bag by roughly a third for no benefit.
-                unset($jsonData['images'], $imageData, $base64Data);
             }
 
-            // Save S{identifier}.nmrium
+            // Save S{identifier}.nmrium (full API response with base64 images intact)
             $nmriumPath = "{$metaDir}/{$studyIdentifier}.nmrium";
-            $disk->put($nmriumPath, json_encode($jsonData, JSON_UNESCAPED_SLASHES));
-            unset($jsonData);
+            $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $disk->put($nmriumPath, $formattedJson);
 
             // Save bio-schema.json
             if ($bioSchema !== null) {
@@ -312,28 +302,35 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function downloadWithRetry(string $url, int $retries): string
     {
-        $tempPath = storage_path('app/temp_'.uniqid().'.zip');
-        $this->ensureDirectoryPath(dirname($tempPath));
+        $attempt = 0;
+        $lastException = null;
 
-        try {
-            // Streamed straight to disk: study archives are too large to buffer in memory.
-            $response = Http::timeout(config('nmrxiv.spectra_parsing.download_timeout', 300))
-                ->retry($retries, self::RETRY_DELAY_MS, throw: false)
-                ->sink($tempPath)
-                ->get($url);
+        while ($attempt < $retries) {
+            try {
+                $attempt++;
+                Log::debug("Download attempt {$attempt}/{$retries}...");
 
-            if (! $response->successful()) {
-                throw new \Exception("Download failed with status {$response->status()}");
+                $tempPath = storage_path('app/temp_'.uniqid().'.zip');
+                $timeout = config('nmrxiv.spectra_parsing.download_timeout', 300);
+                $response = Http::timeout($timeout)->get($url);
+
+                if (! $response->successful()) {
+                    throw new \Exception("Download failed with status {$response->status()}");
+                }
+
+                file_put_contents($tempPath, $response->body());
+
+                return $tempPath;
+            } catch (\Exception $e) {
+                $lastException = $e;
+                if ($attempt < $retries) {
+                    Log::warning("Download failed: {$e->getMessage()}. Retrying...");
+                    sleep(2);
+                }
             }
-        } catch (Throwable $e) {
-            if (file_exists($tempPath)) {
-                @unlink($tempPath);
-            }
-
-            throw new \Exception("Download failed after {$retries} attempts: ".$e->getMessage(), 0, $e);
         }
 
-        return $tempPath;
+        throw new \Exception("Download failed after {$retries} attempts: ".$lastException->getMessage());
     }
 
     /**
@@ -475,24 +472,40 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function callNMRKitAPI(string $url, int $retries): array
     {
-        try {
-            $response = Http::timeout(config('nmrxiv.spectra_parsing.api_timeout', 300))
-                ->retry($retries, self::RETRY_DELAY_MS, throw: false)
-                ->post(config('nmrxiv.spectra_parsing.nmrkit_api_url'), [
-                    'url' => $url,
-                    'capture_snapshot' => true,
-                    'auto_processing' => true,
-                    'auto_detection' => true,
-                ]);
+        $attempt = 0;
+        $lastException = null;
 
-            if (! $response->successful()) {
-                throw new \Exception("API request failed with status {$response->status()}: ".Str::limit($response->body(), 500));
+        while ($attempt < $retries) {
+            try {
+                $attempt++;
+                Log::debug("NMRKit API attempt {$attempt}/{$retries}...");
+
+                $timeout = config('nmrxiv.spectra_parsing.api_timeout', 300);
+                $apiUrl = config('nmrxiv.spectra_parsing.nmrkit_api_url');
+
+                $response = Http::timeout($timeout)
+                    ->post($apiUrl, [
+                        'url' => $url,
+                        'capture_snapshot' => true,
+                        'auto_processing' => true,
+                        'auto_detection' => true,
+                    ]);
+
+                if (! $response->successful()) {
+                    throw new \Exception("API request failed with status {$response->status()}: {$response->body()}");
+                }
+
+                return $response->json();
+            } catch (\Exception $e) {
+                $lastException = $e;
+                if ($attempt < $retries) {
+                    Log::warning("API call failed: {$e->getMessage()}. Retrying...");
+                    sleep(2);
+                }
             }
-        } catch (Throwable $e) {
-            throw new \Exception("API call failed after {$retries} attempts: ".$e->getMessage(), 0, $e);
         }
 
-        return $response->json();
+        throw new \Exception("API call failed after {$retries} attempts: ".$lastException->getMessage());
     }
 
     /**
@@ -500,21 +513,33 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function fetchBioSchema(string $studyIdentifier, int $retries): array
     {
+        $attempt = 0;
+        $lastException = null;
         $baseUrl = config('nmrxiv.spectra_parsing.bioschema_api_url');
+        $url = "{$baseUrl}/{$studyIdentifier}";
 
-        try {
-            $response = Http::timeout(60)
-                ->retry($retries, self::RETRY_DELAY_MS, throw: false)
-                ->get("{$baseUrl}/{$studyIdentifier}");
+        while ($attempt < $retries) {
+            try {
+                $attempt++;
+                Log::debug("Bio-schema attempt {$attempt}/{$retries}...");
 
-            if (! $response->successful()) {
-                throw new \Exception("Bio-schema request failed with status {$response->status()}");
+                $response = Http::timeout(60)->get($url);
+
+                if (! $response->successful()) {
+                    throw new \Exception("Bio-schema request failed with status {$response->status()}");
+                }
+
+                return $response->json();
+            } catch (\Exception $e) {
+                $lastException = $e;
+                if ($attempt < $retries) {
+                    Log::warning("Bio-schema fetch failed: {$e->getMessage()}. Retrying...");
+                    sleep(2);
+                }
             }
-        } catch (Throwable $e) {
-            throw new \Exception("Bio-schema fetch failed after {$retries} attempts: ".$e->getMessage(), 0, $e);
         }
 
-        return $response->json();
+        throw new \Exception("Bio-schema fetch failed after {$retries} attempts: ".$lastException->getMessage());
     }
 
     /**
@@ -522,14 +547,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
      */
     protected function savePNGFromBase64(string $base64Data, string $outputPath): void
     {
-        // Prefix is stripped with substr rather than a regex to avoid copying large payloads.
-        if (str_starts_with($base64Data, 'data:')) {
-            $commaPosition = strpos($base64Data, ',');
-
-            if ($commaPosition !== false) {
-                $base64Data = substr($base64Data, $commaPosition + 1);
-            }
-        }
+        // Remove data:image/png;base64, prefix if present
+        $base64Data = preg_replace('/^data:image\/[a-z]+;base64,/', '', $base64Data);
 
         $imageData = base64_decode($base64Data);
 
