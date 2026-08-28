@@ -186,7 +186,7 @@ class AddProjectMemberTest extends TestCase
             $this->action->add($this->owner, $this->project, $existingMember->email, 'collaborator');
             $this->fail('Expected ValidationException was not thrown');
         } catch (ValidationException $e) {
-            $this->assertStringContainsString('This user already belongs to the project', $e->getMessage());
+            $this->assertStringContainsString('Unable to add member with this email address', $e->getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ class AddProjectMemberTest extends TestCase
             $this->action->add($this->owner, $this->project, 'nonexistent@example.com', 'reviewer');
             $this->fail('Expected ValidationException was not thrown');
         } catch (ValidationException $e) {
-            $this->assertStringContainsString('We were unable to find a registered user with this email address', $e->getMessage());
+            $this->assertStringContainsString('Unable to add member with this email address', $e->getMessage());
         }
     }
 }
