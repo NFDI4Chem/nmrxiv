@@ -18,11 +18,12 @@ class BackfillBagitArchiveLinksCommandTest extends TestCase
     public function test_it_zips_bag_folder_and_backfills_the_matching_public_study(): void
     {
         Storage::fake('local');
+        Storage::fake('public');
 
         config([
             'nmrxiv.spectra_parsing.storage_disk' => 'local',
             'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
-            'filesystems.default_public' => 'local',
+            'filesystems.default_public' => 'public',
         ]);
 
         $study = $this->makeStudy(['identifier' => 213, 'is_public' => true]);
@@ -39,6 +40,7 @@ class BackfillBagitArchiveLinksCommandTest extends TestCase
         $this->assertSame('archive/S213/S213.zip', data_get($study->metadata_bagit_generation_logs, 'archive_path'));
 
         Storage::disk('local')->assertExists('archive/S213/S213.zip');
+        Storage::disk('public')->assertMissing('archive/S213/S213.zip');
     }
 
     public function test_it_skips_studies_that_already_have_an_archive_link_unless_forced(): void

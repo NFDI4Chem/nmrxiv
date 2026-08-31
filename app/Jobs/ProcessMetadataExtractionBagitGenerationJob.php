@@ -263,13 +263,19 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
             $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
-            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
+
+            if (! $isLocalDisk) {
+                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
+                // This runs before the archive upload because $baseDir can contain $archiveKey.
+                $disk->deleteDirectory($baseDir);
+            }
+
             $archiveStream = fopen($archiveZipPath, 'rb');
             if ($archiveStream === false) {
                 throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
             }
 
-            $archiveUploaded = $archiveDisk->put($archiveKey, $archiveStream, 'public');
+            $archiveUploaded = $disk->put($archiveKey, $archiveStream);
             fclose($archiveStream);
 
             if ($archiveUploaded === false) {
@@ -277,12 +283,10 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             }
 
             if (! $isLocalDisk) {
-                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
-                $disk->deleteDirectory($baseDir);
                 $this->uploadDirectory($workBaseDir, $disk, $baseDir);
             }
 
-            $archiveUrl = $archiveDisk->url($archiveKey);
+            $archiveUrl = $disk->url($archiveKey);
             $study->update([
                 'bagit_archive_link' => $archiveUrl,
                 'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [

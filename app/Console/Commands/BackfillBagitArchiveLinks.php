@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Study;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
@@ -92,7 +92,7 @@ class BackfillBagitArchiveLinks extends Command
     /**
      * Zip and backfill a single study's BagIt folder.
      */
-    private function processFolder(Filesystem $sourceDisk, string $basePath, string $folderName): void
+    private function processFolder(FilesystemAdapter $sourceDisk, string $basePath, string $folderName): void
     {
         $identifier = (int) substr($folderName, 1);
 
@@ -133,17 +133,16 @@ class BackfillBagitArchiveLinks extends Command
             $zipPath = $this->zipDirectory($tempDir, $folderName);
 
             $archiveKey = "archive/{$folderName}/{$folderName}.zip";
-            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
             $archiveContents = file_get_contents($zipPath);
             if ($archiveContents === false) {
                 throw new \RuntimeException("Failed to read generated zip for {$folderName}");
             }
 
-            if (! $archiveDisk->put($archiveKey, $archiveContents, 'public')) {
+            if (! $sourceDisk->put($archiveKey, $archiveContents)) {
                 throw new \RuntimeException("Failed to upload archive to disk for {$folderName}: {$archiveKey}");
             }
 
-            $archiveUrl = $archiveDisk->url($archiveKey);
+            $archiveUrl = $sourceDisk->url($archiveKey);
 
             $study->update([
                 'bagit_archive_link' => $archiveUrl,
@@ -171,7 +170,7 @@ class BackfillBagitArchiveLinks extends Command
     /**
      * Mirror a remote storage directory into a local temp directory.
      */
-    private function downloadDirectory(Filesystem $disk, string $remoteDir, string $localDir): void
+    private function downloadDirectory(FilesystemAdapter $disk, string $remoteDir, string $localDir): void
     {
         if (! is_dir($localDir)) {
             mkdir($localDir, 0755, true);

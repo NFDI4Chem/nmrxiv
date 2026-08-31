@@ -272,6 +272,10 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertArrayHasKey('spectra_parse/S213/bagit.txt', $adapter->files);
         $this->assertArrayHasKey('spectra_parse/S213/manifest-sha256.txt', $adapter->files);
 
+        // The archive belongs on the source disk, not on the public disk.
+        $this->assertArrayHasKey('archive/S213/S213.zip', $adapter->files);
+        Storage::disk('local')->assertMissing('archive/S213/S213.zip');
+
         $this->assertEmpty(glob(storage_path('app/bagit_work_*')));
     }
 
@@ -286,9 +290,8 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_disk' => 'rejecting',
             'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
-            'filesystems.default_public' => 'rejecting',
         ]);
 
         $study = $this->makeStudy();
@@ -715,6 +718,14 @@ class InMemoryFlysystemAdapter implements FlysystemAdapterContract
     public function directoryExists(string $path): bool
     {
         return array_key_exists($path, $this->directories);
+    }
+
+    /**
+     * FilesystemAdapter::url() only resolves for known adapter types, so expose one explicitly.
+     */
+    public function getUrl(string $path): string
+    {
+        return 'https://memory.test/'.$path;
     }
 
     public function write(string $path, string $contents, Config $config): void
