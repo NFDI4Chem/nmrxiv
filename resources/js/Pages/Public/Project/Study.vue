@@ -425,7 +425,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import Tag from "@/Shared/Tag.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 
@@ -478,6 +478,7 @@ export default {
             isDescriptionExpanded: false,
             /** Whether the description is long enough to need expansion */
             isDescriptionLong: false,
+            bagitStatusPolling: null,
         };
     },
 
@@ -488,6 +489,13 @@ export default {
          */
         shareURL() {
             return this.study?.data?.public_url ?? "";
+        },
+
+        bagitJobStatus() {
+            return (
+                this.study?.data?.metadata_bagit_generation_status ||
+                (this.study?.data?.bagit_archive_link ? "completed" : "pending")
+            );
         },
 
         /**
@@ -567,6 +575,12 @@ export default {
         },
     },
 
+    watch: {
+        bagitJobStatus() {
+            this.startBagitStatusPolling();
+        },
+    },
+
     mounted() {
         // Parse URL parameters to set initial dataset selection
         const urlSearchParams = new URLSearchParams(window.location.search);
@@ -593,13 +607,42 @@ export default {
                 });
         }
 
+        this.startBagitStatusPolling();
+
         // Check if description needs expansion functionality
         this.$nextTick(() => {
             this.checkDescriptionLength();
         });
     },
 
+    beforeUnmount() {
+        this.stopBagitStatusPolling();
+    },
+
     methods: {
+        startBagitStatusPolling() {
+            if (!["pending", "processing"].includes(this.bagitJobStatus)) {
+                this.stopBagitStatusPolling();
+
+                return;
+            }
+
+            if (this.bagitStatusPolling) {
+                return;
+            }
+
+            this.bagitStatusPolling = window.setInterval(() => {
+                router.reload({ only: ["study"] });
+            }, 15000);
+        },
+
+        stopBagitStatusPolling() {
+            if (this.bagitStatusPolling) {
+                window.clearInterval(this.bagitStatusPolling);
+                this.bagitStatusPolling = null;
+            }
+        },
+
         datasetHref(dataset) {
             if (
                 this.reviewerPreview?.obfuscationcode &&
