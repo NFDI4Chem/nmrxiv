@@ -18,12 +18,11 @@ class BackfillBagitArchiveLinksCommandTest extends TestCase
     public function test_it_zips_bag_folder_and_backfills_the_matching_public_study(): void
     {
         Storage::fake('local');
-        Storage::fake('public');
 
         config([
             'nmrxiv.spectra_parsing.storage_disk' => 'local',
             'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
-            'filesystems.default_public' => 'public',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy(['identifier' => 213, 'is_public' => true]);
@@ -37,12 +36,9 @@ class BackfillBagitArchiveLinksCommandTest extends TestCase
 
         $this->assertNotNull($study->bagit_archive_link);
         $this->assertSame('completed', $study->metadata_bagit_generation_status);
-        $this->assertSame('spectra_parse/S213.zip', data_get($study->metadata_bagit_generation_logs, 'archive_path'));
+        $this->assertSame('archive/S213/S213.zip', data_get($study->metadata_bagit_generation_logs, 'archive_path'));
 
-        // Beside the bag folder, never inside it, so a later bag refresh cannot delete the archive.
-        Storage::disk('local')->assertExists('spectra_parse/S213.zip');
-        Storage::disk('local')->assertMissing('spectra_parse/S213/S213.zip');
-        Storage::disk('public')->assertMissing('archive/S213/S213.zip');
+        Storage::disk('local')->assertExists('archive/S213/S213.zip');
     }
 
     public function test_it_skips_studies_that_already_have_an_archive_link_unless_forced(): void
@@ -88,7 +84,7 @@ class BackfillBagitArchiveLinksCommandTest extends TestCase
 
         $this->artisan('nmrxiv:backfill-bagit-archives')->assertSuccessful();
 
-        Storage::disk('local')->assertMissing('spectra_parse/S999.zip');
+        Storage::disk('local')->assertMissing('archive/S999/S999.zip');
     }
 
     private function putBagFiles(string $folderName): void

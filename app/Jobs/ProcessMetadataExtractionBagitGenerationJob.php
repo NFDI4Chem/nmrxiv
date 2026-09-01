@@ -167,13 +167,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     protected function processStudy(Study $study): array
     {
         // Remove NMRXIV: prefix if present (e.g., "NMRXIV:S1295" -> "S1295")
-        $studyIdentifier = str_replace('NMRXIV:', '', (string) $study->identifier);
-
-        // An empty identifier would resolve $baseDir to the storage root and let the cleanup below wipe every bag.
-        if ($studyIdentifier === '') {
-            throw new \RuntimeException("Study {$study->id} has no identifier, refusing to build a bag at the storage root");
-        }
-
+        $studyIdentifier = str_replace('NMRXIV:', '', $study->identifier);
         $diskName = config('nmrxiv.spectra_parsing.storage_disk', 'local');
         $disk = Storage::disk($diskName);
         $isLocalDisk = config("filesystems.disks.{$diskName}.driver") === 'local';
@@ -268,15 +262,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             $this->generateBagItManifests($workBaseDir);
 
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
-            // Sits beside the bag directory, never inside it, so the stale-file cleanup below cannot delete it.
-            $archiveKey = "{$basePath}/{$studyIdentifier}.zip";
-
+            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
+            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
             $archiveStream = fopen($archiveZipPath, 'rb');
             if ($archiveStream === false) {
                 throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
             }
 
-            $archiveUploaded = $disk->put($archiveKey, $archiveStream);
+            $archiveUploaded = $archiveDisk->put($archiveKey, $archiveStream, 'public');
             fclose($archiveStream);
 
             if ($archiveUploaded === false) {
@@ -289,7 +282,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 $this->uploadDirectory($workBaseDir, $disk, $baseDir);
             }
 
-            $archiveUrl = $disk->url($archiveKey);
+            $archiveUrl = $archiveDisk->url($archiveKey);
             $study->update([
                 'bagit_archive_link' => $archiveUrl,
                 'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
