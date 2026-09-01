@@ -132,7 +132,8 @@ class BackfillBagitArchiveLinks extends Command
 
             $zipPath = $this->zipDirectory($tempDir, $folderName);
 
-            $archiveKey = "archive/{$folderName}/{$folderName}.zip";
+            // Sits beside the bag directory, never inside it, so a later bag refresh cannot delete it.
+            $archiveKey = "{$basePath}/{$folderName}.zip";
             $archiveContents = file_get_contents($zipPath);
             if ($archiveContents === false) {
                 throw new \RuntimeException("Failed to read generated zip for {$folderName}");

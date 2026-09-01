@@ -167,7 +167,13 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     protected function processStudy(Study $study): array
     {
         // Remove NMRXIV: prefix if present (e.g., "NMRXIV:S1295" -> "S1295")
-        $studyIdentifier = str_replace('NMRXIV:', '', $study->identifier);
+        $studyIdentifier = str_replace('NMRXIV:', '', (string) $study->identifier);
+
+        // An empty identifier would resolve $baseDir to the storage root and let the cleanup below wipe every bag.
+        if ($studyIdentifier === '') {
+            throw new \RuntimeException("Study {$study->id} has no identifier, refusing to build a bag at the storage root");
+        }
+
         $diskName = config('nmrxiv.spectra_parsing.storage_disk', 'local');
         $disk = Storage::disk($diskName);
         $isLocalDisk = config("filesystems.disks.{$diskName}.driver") === 'local';
@@ -262,13 +268,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             $this->generateBagItManifests($workBaseDir);
 
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
-            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
-
-            if (! $isLocalDisk) {
-                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
-                // This runs before the archive upload because $baseDir can contain $archiveKey.
-                $disk->deleteDirectory($baseDir);
-            }
+            // Sits beside the bag directory, never inside it, so the stale-file cleanup below cannot delete it.
+            $archiveKey = "{$basePath}/{$studyIdentifier}.zip";
 
             $archiveStream = fopen($archiveZipPath, 'rb');
             if ($archiveStream === false) {
@@ -283,6 +284,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             }
 
             if (! $isLocalDisk) {
+                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
+                $disk->deleteDirectory($baseDir);
                 $this->uploadDirectory($workBaseDir, $disk, $baseDir);
             }
 

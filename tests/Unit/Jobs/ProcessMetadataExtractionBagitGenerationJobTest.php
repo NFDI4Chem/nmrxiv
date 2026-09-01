@@ -272,11 +272,41 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertArrayHasKey('spectra_parse/S213/bagit.txt', $adapter->files);
         $this->assertArrayHasKey('spectra_parse/S213/manifest-sha256.txt', $adapter->files);
 
-        // The archive belongs on the source disk, not on the public disk.
-        $this->assertArrayHasKey('archive/S213/S213.zip', $adapter->files);
-        Storage::disk('local')->assertMissing('archive/S213/S213.zip');
+        // The archive sits beside the bag directory on the source disk, so the stale-file cleanup cannot delete it.
+        $this->assertArrayHasKey('spectra_parse/S213.zip', $adapter->files);
+        $this->assertArrayNotHasKey('archive/S213/S213.zip', $adapter->files);
+        Storage::disk('local')->assertMissing('spectra_parse/S213.zip');
 
         $this->assertEmpty(glob(storage_path('app/bagit_work_*')));
+    }
+
+    public function test_handle_refuses_to_process_a_study_without_an_identifier(): void
+    {
+        Storage::fake('local');
+        Notification::fake();
+
+        $adapter = new InMemoryFlysystemAdapter;
+        $this->registerMemoryDisk('spectra_memory', $adapter);
+
+        config([
+            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
+            'nmrxiv.spectra_parsing.storage_path' => 'archive',
+        ]);
+
+        $study = $this->makeStudy();
+        $study->forceFill(['identifier' => null])->saveQuietly();
+
+        // An empty identifier used to resolve $baseDir to the storage root, wiping every other study's bag.
+        $adapter->files['archive/S999/bagit.txt'] = "BagIt-Version: 1.0\n";
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('has no identifier');
+
+        try {
+            (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+        } finally {
+            $this->assertArrayHasKey('archive/S999/bagit.txt', $adapter->files);
+        }
     }
 
     public function test_handle_marks_study_as_failed_when_archive_upload_is_rejected_by_the_disk(): void
