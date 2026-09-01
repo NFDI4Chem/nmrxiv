@@ -190,7 +190,7 @@
                                                             )
                                                         "
                                                     >
-                                                        Download Project Data
+                                                        Project Data
                                                     </button>
                                                 </MenuItem>
                                                 <MenuItem v-slot="{ active }">
@@ -219,8 +219,8 @@
                                                             requestBagitDownload
                                                         "
                                                     >
-                                                        Download Bagit Archive
-                                                        for this sample
+                                                        Bagit Archive for this
+                                                        sample
                                                     </button>
                                                 </MenuItem>
                                             </MenuItems>
