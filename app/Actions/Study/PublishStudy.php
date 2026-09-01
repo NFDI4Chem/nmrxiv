@@ -2,6 +2,7 @@
 
 namespace App\Actions\Study;
 
+use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Study;
 use App\Services\ChemotionRepositoryTrackerService;
 use App\Support\Public\PublicMoleculeCatalogIndexer;
@@ -26,6 +27,11 @@ class PublishStudy
         }
 
         app(PublicMoleculeCatalogIndexer::class)->refreshForStudy($study);
+        if ($study->is_public && $study->has_nmrium && filled($study->download_url)) {
+            ProcessMetadataExtractionBagitGenerationJob::dispatch($study->id);
+        }
+
+        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
 
         // Track publication if this is an ELN submission
         $this->trackStudyPublished($study);

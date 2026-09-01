@@ -3,14 +3,21 @@
 namespace App\Jobs;
 
 use App\Models\Study;
+use App\Models\User;
+use App\Notifications\BagitGenerationFailedNotification;
+use App\Notifications\BagitGenerationSucceededNotification;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Throwable;
 use whikloj\BagItTools\Bag;
 use ZipArchive;
@@ -98,6 +105,13 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             ]);
 
             Log::info("Successfully processed study {$study->id} ({$study->identifier}): {$result['imageCount']} images saved to {$result['location']}");
+
+            if ($study->owner) {
+                Notification::send($study->owner, new BagitGenerationSucceededNotification(
+                    $study->fresh(),
+                    $study->fresh()->bagit_archive_link,
+                ));
+            }
         } catch (Throwable $e) {
             Log::warning("Attempt {$this->attempts()} failed for study {$this->studyId}: {$e->getMessage()}");
 
@@ -134,6 +148,17 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 'attempts' => $this->attempts(),
             ]),
         ]);
+
+        $admins = User::role(['super-admin'])->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new BagitGenerationFailedNotification(
+                $study,
+                $exception->getMessage(),
+                $exception,
+                $this->attempts(),
+            ));
+        }
     }
 
     /**
@@ -143,11 +168,18 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     {
         // Remove NMRXIV: prefix if present (e.g., "NMRXIV:S1295" -> "S1295")
         $studyIdentifier = str_replace('NMRXIV:', '', $study->identifier);
-        $disk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
-        $basePath = config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse');
+        $diskName = config('nmrxiv.spectra_parsing.storage_disk', 'local');
+        $disk = Storage::disk($diskName);
+        $isLocalDisk = config("filesystems.disks.{$diskName}.driver") === 'local';
+        $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
         $baseDir = "{$basePath}/{$studyIdentifier}";
-        $dataDir = "{$baseDir}/data";
         $zipPath = null;
+        $archiveZipPath = null;
+
+        // The bag is always assembled with native filesystem calls, so remote disks need a real local staging directory.
+        $tempWorkRoot = $isLocalDisk ? null : storage_path('app/bagit_work_'.uniqid());
+        $workBaseDir = $isLocalDisk ? $disk->path($baseDir) : "{$tempWorkRoot}/{$studyIdentifier}";
+        $workDataDir = "{$workBaseDir}/data";
 
         try {
             // Step 1: Download ZIP file
@@ -156,7 +188,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Step 2: Extract ZIP to data directory
             Log::info('Step 2/7: Extracting ZIP archive...');
-            $studyName = $this->extractZip($zipPath, $disk->path($dataDir));
+            $studyName = $this->extractZip($zipPath, $workDataDir);
 
             // Step 3: Call NMRKit API
             Log::info('Step 3/7: Calling NMRKit API...');
@@ -173,23 +205,20 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Step 5: Create nmrxiv-meta structure
             Log::info('Step 5/7: Creating nmrxiv-meta structure...');
-            $metaDir = "{$dataDir}/{$studyName}/nmrxiv-meta";
+            $metaDir = "{$workDataDir}/{$studyName}/nmrxiv-meta";
             $imagesDir = "{$metaDir}/images";
 
-            if (! $disk->exists($metaDir)) {
-                $disk->makeDirectory($metaDir, 0755, true);
-            }
+            $this->ensureDirectoryPath($metaDir);
 
             // Clean up old images directory to prevent duplicates from previous runs
-            if ($disk->exists($imagesDir)) {
-                // Delete all PNG files in the images directory
-                $oldImages = $disk->files($imagesDir);
+            if (is_dir($imagesDir)) {
+                $oldImages = array_filter(glob($imagesDir.'/*') ?: [], 'is_file');
                 foreach ($oldImages as $oldImage) {
-                    $disk->delete($oldImage);
+                    @unlink($oldImage);
                 }
                 Log::info('Cleaned up '.count($oldImages).' old image files');
             } else {
-                $disk->makeDirectory($imagesDir, 0755, true);
+                $this->ensureDirectoryPath($imagesDir);
             }
 
             // Clean up spectra data
@@ -212,32 +241,60 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                         $base64Data = $imageData['image'];
 
                         // Save PNG file
-                        $pngPath = "{$imagesDir}/{$imageId}.png";
-                        $this->savePNGFromBase64($base64Data, $disk->path($pngPath));
+                        $this->savePNGFromBase64($base64Data, "{$imagesDir}/{$imageId}.png");
                         $imageCount++;
                     }
                 }
             }
 
             // Save S{identifier}.nmrium (full API response with base64 images intact)
-            $nmriumPath = "{$metaDir}/{$studyIdentifier}.nmrium";
             $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            $disk->put($nmriumPath, $formattedJson);
+            file_put_contents("{$metaDir}/{$studyIdentifier}.nmrium", $formattedJson);
 
             // Save bio-schema.json
             if ($bioSchema !== null) {
-                $bioSchemaPath = "{$metaDir}/bio-schema.json";
                 $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-                $disk->put($bioSchemaPath, $bioSchemaJson);
+                file_put_contents("{$metaDir}/bio-schema.json", $bioSchemaJson);
             }
 
             // Step 6: Generate BagIt manifests
             Log::info('Step 6/7: Generating BagIt manifests...');
-            $this->generateBagItManifests($disk->path($baseDir));
+            $this->generateBagItManifests($workBaseDir);
+
+            $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
+            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
+            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
+            $archiveStream = fopen($archiveZipPath, 'rb');
+            if ($archiveStream === false) {
+                throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
+            }
+
+            $archiveUploaded = $archiveDisk->put($archiveKey, $archiveStream, 'public');
+            fclose($archiveStream);
+
+            if ($archiveUploaded === false) {
+                throw new \RuntimeException("Failed to upload BagIt archive to disk: {$archiveKey}");
+            }
+
+            if (! $isLocalDisk) {
+                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
+                $disk->deleteDirectory($baseDir);
+                $this->uploadDirectory($workBaseDir, $disk, $baseDir);
+            }
+
+            $archiveUrl = $archiveDisk->url($archiveKey);
+            $study->update([
+                'bagit_archive_link' => $archiveUrl,
+                'metadata_bagit_generation_logs' => array_merge((array) ($study->metadata_bagit_generation_logs ?: []), [
+                    'bagit_archive_link' => $archiveUrl,
+                    'archive_path' => $archiveKey,
+                ]),
+            ]);
 
             return [
                 'imageCount' => $imageCount,
-                'location' => $disk->path($baseDir),
+                'location' => $isLocalDisk ? $workBaseDir : $baseDir,
+                'archiveUrl' => $archiveUrl,
             ];
         } finally {
             // Step 7: Cleanup temporary files (always runs, even on exception)
@@ -245,7 +302,67 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 Log::info('Step 7/7: Cleaning up temporary ZIP file...');
                 @unlink($zipPath);
             }
+
+            if ($archiveZipPath && file_exists($archiveZipPath)) {
+                @unlink($archiveZipPath);
+            }
+
+            if ($tempWorkRoot) {
+                $this->deleteLocalDirectory($tempWorkRoot);
+            }
         }
+    }
+
+    /**
+     * Mirror a locally assembled directory tree onto the configured storage disk.
+     */
+    protected function uploadDirectory(string $localPath, Filesystem $disk, string $remotePath): void
+    {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($localPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
+            $relativePath = ltrim(str_replace($localPath, '', $file->getPathname()), '/');
+            $stream = fopen($file->getPathname(), 'rb');
+
+            if ($stream === false) {
+                throw new \RuntimeException("Failed to open file for upload: {$file->getPathname()}");
+            }
+
+            $uploaded = $disk->put("{$remotePath}/{$relativePath}", $stream);
+            fclose($stream);
+
+            if ($uploaded === false) {
+                throw new \RuntimeException("Failed to upload bag file to disk: {$remotePath}/{$relativePath}");
+            }
+        }
+    }
+
+    /**
+     * Recursively remove a local directory tree.
+     */
+    protected function deleteLocalDirectory(string $path): void
+    {
+        if (! is_dir($path)) {
+            return;
+        }
+
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($items as $item) {
+            $item->isDir() ? @rmdir($item->getPathname()) : @unlink($item->getPathname());
+        }
+
+        @rmdir($path);
     }
 
     /**
@@ -516,14 +633,19 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     protected function generateBagItManifests(string $bagPath): void
     {
         try {
-            // Create bag using BagItTools library
-            $bag = Bag::create($bagPath);
+            // The payload is already extracted here, so adopt the directory instead of creating a new bag.
+            $bag = is_dir($bagPath) ? Bag::load($bagPath) : Bag::create($bagPath);
 
-            // Update bag with checksums
+            // Defaults are a non-extended sha512 bag, which would drop bag-info.txt/tagmanifest and rename the manifest.
+            $bag->setExtended(true);
+            $bag->setAlgorithm('sha256');
+
+            if (! $bag->hasBagInfoTag('Bag-Software-Agent')) {
+                $bag->addBagInfoTag('Bag-Software-Agent', 'nmrXiv/1.0');
+            }
+
+            // Writes bagit.txt, manifest-sha256.txt, bag-info.txt and tagmanifest-sha256.txt.
             $bag->update();
-
-            // Package the bag (this generates manifests)
-            $bag->package($bagPath);
 
             Log::debug('Used BagItTools library for manifest generation');
         } catch (\Exception $e) {
@@ -548,9 +670,9 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         $dataPath = $bagPath.'/data';
 
         if (is_dir($dataPath)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dataPath),
-                \RecursiveIteratorIterator::LEAVES_ONLY
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dataPath),
+                RecursiveIteratorIterator::LEAVES_ONLY
             );
 
             foreach ($files as $file) {
@@ -593,9 +715,9 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         $totalFiles = 0;
 
         if (is_dir($dataPath)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dataPath),
-                \RecursiveIteratorIterator::LEAVES_ONLY
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dataPath),
+                RecursiveIteratorIterator::LEAVES_ONLY
             );
 
             foreach ($files as $file) {
@@ -607,5 +729,36 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         }
 
         return "{$totalBytes}.{$totalFiles}";
+    }
+
+    /**
+     * Create a ZIP archive for the generated BagIt directory and return the local path.
+     */
+    protected function createBagItArchive(string $bagPath, string $studyIdentifier): string
+    {
+        $archivePath = storage_path('app/temp_'.uniqid().'_'.$studyIdentifier.'.zip');
+        $zip = new ZipArchive;
+
+        if ($zip->open($archivePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new \RuntimeException("Failed to create archive for study {$studyIdentifier}: {$archivePath}");
+        }
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($bagPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
+            $relativePath = ltrim(str_replace($bagPath.'/', '', $file->getPathname()), '/');
+            $zip->addFile($file->getPathname(), $relativePath);
+        }
+
+        $zip->close();
+
+        return $archivePath;
     }
 }
