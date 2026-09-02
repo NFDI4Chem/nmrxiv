@@ -619,7 +619,7 @@ import DOIBadge from "@/Shared/DOIBadge.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import MixtureCompositionDisplay from "@/Shared/MixtureCompositionDisplay.vue";
 import Tag from "@/Shared/Tag.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
@@ -646,9 +646,16 @@ export default {
     data() {
         return {
             schema: {},
+            bagitStatusPolling: null,
         };
     },
     computed: {
+        bagitJobStatus() {
+            return (
+                this.study?.data?.metadata_bagit_generation_status ||
+                (this.study?.data?.bagit_archive_link ? "completed" : "pending")
+            );
+        },
         shareURL() {
             return this.study.data.public_url;
         },
@@ -722,16 +729,45 @@ export default {
             );
         },
     },
+    watch: {
+        bagitJobStatus() {
+            this.startBagitStatusPolling();
+        },
+    },
     mounted() {
-        if (this.study?.data?.identifier) {
-            axios
-                .get(route("bioschemas.id", this.study.data.identifier))
-                .then((response) => {
-                    this.schema = response.data;
-                });
-        }
+        axios
+            .get(route("bioschemas.id", this.study.data.identifier))
+            .then((response) => {
+                this.schema = response.data;
+            });
+
+        this.startBagitStatusPolling();
+    },
+    beforeUnmount() {
+        this.stopBagitStatusPolling();
     },
     methods: {
+        startBagitStatusPolling() {
+            if (!["pending", "processing"].includes(this.bagitJobStatus)) {
+                this.stopBagitStatusPolling();
+
+                return;
+            }
+
+            if (this.bagitStatusPolling) {
+                return;
+            }
+
+            this.bagitStatusPolling = window.setInterval(() => {
+                router.reload({ only: ["study"] });
+            }, 15000);
+        },
+        stopBagitStatusPolling() {
+            if (this.bagitStatusPolling) {
+                window.clearInterval(this.bagitStatusPolling);
+                this.bagitStatusPolling = null;
+            }
+        },
         datasetHref(dataset) {
             if (dataset?.public_url) {
                 try {

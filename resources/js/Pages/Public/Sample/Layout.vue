@@ -132,37 +132,100 @@
                                     </div>
                                 </div>
 
-                                <!-- Download button (shown if download URL is available) -->
+                                <!-- Download menu (shown if download URL is available) -->
                                 <div
                                     v-if="study.download_url"
                                     class="flex-shrink-0"
                                 >
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center px-4 py-1.5 rounded-full border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                                        @click="
-                                            requestDownload(
-                                                study.download_url,
-                                                trackingIdentifier(study)
-                                            )
-                                        "
-                                    >
-                                        <!-- Download icon -->
-                                        <svg
-                                            class="-ml-1 mr-2 h-4 w-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
+                                    <Menu as="div" class="relative text-left">
+                                        <MenuButton
+                                            type="button"
+                                            class="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                                         >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            <svg
+                                                class="-ml-1 mr-2 h-4 w-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                                />
+                                            </svg>
+                                            Download
+                                            <ChevronDownIcon
+                                                class="ml-2 h-4 w-4 text-gray-500"
+                                                aria-hidden="true"
                                             />
-                                        </svg>
-                                        Download
-                                    </button>
+                                        </MenuButton>
+                                        <transition
+                                            enter-active-class="transition ease-out duration-100"
+                                            enter-from-class="transform scale-95 opacity-0"
+                                            enter-to-class="transform scale-100 opacity-100"
+                                            leave-active-class="transition ease-in duration-75"
+                                            leave-from-class="transform scale-100 opacity-100"
+                                            leave-to-class="transform scale-95 opacity-0"
+                                        >
+                                            <MenuItems
+                                                class="absolute right-0 z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-gray-800 dark:ring-white/10"
+                                            >
+                                                <MenuItem v-slot="{ active }">
+                                                    <button
+                                                        type="button"
+                                                        :class="[
+                                                            active
+                                                                ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                                                                : 'text-gray-700 dark:text-gray-200',
+                                                            'block w-full px-4 py-2 text-left text-sm font-medium',
+                                                        ]"
+                                                        @click="
+                                                            requestDownload(
+                                                                study.download_url,
+                                                                trackingIdentifier(
+                                                                    study
+                                                                )
+                                                            )
+                                                        "
+                                                    >
+                                                        Project Data
+                                                    </button>
+                                                </MenuItem>
+                                                <MenuItem v-slot="{ active }">
+                                                    <button
+                                                        type="button"
+                                                        :disabled="
+                                                            !bagitArchiveReady
+                                                        "
+                                                        :title="
+                                                            bagitArchiveReady
+                                                                ? null
+                                                                : bagitStatusLabel +
+                                                                  ' - archive not ready yet'
+                                                        "
+                                                        :class="[
+                                                            bagitArchiveReady &&
+                                                            active
+                                                                ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                                                                : '',
+                                                            bagitArchiveReady
+                                                                ? 'text-gray-700 dark:text-gray-200'
+                                                                : 'cursor-not-allowed text-gray-400 dark:text-gray-500',
+                                                            'block w-full px-4 py-2 text-left text-sm font-medium',
+                                                        ]"
+                                                        @click="
+                                                            requestBagitDownload
+                                                        "
+                                                    >
+                                                        Bagit Archive for this
+                                                        sample
+                                                    </button>
+                                                </MenuItem>
+                                            </MenuItems>
+                                        </transition>
+                                    </Menu>
                                 </div>
                             </div>
                         </div>
@@ -213,6 +276,8 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { ChevronDownIcon } from "@heroicons/vue/24/outline";
 import DownloadTermsModal from "@/Shared/DownloadTermsModal.vue";
 import DownloadTerms from "@/Mixins/DownloadTerms.js";
 
@@ -220,6 +285,11 @@ export default {
     components: {
         AppLayout,
         Link,
+        Menu,
+        MenuButton,
+        MenuItem,
+        MenuItems,
+        ChevronDownIcon,
         DownloadTermsModal,
     },
     mixins: [DownloadTerms],
@@ -229,8 +299,46 @@ export default {
             tabs: [],
         };
     },
-    computed: {},
+    computed: {
+        bagitJobStatus() {
+            return (
+                this.study?.metadata_bagit_generation_status ||
+                (this.study?.bagit_archive_link ? "completed" : "pending")
+            );
+        },
+        bagitArchiveReady() {
+            return (
+                this.bagitJobStatus === "completed" &&
+                Boolean(this.study?.bagit_archive_link)
+            );
+        },
+        bagitStatusLabel() {
+            switch (this.bagitJobStatus) {
+                case "pending":
+                    return "Queued";
+                case "processing":
+                    return "Processing";
+                case "failed":
+                    return "Failed";
+                case "completed":
+                    return "Ready";
+                default:
+                    return "Queued";
+            }
+        },
+    },
     mounted() {},
-    methods: {},
+    methods: {
+        requestBagitDownload() {
+            if (!this.bagitArchiveReady) {
+                return;
+            }
+
+            this.requestDownload(
+                this.study.bagit_archive_link,
+                this.trackingIdentifier(this.study)
+            );
+        },
+    },
 };
 </script>
