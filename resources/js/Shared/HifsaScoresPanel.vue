@@ -211,7 +211,7 @@
                 </button>
 
                 <div
-                    v-show="expandedSections[section.id]"
+                    v-if="expandedSections[section.id]"
                     class="border-t border-gray-100 dark:border-slate-700"
                 >
                     <div
@@ -299,7 +299,134 @@
                             >
                                 {{ group.name }}
                             </div>
-                            <div class="overflow-x-auto">
+
+                            <div
+                                v-if="section.showViewer && group.showViewer"
+                                class="grid gap-3 border-b border-gray-100 p-3 dark:border-slate-700 lg:grid-cols-2 lg:items-start"
+                            >
+                                <div class="lg:sticky lg:top-3 lg:self-start">
+                                    <HifsaMoleculeViewer
+                                        class="h-[28rem] w-full sm:h-[32rem]"
+                                        :molfile="group.molfile"
+                                        :atom-map="group.atomMap"
+                                        :mode="section.viewerMode"
+                                        :rows="group.rows"
+                                        :active-row-index="
+                                            hoverState[section.id]?.[group.name]
+                                        "
+                                        :selected-row-index="
+                                            selectedState[section.id]?.[
+                                                group.name
+                                            ]
+                                        "
+                                    />
+                                </div>
+                                <div
+                                    class="max-h-[28rem] overflow-auto rounded-md border border-gray-100 dark:border-slate-700 sm:max-h-[32rem]"
+                                >
+                                    <table class="min-w-full text-left text-sm">
+                                        <thead
+                                            class="sticky top-0 z-10 bg-white text-xs uppercase tracking-wide text-gray-500 dark:bg-slate-800 dark:text-slate-400"
+                                        >
+                                            <tr>
+                                                <th
+                                                    v-for="column in section.columns"
+                                                    :key="column.key"
+                                                    class="px-3 py-2 font-medium"
+                                                >
+                                                    {{ column.label }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody
+                                            class="divide-y divide-gray-100 dark:divide-slate-700"
+                                        >
+                                            <tr
+                                                v-for="(
+                                                    row, rowIndex
+                                                ) in group.rows"
+                                                :key="rowIndex"
+                                                class="cursor-pointer transition-colors"
+                                                :class="[
+                                                    rowHighlightClass(
+                                                        section.id,
+                                                        group.name,
+                                                        rowIndex
+                                                    ),
+                                                    group.assignmentsEnabled &&
+                                                    !rowIsDrawableOnStructure(
+                                                        row,
+                                                        section.viewerMode,
+                                                        group.atomMap
+                                                    )
+                                                        ? 'opacity-50'
+                                                        : '',
+                                                ]"
+                                                :title="
+                                                    rowDrawableTitle(
+                                                        row,
+                                                        section.viewerMode,
+                                                        group
+                                                    )
+                                                "
+                                                @mouseenter="
+                                                    setHover(
+                                                        section.id,
+                                                        group.name,
+                                                        rowIndex
+                                                    )
+                                                "
+                                                @mouseleave="
+                                                    clearHover(
+                                                        section.id,
+                                                        group.name
+                                                    )
+                                                "
+                                                @click="
+                                                    toggleSelected(
+                                                        section.id,
+                                                        group.name,
+                                                        rowIndex
+                                                    )
+                                                "
+                                            >
+                                                <td
+                                                    v-for="column in section.columns"
+                                                    :key="column.key"
+                                                    class="px-3 py-2 text-gray-700 dark:text-slate-300"
+                                                    :class="{
+                                                        'tabular-nums':
+                                                            column.numeric,
+                                                        'font-mono text-xs':
+                                                            column.mono,
+                                                        'max-w-[10rem] truncate':
+                                                            column.truncate,
+                                                    }"
+                                                    :title="
+                                                        column.truncate
+                                                            ? displayCell(
+                                                                  row[
+                                                                      column.key
+                                                                  ],
+                                                                  column
+                                                              )
+                                                            : undefined
+                                                    "
+                                                >
+                                                    {{
+                                                        displayCell(
+                                                            row[column.key],
+                                                            column
+                                                        )
+                                                    }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div v-else class="overflow-x-auto">
                                 <table class="min-w-full text-left text-sm">
                                     <thead
                                         class="bg-white text-xs uppercase tracking-wide text-gray-500 dark:bg-slate-800/60 dark:text-slate-400"
@@ -365,6 +492,14 @@
 </template>
 
 <script>
+import HifsaMoleculeViewer from "@/Shared/Hifsa/HifsaMoleculeViewer.vue";
+import {
+    isDisplayableShiftPpm,
+    isSoluteSpinSystem,
+    resolveMolecule,
+    rowIsDrawable,
+} from "@/Utils/hifsaAtomLabels";
+
 const SCORE_AXES = [
     { key: "match", label: "Match" },
     { key: "rms", label: "RMS" },
@@ -395,23 +530,19 @@ const LINESHAPE_COLUMNS = [
     { key: "gaussian", label: "Gaussian", numeric: true, digits: 4 },
 ];
 
-const QMGI_COLUMNS = [
-    { key: "name", label: "Name", truncate: true },
-    { key: "rms", label: "RMS", numeric: true, digits: 3 },
-    { key: "weight", label: "Weight", numeric: true, digits: 3 },
-    { key: "range_min", label: "Range min", numeric: true, digits: 3 },
-    { key: "range_max", label: "Range max", numeric: true, digits: 3 },
-    { key: "over", label: "Over", numeric: true, digits: 2 },
-    { key: "under", label: "Under", numeric: true, digits: 2 },
-    { key: "orphan", label: "Orphan", numeric: true, digits: 2 },
-];
-
 export default {
     name: "HifsaScoresPanel",
+    components: {
+        HifsaMoleculeViewer,
+    },
     props: {
         hifsaData: {
             type: Object,
             required: true,
+        },
+        molecules: {
+            type: Array,
+            default: () => [],
         },
     },
     data() {
@@ -426,8 +557,9 @@ export default {
                 chemical_shifts: false,
                 couplings: false,
                 lineshapes: false,
-                qmgi: false,
             },
+            hoverState: {},
+            selectedState: {},
         };
     },
     computed: {
@@ -485,11 +617,6 @@ export default {
                 ? this.hifsaData.lineshapes
                 : [];
         },
-        qmgi() {
-            return Array.isArray(this.hifsaData?.qmgi)
-                ? this.hifsaData.qmgi
-                : [];
-        },
         detailSections() {
             const sections = [];
 
@@ -509,7 +636,9 @@ export default {
                     title: "Chemical shifts",
                     count: this.chemicalShifts.length,
                     columns: SHIFT_COLUMNS,
-                    groups: this.groupBySpinSystem(this.chemicalShifts),
+                    showViewer: true,
+                    viewerMode: "shifts",
+                    groups: this.groupBySpinSystem(this.chemicalShifts, true),
                 });
             }
 
@@ -520,7 +649,9 @@ export default {
                     title: "Coupling constants",
                     count: this.couplings.length,
                     columns: COUPLING_COLUMNS,
-                    groups: this.groupBySpinSystem(this.couplings),
+                    showViewer: true,
+                    viewerMode: "couplings",
+                    groups: this.groupBySpinSystem(this.couplings, true),
                 });
             }
 
@@ -531,18 +662,7 @@ export default {
                     title: "Lineshapes",
                     count: this.lineshapes.length,
                     columns: LINESHAPE_COLUMNS,
-                    groups: this.groupBySpinSystem(this.lineshapes),
-                });
-            }
-
-            if (this.qmgi.length) {
-                sections.push({
-                    id: "qmgi",
-                    kind: "grouped",
-                    title: "QMGI fit quality",
-                    count: this.qmgi.length,
-                    columns: QMGI_COLUMNS,
-                    groups: this.groupBySpinSystem(this.qmgi),
+                    groups: this.groupBySpinSystem(this.lineshapes, false),
                 });
             }
 
@@ -609,7 +729,7 @@ export default {
         toggleSection(id) {
             this.expandedSections[id] = !this.expandedSections[id];
         },
-        groupBySpinSystem(rows) {
+        groupBySpinSystem(rows, withViewer = false) {
             const groups = new Map();
 
             for (const row of rows) {
@@ -622,10 +742,109 @@ export default {
                 groups.get(name).push(row);
             }
 
-            return Array.from(groups.entries()).map(([name, groupRows]) => ({
-                name,
-                rows: groupRows,
-            }));
+            return Array.from(groups.entries()).map(([name, groupRows]) => {
+                const spinSystem =
+                    this.spinsystems.find((row) => row.name === name) || null;
+                const showViewer =
+                    withViewer && isSoluteSpinSystem(name, this.spinsystems);
+                const hifsaStructures = this.hifsaData?.structures || {};
+                const hifsaMolfile =
+                    typeof hifsaStructures[name] === "string" &&
+                    hifsaStructures[name].trim()
+                        ? hifsaStructures[name]
+                        : null;
+                const atomMaps = this.hifsaData?.atom_maps || {};
+                const rawAtomMap =
+                    atomMaps[name] && typeof atomMaps[name] === "object"
+                        ? atomMaps[name]
+                        : null;
+                // CT atom maps are only valid on CT structures — never on
+                // sample/nmrxiv SDFs (different atom order / heavy-atom only).
+                const assignmentsEnabled = Boolean(
+                    hifsaMolfile && rawAtomMap && Object.keys(rawAtomMap).length
+                );
+                const molecule =
+                    showViewer && !hifsaMolfile
+                        ? resolveMolecule(this.molecules, spinSystem)
+                        : null;
+                const molfile =
+                    hifsaMolfile ||
+                    (typeof molecule?.sdf === "string" && molecule.sdf.trim()
+                        ? molecule.sdf
+                        : null);
+
+                return {
+                    name,
+                    rows: groupRows,
+                    showViewer,
+                    molfile,
+                    atomMap: assignmentsEnabled ? rawAtomMap : null,
+                    assignmentsEnabled,
+                };
+            });
+        },
+        rowIsDrawableOnStructure(row, viewerMode, atomMap) {
+            return rowIsDrawable(row, viewerMode, atomMap);
+        },
+        rowDrawableTitle(row, viewerMode, group) {
+            if (!group.assignmentsEnabled) {
+                return undefined;
+            }
+
+            if (this.rowIsDrawableOnStructure(row, viewerMode, group.atomMap)) {
+                return undefined;
+            }
+
+            return "Not drawable on this structure (unmapped atoms or missing explicit hydrogens).";
+        },
+        setHover(sectionId, groupName, rowIndex) {
+            this.hoverState = {
+                ...this.hoverState,
+                [sectionId]: {
+                    ...(this.hoverState[sectionId] || {}),
+                    [groupName]: rowIndex,
+                },
+            };
+        },
+        clearHover(sectionId, groupName) {
+            if (!this.hoverState[sectionId]) {
+                return;
+            }
+
+            this.hoverState = {
+                ...this.hoverState,
+                [sectionId]: {
+                    ...this.hoverState[sectionId],
+                    [groupName]: null,
+                },
+            };
+        },
+        toggleSelected(sectionId, groupName, rowIndex) {
+            const current = this.selectedState[sectionId]?.[groupName] ?? null;
+
+            this.selectedState = {
+                ...this.selectedState,
+                [sectionId]: {
+                    ...(this.selectedState[sectionId] || {}),
+                    [groupName]: current === rowIndex ? null : rowIndex,
+                },
+            };
+        },
+        rowHighlightClass(sectionId, groupName, rowIndex) {
+            const hovered = this.hoverState[sectionId]?.[groupName];
+            const selected = this.selectedState[sectionId]?.[groupName];
+            const isSelected = selected === rowIndex;
+            const isHovered = hovered === rowIndex;
+
+            if (isSelected) {
+                return "bg-teal-100 ring-1 ring-inset ring-teal-400 dark:bg-teal-900/50 dark:ring-teal-500";
+            }
+
+            if (isHovered) {
+                return "bg-teal-50 dark:bg-teal-900/30";
+            }
+
+            return "bg-white hover:bg-gray-50 dark:bg-slate-800/40 dark:hover:bg-slate-800";
         },
         pointAt(index, distance) {
             const angle =
@@ -676,6 +895,19 @@ export default {
             return by || at;
         },
         displayCell(value, column) {
+            if (column.key === "shift" && !isDisplayableShiftPpm(value)) {
+                return "—";
+            }
+
+            if (
+                column.key === "coupling" &&
+                (typeof value !== "number" ||
+                    !Number.isFinite(value) ||
+                    Math.abs(value) >= 1e6)
+            ) {
+                return "—";
+            }
+
             if (column.numeric) {
                 return this.formatNumber(value, column.digits ?? 3);
             }

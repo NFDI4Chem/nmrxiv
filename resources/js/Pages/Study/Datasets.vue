@@ -195,6 +195,16 @@
                                 :project="project"
                                 :study="study"
                             ></SpectraViewer>
+                            <HifsaPanel
+                                class="mt-7"
+                                :hifsa-data="study.hifsa_data"
+                                :molecules="
+                                    study.sample?.molecules ||
+                                    study.molecules ||
+                                    []
+                                "
+                                id-prefix="study-datasets-hifsa"
+                            />
                         </div>
                         <div class="my-2">
                             <div>
@@ -311,6 +321,7 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
+import HifsaPanel from "@/Shared/HifsaPanel.vue";
 
 export default {
     components: {
@@ -324,6 +335,7 @@ export default {
         MenuItems,
         SpectraEditor,
         SpectraViewer,
+        HifsaPanel,
     },
     props: [
         "study",

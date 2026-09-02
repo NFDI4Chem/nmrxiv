@@ -145,17 +145,34 @@ export function withActiveTab(payload, tab) {
 }
 
 /**
+ * @param {object} payload
+ * @param {{ exclude?: string[], include?: string[] }|null|undefined} fileFilter
+ * @returns {object}
+ */
+export function withFileFilter(payload, fileFilter) {
+    if (!fileFilter || typeof fileFilter !== "object") {
+        return payload;
+    }
+
+    return {
+        ...payload,
+        fileFilter,
+    };
+}
+
+/**
  * @param {Window} iframe
  * @param {object} payload
  * @param {string} targetOrigin
  * @param {string|null} tab
+ * @param {{ exclude?: string[], include?: string[] }|null|undefined} [fileFilter]
  */
-export function postNmriumLoad(iframe, payload, targetOrigin, tab) {
+export function postNmriumLoad(iframe, payload, targetOrigin, tab, fileFilter) {
     if (!iframe?.postMessage) {
         return;
     }
 
-    const data = withActiveTab(payload, tab);
+    const data = withFileFilter(withActiveTab(payload, tab), fileFilter);
 
     iframe.postMessage({ type: "nmr-wrapper:load", data }, targetOrigin);
 }

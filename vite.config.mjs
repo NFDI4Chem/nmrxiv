@@ -26,10 +26,10 @@ export default defineConfig({
             '@': '/resources/js',
             'ziggy-js': path.resolve('vendor/tightenco/ziggy'),
         },
-        dedupe: ['openchemlib'],
+        dedupe: ['openchemlib', '3dmol'],
     },
     optimizeDeps: {
-        include: ['openchemlib'],
+        include: ['openchemlib', '3dmol'],
     },
     server: {
         host: '0.0.0.0',

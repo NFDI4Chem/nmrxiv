@@ -111,6 +111,8 @@ class DraftHifsaPdfTest extends TestCase
             $files = [
                 'analysis.csv' => $this->sampleAnalysisCsv(),
                 'EXTRA/compound_REF.csv' => $this->sampleRefCsv(),
+                'spinsystems.sdf' => $this->sampleSpinSystemsSdf(),
+                'EXTRA/compound.sdf_Ss3_OUTPUT.json' => $this->sampleOutputJson(),
             ];
         }
 
@@ -164,6 +166,7 @@ sep=,
 "Ss1","DMSO-d5","Sg1","DMSO-H",1,512,1,1,2.5,1,"H",0.01,,,,,,,
 "Ss3","compound.sdf","Sg2",""C10,C11"",6,3072,2,2,160.1,1,""C10,C11"",-1,,,,,,,
 "Ss3","compound.sdf","Sg3","H14",1,512,1,1,3.75,1,"H14",0.04,,,,,,,
+"Ss3","compound.sdf","Sg4","O7",8,4096,1,1,-1000000000000,1,"O7",-1,,,,,,,
 ,,,,,,,,
 "COUPLING CONSTANTS (Hz)",,,,,,,,,
 "SS CTKey","Spin system","CG CTKey","Name","Shift","Shift","Coupling",,,,,,,,,,,,
@@ -192,6 +195,52 @@ sep=,
 "SSType:","Solute",,,,,,,,
 "AType:","Reference",,,,,,,,
 CSV;
+    }
+
+    private function sampleSpinSystemsSdf(): string
+    {
+        return <<<'SDF'
+compound.sdf
+  Mrv2311 01202612343D
+
+  2  1  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    1.0890 H   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0  0  0  0
+M  END
+$$$$
+DMSO-d5
+  Mrv2311 01202612343D
+
+  1  0  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 S   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+$$$$
+SDF;
+    }
+
+    private function sampleOutputJson(): string
+    {
+        // Cosmic Truth labels are NOT SDF serials: H14 maps via o+1 to SDF atom 2.
+        return json_encode([
+            'n' => 'compound.sdf',
+            'id' => 'Ss3',
+            'type' => 100,
+            'a' => [
+                [
+                    'n' => 'C10',
+                    'o' => 0,
+                ],
+                [
+                    'n' => 'H14',
+                    'o' => 1,
+                ],
+                [
+                    'n' => 'C14',
+                    'o' => 0,
+                ],
+            ],
+        ], JSON_THROW_ON_ERROR);
     }
 
     private function invokeFinalizeProcessing(): mixed
@@ -320,11 +369,13 @@ CSV;
         $this->assertEqualsWithDelta(486.0, $study->hifsa_data['spinsystems'][2]['mw'], 1e-9);
         $this->assertNull($study->hifsa_data['spinsystems'][0]['lrms_min']);
 
-        $this->assertCount(3, $study->hifsa_data['chemical_shifts']);
+        $this->assertCount(4, $study->hifsa_data['chemical_shifts']);
         $this->assertSame('C10,C11', $study->hifsa_data['chemical_shifts'][1]['name']);
         $this->assertSame('C10,C11', $study->hifsa_data['chemical_shifts'][1]['line_shape']);
         $this->assertEqualsWithDelta(160.1, $study->hifsa_data['chemical_shifts'][1]['shift'], 1e-9);
         $this->assertNull($study->hifsa_data['chemical_shifts'][1]['lrms']);
+        $this->assertSame('O7', $study->hifsa_data['chemical_shifts'][3]['name']);
+        $this->assertNull($study->hifsa_data['chemical_shifts'][3]['shift']);
 
         $this->assertCount(2, $study->hifsa_data['couplings']);
         $this->assertSame('C14-H14', $study->hifsa_data['couplings'][0]['name']);
@@ -344,6 +395,41 @@ CSV;
         $this->assertEqualsWithDelta(0.97, $study->hifsa_data['qmgi'][0]['rms'], 1e-9);
         $this->assertEqualsWithDelta(0.3, $study->hifsa_data['qmgi'][0]['under'], 1e-9);
         $this->assertEqualsWithDelta(0.1, $study->hifsa_data['qmgi'][0]['orphan'], 1e-9);
+
+        $this->assertArrayHasKey('structures', $study->hifsa_data);
+        $this->assertArrayHasKey('compound.sdf', $study->hifsa_data['structures']);
+        $this->assertStringContainsString(
+            '3D',
+            explode("\n", $study->hifsa_data['structures']['compound.sdf'])[1] ?? '',
+        );
+        $this->assertStringContainsString(
+            '0.0000    0.0000    1.0890',
+            $study->hifsa_data['structures']['compound.sdf'],
+        );
+
+        $this->assertArrayHasKey('atom_maps', $study->hifsa_data);
+        $this->assertSame([
+            'C10' => 1,
+            'H14' => 2,
+            'C14' => 1,
+        ], $study->hifsa_data['atom_maps']['compound.sdf']);
+
+        $compoundSdf = $study->hifsa_data['structures']['compound.sdf'];
+        $atomElements = [];
+        foreach (preg_split('/\r\n|\r|\n/', $compoundSdf) ?: [] as $line) {
+            if (preg_match('/^\s*-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s+([A-Za-z]+)/', $line, $matches)) {
+                $atomElements[] = $matches[1];
+            }
+        }
+
+        foreach ($study->hifsa_data['atom_maps']['compound.sdf'] as $label => $index) {
+            $expectedElement = preg_replace('/\d+.*/', '', $label);
+            $this->assertSame(
+                $expectedElement,
+                $atomElements[$index - 1] ?? null,
+                "Atom map {$label} → {$index} should match SDF element",
+            );
+        }
     }
 
     public function test_finalize_processing_leaves_hifsa_data_null_without_export_zip(): void
@@ -402,6 +488,14 @@ CSV;
                 'couplings' => [],
                 'lineshapes' => [],
                 'qmgi' => [],
+                'structures' => [
+                    'compound.sdf' => "compound.sdf\n",
+                ],
+                'atom_maps' => [
+                    'compound.sdf' => [
+                        'H14' => 2,
+                    ],
+                ],
             ],
         ]);
 
@@ -420,6 +514,148 @@ CSV;
 
         $this->assertSame('https://example.test/existing', $study->fresh()->hifsa_data['url']);
         $this->assertEquals(1.0, $study->fresh()->hifsa_data['scores']['match']);
+    }
+
+    public function test_finalize_processing_upgrades_empty_structures_and_atom_maps(): void
+    {
+        Storage::fake(config('filesystems.default'));
+
+        [$study, , $hifsaFolder] = $this->makeStudyWithHifsaSibling();
+        $study->update([
+            'hifsa_data' => [
+                'url' => 'https://example.test/empty-maps',
+                'remarks' => 'empty structures and atom_maps',
+                'solvent' => 'CDCl3',
+                'temperature' => '300',
+                'scores' => [
+                    'match' => 1.0,
+                    'rms' => 1.0,
+                    'shift_similarity' => 1.0,
+                    'coupling_similarity' => 1.0,
+                    'intensity' => 1.0,
+                ],
+                'spinsystems' => [],
+                'chemical_shifts' => [],
+                'couplings' => [],
+                'lineshapes' => [],
+                'qmgi' => [],
+                'structures' => [],
+                'atom_maps' => [],
+            ],
+        ]);
+
+        $zipPath = 'drafts/compound/hifsa/analysis_export.zip';
+        Storage::disk(config('filesystems.default'))
+            ->put($zipPath, $this->makeExportZipContents());
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $hifsaFolder->id,
+            'name' => 'analysis_export.zip',
+            'path' => '/'.$zipPath,
+        ]);
+
+        $this->invokeFinalizeProcessing();
+
+        $study->refresh();
+        $this->assertSame('https://ctb.nmrsolutions.fi//analysis-v/AnA_test', $study->hifsa_data['url']);
+        $this->assertNotEmpty($study->hifsa_data['structures']);
+        $this->assertNotEmpty($study->hifsa_data['atom_maps']);
+    }
+
+    public function test_finalize_processing_upgrades_hifsa_data_missing_structures(): void
+    {
+        Storage::fake(config('filesystems.default'));
+
+        [$study, , $hifsaFolder] = $this->makeStudyWithHifsaSibling();
+        $study->update([
+            'hifsa_data' => [
+                'url' => 'https://example.test/no-structures',
+                'remarks' => 'missing structures key',
+                'solvent' => 'CDCl3',
+                'temperature' => '300',
+                'scores' => [
+                    'match' => 1.0,
+                    'rms' => 1.0,
+                    'shift_similarity' => 1.0,
+                    'coupling_similarity' => 1.0,
+                    'intensity' => 1.0,
+                ],
+                'spinsystems' => [],
+                'chemical_shifts' => [],
+                'couplings' => [],
+                'lineshapes' => [],
+                'qmgi' => [],
+            ],
+        ]);
+
+        $zipPath = 'drafts/compound/hifsa/analysis_export.zip';
+        Storage::disk(config('filesystems.default'))
+            ->put($zipPath, $this->makeExportZipContents());
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $hifsaFolder->id,
+            'name' => 'analysis_export.zip',
+            'path' => '/'.$zipPath,
+        ]);
+
+        $this->invokeFinalizeProcessing();
+
+        $study->refresh();
+        $this->assertSame('https://ctb.nmrsolutions.fi//analysis-v/AnA_test', $study->hifsa_data['url']);
+        $this->assertArrayHasKey('structures', $study->hifsa_data);
+        $this->assertArrayHasKey('compound.sdf', $study->hifsa_data['structures']);
+        $this->assertArrayHasKey('atom_maps', $study->hifsa_data);
+        $this->assertSame(2, $study->hifsa_data['atom_maps']['compound.sdf']['H14']);
+    }
+
+    public function test_finalize_processing_upgrades_hifsa_data_missing_atom_maps(): void
+    {
+        Storage::fake(config('filesystems.default'));
+
+        [$study, , $hifsaFolder] = $this->makeStudyWithHifsaSibling();
+        $study->update([
+            'hifsa_data' => [
+                'url' => 'https://example.test/no-atom-maps',
+                'remarks' => 'missing atom_maps key',
+                'solvent' => 'CDCl3',
+                'temperature' => '300',
+                'scores' => [
+                    'match' => 1.0,
+                    'rms' => 1.0,
+                    'shift_similarity' => 1.0,
+                    'coupling_similarity' => 1.0,
+                    'intensity' => 1.0,
+                ],
+                'spinsystems' => [],
+                'chemical_shifts' => [],
+                'couplings' => [],
+                'lineshapes' => [],
+                'qmgi' => [],
+                'structures' => [
+                    'compound.sdf' => 'placeholder',
+                ],
+            ],
+        ]);
+
+        $zipPath = 'drafts/compound/hifsa/analysis_export.zip';
+        Storage::disk(config('filesystems.default'))
+            ->put($zipPath, $this->makeExportZipContents());
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'parent_id' => $hifsaFolder->id,
+            'name' => 'analysis_export.zip',
+            'path' => '/'.$zipPath,
+        ]);
+
+        $this->invokeFinalizeProcessing();
+
+        $study->refresh();
+        $this->assertSame('https://ctb.nmrsolutions.fi//analysis-v/AnA_test', $study->hifsa_data['url']);
+        $this->assertArrayHasKey('atom_maps', $study->hifsa_data);
+        $this->assertSame(1, $study->hifsa_data['atom_maps']['compound.sdf']['C10']);
     }
 
     public function test_finalize_processing_upgrades_score_only_hifsa_data(): void
@@ -464,6 +700,10 @@ CSV;
         $this->assertArrayHasKey('couplings', $study->hifsa_data);
         $this->assertArrayHasKey('lineshapes', $study->hifsa_data);
         $this->assertArrayHasKey('qmgi', $study->hifsa_data);
+        $this->assertArrayHasKey('structures', $study->hifsa_data);
+        $this->assertArrayHasKey('compound.sdf', $study->hifsa_data['structures']);
+        $this->assertArrayHasKey('atom_maps', $study->hifsa_data);
+        $this->assertArrayHasKey('compound.sdf', $study->hifsa_data['atom_maps']);
     }
 
     public function test_info_upgrades_score_only_hifsa_data(): void
