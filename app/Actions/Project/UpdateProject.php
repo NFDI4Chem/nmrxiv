@@ -149,7 +149,7 @@ class UpdateProject
                     }
                 }
             }
-            $validation->process();
+            $validation->process(project: $project);
 
             $project = $project->fresh();
 

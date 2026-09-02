@@ -76,7 +76,7 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
 
             // Process validation
             $validation = $project->validation;
-            $validation->process();
+            $validation->process(project: $project);
             $validation = $validation->fresh();
 
             $status = true;
