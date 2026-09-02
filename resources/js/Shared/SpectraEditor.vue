@@ -126,6 +126,7 @@ import {
     requestSelectTab,
     resolveNmriumTargetOrigin,
 } from "@/Utils/nmriumTabPreference.js";
+import { hifsaNmriumFileFilter } from "@/Utils/hifsaNmriumFileFilter.js";
 import {
     ArrowPathIcon,
     ChevronDownIcon,
@@ -807,7 +808,8 @@ export default {
                 iframe,
                 data,
                 this.nmriumTargetOrigin(),
-                getDefaultSpectrumTab(this.$page)
+                getDefaultSpectrumTab(this.$page),
+                hifsaNmriumFileFilter(this.study)
             );
             this.scheduleNmriumHandoff();
         },

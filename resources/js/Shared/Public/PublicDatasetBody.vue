@@ -150,6 +150,12 @@
                 :study="study.data"
             />
 
+            <HifsaPanel
+                :hifsa-data="study.data.hifsa_data"
+                :molecules="compositionMolecules"
+                id-prefix="public-dataset-hifsa"
+            />
+
             <section
                 v-if="orderedSpectrumInfoRows.length > 0"
                 aria-labelledby="spectrum-info-heading"
@@ -318,6 +324,7 @@
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
+import HifsaPanel from "@/Shared/HifsaPanel.vue";
 import Citation from "@/Shared/Citation.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import Tag from "@/Shared/Tag.vue";
@@ -378,6 +385,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        HifsaPanel,
         Citation,
         MolecularInfoPanel,
         Tag,

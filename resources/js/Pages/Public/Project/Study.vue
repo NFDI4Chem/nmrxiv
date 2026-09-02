@@ -158,6 +158,12 @@
                             :study="study.data"
                         />
 
+                        <HifsaPanel
+                            :hifsa-data="study.data.hifsa_data"
+                            :molecules="compositionMolecules"
+                            id-prefix="public-study-hifsa"
+                        />
+
                         <section class="overflow-visible">
                             <div
                                 class="mb-5 flex flex-wrap items-center justify-between gap-3"
@@ -423,6 +429,7 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
+import HifsaPanel from "@/Shared/HifsaPanel.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import Tag from "@/Shared/Tag.vue";
 import { Head, router } from "@inertiajs/vue3";
@@ -441,6 +448,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        HifsaPanel,
         MolecularInfoPanel,
         Tag,
         Head,

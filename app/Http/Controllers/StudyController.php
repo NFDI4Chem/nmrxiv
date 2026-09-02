@@ -198,7 +198,7 @@ class StudyController extends Controller
                 break;
             case 'Datasets':
                 return Inertia::render('Study/Datasets', [
-                    'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
+                    'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets', 'sample.molecules'),
                     'team' => $team ? $team->load('users', 'owner') : null,
                     'project' => $project ? $project->load('users', 'owner') : null,
                     'members' => $study->allUsers(),

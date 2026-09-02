@@ -303,6 +303,7 @@ import {
     requestSelectTab,
     resolveNmriumTargetOrigin,
 } from "@/Utils/nmriumTabPreference.js";
+import { hifsaNmriumFileFilter } from "@/Utils/hifsaNmriumFileFilter.js";
 
 export default {
     components: {
@@ -534,10 +535,17 @@ export default {
         loadFromURL(urls) {
             this.infoLog("Loading Spectra from URL..");
             const iframe = window.frames.NMRiumIframe;
-            this.postLoadToIframe(iframe, {
-                data: urls,
-                type: "url",
-            });
+            this.defaultTabApplied = false;
+            postNmriumLoad(
+                iframe,
+                {
+                    data: urls,
+                    type: "url",
+                },
+                this.nmriumTargetOrigin(),
+                getDefaultSpectrumTab(this.$page),
+                hifsaNmriumFileFilter(this.study)
+            );
         },
         loadMol(molFile) {
             let svgString = null;

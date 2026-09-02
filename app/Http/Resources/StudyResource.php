@@ -56,6 +56,7 @@ class StudyResource extends JsonResource
             'external_id' => $this->external_id,
             'external_url' => $this->external_url,
             'processing_logs' => $this->processing_logs,
+            'hifsa_data' => $this->when(! $this->lite, fn () => $this->hifsa_data),
             'stats' => [
                 'likes' => $this->likesCount(),
                 'views' => (int) $this->views,

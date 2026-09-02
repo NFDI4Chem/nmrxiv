@@ -1753,84 +1753,31 @@
                                                                         <div
                                                                             class="mx-auto flex max-w-7xl flex-col gap-3"
                                                                         >
-                                                                            <section
+                                                                            <HifsaPanel
                                                                                 v-if="
-                                                                                    selectedStudy &&
-                                                                                    hasHifsaPanel(
-                                                                                        selectedStudy
-                                                                                    )
+                                                                                    selectedStudy
                                                                                 "
-                                                                                class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5 dark:border-gray-700 dark:bg-slate-800/90 dark:ring-white/5"
-                                                                            >
-                                                                                <button
-                                                                                    type="button"
-                                                                                    class="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-gray-700 dark:hover:bg-slate-800/80 sm:px-4"
-                                                                                    :aria-expanded="
-                                                                                        hifsaExpanded
-                                                                                    "
-                                                                                    aria-controls="upload-hifsa-panel"
-                                                                                    @click="
-                                                                                        hifsaExpanded =
-                                                                                            !hifsaExpanded
-                                                                                    "
-                                                                                >
-                                                                                    <div
-                                                                                        class="min-w-0 flex-1"
-                                                                                    >
-                                                                                        <h3
-                                                                                            id="upload-hifsa-heading"
-                                                                                            class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100"
-                                                                                        >
-                                                                                            HiFSA
-                                                                                        </h3>
-                                                                                    </div>
-                                                                                    <ChevronRightIcon
-                                                                                        class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 dark:text-slate-500"
-                                                                                        :class="{
-                                                                                            'rotate-90':
-                                                                                                hifsaExpanded,
-                                                                                        }"
-                                                                                        aria-hidden="true"
-                                                                                    />
-                                                                                </button>
-                                                                                <div
-                                                                                    v-show="
-                                                                                        hifsaExpanded
-                                                                                    "
-                                                                                    id="upload-hifsa-panel"
-                                                                                    class="p-3 sm:p-4"
-                                                                                    role="region"
-                                                                                    aria-labelledby="upload-hifsa-heading"
-                                                                                >
-                                                                                    <HifsaScoresPanel
-                                                                                        v-if="
-                                                                                            hasHifsaScores(
-                                                                                                selectedStudy
-                                                                                            )
-                                                                                        "
-                                                                                        :hifsa-data="
-                                                                                            selectedStudy.hifsa_data
-                                                                                        "
-                                                                                    />
-                                                                                    <iframe
-                                                                                        v-else-if="
-                                                                                            selectedStudy.hifsa_pdf_url
-                                                                                        "
-                                                                                        title="HiFSA report"
-                                                                                        frameborder="0"
-                                                                                        class="block w-full rounded-md border"
-                                                                                        style="
-                                                                                            height: min(
-                                                                                                75vh,
-                                                                                                600px
-                                                                                            );
-                                                                                        "
-                                                                                        :src="
-                                                                                            selectedStudy.hifsa_pdf_url
-                                                                                        "
-                                                                                    ></iframe>
-                                                                                </div>
-                                                                            </section>
+                                                                                :hifsa-data="
+                                                                                    selectedStudy.hifsa_data
+                                                                                "
+                                                                                :hifsa-pdf-url="
+                                                                                    selectedStudy.hifsa_pdf_url
+                                                                                "
+                                                                                :molecules="
+                                                                                    selectedStudy
+                                                                                        .sample
+                                                                                        ?.molecules ||
+                                                                                    []
+                                                                                "
+                                                                                :expanded="
+                                                                                    hifsaExpanded
+                                                                                "
+                                                                                id-prefix="upload-hifsa"
+                                                                                @update:expanded="
+                                                                                    hifsaExpanded =
+                                                                                        $event
+                                                                                "
+                                                                            />
 
                                                                             <ChemicalCompositionEditor
                                                                                 v-if="
@@ -2985,7 +2932,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ChemicalCompositionEditor from "@/Shared/ChemicalCompositionEditor.vue";
-import HifsaScoresPanel from "@/Shared/HifsaScoresPanel.vue";
+import HifsaPanel from "@/Shared/HifsaPanel.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
@@ -3007,6 +2954,7 @@ import {
     basisUnitLabel,
     formatMixtureValue,
 } from "@/Utils/mixtureComposition";
+import { studyHasHifsa } from "@/Utils/hifsaNmriumFileFilter.js";
 
 export default {
     components: {
@@ -3028,7 +2976,7 @@ export default {
         Validation,
         SpectraEditor,
         ChemicalCompositionEditor,
-        HifsaScoresPanel,
+        HifsaPanel,
         Depictor,
         Depictor2D,
         slider,
@@ -3718,12 +3666,6 @@ export default {
         this.clearProcessingStuckTimer();
     },
     methods: {
-        hasHifsaScores(study) {
-            return Boolean(study?.hifsa_data?.scores);
-        },
-        hasHifsaPanel(study) {
-            return this.hasHifsaScores(study) || Boolean(study?.hifsa_pdf_url);
-        },
         startProcessingStuckTimer() {
             this.clearProcessingStuckTimer();
             this.isProcessingStuck = false;
@@ -4636,16 +4578,25 @@ export default {
             );
         },
         fetchValidations() {
+            if (!this.project?.id) {
+                return Promise.resolve();
+            }
+
             return axios
                 .get("/projects/" + this.project.id + "/validation")
                 .then((response) => {
                     this.validation = response.data.report;
+                    const studies = this.validation?.project?.studies;
                     this.validationStatus = true;
-                    this.validation.project.studies.forEach((study) => {
-                        if (study.status == false) {
-                            this.validationStatus = false;
-                        }
-                    });
+                    if (!Array.isArray(studies) || studies.length === 0) {
+                        this.validationStatus = false;
+                    } else {
+                        studies.forEach((study) => {
+                            if (study.status == false) {
+                                this.validationStatus = false;
+                            }
+                        });
+                    }
                 });
         },
         /**
@@ -4879,7 +4830,9 @@ export default {
         updateAutoImportList() {
             this.studiesToImport = [];
             this.studies.forEach((study) => {
-                if (!study.has_nmrium) {
+                // HiFSA samples must load via NMRium URL+fileFilter; NMRKit has
+                // no fileFilter and would persist Cosmic Truth EXTRA/ artifacts.
+                if (!study.has_nmrium && !studyHasHifsa(study)) {
                     this.studiesToImport.push({
                         projectSlug: this.project.slug,
                         study: study,

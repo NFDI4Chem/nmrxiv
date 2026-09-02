@@ -107,7 +107,9 @@ class HifsaPdfResolver
      *     chemical_shifts: list<array<string, mixed>>,
      *     couplings: list<array<string, mixed>>,
      *     lineshapes: list<array<string, mixed>>,
-     *     qmgi: list<array<string, mixed>>
+     *     qmgi: list<array<string, mixed>>,
+     *     structures?: array<string, string>,
+     *     atom_maps?: array<string, array<string, int>>
      * }|null
      */
     public function readCsvData(FileSystemObject $zipFile): ?array
@@ -203,6 +205,8 @@ class HifsaPdfResolver
                 }
 
                 $this->enrichFromRefCsvs($zip, $parsed);
+                $parsed['structures'] = $this->extractSpinSystemStructures($zip);
+                $parsed['atom_maps'] = $this->extractAtomMaps($zip);
 
                 return $parsed;
             } finally {
@@ -655,7 +659,7 @@ class HifsaPdfResolver
             'nucleus' => $this->toFloat($row['Nucleus'] ?? null),
             'spincount' => $this->toFloat($row['Spincount'] ?? null),
             'nucleicount' => $this->toFloat($row['Nucleicount'] ?? null),
-            'shift' => $this->toFloat($row['Shift'] ?? null),
+            'shift' => $this->toDisplayableShiftPpm($row['Shift'] ?? null),
             'response' => $this->toFloat($row['Response'] ?? null),
             'line_shape' => $this->nullableString($row['Line shape'] ?? null),
             'lrms' => $this->toNullableFiniteFloat($row['LRMS'] ?? null),
@@ -687,7 +691,7 @@ class HifsaPdfResolver
             'name' => $this->nullableString($this->cellByHeader($header, $cells, 'Name')),
             'shift_from' => $this->nullableString($cells[$shiftIndexes[0] ?? -1] ?? null),
             'shift_to' => $this->nullableString($cells[$shiftIndexes[1] ?? -1] ?? null),
-            'coupling' => $this->toFloat($this->cellByHeader($header, $cells, 'Coupling')),
+            'coupling' => $this->toDisplayableCouplingHz($this->cellByHeader($header, $cells, 'Coupling')),
         ];
     }
 
@@ -823,6 +827,34 @@ class HifsaPdfResolver
     }
 
     /**
+     * Cosmic Truth unset chemical shifts use huge sentinels (e.g. -1e12).
+     */
+    private function toDisplayableShiftPpm(mixed $value): ?float
+    {
+        $float = $this->toFloat($value);
+
+        if ($float === null || ! is_finite($float) || abs($float) >= 1000) {
+            return null;
+        }
+
+        return $float;
+    }
+
+    /**
+     * Reject non-physical / sentinel coupling constants.
+     */
+    private function toDisplayableCouplingHz(mixed $value): ?float
+    {
+        $float = $this->toFloat($value);
+
+        if ($float === null || ! is_finite($float) || abs($float) >= 1e6) {
+            return null;
+        }
+
+        return $float;
+    }
+
+    /**
      * Like toFloat, but also rejects Cosmic Truth ND sentinels (-1, ±Infinity).
      */
     private function toNullableFiniteFloat(mixed $value): ?float
@@ -845,9 +877,9 @@ class HifsaPdfResolver
     }
 
     /**
-     * True when hifsa_data already has scores and the section arrays introduced
-     * for the detail tables. Score-only payloads from earlier parses are treated
-     * as incomplete so they get upgraded from the export zip.
+     * True when hifsa_data already has scores, section arrays, and non-empty
+     * CT structures + atom maps. Empty maps/structures are incomplete so a
+     * later export with OUTPUT.json / spinsystems.sdf can upgrade the study.
      */
     private function hasStructuredHifsaData(mixed $data): bool
     {
@@ -855,13 +887,149 @@ class HifsaPdfResolver
             return false;
         }
 
-        foreach (['spinsystems', 'chemical_shifts', 'couplings', 'lineshapes', 'qmgi'] as $key) {
+        foreach (['spinsystems', 'chemical_shifts', 'couplings', 'lineshapes', 'qmgi', 'structures', 'atom_maps'] as $key) {
             if (! array_key_exists($key, $data) || ! is_array($data[$key])) {
                 return false;
             }
         }
 
+        if ($data['structures'] === [] || $data['atom_maps'] === []) {
+            return false;
+        }
+
         return true;
+    }
+
+    /**
+     * Extract Cosmic Truth `spinsystems.sdf` (true 3D conformers) keyed by
+     * spin-system name / SDF title line.
+     *
+     * @return array<string, string>
+     */
+    private function extractSpinSystemStructures(ZipArchive $zip): array
+    {
+        $sdfName = null;
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+
+            if (! is_string($name)) {
+                continue;
+            }
+
+            if (strcasecmp(basename($name), 'spinsystems.sdf') === 0) {
+                $sdfName = $name;
+                break;
+            }
+        }
+
+        if ($sdfName === null) {
+            return [];
+        }
+
+        $contents = $zip->getFromName($sdfName);
+
+        if ($contents === false || trim($contents) === '') {
+            return [];
+        }
+
+        $structures = [];
+
+        foreach (preg_split('/\$\$\$\$\s*/', $contents) ?: [] as $block) {
+            $block = trim($block);
+
+            if ($block === '') {
+                continue;
+            }
+
+            $lines = preg_split('/\r\n|\r|\n/', $block) ?: [];
+            $title = trim((string) ($lines[0] ?? ''));
+
+            if ($title === '') {
+                continue;
+            }
+
+            if (! str_contains($block, 'M  END') && ! str_contains($block, 'M END')) {
+                continue;
+            }
+
+            $structures[$title] = $block."\n".'$$$$'."\n";
+        }
+
+        return $structures;
+    }
+
+    /**
+     * Build Cosmic Truth atom-name → 1-based SDF index maps from OUTPUT.json.
+     *
+     * CT labels like C34 / H4 are NOT SDF serials. Each atom entry has `n`
+     * (label) and `o` (0-based order in the mol/SDF); use o+1 as the SDF index.
+     *
+     * @return array<string, array<string, int>>
+     */
+    private function extractAtomMaps(ZipArchive $zip): array
+    {
+        $maps = [];
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+
+            if (! is_string($name)) {
+                continue;
+            }
+
+            if (! preg_match('/_OUTPUT\.json$/i', $name)) {
+                continue;
+            }
+
+            $contents = $zip->getFromName($name);
+
+            if ($contents === false || trim($contents) === '') {
+                continue;
+            }
+
+            $json = json_decode($contents, true);
+
+            if (! is_array($json)) {
+                continue;
+            }
+
+            $spinSystem = trim((string) ($json['n'] ?? ''));
+            $atoms = $json['a'] ?? null;
+
+            if ($spinSystem === '' || ! is_array($atoms)) {
+                continue;
+            }
+
+            $map = [];
+
+            foreach ($atoms as $atom) {
+                if (! is_array($atom)) {
+                    continue;
+                }
+
+                $label = trim((string) ($atom['n'] ?? ''));
+                $order = $atom['o'] ?? null;
+
+                if ($label === '' || ! is_numeric($order)) {
+                    continue;
+                }
+
+                $index = ((int) $order) + 1;
+
+                if ($index < 1) {
+                    continue;
+                }
+
+                $map[$label] = $index;
+            }
+
+            if ($map !== []) {
+                $maps[$spinSystem] = $map;
+            }
+        }
+
+        return $maps;
     }
 
     /**
