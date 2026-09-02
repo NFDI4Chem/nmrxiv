@@ -35,48 +35,6 @@
                                     v-if="study.data.is_public"
                                     class="flex shrink-0 flex-wrap items-center gap-3"
                                 >
-                                    <div
-                                        v-if="showBagitArchiveStatus"
-                                        class="flex items-center gap-2"
-                                    >
-                                        <span
-                                            class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium"
-                                            :class="bagitStatusClasses"
-                                        >
-                                            {{ bagitStatusLabel }}
-                                        </span>
-                                        <a
-                                            v-if="bagitArchiveReady"
-                                            :href="
-                                                study.data.bagit_archive_link
-                                            "
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
-                                        >
-                                            <ArrowDownTrayIcon
-                                                class="mr-2 h-4 w-4"
-                                                aria-hidden="true"
-                                            />
-                                            Download BagIt Archive
-                                        </a>
-                                        <button
-                                            v-else
-                                            type="button"
-                                            disabled
-                                            :title="
-                                                bagitStatusLabel +
-                                                ' - archive not ready yet'
-                                            "
-                                            class="inline-flex cursor-not-allowed items-center rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-400 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500"
-                                        >
-                                            <ArrowDownTrayIcon
-                                                class="mr-2 h-4 w-4"
-                                                aria-hidden="true"
-                                            />
-                                            Download BagIt Archive
-                                        </button>
-                                    </div>
                                     <Menu as="div" class="relative text-left">
                                         <MenuButton
                                             type="button"
@@ -462,11 +420,7 @@
  */
 
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
-import {
-    ArrowDownTrayIcon,
-    ShareIcon,
-    ClipboardDocumentIcon,
-} from "@heroicons/vue/24/solid";
+import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
@@ -480,7 +434,6 @@ export default {
 
     components: {
         ProjectLayout,
-        ArrowDownTrayIcon,
         ShareIcon,
         ClipboardDocumentIcon,
         Menu,
@@ -543,53 +496,6 @@ export default {
                 this.study?.data?.metadata_bagit_generation_status ||
                 (this.study?.data?.bagit_archive_link ? "completed" : "pending")
             );
-        },
-
-        bagitArchiveReady() {
-            return (
-                this.bagitJobStatus === "completed" &&
-                Boolean(this.study?.data?.bagit_archive_link)
-            );
-        },
-
-        showBagitArchiveStatus() {
-            return (
-                this.study?.data?.is_public &&
-                (this.bagitArchiveReady ||
-                    ["pending", "processing", "failed"].includes(
-                        this.bagitJobStatus
-                    ))
-            );
-        },
-
-        bagitStatusLabel() {
-            switch (this.bagitJobStatus) {
-                case "pending":
-                    return "Queued";
-                case "processing":
-                    return "Processing";
-                case "failed":
-                    return "Failed";
-                case "completed":
-                    return "Ready";
-                default:
-                    return "Queued";
-            }
-        },
-
-        bagitStatusClasses() {
-            switch (this.bagitJobStatus) {
-                case "pending":
-                    return "border-amber-200 bg-amber-50 text-amber-700";
-                case "processing":
-                    return "border-sky-200 bg-sky-50 text-sky-700";
-                case "failed":
-                    return "border-rose-200 bg-rose-50 text-rose-700";
-                case "completed":
-                    return "border-emerald-200 bg-emerald-50 text-emerald-700";
-                default:
-                    return "border-gray-200 bg-gray-50 text-gray-700";
-            }
         },
 
         /**
