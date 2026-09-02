@@ -25,6 +25,8 @@ class FindOrCreateDraftStudy
         if (! $study) {
             $study = $this->createNewStudy($folder, $draft, $project, $validation);
             $this->updateFolderWithStudy($folder, $study);
+        } else {
+            $this->reassignStudyToProject($study, $project);
         }
 
         return $study;
@@ -65,5 +67,21 @@ class FindOrCreateDraftStudy
     {
         $folder->study_id = $study->id;
         $folder->save();
+    }
+
+    /**
+     * Keep an existing study on the project this process run is using.
+     */
+    private function reassignStudyToProject(Study $study, Project $project): void
+    {
+        if ($study->project_id === $project->id) {
+            return;
+        }
+
+        $study->project_id = $project->id;
+        $study->save();
+
+        $study->sample()->update(['project_id' => $project->id]);
+        $study->datasets()->update(['project_id' => $project->id]);
     }
 }

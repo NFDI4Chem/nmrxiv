@@ -349,7 +349,7 @@ class ProjectController extends Controller
             }
         }
 
-        $validation->process();
+        $validation->process(project: $project);
 
         return Inertia::render('Project/Validation', [
             'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'fundingReferences'),
@@ -377,7 +377,7 @@ class ProjectController extends Controller
             }
         }
 
-        $validation->process();
+        $validation->process(project: $project);
 
         return $validation->fresh();
     }
@@ -409,7 +409,7 @@ class ProjectController extends Controller
                 }
 
                 $project->release_date = $request->get('release_date');
-                $validation->process();
+                $validation->process(project: $project);
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
                     $project->status = 'queued';
@@ -467,7 +467,7 @@ class ProjectController extends Controller
 
                 $validation = $project->validation;
                 if ($validation) {
-                    $validation->process(forceSamplesMode: true);
+                    $validation->process(forceSamplesMode: true, project: $project);
                     $validation = $validation->fresh();
                 }
 

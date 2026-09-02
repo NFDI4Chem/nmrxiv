@@ -82,9 +82,28 @@ class Validation extends Model
         return $this->hasOne(Project::class);
     }
 
-    public function process(bool $forceSamplesMode = false): void
+    public function projects(): HasMany
     {
-        if (! $project = $this->project) {
+        return $this->hasMany(Project::class);
+    }
+
+    /**
+     * Project this validation should score when several project rows share validation_id.
+     */
+    public function associatedProject(): ?Project
+    {
+        return $this->projects()
+            ->withCount('studies')
+            ->orderByDesc('studies_count')
+            ->orderBy('id')
+            ->first();
+    }
+
+    public function process(bool $forceSamplesMode = false, ?Project $project = null): void
+    {
+        $project ??= $this->associatedProject();
+
+        if (! $project) {
             return;
         }
 
@@ -151,14 +170,16 @@ class Validation extends Model
                 'id' => $study->id,
             ];
 
+            $moleculeIds = $study->sample?->molecules?->pluck('id')->toArray() ?? [];
+
             $values = [
                 'title' => $study->name,
                 'description' => $study->description,
                 'keywords' => $study->tags->pluck('id')->toArray(),
-                'composition' => $study->sample->molecules->pluck('id')->toArray(),
+                'composition' => $moleculeIds,
                 'nmrium_info' => $study->has_nmrium ? $study->has_nmrium : null,
                 'sample' => $study->sample,
-                'molecules' => $study->sample->molecules->pluck('id')->toArray(),
+                'molecules' => $moleculeIds,
             ];
 
             $study_rules = $rules['study'];

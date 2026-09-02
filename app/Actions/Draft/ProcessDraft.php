@@ -15,7 +15,6 @@ use App\Models\User;
 use App\Models\Validation;
 use App\Support\Draft\HifsaPdfResolver;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +35,7 @@ class ProcessDraft
     /**
      * Process draft and create project structure.
      */
-    public function execute(Request $request, Draft $draft, User $user): Response|JsonResponse|RedirectResponse
+    public function execute(Request $request, Draft $draft, User $user): Response|JsonResponse
     {
         [$user_id, $team_id, $team] = $user->getUserTeamData();
 
@@ -94,7 +93,7 @@ class ProcessDraft
      */
     public function createOrUpdateProject(Draft $draft, int $user_id, int $team_id, $user, $team): Project
     {
-        $project = Project::where('draft_id', $draft->id)->first();
+        $project = $this->resolveDraftProject($draft);
 
         if (! $project) {
             $project = $this->createNewProject($draft, $user_id, $team_id, $user, $team);
@@ -103,6 +102,40 @@ class ProcessDraft
         }
 
         return $project;
+    }
+
+    /**
+     * Pick the existing project for this draft.
+     *
+     * A draft can accumulate more than one project row (retries, concurrent
+     * process requests). `first()` without an order then often returns an
+     * empty newer project while studies still belong to an older one, so
+     * finalizeProcessing sees zero studies and redirects.
+     */
+    public function resolveDraftProject(Draft $draft): ?Project
+    {
+        $studyProjectId = Study::query()
+            ->where('draft_id', $draft->id)
+            ->whereNotNull('project_id')
+            ->value('project_id');
+
+        if ($studyProjectId) {
+            $project = Project::query()->find($studyProjectId);
+
+            if ($project) {
+                if ($project->draft_id !== $draft->id) {
+                    $project->draft_id = $draft->id;
+                    $project->save();
+                }
+
+                return $project;
+            }
+        }
+
+        return Project::query()
+            ->where('draft_id', $draft->id)
+            ->orderBy('id')
+            ->first();
     }
 
     /**
@@ -363,7 +396,7 @@ class ProcessDraft
     /**
      * Finalize processing and return response.
      */
-    public function finalizeProcessing(Draft $draft, Project $project): Response|JsonResponse|RedirectResponse
+    public function finalizeProcessing(Draft $draft, Project $project): Response|JsonResponse
     {
         $draft->save();
 
@@ -371,8 +404,15 @@ class ProcessDraft
         $this->hifsaPdfResolver->persistCsvData($studies);
         $studies = $this->hifsaPdfResolver->enrichStudies($studies, $draft);
 
-        if (count($studies) == 0) {
-            return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);
+        if ($studies->isEmpty()) {
+            $message = 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.';
+
+            return response()->json([
+                'message' => $message,
+                'errors' => [
+                    'studies' => [$message],
+                ],
+            ], 422);
         }
 
         Log::info('Finalizing processing for draft '.$draft->id);
