@@ -277,14 +277,14 @@ class Validation extends Model
             array_push($studiesValidation, $studyReport);
         }
 
-        // Validate citations
+        // Validate citations. The associated article DOI is optional.
         $citations = $project->citations;
         $citationsValidation = [];
         $citationsStatus = $citations && $citations->isNotEmpty();
-        $shouldValidateCitationDoi = ! $samplesMode;
+        $shouldAnnotateCitationDoi = ! $samplesMode;
 
-        if ($shouldValidateCitationDoi && $project->release_date) {
-            $shouldValidateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
+        if ($shouldAnnotateCitationDoi && $project->release_date) {
+            $shouldAnnotateCitationDoi = Carbon::parse($project->release_date)->lessThanOrEqualTo(now());
         }
 
         if ($citations && $citations->isNotEmpty()) {
@@ -294,18 +294,9 @@ class Validation extends Model
                     'id' => $citation->id,
                 ];
 
-                if ($shouldValidateCitationDoi) {
-                    // Check if DOI is present only for current/past release date projects.
-                    $hasDoi = is_string($citation->doi) && trim($citation->doi) !== '';
-
-                    if ($hasDoi) {
-                        $citationReport['doi'] = 'true|required';
-                    } else {
-                        $citationReport['doi'] = 'false|required';
-                        $citationsStatus = false; // Citation validation failed
-                    }
-
-                    $citationReport['status'] = $hasDoi;
+                if ($shouldAnnotateCitationDoi) {
+                    $citationReport['doi'] = 'true|optional';
+                    $citationReport['status'] = true;
                 } else {
                     $citationReport['doi'] = $samplesMode
                         ? 'true|skipped-samples-mode'

@@ -126,7 +126,7 @@ class PublishProjectTest extends TestCase
     }
 
     #[Test]
-    public function citations_without_doi_fail_validation(): void
+    public function citations_without_doi_pass_validation(): void
     {
         $this->project->draft->update(['project_enabled' => true]);
 
@@ -144,12 +144,10 @@ class PublishProjectTest extends TestCase
 
         $validation->process();
 
-        // Check that validation report shows citation without DOI
-        $this->assertFalse($validation->report['project']['status']);
-        $this->assertEquals('false|required', $validation->report['project']['citations']);
+        $this->assertEquals('true|required', $validation->report['project']['citations']);
         $this->assertNotEmpty($validation->report['project']['citations_detail']);
-        $this->assertEquals(false, $validation->report['project']['citations_detail'][0]['status']);
-        $this->assertEquals('false|required', $validation->report['project']['citations_detail'][0]['doi']);
+        $this->assertEquals(true, $validation->report['project']['citations_detail'][0]['status']);
+        $this->assertEquals('true|optional', $validation->report['project']['citations_detail'][0]['doi']);
     }
 
     #[Test]
@@ -175,7 +173,7 @@ class PublishProjectTest extends TestCase
         $this->assertEquals('true|required', $validation->report['project']['citations']);
         $this->assertNotEmpty($validation->report['project']['citations_detail']);
         $this->assertEquals(true, $validation->report['project']['citations_detail'][0]['status']);
-        $this->assertEquals('true|required', $validation->report['project']['citations_detail'][0]['doi']);
+        $this->assertEquals('true|optional', $validation->report['project']['citations_detail'][0]['doi']);
     }
 
     #[Test]

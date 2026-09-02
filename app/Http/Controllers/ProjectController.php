@@ -562,7 +562,7 @@ class ProjectController extends Controller
 
         $citations = $project['citations'] ?? null;
         if (is_string($citations) && str_starts_with($citations, 'false|')) {
-            $hints[] = 'Add a DOI to every citation, or choose a future release date if you are not ready to publish immediately.';
+            $hints[] = 'Add at least one citation before publishing in project mode.';
         }
 
         $labels = [
