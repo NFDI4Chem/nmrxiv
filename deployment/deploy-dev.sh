@@ -192,15 +192,24 @@ backup_database() {
     fi
 }
 
+refresh_openapi_docs() {
+    log_message "Refreshing OpenAPI documentation..."
+
+    docker compose -f "$COMPOSE_FILE" exec -T app sh -lc 'cd /var/www/html && L5_SWAGGER_USE_REFLECTION_ANALYSER=true php artisan l5-swagger:generate && cp storage/api-docs/api-docs.json public/api-docs.json'
+
+    log_message "OpenAPI documentation refreshed successfully"
+}
+
 run_migration_and_clear_cache() {
-    log_message "Running database migration..."
+    log_message "Running database migration, refreshing OpenAPI docs, and clearing cache..."
 
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan migrate --force
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan cache:clear
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize:clear
+    refresh_openapi_docs
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize
     
-    log_message "Database migration completed successfully"
+    log_message "Database migration and cache refresh completed successfully"
 }
 
 build_multi_platform() {
