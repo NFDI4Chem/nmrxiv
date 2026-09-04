@@ -10,6 +10,7 @@ use Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotificatio
 use Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
+use Spatie\DbDumper\Compressors\GzipCompressor;
 
 return [
 
@@ -29,7 +30,8 @@ return [
                  * The list of directories and files that will be included in the backup.
                  */
                 'include' => [
-                    base_path(),
+                    // Keep backups database-focused to respect our limited Ceph quota.
+                    // Production backups are normally generated with --only-db.
                 ],
 
                 /*
@@ -106,7 +108,7 @@ return [
          *
          * If you do not want any compressor at all, set it to null.
          */
-        'database_dump_compressor' => null,
+        'database_dump_compressor' => GzipCompressor::class,
 
         /*
          * The file extension used for the database dump files.
@@ -222,7 +224,7 @@ return [
     'monitor_backups' => [
         [
             'name' => env('APP_NAME', 'laravel-backup'),
-            'disks' => ['local'],
+            'disks' => ['ceph'],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 5000,
@@ -266,14 +268,14 @@ return [
             'keep_daily_backups_for_days' => 7,
 
             /*
-             * The number of weeks for which one weekly backup must be kept.
+             * Keep a few weekly snapshots without growing Ceph usage indefinitely.
              */
-            'keep_weekly_backups_for_weeks' => 0,
+            'keep_weekly_backups_for_weeks' => 4,
 
             /*
-             * The number of months for which one monthly backup must be kept.
+             * Keep a small number of monthly snapshots for longer-term recovery.
              */
-            'keep_monthly_backups_for_months' => 0,
+            'keep_monthly_backups_for_months' => 2,
 
             /*
              * The number of years for which one yearly backup must be kept.
@@ -284,7 +286,7 @@ return [
              * After cleaning up the backups remove the oldest backup until
              * this amount of megabytes has been reached.
              */
-            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+            'delete_oldest_backups_when_using_more_megabytes_than' => (int) env('BACKUP_MAX_STORAGE_MB', 4096),
         ],
     ],
 
