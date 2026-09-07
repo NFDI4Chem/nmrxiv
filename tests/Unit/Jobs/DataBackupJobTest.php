@@ -6,6 +6,7 @@ use App\Jobs\DataBackupJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -114,6 +115,7 @@ class DataBackupJobTest extends TestCase
         ]);
 
         Storage::fake('ceph');
+        Log::shouldReceive('warning')->once();
 
         Artisan::shouldReceive('call')
             ->once()
@@ -132,6 +134,7 @@ class DataBackupJobTest extends TestCase
         ]);
 
         Storage::fake('ceph');
+        Log::shouldReceive('info')->once();
         Storage::disk('ceph')->put('testing/database/nmrxiv-data-dump-latest.zip', 'backup-contents');
 
         Artisan::shouldReceive('call')
