@@ -22,7 +22,7 @@ Yes. Registration is a prerequisite to submitting the data. Although you can sub
 
 After you submit your data, it will remain private and will only be visible to you, unless you decide to make it public.
 
-All the data uploaded to nmrXiv are stored in the S3 bucket provisioned by the University Computing Center of [Friedrich-Schiller-Universität Jena](https://www.uni-jena.de/) and are backed up daily to the [Google Cloud Storage Archive Storage](https://cloud.google.com/storage/docs/storage-classes#archive) with multiple regions located in the European Union.
+All data uploaded to nmrXiv are stored in the S3-compatible object storage provisioned by the University Computing Center of [Friedrich-Schiller-Universität Jena](https://www.uni-jena.de/). The application runs on virtual machines hosted by FSU URZ, and the repository's research files and PostgreSQL database are protected within the URZ data center. Database recovery copies are compressed and retained according to the operational backup policy; published research objects are preserved separately from the rotating database backup copies.
 
 ### What are public and private objects in **[nmrXiv](https://nmrxiv.org/)**?
 
