@@ -12,6 +12,30 @@ Once deposited, the users receive a stable identifier, typically a [DOI](https:/
 
 nmrXiv will also support **DOI Versioning**, allowing users to update their data while maintaining modification records. In **DOI Versioning**, the [DOI](https://www.doi.org/) assigned to a dataset will always point to the latest version, while specific [DOI](https://www.doi.org/)s are assigned to specific versions. This will allow nmrXiv to manage data, e.g., structural revisions, without breaking the [DOI](https://www.doi.org/) link in publications.
 
+#### Backup scope
+
+The repository's persistent data is protected at the FSU URZ data center:
+
+-   Uploaded research files and generated data artifacts are stored in the URZ S3-compatible object storage.
+-   The PostgreSQL database, including repository metadata, relationships, permissions, and processing metadata, is backed up to the URZ S3-compatible storage.
+-   The application runs on URZ-hosted virtual machines; the virtual machines provide the runtime platform and are not the authoritative copy of research data.
+-   The routine Laravel backup job creates a PostgreSQL-only backup. Application source code and rebuildable dependencies are maintained through version control and deployment artifacts rather than being included in the routine database backup.
+
+Database backup archives are compressed and stored in the Ceph-backed S3-compatible storage. Backup operations and cleanup are scheduled by the application, and backup health is monitored against the same storage destination.
+
+#### Retention policy
+
+The backup cleanup policy uses a tiered retention ladder to balance recoverability with storage quota:
+
+-   Keep all daily database backups for 7 days.
+-   Keep daily recovery points for a further 7 days.
+-   Keep one weekly recovery point for 4 weeks.
+-   Keep one monthly recovery point for 2 months.
+-   Keep one yearly recovery point for up to 10 years.
+-   Enforce a maximum managed backup size of approximately 300 GB through `BACKUP_MAX_STORAGE_MB=300000`.
+
+The storage threshold is an application cleanup threshold, not a replacement for the Ceph bucket quota. When the threshold is exceeded, the oldest eligible backups are removed. The newest backup is protected by the backup cleanup strategy, so the actual usage can temporarily exceed the threshold when a single backup is larger than the remaining budget.
+
 ## Other Sources of Data
 
 nmrXiv will not be limited to publication-related applications. We also envision and make an effort towards characterizing a set of well-known "flagship" **Natural Products (NP)** and deposit these data in nmrXiv.
