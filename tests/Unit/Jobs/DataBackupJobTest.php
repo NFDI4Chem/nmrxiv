@@ -115,8 +115,11 @@ class DataBackupJobTest extends TestCase
         ]);
 
         Storage::fake('ceph');
-        Log::shouldReceive('warning')->once();
-
+        Log::shouldReceive('warning')
+            ->once()
+            ->withArgs(fn (string $message, array $context): bool => $message === 'Data backup completed but no backup archive was found on storage.'
+                && ($context['disk'] ?? null) === 'ceph'
+                && ($context['prefix'] ?? null) === 'testing/database');
         Artisan::shouldReceive('call')
             ->once()
             ->with('backup:run', ['--only-db' => true]);
