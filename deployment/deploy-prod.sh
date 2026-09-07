@@ -292,7 +292,7 @@ run_migration_and_clear_cache() {
     refresh_openapi_docs
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize:clear
     
-    log_message "Database migration and cache refresh completed successfully"
+    log_message "Database migration, OpenAPI documentation refresh, and cache clear completed successfully"
 }
 
 build_multi_platform() {
