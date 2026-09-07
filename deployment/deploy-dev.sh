@@ -193,10 +193,17 @@ backup_database() {
 }
 
 refresh_openapi_docs() {
+    : "${OPENAPI_DOCS_REFRESHED:=false}"
+    if [[ "$OPENAPI_DOCS_REFRESHED" == "true" ]]; then
+        log_message "OpenAPI documentation already refreshed; skipping"
+        return 0
+    fi
+
     log_message "Refreshing OpenAPI documentation..."
 
     docker compose -f "$COMPOSE_FILE" exec -T app sh -lc 'cd /var/www/html && L5_SWAGGER_USE_REFLECTION_ANALYSER=true php artisan l5-swagger:generate && cp storage/api-docs/api-docs.json public/api-docs.json'
 
+    OPENAPI_DOCS_REFRESHED=true
     log_message "OpenAPI documentation refreshed successfully"
 }
 
