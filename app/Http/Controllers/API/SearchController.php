@@ -15,7 +15,9 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class SearchController extends Controller
@@ -1010,19 +1012,21 @@ class SearchController extends Controller
 
     private function buildTaggedMoleculeQuery(string $query, ?string $tagType = null): Builder
     {
+        $tagSlug = Str::slug($query);
+
         return PublicMoleculeAggregates::scopePublicCatalog(
-            Molecule::query()->whereHas('samples.study', function (Builder $studyQuery) use ($query, $tagType): void {
+            Molecule::query()->whereHas('samples.study', function (Builder $studyQuery) use ($tagSlug, $tagType): void {
                 $studyQuery->where('is_public', true)
                     ->where('is_archived', false)
-                    ->where(function (Builder $scopeQuery) use ($query, $tagType): void {
-                        $scopeQuery->whereHas('tags', function (Builder $tagQuery) use ($query, $tagType): void {
-                            $tagQuery->where('name->en', $query);
+                    ->where(function (Builder $scopeQuery) use ($tagSlug, $tagType): void {
+                        $scopeQuery->whereHas('tags', function (Builder $tagQuery) use ($tagSlug, $tagType): void {
+                            $this->whereTagSlugMatches($tagQuery, $tagSlug);
 
                             if (filled($tagType)) {
                                 $tagQuery->where('type', $tagType);
                             }
-                        })->orWhereHas('project.tags', function (Builder $tagQuery) use ($query, $tagType): void {
-                            $tagQuery->where('name->en', $query);
+                        })->orWhereHas('project.tags', function (Builder $tagQuery) use ($tagSlug, $tagType): void {
+                            $this->whereTagSlugMatches($tagQuery, $tagSlug);
 
                             if (filled($tagType)) {
                                 $tagQuery->where('type', $tagType);
@@ -1031,6 +1035,17 @@ class SearchController extends Controller
                     });
             })
         );
+    }
+
+    private function whereTagSlugMatches(Builder $tagQuery, string $tagSlug): void
+    {
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            $tagQuery->whereRaw('slug::jsonb @> ?::jsonb', [json_encode(['en' => $tagSlug])]);
+
+            return;
+        }
+
+        $tagQuery->where('slug->en', $tagSlug);
     }
 
     /**
