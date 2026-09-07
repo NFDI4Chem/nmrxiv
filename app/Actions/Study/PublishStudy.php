@@ -5,7 +5,7 @@ namespace App\Actions\Study;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Study;
 use App\Services\ChemotionRepositoryTrackerService;
-use App\Support\Public\PublicMoleculeAggregates;
+use App\Support\Public\PublicMoleculeCatalogIndexer;
 use Illuminate\Support\Facades\Log;
 
 class PublishStudy
@@ -26,6 +26,7 @@ class PublishStudy
             $dataset->save();
         }
 
+        app(PublicMoleculeCatalogIndexer::class)->refreshForStudy($study);
         if ($study->is_public && $study->has_nmrium && filled($study->download_url)) {
             ProcessMetadataExtractionBagitGenerationJob::dispatch($study->id);
         }

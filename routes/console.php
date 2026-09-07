@@ -23,6 +23,10 @@ Schedule::command('nmrxiv:delete-projects')->daily();
 // Staggered away from the backup dump (both defaulted to ->daily(), i.e. midnight) since this rebuilds the mols/fps RDKit tables via DROP/CREATE DDL
 Schedule::command('nmrxiv:index-molecules')->dailyAt('02:00');
 Schedule::command('nmrxiv:index-spectra-metadata-stats')->daily();
+Schedule::command('nmrxiv:index-public-molecule-catalog')
+    ->daily()
+    ->withoutOverlapping()
+    ->onOneServer();
 Schedule::command('nmrxiv:delete-citations')->weekly();
 Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {

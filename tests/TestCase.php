@@ -2,12 +2,21 @@
 
 namespace Tests;
 
+use App\Support\Public\PublicMoleculeCatalogIndexer;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Testing\TestResponse;
 use JsonException;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * @param  list<int>|null  $moleculeIds
+     */
+    protected function indexPublicMoleculeCatalog(?array $moleculeIds = null): void
+    {
+        app(PublicMoleculeCatalogIndexer::class)->refresh($moleculeIds);
+    }
+
     protected function inertiaPageFromResponse(TestResponse $response): array
     {
         $content = $response->getContent();
