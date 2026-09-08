@@ -16,7 +16,14 @@ class AltchaRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
-        $altcha = new Altcha(config('altcha.hmac_secret'));
+        $secret = config('altcha.hmac_secret');
+
+        if (! is_string($secret) || $secret === '') {
+            $fail('ALTCHA is not configured. Please set the value for ALTCHA_HMAC_SECRET in env.');
+
+            return;
+        }
+        $altcha = new Altcha($secret);
 
         try {
             $result = $altcha->verifySolution(new VerifySolutionOptions(

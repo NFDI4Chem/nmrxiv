@@ -14,12 +14,17 @@ class AltchaController extends Controller
      */
     public function challenge(): JsonResponse
     {
-        $altcha = new Altcha(config('altcha.hmac_secret'));
+        $secret = config('altcha.hmac_secret');
+
+        if (! is_string($secret) || $secret === '') {
+            return response()->json(['message' => 'ALTCHA is not configured. Please set the value for ALTCHA_HMAC_SECRET in env.'], 503);
+        }
+        $altcha = new Altcha($secret);
 
         $challenge = $altcha->createChallenge(new CreateChallengeOptions(
             algorithm: new Pbkdf2,
-            cost: config('altcha.cost'),
-            expiresAt: time() + config('altcha.challenge_ttl'),
+            cost: (int) config('altcha.cost'),
+            expiresAt: time() + (int) config('altcha.challenge_ttl'),
         ));
 
         return response()->json($challenge->toArray());
