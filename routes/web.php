@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\CurationController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\AltchaController;
 use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
@@ -46,6 +47,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
+use Spatie\Honeypot\ProtectAgainstSpam;
 use Spatie\WelcomeNotification\WelcomesNewUsers;
 
 Route::prefix('auth')->group(function () {
@@ -107,10 +109,14 @@ Route::get('/predict', function () {
 
 Route::get('/stats', [PublicStatsController::class, 'index'])->name('stats');
 
-// Custom support bubble route with rate limiting and enhanced security
+// Custom support bubble route with rate limiting, ALTCHA and honeypot spam protection
 Route::post('support-bubble', [SupportBubbleController::class, 'submit'])
-    ->middleware(['throttle:support-bubble'])
+    ->middleware(['throttle:support-bubble', ProtectAgainstSpam::class])
     ->name('supportBubble.submit');
+
+Route::get('altcha/challenge', [AltchaController::class, 'challenge'])
+    ->middleware(['throttle:altcha-challenge'])
+    ->name('altcha.challenge');
 
 Route::impersonate();
 
