@@ -45,5 +45,12 @@
         />
     @endif
 
+    <altcha-widget
+        name="altcha"
+        challenge="{{ route('altcha.challenge') }}"
+        auto="off"
+        display="standard"
+    ></altcha-widget>
+
     <button type="submit" class="{{ config('support-bubble.classes.button') }}">{{ __('support-bubble::support-bubble.submit_label') }}</button>
 </form>

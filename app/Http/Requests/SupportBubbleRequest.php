@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\RecaptchaRule;
+use App\Rules\AltchaRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -106,19 +106,7 @@ class SupportBubbleRequest extends FormRequest
                 },
             ],
             'url' => 'nullable|url|max:255',
-            'g-recaptcha-response' => [
-                function ($attribute, $value, $fail) {
-                    if (config('services.recaptcha.site_key') && empty($value)) {
-                        $fail('Please complete the CAPTCHA verification.');
-
-                        return;
-                    }
-                    if (config('services.recaptcha.site_key') && ! empty($value)) {
-                        $rule = new RecaptchaRule;
-                        $rule->validate($attribute, $value, $fail);
-                    }
-                },
-            ],
+            'altcha' => ['required', 'string', new AltchaRule],
         ];
     }
 
