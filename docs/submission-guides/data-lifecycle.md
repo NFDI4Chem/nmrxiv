@@ -5,12 +5,36 @@ Research data passes through many processes from creation to (voluntary or accid
 **Deposition:** User(s) can submit their datasets to the repository using our easy-to-use interface, or an electronic lab notebook such as Chemotion ELN. Using smart lab notebooks enables easy integration with commonly used software. We ensure that the submitted data sets are in accordance with minimum information standards and additional requirements set by the domain experts and funders. The submitter can then enrich their dataset with additional information (taxonomic and genomic information, related publication) according to standards defined by the community, with some metadata and acquisition parameters being pre-populated.
 
 **Processing/Archiving/Distribution:**
-nmrXiv infrastructure will convert the data into the standard formats using workflows over distributed infrastructure. Data and associated metadata will be processed, stored, and archived following the RDM best practises such as [BagIt](https://tools.ietf.org/id/draft-kunze-bagit-16.html).
+nmrXiv infrastructure will convert the data into the standard formats using workflows over distributed infrastructure. Data and associated metadata will be processed, stored, and archived following the RDM best practises such as [BagIt](https://tools.ietf.org/id/draft-kunze-bagit-16.html). For each publicly released sample, nmrXiv automatically generates a downloadable BagIt archive containing the raw data, processed spectra metadata, and checksums, accessible directly from the sample's public page once generation completes.
 
 **Archiving:**
 Once deposited, the users receive a stable identifier, typically a [DOI](https://www.doi.org/) hyperlink that remains unchanged for the resource's lifetime. As nmrXiv will issue [DOI](https://www.doi.org/)s, any deposited data will immediately have a stable identifier that can point to the dataset and allow its re-use or repurposing. This fully accommodates manuscript submission, peer review, and post-acceptance needs. nmrXiv will also develop restricted access models that allow only authorized reviewers to access the author's original NMR data. Upon acceptance, the [DOI](https://www.doi.org/)-labeled datasets will become publicly accessible.
 
 nmrXiv will also support **DOI Versioning**, allowing users to update their data while maintaining modification records. In **DOI Versioning**, the [DOI](https://www.doi.org/) assigned to a dataset will always point to the latest version, while specific [DOI](https://www.doi.org/)s are assigned to specific versions. This will allow nmrXiv to manage data, e.g., structural revisions, without breaking the [DOI](https://www.doi.org/) link in publications.
+
+#### Backup scope
+
+The repository's persistent data is protected at the FSU URZ data center:
+
+-   Uploaded research files and generated data artifacts are stored in the URZ S3-compatible object storage.
+-   The PostgreSQL database, including repository metadata, relationships, permissions, and processing metadata, is backed up to the URZ S3-compatible storage.
+-   The application runs on URZ-hosted virtual machines; the virtual machines provide the runtime platform and are not the authoritative copy of research data.
+-   The routine Laravel backup job creates a PostgreSQL-only backup. Application source code and rebuildable dependencies are maintained through version control and deployment artifacts rather than being included in the routine database backup.
+
+Database backup archives are compressed and stored in the Ceph-backed S3-compatible storage. Backup operations and cleanup are scheduled by the application, and backup health is monitored against the same storage destination.
+
+#### Retention policy
+
+The backup cleanup policy uses a tiered retention ladder to balance recoverability with storage quota:
+
+-   Keep all daily database backups for 7 days.
+-   Keep daily recovery points for a further 7 days.
+-   Keep one weekly recovery point for 4 weeks.
+-   Keep one monthly recovery point for 2 months.
+-   Keep one yearly recovery point for up to 10 years.
+-   Enforce a maximum managed backup size of approximately 300 GB through `BACKUP_MAX_STORAGE_MB=300000`.
+
+The storage threshold is an application cleanup threshold, not a replacement for the Ceph bucket quota. When the threshold is exceeded, the oldest eligible backups are removed. The newest backup is protected by the backup cleanup strategy, so the actual usage can temporarily exceed the threshold when a single backup is larger than the remaining budget.
 
 ## Other Sources of Data
 

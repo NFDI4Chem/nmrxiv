@@ -3,10 +3,12 @@
 namespace Tests\Unit\Actions\Project;
 
 use App\Actions\Project\PublishProject;
+use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class PublishProjectTest extends TestCase
@@ -40,6 +42,33 @@ class PublishProjectTest extends TestCase
 
         $this->assertTrue($study1->fresh()->is_public);
         $this->assertTrue($study2->fresh()->is_public);
+    }
+
+    public function test_publish_dispatches_bagit_job_for_each_public_study_with_nmrium_download(): void
+    {
+        Queue::fake();
+
+        $project = Project::factory()->create(['is_public' => false]);
+        $study1 = Study::factory()->for($project)->create([
+            'is_public' => false,
+            'has_nmrium' => true,
+            'download_url' => 'https://example.com/one.zip',
+        ]);
+        $study2 = Study::factory()->for($project)->create([
+            'is_public' => false,
+            'has_nmrium' => true,
+            'download_url' => 'https://example.com/two.zip',
+        ]);
+
+        $this->action->publish($project);
+
+        Queue::assertPushed(ProcessMetadataExtractionBagitGenerationJob::class, 2);
+        Queue::assertPushed(ProcessMetadataExtractionBagitGenerationJob::class, function ($job) use ($study1) {
+            return $job->studyId === $study1->id;
+        });
+        Queue::assertPushed(ProcessMetadataExtractionBagitGenerationJob::class, function ($job) use ($study2) {
+            return $job->studyId === $study2->id;
+        });
     }
 
     public function test_publish_makes_all_datasets_public()

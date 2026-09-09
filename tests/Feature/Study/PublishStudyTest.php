@@ -4,6 +4,7 @@ namespace Tests\Feature\Study;
 
 use App\Actions\Study\PublishStudy;
 use App\Actions\Study\UpdateStudy;
+use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Dataset;
 use App\Models\License;
 use App\Models\Project;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -64,6 +66,27 @@ class PublishStudyTest extends TestCase
             $dataset->refresh();
             $this->assertTrue($dataset->is_public);
         }
+    }
+
+    public function test_publication_dispatches_bagit_job_for_public_study_with_download_url(): void
+    {
+        Queue::fake();
+
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'is_public' => false,
+            'has_nmrium' => true,
+            'download_url' => 'https://example.com/sample.zip',
+        ]);
+
+        $publishAction = new PublishStudy;
+        $publishAction->publish($study);
+
+        Queue::assertPushed(ProcessMetadataExtractionBagitGenerationJob::class, function ($job) use ($study) {
+            return $job->studyId === $study->id;
+        });
     }
 
     // This test is removed as it requires complex license validation logic changes

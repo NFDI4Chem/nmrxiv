@@ -156,15 +156,12 @@ class DatasetSpectraInfoExtractor
         $parts = [];
 
         foreach ($info as $key => $value) {
-            if ($value === null || $value === '') {
+            $flattened = $this->flattenForSearch($value);
+            if ($flattened === '') {
                 continue;
             }
 
-            if (is_array($value)) {
-                $parts[] = $key.' '.implode(' ', array_map('strval', $value));
-            } else {
-                $parts[] = $key.' '.(string) $value;
-            }
+            $parts[] = $key.' '.$flattened;
         }
 
         $parts[] = json_encode($info, JSON_UNESCAPED_UNICODE) ?: '';
@@ -172,6 +169,39 @@ class DatasetSpectraInfoExtractor
         $normalized = TextSearchNormalizer::normalize(implode(' ', $parts));
 
         return $normalized ?? '';
+    }
+
+    /**
+     * Recursively stringify scalars so nested NMRium arrays (2D frequencies,
+     * filters, meta) never trigger "Array to string conversion".
+     */
+    private function flattenForSearch(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '';
+        }
+
+        if (is_array($value)) {
+            $parts = [];
+            foreach ($value as $item) {
+                $flattened = $this->flattenForSearch($item);
+                if ($flattened !== '') {
+                    $parts[] = $flattened;
+                }
+            }
+
+            return implode(' ', $parts);
+        }
+
+        if (! is_scalar($value)) {
+            return '';
+        }
+
+        return trim((string) $value);
     }
 
     private function property(array $info, string $key): mixed
@@ -185,20 +215,9 @@ class DatasetSpectraInfoExtractor
             return null;
         }
 
-        $string = trim((string) $value);
-
-        return $string === '' ? null : $string;
-    }
-
-    private function normalizeNucleus(mixed $value): ?string
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
         if (is_array($value)) {
-            foreach ($value as $item) {
-                $normalized = $this->normalizeString($item);
+            foreach ($this->scalarLeaves($value) as $leaf) {
+                $normalized = $this->normalizeString($leaf);
                 if ($normalized !== null) {
                     return $normalized;
                 }
@@ -207,12 +226,50 @@ class DatasetSpectraInfoExtractor
             return null;
         }
 
+        if (is_bool($value) || ! is_scalar($value)) {
+            return null;
+        }
+
+        $string = trim((string) $value);
+
+        return $string === '' ? null : $string;
+    }
+
+    /**
+     * @return list<int|float|string|bool>
+     */
+    private function scalarLeaves(array $value): array
+    {
+        $leaves = [];
+
+        array_walk_recursive($value, function (mixed $item) use (&$leaves): void {
+            if (is_scalar($item)) {
+                $leaves[] = $item;
+            }
+        });
+
+        return $leaves;
+    }
+
+    private function normalizeNucleus(mixed $value): ?string
+    {
         return $this->normalizeString($value);
     }
 
     private function normalizeDecimal(mixed $value): ?string
     {
         if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            foreach ($this->scalarLeaves($value) as $leaf) {
+                $normalized = $this->normalizeDecimal($leaf);
+                if ($normalized !== null) {
+                    return $normalized;
+                }
+            }
+
             return null;
         }
 
@@ -226,6 +283,17 @@ class DatasetSpectraInfoExtractor
     private function normalizeInteger(mixed $value): ?int
     {
         if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            foreach ($this->scalarLeaves($value) as $leaf) {
+                $normalized = $this->normalizeInteger($leaf);
+                if ($normalized !== null) {
+                    return $normalized;
+                }
+            }
+
             return null;
         }
 
@@ -245,7 +313,7 @@ class DatasetSpectraInfoExtractor
 
     private function normalizeBoolean(mixed $value): ?bool
     {
-        if ($value === null || $value === '') {
+        if ($value === null || $value === '' || is_array($value)) {
             return null;
         }
 
@@ -255,6 +323,10 @@ class DatasetSpectraInfoExtractor
 
         if (is_numeric($value)) {
             return (bool) $value;
+        }
+
+        if (! is_scalar($value)) {
+            return null;
         }
 
         $normalized = strtolower(trim((string) $value));
@@ -365,8 +437,23 @@ class DatasetSpectraInfoExtractor
             return null;
         }
 
+        if (is_array($value)) {
+            foreach ($this->scalarLeaves($value) as $leaf) {
+                $normalized = $this->normalizeTubeDiameter($leaf);
+                if ($normalized !== null) {
+                    return $normalized;
+                }
+            }
+
+            return null;
+        }
+
         if (is_numeric($value)) {
             return (string) (int) round((float) $value);
+        }
+
+        if (! is_scalar($value)) {
+            return null;
         }
 
         $string = strtolower(trim((string) $value));

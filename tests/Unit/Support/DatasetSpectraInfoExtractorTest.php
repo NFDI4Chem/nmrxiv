@@ -303,6 +303,57 @@ class DatasetSpectraInfoExtractorTest extends TestCase
         $this->assertSame('JCAMP', $payload['spectra_manufacturer']);
     }
 
+    public function test_extract_handles_nested_arrays_without_array_to_string_error(): void
+    {
+        $dataset = $this->makeDataset();
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        [
+                            'info' => [
+                                'solvent' => 'CDCl3',
+                                'nucleus' => ['1H', '13C'],
+                                'experiment' => ['HSQC'],
+                                'probeName' => ['name' => 'BBO'],
+                                'originFrequency' => [600.13, 150.9],
+                                'baseFrequency' => [600.13, 150.9],
+                                'spectralWidth' => [16.02, 220.0],
+                                'numberOfPoints' => [2048, 512],
+                                'filters' => [
+                                    [
+                                        'name' => 'shift2D',
+                                        'value' => ['shift' => [0, 0]],
+                                    ],
+                                ],
+                                'meta' => [
+                                    'instrument' => ['vendor' => 'Bruker'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataset->refresh();
+
+        $payload = $this->extractor->extractForDataset($dataset);
+
+        $this->assertSame('CDCl3', $payload['spectra_solvent']);
+        $this->assertSame('1H', $payload['spectra_nucleus']);
+        $this->assertSame('HSQC', $payload['spectra_experiment']);
+        $this->assertSame('BBO', $payload['spectra_probe_name']);
+        $this->assertSame('600.13', $payload['spectra_origin_frequency']);
+        $this->assertSame('600.13', $payload['spectra_base_frequency']);
+        $this->assertSame('16.02', $payload['spectra_spectral_width']);
+        $this->assertSame(2048, $payload['spectra_number_of_points']);
+        $this->assertNotNull($payload['spectra_info_extracted_at']);
+        $this->assertStringContainsString('bruker', strtolower($payload['spectra_search_text']));
+        $this->assertStringContainsString('hsqc', $payload['spectra_search_text']);
+    }
+
     public function test_extract_returns_empty_payload_when_no_nmrium_info(): void
     {
         $dataset = $this->makeDataset();

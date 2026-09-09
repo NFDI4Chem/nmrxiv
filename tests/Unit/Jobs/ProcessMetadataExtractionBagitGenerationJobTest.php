@@ -8,14 +8,27 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
+use App\Notifications\BagitGenerationFailedNotification;
+use App\Notifications\BagitGenerationSucceededNotification;
 use Exception;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Config;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemAdapter as FlysystemAdapterContract;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
+use League\Flysystem\Visibility;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
+use whikloj\BagItTools\Bag;
 use ZipArchive;
 
 class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
@@ -41,6 +54,11 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
     public function test_failed_marks_the_study_as_failed_after_final_attempt(): void
     {
+        Notification::fake();
+        Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super-admin');
+
         $study = $this->makeStudy();
         $study->update([
             'metadata_bagit_generation_status' => 'processing',
@@ -66,6 +84,16 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertSame('Gateway Timeout', data_get($study->metadata_bagit_generation_logs, 'error_message'));
         $this->assertSame(3, data_get($study->metadata_bagit_generation_logs, 'attempts'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'failed_at'));
+
+        Notification::assertSentTo(
+            [$superAdmin],
+            BagitGenerationFailedNotification::class,
+            function ($notification, $channels) use ($study) {
+                return $notification->study->is($study)
+                    && $notification->reason === 'Gateway Timeout'
+                    && $notification->attempts === 3;
+            }
+        );
     }
 
     public function test_extract_zip_handles_root_placeholder_entry_conflict(): void
@@ -116,11 +144,15 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
     public function test_handle_processes_study_successfully_and_cleans_up_old_images_on_rerun(): void
     {
         Storage::fake('local');
+        Notification::fake();
 
         config([
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy();
@@ -130,7 +162,8 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
         Http::fake([
-            $study->download_url => Http::response($zipBinary, 200),
+            // A fresh response per call: the sink stub handler drains the body stream without rewinding it.
+            $study->download_url => fn () => Http::response($zipBinary, 200),
             'https://nmrkit.test/parse' => Http::response([
                 'images' => [
                     ['id' => 'img1', 'image' => 'data:image/png;base64,'.$pngBase64],
@@ -164,6 +197,15 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'storage_path'));
         $this->assertNotNull(data_get($study->metadata_bagit_generation_logs, 'completed_at'));
 
+        Notification::assertSentTo(
+            [$study->owner],
+            BagitGenerationSucceededNotification::class,
+            function ($notification, $channels) use ($study) {
+                return $notification->study->is($study)
+                    && $notification->archiveUrl === $study->bagit_archive_link;
+            }
+        );
+
         $disk = Storage::disk('local');
         $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';
 
@@ -190,6 +232,85 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertCount(1, $disk->files("{$metaDir}/images"));
     }
 
+    public function test_handle_processes_study_successfully_on_a_non_local_storage_disk(): void
+    {
+        Storage::fake('local');
+        Notification::fake();
+
+        $adapter = new InMemoryFlysystemAdapter;
+        $this->registerMemoryDisk('spectra_memory', $adapter);
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
+        ]);
+
+        $study = $this->makeStudy();
+
+        // NMRKit returns fresh image ids per parse, so a previous run's files must not survive.
+        $adapter->files['spectra_parse/S213/data/S213/nmrxiv-meta/images/stale.png'] = 'stale';
+
+        $this->fakeSuccessfulPipeline($study);
+
+        (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+
+        $study->refresh();
+
+        $this->assertSame('completed', $study->metadata_bagit_generation_status);
+        $this->assertSame(1, data_get($study->metadata_bagit_generation_logs, 'image_count'));
+
+        $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';
+
+        $this->assertArrayHasKey("{$metaDir}/images/img1.png", $adapter->files);
+        $this->assertArrayNotHasKey("{$metaDir}/images/stale.png", $adapter->files);
+        $this->assertArrayHasKey("{$metaDir}/S213.nmrium", $adapter->files);
+        $this->assertArrayHasKey("{$metaDir}/bio-schema.json", $adapter->files);
+        $this->assertArrayHasKey('spectra_parse/S213/bagit.txt', $adapter->files);
+        $this->assertArrayHasKey('spectra_parse/S213/manifest-sha256.txt', $adapter->files);
+
+        $this->assertEmpty(glob(storage_path('app/bagit_work_*')));
+    }
+
+    public function test_handle_marks_study_as_failed_when_archive_upload_is_rejected_by_the_disk(): void
+    {
+        Storage::fake('local');
+        Notification::fake();
+
+        $this->registerMemoryDisk('rejecting', new RejectingFlysystemAdapter);
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'rejecting',
+        ]);
+
+        $study = $this->makeStudy();
+
+        $this->fakeSuccessfulPipeline($study);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to upload BagIt archive to disk');
+
+        try {
+            (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+        } finally {
+            $study->refresh();
+
+            $this->assertNull($study->bagit_archive_link);
+            $this->assertStringContainsString(
+                'Failed to upload BagIt archive to disk',
+                data_get($study->metadata_bagit_generation_logs, 'last_error_message')
+            );
+        }
+    }
+
     public function test_handle_continues_without_bio_schema_when_fetch_fails(): void
     {
         Storage::fake('local');
@@ -198,6 +319,9 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
         ]);
 
         $study = $this->makeStudy();
@@ -371,9 +495,11 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         }
     }
 
-    public function test_generate_bagit_manifests_falls_back_to_manual_generation_when_packaging_fails(): void
+    public function test_generate_bagit_manifests_uses_the_library_on_an_already_populated_payload_directory(): void
     {
         $bagPath = sys_get_temp_dir().'/nmrxiv_bag_'.uniqid('', true);
+        mkdir($bagPath.'/data/Sample', 0755, true);
+        file_put_contents($bagPath.'/data/Sample/fid', 'spectra bytes');
 
         $job = $this->makeTestableJob(1);
 
@@ -384,10 +510,64 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             $this->assertFileExists($bagPath.'/manifest-sha256.txt');
             $this->assertFileExists($bagPath.'/bag-info.txt');
             $this->assertFileExists($bagPath.'/tagmanifest-sha256.txt');
+
+            $this->assertStringContainsString('data/Sample/fid', file_get_contents($bagPath.'/manifest-sha256.txt'));
+
+            $bagInfo = file_get_contents($bagPath.'/bag-info.txt');
+            $this->assertStringContainsString('Payload-Oxum:', $bagInfo);
+            $this->assertStringContainsString('Bag-Software-Agent:', $bagInfo);
+
+            $this->assertTrue(Bag::load($bagPath)->isValid());
+        } finally {
+            $this->removeDirectory($bagPath);
+        }
+    }
+
+    public function test_generate_bagit_manually_writes_all_bagit_tag_files(): void
+    {
+        $bagPath = sys_get_temp_dir().'/nmrxiv_bag_'.uniqid('', true);
+        mkdir($bagPath.'/data/Sample', 0755, true);
+        file_put_contents($bagPath.'/data/Sample/fid', 'spectra bytes');
+
+        $job = $this->makeTestableJob(1);
+
+        try {
+            $job->generateBagItManuallyForTest($bagPath);
+
+            $this->assertFileExists($bagPath.'/bagit.txt');
+            $this->assertFileExists($bagPath.'/manifest-sha256.txt');
+            $this->assertFileExists($bagPath.'/bag-info.txt');
+            $this->assertFileExists($bagPath.'/tagmanifest-sha256.txt');
+
+            $this->assertStringContainsString('data/Sample/fid', file_get_contents($bagPath.'/manifest-sha256.txt'));
             $this->assertStringContainsString('Payload-Oxum:', file_get_contents($bagPath.'/bag-info.txt'));
         } finally {
             $this->removeDirectory($bagPath);
         }
+    }
+
+    /**
+     * Fake the download, NMRKit and bio-schema calls for a happy-path run.
+     */
+    private function fakeSuccessfulPipeline(Study $study): void
+    {
+        $zipBinary = $this->buildZipBinary('S213', ['1/acqu' => 'acquisition data']);
+        $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+        Http::fake([
+            // A fresh response per call: the sink stub handler drains the body stream without rewinding it.
+            $study->download_url => fn () => Http::response($zipBinary, 200),
+            'https://nmrkit.test/parse' => Http::response([
+                'images' => [
+                    ['id' => 'img1', 'image' => 'data:image/png;base64,'.$pngBase64],
+                ],
+                'data' => ['spectra' => [['id' => 'spectrum-1', 'keep' => 'yes']]],
+            ], 200),
+            'https://bioschema.test/schemas/S213' => Http::response([
+                '@context' => 'https://schema.org',
+                'name' => 'Test study',
+            ], 200),
+        ]);
     }
 
     private function buildZipBinary(string $studyFolder, array $files): string
@@ -444,6 +624,11 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
                 $this->generateBagItManifests($bagPath);
             }
 
+            public function generateBagItManuallyForTest(string $bagPath): void
+            {
+                $this->generateBagItManually($bagPath);
+            }
+
             public function calculatePayloadOxumForTest(string $dataPath): string
             {
                 return $this->calculatePayloadOxum($dataPath);
@@ -497,5 +682,134 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         }
 
         @rmdir($directory);
+    }
+
+    /**
+     * Storage::fake() always registers a 'local' driver, so a non-local disk has to be registered by hand.
+     */
+    private function registerMemoryDisk(string $name, InMemoryFlysystemAdapter $adapter): void
+    {
+        Storage::extend('memory', function ($app, $config) use ($adapter) {
+            return new FilesystemAdapter(new Filesystem($adapter), $adapter, $config);
+        });
+
+        config(["filesystems.disks.{$name}" => ['driver' => 'memory', 'url' => 'https://memory.test']]);
+
+        Storage::forgetDisk($name);
+    }
+}
+
+class InMemoryFlysystemAdapter implements FlysystemAdapterContract
+{
+    /** @var array<string, string> */
+    public array $files = [];
+
+    /** @var array<string, bool> */
+    public array $directories = [];
+
+    public function fileExists(string $path): bool
+    {
+        return array_key_exists($path, $this->files);
+    }
+
+    public function directoryExists(string $path): bool
+    {
+        return array_key_exists($path, $this->directories);
+    }
+
+    public function write(string $path, string $contents, Config $config): void
+    {
+        $this->files[$path] = $contents;
+        $this->directories[dirname($path)] = true;
+    }
+
+    public function writeStream(string $path, $contents, Config $config): void
+    {
+        $this->write($path, stream_get_contents($contents) ?: '', $config);
+    }
+
+    public function read(string $path): string
+    {
+        return $this->files[$path] ?? throw UnableToReadFile::fromLocation($path);
+    }
+
+    public function readStream(string $path)
+    {
+        $stream = fopen('php://temp', 'w+b');
+        fwrite($stream, $this->read($path));
+        rewind($stream);
+
+        return $stream;
+    }
+
+    public function delete(string $path): void
+    {
+        unset($this->files[$path]);
+    }
+
+    public function deleteDirectory(string $path): void
+    {
+        foreach (array_keys($this->files) as $file) {
+            if (str_starts_with($file, $path.'/')) {
+                unset($this->files[$file]);
+            }
+        }
+
+        unset($this->directories[$path]);
+    }
+
+    public function createDirectory(string $path, Config $config): void
+    {
+        $this->directories[$path] = true;
+    }
+
+    public function setVisibility(string $path, string $visibility): void {}
+
+    public function visibility(string $path): FileAttributes
+    {
+        return new FileAttributes($path, null, Visibility::PUBLIC);
+    }
+
+    public function mimeType(string $path): FileAttributes
+    {
+        return new FileAttributes($path, null, null, null, 'application/octet-stream');
+    }
+
+    public function lastModified(string $path): FileAttributes
+    {
+        return new FileAttributes($path, null, null, time());
+    }
+
+    public function fileSize(string $path): FileAttributes
+    {
+        return new FileAttributes($path, strlen($this->read($path)));
+    }
+
+    public function listContents(string $path, bool $deep): iterable
+    {
+        foreach ($this->files as $file => $contents) {
+            if ($path === '' || str_starts_with($file, $path.'/')) {
+                yield new FileAttributes($file, strlen($contents));
+            }
+        }
+    }
+
+    public function move(string $source, string $destination, Config $config): void
+    {
+        $this->write($destination, $this->read($source), $config);
+        $this->delete($source);
+    }
+
+    public function copy(string $source, string $destination, Config $config): void
+    {
+        $this->write($destination, $this->read($source), $config);
+    }
+}
+
+class RejectingFlysystemAdapter extends InMemoryFlysystemAdapter
+{
+    public function write(string $path, string $contents, Config $config): void
+    {
+        throw UnableToWriteFile::atLocation($path, 'disk rejected the write');
     }
 }
