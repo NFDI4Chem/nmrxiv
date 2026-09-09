@@ -42,6 +42,7 @@ class NmrxivPolicy implements Preset
         $policy
             ->add(Directive::SCRIPT, Keyword::SELF)
             ->add(Directive::STYLE, Keyword::SELF)
+            ->add(Directive::WORKER, 'blob:')
             ->add(Directive::FONT, 'data:')
             ->add(Directive::CONNECT, Keyword::SELF);
 
