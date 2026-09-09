@@ -1,5 +1,42 @@
 # Changelog
 
+## [2.4.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.3.0...v2.4.0) (2026-09-09)
+
+
+### Features
+
+* Add command to backfill BagIt archive links for existing studies ([#1529](https://github.com/NFDI4Chem/nmrxiv/issues/1529)) ([523bb46](https://github.com/NFDI4Chem/nmrxiv/commit/523bb46aa87c4b21e98b0ae8a6cea560859bef77))
+* integrate ALTCHA for enhanced spam protection in support bubble ([#1549](https://github.com/NFDI4Chem/nmrxiv/issues/1549)) ([b9a8b65](https://github.com/NFDI4Chem/nmrxiv/commit/b9a8b6588d1b8e041526aad3a90a03a92a817694))
+* trigger Bagit Metadata Extraction Job on Project Publication ([#1526](https://github.com/NFDI4Chem/nmrxiv/issues/1526)) ([5f6cdc6](https://github.com/NFDI4Chem/nmrxiv/commit/5f6cdc6ea3d7f39aefaf015f72d1a06aa167bf8d))
+
+
+### Bug Fixes
+
+* **api:** avoid Unicode tag extraction in compound search ([#1541](https://github.com/NFDI4Chem/nmrxiv/issues/1541)) ([5bd4d45](https://github.com/NFDI4Chem/nmrxiv/commit/5bd4d451069b7b0e2e58d45ebe6cec2d05d4c3a7))
+* bagit archive bug ([d311410](https://github.com/NFDI4Chem/nmrxiv/commit/d31141084044fdb21f63b524e99684bfe6b845e5))
+* bagit archive error ([bfd7981](https://github.com/NFDI4Chem/nmrxiv/commit/bfd7981fdbd7786991ab0ab467566609502d4698))
+* **bagIt:** revert to old code and publish zip in public bucket ([f1eb3b5](https://github.com/NFDI4Chem/nmrxiv/commit/f1eb3b5c99f4c886ae266aec40d6de05a7a06656))
+* **bagit:** store BagIt archives in the same bucket as their source bags ([318e482](https://github.com/NFDI4Chem/nmrxiv/commit/318e4820eb56aab7af0502c6aba552ea907b21cd))
+* failed to open stream error in Bagit generation job ([27e37f4](https://github.com/NFDI4Chem/nmrxiv/commit/27e37f441f831f2a9e7a3c1158c9653cc159bda4))
+* file_put_contents() error when generating BagIt archive ([418cd27](https://github.com/NFDI4Chem/nmrxiv/commit/418cd2726602c240c2502e052c690010e3e07b8e))
+* **nmr:** handle nested arrays when extracting spectra metadata ([#1530](https://github.com/NFDI4Chem/nmrxiv/issues/1530)) ([877798c](https://github.com/NFDI4Chem/nmrxiv/commit/877798c25bd5d179d9e56c4183dc4491d2b6722f))
+* optimize ceph backup retention and reduce storage usage ([#1546](https://github.com/NFDI4Chem/nmrxiv/issues/1546)) ([5f82224](https://github.com/NFDI4Chem/nmrxiv/commit/5f822244506839bc642d388819407c414fd945c0))
+* repair BagIt generation on remote disks and BagItTools manifests ([be2df38](https://github.com/NFDI4Chem/nmrxiv/commit/be2df3824e5552f58a6fc4d4d1aa25f2df956430))
+* revert changes related to bagit changes ([852ede0](https://github.com/NFDI4Chem/nmrxiv/commit/852ede0adecb2fa51906cfa421f219f8e9cb4e27))
+* reverted changes to ProcessMetadataExtractionBagitGenerationJobTest.php to fix failing test ([1af20dd](https://github.com/NFDI4Chem/nmrxiv/commit/1af20dd4ae3375d7771a6258bb149d503988628a))
+* **ui:** move BagIt archive downloads into public download menu([#1537](https://github.com/NFDI4Chem/nmrxiv/issues/1537)) ([284af39](https://github.com/NFDI4Chem/nmrxiv/commit/284af39303087e67a0705190692ef96e57cc8819))
+
+
+### Performance Improvements
+
+* stream downloads and cut peak memory in BagIt generation job ([8c0cdd8](https://github.com/NFDI4Chem/nmrxiv/commit/8c0cdd87402b0ae8a17444bc3e0622843a7bfb01))
+
+
+### Miscellaneous Chores
+
+* **composer:** fix composer vulnerabilities ([8681915](https://github.com/NFDI4Chem/nmrxiv/commit/8681915bc5e981e917b29a21c561241f88b6f9ad))
+* **npm:** update package-lock.json and yarn.lock ([7978af6](https://github.com/NFDI4Chem/nmrxiv/commit/7978af6749394272670df9bda9fc70e86be2884e))
+
 ## [2.3.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.2.0...v2.3.0) (2026-08-18)
 
 
