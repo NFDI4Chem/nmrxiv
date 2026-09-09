@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/NFDI4Chem/nmrxiv/compare/v2.4.0...v2.4.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* **policy:** update csp policy for ALTCHA ([6849c3f](https://github.com/NFDI4Chem/nmrxiv/commit/6849c3f6c5bd9929144c430ea5b08ca40e800ac8))
+
 ## [2.4.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.3.0...v2.4.0) (2026-09-09)
 
 
