@@ -396,7 +396,7 @@
                                                             requestSampleBagitDownload
                                                         "
                                                     >
-                                                        Bagit Archive for this
+                                                        BagIt Archive for this
                                                         sample
                                                     </button>
                                                 </MenuItem>
