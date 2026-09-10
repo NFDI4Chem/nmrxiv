@@ -339,22 +339,24 @@ Public records include:
 <img src="/img/submission-process/community-contribution/8.png" width="1000"/>
 </p>
 
-Each published sample also receives a downloadable [BagIt](https://tools.ietf.org/id/draft-kunze-bagit-16.html) archive that bundles its raw data, the spectra metadata produced during processing, and checksums for every file.
+Each published sample also receives a downloadable [BagIt](https://en.wikipedia.org/wiki/BagIt) archive that bundles its raw data, the spectra metadata produced during processing, and checksums for every file.
 
 ## Downloading the BagIt Archive
 
-The archive is built in the background, so it is not ready the moment a sample becomes public. Generation usually takes a few minutes, depending on how much data the sample contains. nmrXiv emails you once the archive is available.
+BagIt is an open packaging standard for preserving and transferring digital research data. It keeps the sample's raw files, metadata, and integrity checksums together in a structured archive, so the contents can be verified and reused independently of nmrXiv.
+
+After a sample is published, nmrXiv creates its BagIt archive in the background. The archive may take a few minutes to become available, depending on the amount of data in the sample. We will email you when it is ready to download.
 
 To download it, open the public sample page and use the **Download** menu in the top right corner. It offers two options:
 
 -   **Project Data** - the complete project data as a plain ZIP file.
--   **Bagit Archive for this sample** - the BagIt package for the sample as described below.
+-   **BagIt Archive for this sample** - the BagIt package for the sample as described below.
 
 <p align="center">
 <img src="/img/submission-process/community-contribution/9.png" width="1000"/>
 </p>
 
-While generation is still running, the **Bagit Archive for this sample** option stays greyed out. Once the archive is ready the option becomes clickable.
+While generation is still running, the **BagIt Archive for this sample** option stays greyed out. Once the archive is ready the option becomes clickable.
 
 ## What the BagIt Archive Contains
 
