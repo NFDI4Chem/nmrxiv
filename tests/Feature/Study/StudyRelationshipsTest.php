@@ -261,34 +261,15 @@ class StudyRelationshipsTest extends TestCase
         $this->assertEquals($expectedPrivateUrl, $this->study->private_url);
     }
 
-    public function test_study_photo_url_attribute(): void
+    public function test_study_photo_urls_attribute(): void
     {
-        $this->assertEquals('', $this->study->study_photo_url);
+        $this->assertEquals([], $this->study->study_photo_urls);
 
-        $this->study->update(['study_photo_path' => '/path/to/photo.jpg']);
+        $this->study->update(['study_photo_path' => ['/path/to/photo.jpg']]);
         $this->study->refresh();
 
-        $this->assertStringContainsString('/path/to/photo.jpg', $this->study->study_photo_url);
-    }
-
-    public function test_study_preview_urls_from_datasets(): void
-    {
-        $dataset1 = Dataset::factory()->create([
-            'study_id' => $this->study->id,
-            'dataset_photo_path' => '/path/to/dataset1.jpg',
-        ]);
-        $dataset2 = Dataset::factory()->create([
-            'study_id' => $this->study->id,
-            'dataset_photo_path' => '/path/to/dataset2.jpg',
-        ]);
-        $dataset3 = Dataset::factory()->create([
-            'study_id' => $this->study->id,
-            'dataset_photo_path' => null,
-        ]);
-
-        $previewUrls = $this->study->study_preview_urls;
-        $this->assertIsArray($previewUrls);
-        $this->assertCount(2, $previewUrls); // Only datasets with photos
+        $this->assertCount(1, $this->study->study_photo_urls);
+        $this->assertStringContainsString('/path/to/photo.jpg', $this->study->study_photo_urls[0]);
     }
 
     public function test_study_is_published_attribute(): void

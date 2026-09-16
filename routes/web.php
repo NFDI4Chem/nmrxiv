@@ -340,8 +340,6 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.studies.nmrium');
         Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
             ->name('dashboard.studies.nmriumInfo');
-        Route::post('studies/{study}/snapshot', [StudyController::class, 'snapshot'])
-            ->name('dashboard.study.snapshot');
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
