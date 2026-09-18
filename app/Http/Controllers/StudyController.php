@@ -642,19 +642,6 @@ class StudyController extends Controller
         return Bookmark::toggle($study, $request->user());
     }
 
-    public function snapshot(Request $request, Study $study)
-    {
-        Gate::forUser($request->user())->authorize('updateStudy', $study);
-
-        $content = $request->get('img');
-        if ($content) {
-            $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';
-            Storage::disk(config('filesystems.default_public'))->put($path, $content, 'public');
-            $study->study_photo_path = $path;
-            $study->save();
-        }
-    }
-
     /**
      * Ensure each entry in `data.molecules[*].molfile` keeps a valid 3-line
      * MOL header (title, generator, comment) before the V2000/V3000 counts

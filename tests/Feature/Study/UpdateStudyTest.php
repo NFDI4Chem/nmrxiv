@@ -141,7 +141,7 @@ class UpdateStudyTest extends TestCase
             'species' => 'Mouse',
             'access' => 'link',
             'access_type' => 'editor',
-            'study_photo_path' => 'path/to/photo.jpg',
+            'study_photo_path' => ['path/to/photo.jpg'],
         ]);
 
         $study->refresh();
@@ -156,7 +156,7 @@ class UpdateStudyTest extends TestCase
         $this->assertEquals('Mouse', $study->species);
         $this->assertEquals('link', $study->access);
         $this->assertEquals('editor', $study->access_type);
-        $this->assertEquals('path/to/photo.jpg', $study->study_photo_path);
+        $this->assertEquals(['path/to/photo.jpg'], $study->study_photo_path);
     }
 
     public function test_update_syncs_tags_when_provided(): void
