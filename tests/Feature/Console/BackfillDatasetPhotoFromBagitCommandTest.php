@@ -5,7 +5,6 @@ namespace Tests\Feature\Console;
 use App\Models\Dataset;
 use App\Models\FileSystemObject;
 use App\Models\License;
-use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -28,9 +27,11 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'filesystems.default_public' => 'local',
         ]);
 
-        [$study, $dataset] = $this->makeStudyWithMatchingDataset(217, 'proton');
+        [$study, $dataset] = $this->makeStudyWithDataset(217, 'proton');
 
-        $this->putNmriumFile('S217', 'StudyRoot', ['spec-1' => 'fake-png-bytes']);
+        $this->putBagWithSpectra('S217', 'StudyRoot', [
+            ['id' => 'spec-1', 'selectorPath' => '/StudyRoot/proton/acqus', 'imageBytes' => 'fake-png-bytes'],
+        ]);
 
         $this->artisan('nmrxiv:backfill-dataset-photo')->assertSuccessful();
 
@@ -40,7 +41,7 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         $expectedPath = '/projects/'.$study->project->uuid.'/'.$study->uuid.'/proton.png';
 
         $this->assertSame($expectedPath, $dataset->dataset_photo_path);
-        Storage::disk('local')->assertExists($expectedPath);
+        Storage::disk('local')->assertExists($expectedPath, 'fake-png-bytes');
 
         $this->assertSame([$expectedPath], $study->study_photo_path);
     }
@@ -55,10 +56,12 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'filesystems.default_public' => 'local',
         ]);
 
-        [$study, $dataset] = $this->makeStudyWithMatchingDataset(218, 'proton');
+        [$study, $dataset] = $this->makeStudyWithDataset(218, 'proton');
         $dataset->update(['dataset_photo_path' => '/existing/photo.png']);
 
-        $this->putNmriumFile('S218', 'StudyRoot', ['spec-1' => 'fake-png-bytes']);
+        $this->putBagWithSpectra('S218', 'StudyRoot', [
+            ['id' => 'spec-1', 'selectorPath' => '/StudyRoot/proton/acqus', 'imageBytes' => 'fake-png-bytes'],
+        ]);
 
         $this->artisan('nmrxiv:backfill-dataset-photo')->assertSuccessful();
 
@@ -71,7 +74,7 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         $this->assertNotSame('/existing/photo.png', $dataset->dataset_photo_path);
     }
 
-    public function test_it_skips_studies_without_nmrium_data_yet(): void
+    public function test_it_skips_bag_folders_with_no_nmrium_file(): void
     {
         Storage::fake('local');
 
@@ -81,17 +84,14 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'filesystems.default_public' => 'local',
         ]);
 
-        $study = $this->makeStudy(['identifier' => 219, 'is_public' => true]);
-        $dataset = Dataset::factory()->create([
-            'study_id' => $study->id,
-            'slug' => 'proton',
-        ]);
+        [$study, $dataset] = $this->makeStudyWithDataset(219, 'proton');
 
-        $this->putNmriumFile('S219', 'StudyRoot', ['spec-1' => 'fake-png-bytes']);
+        Storage::disk('local')->put('spectra_parse/S219/bagit.txt', "BagIt-Version: 1.0\n");
 
         $this->artisan('nmrxiv:backfill-dataset-photo')->assertSuccessful();
 
         $this->assertNull($dataset->refresh()->dataset_photo_path);
+        $this->assertNull($study->refresh()->study_photo_path);
     }
 
     public function test_it_skips_datasets_with_no_matching_spectrum(): void
@@ -104,16 +104,43 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'filesystems.default_public' => 'local',
         ]);
 
-        // Dataset fs name ("carbon") never appears in the study's spectra
-        // selector files, so no match is found.
-        [$study, $dataset] = $this->makeStudyWithMatchingDataset(220, 'carbon', matchingSelectorPath: '/StudyRoot/proton/acqus');
+        // Dataset fs name ("carbon") never appears in the bag's spectra
+        // selector files (which reference "proton"), so no match is found.
+        [$study, $dataset] = $this->makeStudyWithDataset(220, 'carbon');
 
-        $this->putNmriumFile('S220', 'StudyRoot', ['spec-1' => 'fake-png-bytes']);
+        $this->putBagWithSpectra('S220', 'StudyRoot', [
+            ['id' => 'spec-1', 'selectorPath' => '/StudyRoot/proton/acqus', 'imageBytes' => 'fake-png-bytes'],
+        ]);
 
         $this->artisan('nmrxiv:backfill-dataset-photo')->assertSuccessful();
 
         $this->assertNull($dataset->refresh()->dataset_photo_path);
         $this->assertNull($study->refresh()->study_photo_path);
+    }
+
+    public function test_it_does_not_depend_on_the_studys_stored_nmrium_row(): void
+    {
+        Storage::fake('local');
+
+        config([
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
+        ]);
+
+        // No NMRium row is ever created for this study — matching must work
+        // purely from the bag's own freshly-read .nmrium file.
+        [$study, $dataset] = $this->makeStudyWithDataset(222, 'proton');
+        $this->assertNull($study->nmrium);
+
+        $this->putBagWithSpectra('S222', 'StudyRoot', [
+            ['id' => 'spec-1', 'selectorPath' => '/StudyRoot/proton/acqus', 'imageBytes' => 'fake-png-bytes'],
+        ]);
+
+        $this->artisan('nmrxiv:backfill-dataset-photo')->assertSuccessful();
+
+        $this->assertNotNull($dataset->refresh()->dataset_photo_path);
+        $this->assertNull($study->refresh()->nmrium);
     }
 
     public function test_dry_run_does_not_write_anything(): void
@@ -126,9 +153,11 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'filesystems.default_public' => 'local',
         ]);
 
-        [$study, $dataset] = $this->makeStudyWithMatchingDataset(221, 'proton');
+        [$study, $dataset] = $this->makeStudyWithDataset(221, 'proton');
 
-        $this->putNmriumFile('S221', 'StudyRoot', ['spec-1' => 'fake-png-bytes']);
+        $this->putBagWithSpectra('S221', 'StudyRoot', [
+            ['id' => 'spec-1', 'selectorPath' => '/StudyRoot/proton/acqus', 'imageBytes' => 'fake-png-bytes'],
+        ]);
 
         $this->artisan('nmrxiv:backfill-dataset-photo', ['--dry-run' => true])->assertSuccessful();
 
@@ -137,42 +166,47 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
     }
 
     /**
-     * Write a bagit .nmrium file whose "images" array maps spectrum id => raw
-     * (pre-base64) bytes.
+     * Write a bag whose .nmrium file lists the given spectra (id + selector
+     * path), and — for any entry with imageBytes set — a matching loose
+     * preview PNG under nmrxiv-meta/images/{id}.png, mirroring how NMRKit
+     * actually stores previews (not as base64 inside the JSON).
      *
-     * @param  array<string, string>  $imagesBySpectrumId
+     * @param  list<array{id: string, selectorPath: string, imageBytes?: string|null}>  $spectra
      */
-    private function putNmriumFile(string $folderName, string $sampleName, array $imagesBySpectrumId): void
+    private function putBagWithSpectra(string $folderName, string $sampleName, array $spectra): void
     {
+        $spectraEntries = array_map(fn (array $s) => [
+            'id' => $s['id'],
+            'sourceSelector' => ['files' => ['https://example.org/files'.$s['selectorPath']]],
+            'info' => ['solvent' => 'CDCl3'],
+        ], $spectra);
+
         $content = json_encode([
-            'nmriumState' => ['data' => ['spectra' => []], 'version' => 14],
-            'images' => array_map(
-                fn (string $id, string $bytes) => ['id' => $id, 'image' => base64_encode($bytes)],
-                array_keys($imagesBySpectrumId),
-                $imagesBySpectrumId
-            ),
+            'nmriumState' => ['data' => ['spectra' => $spectraEntries, 'molecules' => []], 'version' => 14],
+            'images' => [],
             'logs' => [],
         ]);
 
-        Storage::disk('local')->put(
-            "spectra_parse/{$folderName}/data/{$sampleName}/nmrxiv-meta/{$sampleName}.nmrium",
-            $content
-        );
+        $metaDir = "spectra_parse/{$folderName}/data/{$sampleName}/nmrxiv-meta";
+        Storage::disk('local')->put("{$metaDir}/{$sampleName}.nmrium", $content);
+
+        foreach ($spectra as $s) {
+            if (($s['imageBytes'] ?? null) !== null) {
+                Storage::disk('local')->put("{$metaDir}/images/{$s['id']}.png", $s['imageBytes']);
+            }
+        }
     }
 
     /**
-     * Build a public study whose nmrium payload already has one spectrum
-     * ("spec-1") matched to a dataset via the fs-object name/path scheme
-     * BioschemasHelper relies on, mirroring
-     * BioschemasHelperGetNMRiumInfoTest's wiring.
+     * Build a public study + dataset wired via FileSystemObject (name/parent)
+     * the way BioschemasHelper's path matching relies on, mirroring
+     * BioschemasHelperGetNMRiumInfoTest's setup. No NMRium row is created —
+     * matching now comes entirely from the bag file itself.
      *
      * @return array{0: Study, 1: Dataset}
      */
-    private function makeStudyWithMatchingDataset(
-        int $identifier,
-        string $datasetFsName,
-        string $matchingSelectorPath = '/StudyRoot/proton/acqus',
-    ): array {
+    private function makeStudyWithDataset(int $identifier, string $datasetFsName): array
+    {
         $study = $this->makeStudy(['identifier' => $identifier, 'is_public' => true]);
 
         $studyRootFs = FileSystemObject::factory()->asStudyRoot($study)->create([
@@ -196,25 +230,6 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'fs_id' => $datasetFs->id,
             'slug' => $datasetFsName,
         ]);
-
-        NMRium::factory()->forStudy($study)->create([
-            'nmrium_info' => [
-                'data' => [
-                    'molecules' => [],
-                    'spectra' => [
-                        [
-                            'id' => 'spec-1',
-                            'sourceSelector' => [
-                                'files' => ['https://example.org/files'.$matchingSelectorPath],
-                            ],
-                            'info' => ['solvent' => 'CDCl3'],
-                        ],
-                    ],
-                ],
-                'version' => 6,
-            ],
-        ]);
-        $study->update(['has_nmrium' => true]);
 
         return [$study->refresh(), $dataset->refresh()];
     }

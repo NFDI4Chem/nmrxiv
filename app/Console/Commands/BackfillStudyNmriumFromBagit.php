@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Study;
-use App\Support\Bagit\BagitNmriumLocator;
+use App\Support\Bagit\BagitArchive;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
@@ -120,23 +120,32 @@ class BackfillStudyNmriumFromBagit extends Command
         // (a freshly-generated, not-yet-archived bag), or just a single
         // {folder}.zip (the archived, publicly-downloadable form produced by
         // nmrxiv:backfill-bagit-archives — which is how bags actually live
-        // on the public bucket in practice). The locator handles both.
-        $contents = (new BagitNmriumLocator)->read($sourceDisk, $remoteBagDir);
+        // on the public bucket in practice). BagitArchive handles both.
+        $archive = BagitArchive::open($sourceDisk, $remoteBagDir);
 
-        if ($contents === null) {
+        if ($archive === null) {
             $this->skippedNoFile++;
             $this->line("  [skip] {$folderName}: no .nmrium file found under {$remoteBagDir}");
 
             return;
         }
 
-        if ($this->option('dry-run')) {
-            $this->line("  [dry-run] Would backfill nmrium for study {$study->identifier} from {$remoteBagDir}");
-
-            return;
-        }
-
         try {
+            $contents = $archive->readNmrium();
+
+            if ($contents === null) {
+                $this->skippedNoFile++;
+                $this->line("  [skip] {$folderName}: failed to read .nmrium file under {$remoteBagDir}");
+
+                return;
+            }
+
+            if ($this->option('dry-run')) {
+                $this->line("  [dry-run] Would backfill nmrium for study {$study->identifier} from {$remoteBagDir}");
+
+                return;
+            }
+
             $decoded = json_decode($contents, true);
 
             if (! is_array($decoded) || $decoded === []) {
@@ -165,6 +174,8 @@ class BackfillStudyNmriumFromBagit extends Command
             $this->failed++;
             $this->error("  [failed] {$folderName}: {$e->getMessage()}");
             Log::error("Backfill study NMRium failed for {$folderName}: {$e->getMessage()}");
+        } finally {
+            $archive->close();
         }
     }
 }

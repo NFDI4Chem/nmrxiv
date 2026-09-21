@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
 use App\Models\Dataset;
 use App\Models\Study;
-use App\Support\Bagit\BagitNmriumLocator;
+use App\Support\Bagit\BagitArchive;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +30,7 @@ class BackfillDatasetPhotoFromBagit extends Command
      *
      * @var string
      */
-    protected $description = "Backfill datasets.dataset_photo_path (and the combined studies.study_photo_path array) from the images embedded in a study's BagIt .nmrium file";
+    protected $description = "Backfill datasets.dataset_photo_path (and the combined studies.study_photo_path array) from a study's BagIt archive";
 
     private int $processed = 0;
 
@@ -38,7 +38,7 @@ class BackfillDatasetPhotoFromBagit extends Command
 
     private int $skippedStudyNotFound = 0;
 
-    private int $skippedNoStudyNmrium = 0;
+    private int $skippedNoFile = 0;
 
     private int $skippedNoMatch = 0;
 
@@ -49,10 +49,14 @@ class BackfillDatasetPhotoFromBagit extends Command
     /**
      * Execute the console command.
      *
-     * Requires the study's own nmrium row to already exist (see
-     * nmrxiv:backfill-study-nmrium) — this command matches each dataset
-     * against that stored nmrium_info to work out which spectrum/image
-     * belongs to it.
+     * This matches each dataset against the spectra listed in the bag's own
+     * .nmrium file — read fresh, right now, from the archive — rather than
+     * whatever is already stored in the study's `nmrium` row. Spectrum ids
+     * are just a random id assigned by whichever tool last parsed the raw
+     * data; an older, separately-submitted `nmrium_info` would have its own,
+     * unrelated ids that can never line up with the ids in *this* bag's
+     * images. Matching and image lookup therefore both stay within the same
+     * bag read, and studies.nmrium is never read or written by this command.
      */
     public function handle(): int
     {
@@ -93,12 +97,12 @@ class BackfillDatasetPhotoFromBagit extends Command
         $this->newLine(2);
 
         $this->table(
-            ['Processed', 'Skipped (has photo)', 'Skipped (study not found)', 'Skipped (no study nmrium)', 'Skipped (no match)', 'Skipped (no image)', 'Failed'],
+            ['Processed', 'Skipped (has photo)', 'Skipped (study not found)', 'Skipped (no .nmrium file)', 'Skipped (no match)', 'Skipped (no image)', 'Failed'],
             [[
                 $this->processed,
                 $this->skippedHasPhoto,
                 $this->skippedStudyNotFound,
-                $this->skippedNoStudyNmrium,
+                $this->skippedNoFile,
                 $this->skippedNoMatch,
                 $this->skippedNoImage,
                 $this->failed,
@@ -126,60 +130,75 @@ class BackfillDatasetPhotoFromBagit extends Command
             return;
         }
 
-        $study->loadMissing(['nmrium', 'fsObject', 'draft', 'project', 'datasets.fsObject']);
-
-        if (! $study->nmrium || empty($study->nmrium->nmrium_info)) {
-            $this->skippedNoStudyNmrium++;
-            $this->line("  [skip] {$folderName}: study has no nmrium_info yet (run nmrxiv:backfill-study-nmrium first)");
-
-            return;
-        }
+        $study->loadMissing(['fsObject', 'draft', 'project', 'datasets.fsObject']);
 
         $remoteBagDir = "{$basePath}/{$folderName}";
+        $archive = BagitArchive::open($sourceDisk, $remoteBagDir);
 
-        // Same dual-location handling as nmrxiv:backfill-study-nmrium: the
-        // bag may be a loose folder tree or an already-archived {folder}.zip.
-        $contents = (new BagitNmriumLocator)->read($sourceDisk, $remoteBagDir);
-
-        if ($contents === null) {
-            $this->skippedNoImage++;
+        if ($archive === null) {
+            $this->skippedNoFile++;
             $this->line("  [skip] {$folderName}: no .nmrium file found under {$remoteBagDir}");
 
             return;
         }
 
-        $images = $this->extractImagesById($contents);
+        try {
+            $contents = $archive->readNmrium();
 
-        if ($images === []) {
-            $this->skippedNoImage++;
-            $this->line("  [skip] {$folderName}: .nmrium file has no embedded images");
+            if ($contents === null) {
+                $this->skippedNoFile++;
+                $this->line("  [skip] {$folderName}: failed to read .nmrium file under {$remoteBagDir}");
 
-            return;
-        }
-
-        // Collect every dataset's photo path (freshly written or already
-        // present) so the study's own study_photo_path can be kept as the
-        // combined array of all its datasets' photos.
-        $datasetPhotoPaths = [];
-        foreach ($study->datasets as $dataset) {
-            $path = $this->processDataset($study, $dataset, $images);
-            if ($path !== null) {
-                $datasetPhotoPaths[] = $path;
+                return;
             }
-        }
 
-        if (! $this->option('dry-run') && $datasetPhotoPaths !== []) {
-            $this->updateStudyPhotoPath($study, $datasetPhotoPaths);
+            $decoded = json_decode($contents, true);
+
+            if (! is_array($decoded)) {
+                $this->skippedNoFile++;
+                $this->line("  [skip] {$folderName}: invalid JSON in .nmrium file under {$remoteBagDir}");
+
+                return;
+            }
+
+            // Same envelope-unwrap as nmrxiv:backfill-study-nmrium, but kept
+            // purely in memory here — never persisted to studies.nmrium.
+            $nmriumInfo = $decoded['nmriumState'] ?? $decoded;
+
+            if (! isset($nmriumInfo['data']['spectra']) || ! is_array($nmriumInfo['data']['spectra'])) {
+                $this->skippedNoFile++;
+                $this->line("  [skip] {$folderName}: unexpected .nmrium structure (missing data.spectra)");
+
+                return;
+            }
+
+            // Collect every dataset's photo path (freshly written or already
+            // present) so the study's own study_photo_path can be kept as
+            // the combined array of all its datasets' photos.
+            $datasetPhotoPaths = [];
+            foreach ($study->datasets as $dataset) {
+                $path = $this->processDataset($study, $dataset, $nmriumInfo, $archive);
+                if ($path !== null) {
+                    $datasetPhotoPaths[] = $path;
+                }
+            }
+
+            if (! $this->option('dry-run') && $datasetPhotoPaths !== []) {
+                $this->updateStudyPhotoPath($study, $datasetPhotoPaths);
+            }
+        } finally {
+            $archive->close();
         }
     }
 
     /**
-     * Backfill a single dataset's photo, given the study's id => base64 image map.
+     * Backfill a single dataset's photo, matching it against the bag's own
+     * (freshly-read) spectra list — not the study's stored nmrium_info.
      *
-     * @param  array<string, string>  $images
+     * @param  array<string, mixed>  $nmriumInfo
      * @return string|null The dataset's photo path (new or pre-existing), or null if it has none.
      */
-    private function processDataset(Study $study, Dataset $dataset, array $images): ?string
+    private function processDataset(Study $study, Dataset $dataset, array $nmriumInfo, BagitArchive $archive): ?string
     {
         if ($dataset->dataset_photo_path && ! $this->option('force')) {
             $this->skippedHasPhoto++;
@@ -192,10 +211,10 @@ class BackfillDatasetPhotoFromBagit extends Command
         // lookup doesn't re-query it per dataset.
         $dataset->setRelation('study', $study);
 
-        // Reuse the same spectra <-> dataset path matching already used by
-        // the study-nmrium save path, so this stays in lockstep with how
-        // BioschemasHelper decides ownership everywhere else.
-        $matched = BioschemasHelper::collectStudySpectraMatchingDataset($dataset);
+        // Match against the bag's own spectra list, read fresh above — not
+        // $study->nmrium->nmrium_info, which may hold an older, separately
+        // submitted payload with unrelated spectrum ids.
+        $matched = BioschemasHelper::collectStudySpectraMatchingDatasetFromPayload($dataset, $nmriumInfo);
 
         if ($matched === []) {
             $this->skippedNoMatch++;
@@ -203,16 +222,18 @@ class BackfillDatasetPhotoFromBagit extends Command
             return null;
         }
 
-        $image = null;
+        $imageBytes = null;
         foreach ($matched as $spectrum) {
             $spectrumId = $spectrum['id'] ?? null;
-            if (is_string($spectrumId) && isset($images[$spectrumId])) {
-                $image = $images[$spectrumId];
-                break;
+            if (is_string($spectrumId)) {
+                $imageBytes = $archive->readImage($spectrumId);
+                if ($imageBytes !== null) {
+                    break;
+                }
             }
         }
 
-        if ($image === null) {
+        if ($imageBytes === null) {
             $this->skippedNoImage++;
 
             return null;
@@ -229,12 +250,7 @@ class BackfillDatasetPhotoFromBagit extends Command
                 ? '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.png'
                 : '/samples/'.$study->uuid.'/'.$dataset->slug.'.png';
 
-            $decoded = base64_decode($image, true);
-            if ($decoded === false) {
-                throw new \RuntimeException("Failed to decode base64 image for dataset {$dataset->identifier}");
-            }
-
-            Storage::disk(config('filesystems.default_public'))->put($path, $decoded, 'public');
+            Storage::disk(config('filesystems.default_public'))->put($path, $imageBytes, 'public');
 
             $dataset->update(['dataset_photo_path' => $path]);
 
@@ -271,29 +287,5 @@ class BackfillDatasetPhotoFromBagit extends Command
         }
 
         $study->update(['study_photo_path' => $combined]);
-    }
-
-    /**
-     * Read the raw .nmrium file's "images" array into an [spectrumId => base64Image] map.
-     *
-     * @return array<string, string>
-     */
-    private function extractImagesById(string $contents): array
-    {
-        $decoded = json_decode($contents, true);
-        $images = $decoded['images'] ?? [];
-
-        if (! is_array($images)) {
-            return [];
-        }
-
-        $byId = [];
-        foreach ($images as $entry) {
-            if (is_array($entry) && isset($entry['id'], $entry['image']) && is_string($entry['id']) && is_string($entry['image'])) {
-                $byId[$entry['id']] = $entry['image'];
-            }
-        }
-
-        return $byId;
     }
 }
