@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
 use App\Models\Dataset;
 use App\Models\Study;
+use App\Support\Bagit\BagitNmriumLocator;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
@@ -135,16 +136,19 @@ class BackfillDatasetPhotoFromBagit extends Command
         }
 
         $remoteBagDir = "{$basePath}/{$folderName}";
-        $nmriumFile = $this->findNmriumFile($sourceDisk, $remoteBagDir);
 
-        if (! $nmriumFile) {
+        // Same dual-location handling as nmrxiv:backfill-study-nmrium: the
+        // bag may be a loose folder tree or an already-archived {folder}.zip.
+        $contents = (new BagitNmriumLocator)->read($sourceDisk, $remoteBagDir);
+
+        if ($contents === null) {
             $this->skippedNoImage++;
             $this->line("  [skip] {$folderName}: no .nmrium file found under {$remoteBagDir}");
 
             return;
         }
 
-        $images = $this->loadImagesById($sourceDisk, $nmriumFile);
+        $images = $this->extractImagesById($contents);
 
         if ($images === []) {
             $this->skippedNoImage++;
@@ -270,34 +274,12 @@ class BackfillDatasetPhotoFromBagit extends Command
     }
 
     /**
-     * Find the single .nmrium file under data/*\/nmrxiv-meta/ inside a bag directory.
-     */
-    private function findNmriumFile(Filesystem $disk, string $remoteBagDir): ?string
-    {
-        $matches = collect($disk->allFiles($remoteBagDir))
-            ->filter(fn (string $path) => str_ends_with(strtolower($path), '.nmrium')
-                && str_contains($path, '/nmrxiv-meta/'))
-            ->values();
-
-        if ($matches->count() !== 1) {
-            return null;
-        }
-
-        return $matches->first();
-    }
-
-    /**
      * Read the raw .nmrium file's "images" array into an [spectrumId => base64Image] map.
      *
      * @return array<string, string>
      */
-    private function loadImagesById(Filesystem $disk, string $nmriumFile): array
+    private function extractImagesById(string $contents): array
     {
-        $contents = $disk->get($nmriumFile);
-        if ($contents === null) {
-            return [];
-        }
-
         $decoded = json_decode($contents, true);
         $images = $decoded['images'] ?? [];
 

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Study;
+use App\Support\Bagit\BagitNmriumLocator;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
@@ -114,9 +115,15 @@ class BackfillStudyNmriumFromBagit extends Command
         }
 
         $remoteBagDir = "{$basePath}/{$folderName}";
-        $nmriumFile = $this->findNmriumFile($sourceDisk, $remoteBagDir);
 
-        if (! $nmriumFile) {
+        // The bag folder may hold a loose data/*/nmrxiv-meta/*.nmrium file
+        // (a freshly-generated, not-yet-archived bag), or just a single
+        // {folder}.zip (the archived, publicly-downloadable form produced by
+        // nmrxiv:backfill-bagit-archives — which is how bags actually live
+        // on the public bucket in practice). The locator handles both.
+        $contents = (new BagitNmriumLocator)->read($sourceDisk, $remoteBagDir);
+
+        if ($contents === null) {
             $this->skippedNoFile++;
             $this->line("  [skip] {$folderName}: no .nmrium file found under {$remoteBagDir}");
 
@@ -124,22 +131,16 @@ class BackfillStudyNmriumFromBagit extends Command
         }
 
         if ($this->option('dry-run')) {
-            $this->line("  [dry-run] Would backfill nmrium for study {$study->identifier} from {$nmriumFile}");
+            $this->line("  [dry-run] Would backfill nmrium for study {$study->identifier} from {$remoteBagDir}");
 
             return;
         }
 
         try {
-            $contents = $sourceDisk->get($nmriumFile);
-
-            if ($contents === null) {
-                throw new \RuntimeException("Failed to read {$nmriumFile}");
-            }
-
             $decoded = json_decode($contents, true);
 
             if (! is_array($decoded) || $decoded === []) {
-                throw new \RuntimeException("Invalid or empty JSON in {$nmriumFile}");
+                throw new \RuntimeException("Invalid or empty JSON in .nmrium file under {$remoteBagDir}");
             }
 
             // NMRKit's spectra/parse API wraps its response as
@@ -153,7 +154,7 @@ class BackfillStudyNmriumFromBagit extends Command
             $nmriumInfo = $decoded['nmriumState'] ?? $decoded;
 
             if (! isset($nmriumInfo['data']['spectra']) || ! is_array($nmriumInfo['data']['spectra'])) {
-                throw new \RuntimeException("Unexpected .nmrium structure (missing data.spectra) in {$nmriumFile}");
+                throw new \RuntimeException("Unexpected .nmrium structure (missing data.spectra) in {$remoteBagDir}");
             }
 
             $study->nmrium()->updateOrCreate([], ['nmrium_info' => $nmriumInfo]);
@@ -165,22 +166,5 @@ class BackfillStudyNmriumFromBagit extends Command
             $this->error("  [failed] {$folderName}: {$e->getMessage()}");
             Log::error("Backfill study NMRium failed for {$folderName}: {$e->getMessage()}");
         }
-    }
-
-    /**
-     * Find the single .nmrium file under data/*\/nmrxiv-meta/ inside a bag directory.
-     */
-    private function findNmriumFile(Filesystem $disk, string $remoteBagDir): ?string
-    {
-        $matches = collect($disk->allFiles($remoteBagDir))
-            ->filter(fn (string $path) => str_ends_with(strtolower($path), '.nmrium')
-                && str_contains($path, '/nmrxiv-meta/'))
-            ->values();
-
-        if ($matches->count() !== 1) {
-            return null;
-        }
-
-        return $matches->first();
     }
 }
