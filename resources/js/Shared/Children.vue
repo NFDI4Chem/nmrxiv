@@ -1086,6 +1086,10 @@ export default {
          * @param {String|Number} selectedId - ID of the selected file/folder
          */
         updateURLWithSelection(selectedId) {
+            if (selectedId == null || selectedId === "") {
+                return;
+            }
+
             // Parse current URL parameters
             const urlParams = new URLSearchParams(window.location.search);
 
