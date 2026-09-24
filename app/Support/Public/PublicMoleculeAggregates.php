@@ -290,7 +290,7 @@ SQL;
         return (int) Cache::remember($totalCacheKey, $totalCacheSeconds, $resolve);
     }
 
-    private static function publicSamplesCountFromRow(object|Molecule $molecule): int
+    private static function publicSamplesCountFromRow(object $molecule): int
     {
         return (int) ($molecule->public_samples_count ?? 0);
     }
@@ -298,7 +298,7 @@ SQL;
     /**
      * @return array<string, int>
      */
-    private static function publicExperimentTypeCountsFromRow(object|Molecule $molecule): array
+    private static function publicExperimentTypeCountsFromRow(object $molecule): array
     {
         $value = $molecule->public_experiment_type_counts ?? [];
 
