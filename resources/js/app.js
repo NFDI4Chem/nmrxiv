@@ -1,5 +1,6 @@
 import "./bootstrap";
 import "../css/app.css";
+import "altcha";
 
 import { installBlockingDiagnostics } from "./Utils/blockingDiagnostics";
 

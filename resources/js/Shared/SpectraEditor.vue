@@ -15,16 +15,9 @@
                         >Learn more
                     </a>
                     <a
-                        class="cursor-pointer mr-3 border px-2 py-1 rounded-md"
+                        class="cursor-pointer border px-2 py-1 rounded-md"
                         @click="resetStudy"
                         >Reset</a
-                    >
-                    <a
-                        class="cursor-pointer border px-2 py-1 rounded-md"
-                        @click="exportPreview()"
-                    >
-                        <ArrowPathIcon class="w-4 h-4 inline" />
-                        Preview</a
                     >
                 </small>
             </div>
@@ -127,7 +120,6 @@ import {
     resolveNmriumTargetOrigin,
 } from "@/Utils/nmriumTabPreference.js";
 import {
-    ArrowPathIcon,
     ChevronDownIcon,
     ExclamationTriangleIcon,
 } from "@heroicons/vue/24/outline";
@@ -175,7 +167,6 @@ export default {
     components: {
         Versions,
         DefaultSpectrumTabSelect,
-        ArrowPathIcon,
         ChevronDownIcon,
         ExclamationTriangleIcon,
     },
@@ -224,15 +215,6 @@ export default {
             nmriumInfoCache: markRaw(new Map()),
             /** Mirrors last status sent on the `loading` event so we can skip duplicate emits. */
             lastEmittedLoadingStatus: null,
-            /**
-             * Set of study ids for which we have already kicked off a
-             * silent (background) preview snapshot in this session, so we
-             * don't keep re-firing on every navigation back to the same
-             * study before the page is reloaded.
-             */
-            silentPreviewAttemptedFor: markRaw(new Set()),
-            /** True while the in-flight blob save should suppress the visible "Saved" banner. */
-            previewSilent: false,
             /**
              * False while NMRium is still hydrating after a load/reset. Internal
              * data-change events during this window must not fan out chemistry
@@ -441,15 +423,6 @@ export default {
         },
         handleNmriumWindowMessageSync(e) {
             const { data, type } = e.data;
-            if (type == "nmr-wrapper:action-response") {
-                if (!this.isAllowedNmriumOrigin(e.origin)) {
-                    return;
-                }
-                let actionType = data.type;
-                if (actionType == "exportSpectraViewerAsBlob") {
-                    this.saveStudyPreview(data.data);
-                }
-            }
             if (type == "nmr-wrapper:error") {
                 console.debug(
                     "[SpectraEditor] nmr-wrapper:error payload",
@@ -499,29 +472,6 @@ export default {
                             this.updateLoadingStatus(false);
                             this.applyDefaultSpectrumTab();
 
-                            // Auto-imports come in via the parse-url backend
-                            // path which never gets the chance to capture a
-                            // preview SVG. The NMRium iframe IS now mounted
-                            // for whatever study the user lands on, so if
-                            // the saved snapshot is still missing, fire a
-                            // silent background capture. The user sees no
-                            // "Updating Preview" banner — the request just
-                            // populates `study_photo_path` for next time.
-                            if (
-                                this.study &&
-                                !this.study.study_photo_url &&
-                                !this.silentPreviewAttemptedFor.has(
-                                    this.study.id
-                                )
-                            ) {
-                                this.silentPreviewAttemptedFor.add(
-                                    this.study.id
-                                );
-                                window.setTimeout(() => {
-                                    this.exportPreview({ silent: true });
-                                }, 750);
-                            }
-
                             return;
                         }
 
@@ -564,14 +514,6 @@ export default {
                                         delete spec["originalInfo"];
                                     }
                                 );
-                                if (this.study.study_photo_url == "") {
-                                    setTimeout(
-                                        function () {
-                                            this.exportPreview();
-                                        }.bind(this),
-                                        500
-                                    );
-                                }
                                 this.resetInProgress = false;
                                 this.updateStudyNMRiumInfo();
                                 return;
@@ -1014,65 +956,6 @@ export default {
                 svgString = mol.toSVG(300, 300);
             }
             return svgString;
-        },
-        /**
-         * Ask the embedded NMRium for an SVG snapshot of the current
-         * spectra. When `silent` is true, no user-facing "Updating Preview"
-         * banner is shown — used for the background capture that runs after
-         * an auto-imported study first opens, so the user never notices the
-         * preview being generated.
-         */
-        exportPreview(opts = {}) {
-            const silent = opts && opts.silent === true;
-            if (!silent) {
-                this.infoLog("Updating Preview");
-            }
-            this.previewSilent = silent;
-            const iframe = window.frames.submissionNMRiumIframe;
-            if (iframe) {
-                let data = {
-                    type: "exportSpectraViewerAsBlob",
-                };
-                iframe.postMessage(
-                    {
-                        type: `nmr-wrapper:action-request`,
-                        data,
-                    },
-                    this.nmriumTargetOrigin()
-                );
-            }
-        },
-        saveStudyPreview(data) {
-            if (this.study) {
-                const silent = this.previewSilent === true;
-                this.previewSilent = false;
-                const reader = new FileReader();
-                reader.addEventListener("loadend", () => {
-                    let svg = reader.result;
-                    axios
-                        .post(
-                            "/dashboard/studies/" + this.study.id + "/snapshot",
-                            {
-                                img: svg,
-                            }
-                        )
-                        .then(() => {
-                            if (!silent) {
-                                this.infoLog(
-                                    "Saved preview successfully",
-                                    true
-                                );
-                            }
-                        })
-                        .catch((err) => {
-                            console.warn(
-                                "[SpectraEditor] preview snapshot failed",
-                                err
-                            );
-                        });
-                });
-                reader.readAsText(data.blob);
-            }
         },
         getSVGString(molecule) {
             if (molecule.MOL) {

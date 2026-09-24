@@ -27,11 +27,14 @@
                     class="relative h-full"
                 >
                     <!-- Single preview image display -->
-                    <div v-if="study.study_preview_urls.length === 1">
+                    <div
+                        v-if="study.study_preview_urls.length === 1"
+                        class="h-full"
+                    >
                         <img
                             :src="study.study_preview_urls[0]"
                             :alt="`Preview of ${study.name}`"
-                            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         />
                     </div>
 
@@ -47,7 +50,7 @@
                             <img
                                 :src="url"
                                 :alt="`Preview ${index + 1} of ${study.name}`"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>
 

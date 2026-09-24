@@ -35,6 +35,9 @@
     <!-- The cookie consent middleware rewrites response HTML via setContent(),
          which discards the original View and breaks assertInertia(). -->
     <env name="COOKIE_CONSENT_ENABLED" value="false"/>
+    <!-- Feature tests post directly to the support-bubble endpoint without rendering the form first. -->
+    <env name="HONEYPOT_ENABLED" value="false"/>
+    <env name="ALTCHA_HMAC_SECRET" value="test-secret"/>
     <env name="AWS_ACCESS_KEY_ID" value="test-key"/>
     <env name="AWS_SECRET_ACCESS_KEY" value="test-secret"/>
     <env name="AWS_DEFAULT_REGION" value="us-east-1"/>
