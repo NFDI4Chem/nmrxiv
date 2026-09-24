@@ -5,6 +5,7 @@ namespace App\Actions\Project;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
+use App\Support\Public\PublicMoleculeCatalogIndexer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -28,22 +29,27 @@ class DeleteProject
                 $study->datasets()->update(['is_archived' => true]);
             }
             $project->is_archived = true;
-        } else {
-            $project->studies()->update(['is_deleted' => true]);
-            foreach ($project->studies as $study) {
-                $study->update(['is_deleted' => true, 'status' => 'deleted']);
-                $study->datasets()->update(['is_deleted' => true, 'status' => 'deleted']);
-            }
-            $draft = $project->draft;
-            if ($draft) {
-                $draft->update(['is_deleted' => true]);
-            }
-            $project->name = $project->name;
-            $project->deleted_on = Carbon::now();
-            $project->is_deleted = true;
-            $project->status = 'deleted';
-            $project->sendNotification('deletion', $this->prepareSendList($project));
+            $project->save();
+
+            app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
+
+            return;
         }
+
+        $project->studies()->update(['is_deleted' => true]);
+        foreach ($project->studies as $study) {
+            $study->update(['is_deleted' => true, 'status' => 'deleted']);
+            $study->datasets()->update(['is_deleted' => true, 'status' => 'deleted']);
+        }
+        $draft = $project->draft;
+        if ($draft) {
+            $draft->update(['is_deleted' => true]);
+        }
+        $project->name = $project->name;
+        $project->deleted_on = Carbon::now();
+        $project->is_deleted = true;
+        $project->status = 'deleted';
+        $project->sendNotification('deletion', $this->prepareSendList($project));
         $project->save();
     }
 

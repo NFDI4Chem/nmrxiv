@@ -38,6 +38,10 @@ class Molecule extends Model
     {
         return [
             'workspace_experiment_type_counts' => 'array',
+            'has_public_spectra' => 'boolean',
+            'public_samples_count' => 'integer',
+            'public_experiment_type_counts' => 'array',
+            'public_catalog_indexed_at' => 'datetime',
         ];
     }
 

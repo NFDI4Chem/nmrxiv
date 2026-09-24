@@ -63,6 +63,8 @@ class SearchControllerTest extends TestCase
             'has_nmrium' => true,
         ]);
 
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
+
         return $molecule;
     }
 
@@ -348,6 +350,8 @@ class SearchControllerTest extends TestCase
             'has_nmrium' => true,
         ]);
 
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
+
         $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
@@ -401,6 +405,8 @@ class SearchControllerTest extends TestCase
             ],
         ]);
 
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
+
         $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
@@ -444,6 +450,8 @@ class SearchControllerTest extends TestCase
             'is_deleted' => false,
             'has_nmrium' => true,
         ]);
+
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
 
         $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
@@ -510,6 +518,8 @@ class SearchControllerTest extends TestCase
             'has_nmrium' => true,
         ]);
 
+        $this->indexPublicMoleculeCatalog([$withSpectra->id, $withoutSpectra->id]);
+
         $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
         ]);
@@ -547,6 +557,8 @@ class SearchControllerTest extends TestCase
                 ],
             ],
         ]);
+
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
 
         $response = $this->postJson('/api/v1/search/compounds', [
             'query' => '',
