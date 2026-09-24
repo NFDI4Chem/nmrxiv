@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+        />
+        <meta name="bagit-viewer-version" content="%BAGIT_VIEWER_VERSION%" />
+        <meta name="bagit-viewer-build-date" content="%BAGIT_VIEWER_BUILD_DATE%" />
+        <title>nmrXiv BagIt Viewer</title>
+    </head>
+    <body class="bg-gray-50 text-gray-900 antialiased">
+        <div id="app"></div>
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>
