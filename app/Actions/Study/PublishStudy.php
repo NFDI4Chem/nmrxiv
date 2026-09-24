@@ -31,8 +31,6 @@ class PublishStudy
             ProcessMetadataExtractionBagitGenerationJob::dispatch($study->id);
         }
 
-        PublicMoleculeAggregates::forgetPublicCatalogTotalCache();
-
         // Track publication if this is an ELN submission
         $this->trackStudyPublished($study);
     }
