@@ -51,6 +51,51 @@ class DeleteProjectTest extends TestCase
         $this->assertFalse($project->fresh()->is_deleted);
     }
 
+    public function test_delete_public_project_clears_public_catalog_molecules(): void
+    {
+        $project = Project::factory()->create(['is_public' => true]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $project->id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        ['info' => ['experiment' => '1D', 'nucleus' => '1H']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
+        $this->assertTrue($molecule->fresh()->has_public_spectra);
+
+        $this->action->delete($project);
+
+        $this->assertFalse($molecule->fresh()->has_public_spectra);
+    }
+
     public function test_delete_private_project_marks_as_deleted()
     {
         $project = Project::factory()->create(['is_public' => false]);

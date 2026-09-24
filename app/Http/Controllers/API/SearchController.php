@@ -766,7 +766,7 @@ class SearchController extends Controller
 
             $queryType = strtolower($queryType);
 
-            $publicSpectraExists = PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+            $publicSpectraFilter = PublicMoleculeAggregates::hasPublicSpectraColumnSql();
             $orderByRecentSql = $sort === 'recent' ? 'ORDER BY molecules.created_at DESC' : '';
 
             $ids = [];
@@ -776,7 +776,7 @@ class SearchController extends Controller
                 ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                     [
                         'from' => 'FROM molecules',
-                        'where' => "WHERE identifier IS NOT NULL AND (smiles LIKE ? OR absolute_smiles LIKE ? OR canonical_smiles LIKE ?) AND {$publicSpectraExists}",
+                        'where' => "WHERE identifier IS NOT NULL AND (smiles LIKE ? OR absolute_smiles LIKE ? OR canonical_smiles LIKE ?) AND {$publicSpectraFilter}",
                         'order' => $orderByRecentSql,
                     ],
                     ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%'],
@@ -788,7 +788,7 @@ class SearchController extends Controller
                     ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                         [
                             'from' => 'FROM mols INNER JOIN molecules ON molecules.id = mols.id',
-                            'where' => "WHERE m@>? AND molecules.identifier IS NOT NULL AND {$publicSpectraExists}",
+                            'where' => "WHERE m@>? AND molecules.identifier IS NOT NULL AND {$publicSpectraFilter}",
                             'id' => 'mols.id',
                             'order' => $orderByRecentSql,
                         ],
@@ -805,7 +805,7 @@ class SearchController extends Controller
                 ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                     [
                         'from' => 'FROM molecules',
-                        'where' => "WHERE identifier IS NOT NULL AND (inchi LIKE ? OR standard_inchi LIKE ?) AND {$publicSpectraExists}",
+                        'where' => "WHERE identifier IS NOT NULL AND (inchi LIKE ? OR standard_inchi LIKE ?) AND {$publicSpectraFilter}",
                         'order' => $orderByRecentSql,
                     ],
                     ['%'.$query.'%', '%'.$query.'%'],
@@ -816,7 +816,7 @@ class SearchController extends Controller
                 ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                     [
                         'from' => 'FROM molecules',
-                        'where' => "WHERE identifier IS NOT NULL AND (inchi_key LIKE ? OR standard_inchi_key LIKE ?) AND {$publicSpectraExists}",
+                        'where' => "WHERE identifier IS NOT NULL AND (inchi_key LIKE ? OR standard_inchi_key LIKE ?) AND {$publicSpectraFilter}",
                         'order' => $orderByRecentSql,
                     ],
                     ['%'.$query.'%', '%'.$query.'%'],
@@ -828,7 +828,7 @@ class SearchController extends Controller
                     ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                         [
                             'from' => 'FROM mols INNER JOIN molecules ON molecules.id = mols.id',
-                            'where' => "WHERE m@=? AND molecules.identifier IS NOT NULL AND {$publicSpectraExists}",
+                            'where' => "WHERE m@=? AND molecules.identifier IS NOT NULL AND {$publicSpectraFilter}",
                             'id' => 'mols.id',
                             'order' => $orderByRecentSql,
                         ],
@@ -846,7 +846,7 @@ class SearchController extends Controller
                     ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                         [
                             'from' => 'FROM fps INNER JOIN molecules ON molecules.id = fps.id',
-                            'where' => "WHERE mfp2%morganbv_fp(?) AND molecules.identifier IS NOT NULL AND {$publicSpectraExists}",
+                            'where' => "WHERE mfp2%morganbv_fp(?) AND molecules.identifier IS NOT NULL AND {$publicSpectraFilter}",
                             'id' => 'fps.id',
                             'order' => $orderByRecentSql,
                         ],
@@ -886,7 +886,7 @@ class SearchController extends Controller
                 ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                     [
                         'from' => 'FROM molecules',
-                        'where' => "WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?) AND {$publicSpectraExists}",
+                        'where' => "WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR iupac_name ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?) AND {$publicSpectraFilter}",
                         'order' => $orderByRecentSql,
                     ],
                     ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', '%'.$query.'%'],
@@ -1150,7 +1150,7 @@ class SearchController extends Controller
             }
 
             $whereClause = implode(' OR ', $whereConditions);
-            $publicSpectraFilter = PublicMoleculeAggregates::hasPublicSpectraExistsSql('molecules.id');
+            $publicSpectraFilter = PublicMoleculeAggregates::hasPublicSpectraColumnSql();
 
             ['ids' => $ids, 'total' => $count] = PublicMoleculeAggregates::paginateIds(
                 [
