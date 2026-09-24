@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.1](https://github.com/NFDI4Chem/nmrxiv/compare/v2.5.0...v2.5.1) (2026-09-24)
+
+
+### Performance Improvements
+
+* **search:** denormalize public compound catalog onto molecules ([#1531](https://github.com/NFDI4Chem/nmrxiv/issues/1531)) ([#1563](https://github.com/NFDI4Chem/nmrxiv/issues/1563)) ([a1a4017](https://github.com/NFDI4Chem/nmrxiv/commit/a1a4017485b84703492ee40aa6711ee20766dd4c))
+
 ## [2.5.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.4.0...v2.5.0) (2026-09-21)
 
 
