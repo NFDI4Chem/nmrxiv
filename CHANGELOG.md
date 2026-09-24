@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.5.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.4.0...v2.5.0) (2026-09-21)
+
+
+### Features
+
+* enhance nmrium file handling in backfill commands with BagitNmriumLocator ([5573540](https://github.com/NFDI4Chem/nmrxiv/commit/55735409fa8f77c3ae01f657b115814c2fa30461))
+* implement commands for backfilling dataset photos and study NMRium from BagIt archives ([#1557](https://github.com/NFDI4Chem/nmrxiv/issues/1557)) ([d45c6a7](https://github.com/NFDI4Chem/nmrxiv/commit/d45c6a7abb2664ca34dc0b9d866267e5274879c1))
+* refactor nmrium handling by replacing BagitNmriumLocator with BagitArchive for improved file access ([af9cc82](https://github.com/NFDI4Chem/nmrxiv/commit/af9cc82e1a04c8eab9d153af74e7f7bc9993bf14))
+
+
+### Bug Fixes
+
+* adjust image display styles in StudyCardPublic for better responsiveness ([27c7369](https://github.com/NFDI4Chem/nmrxiv/commit/27c7369da547c871a11f4af62e88cce9670cf0de))
+* **policy:** update csp policy for ALTCHA ([6849c3f](https://github.com/NFDI4Chem/nmrxiv/commit/6849c3f6c5bd9929144c430ea5b08ca40e800ac8))
+
 ## [2.4.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.3.0...v2.4.0) (2026-09-09)
 
 ### Features
