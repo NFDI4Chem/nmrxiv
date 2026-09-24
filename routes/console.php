@@ -24,7 +24,7 @@ Schedule::command('nmrxiv:delete-projects')->daily();
 Schedule::command('nmrxiv:index-molecules')->dailyAt('02:00');
 Schedule::command('nmrxiv:index-spectra-metadata-stats')->daily();
 Schedule::command('nmrxiv:index-public-molecule-catalog')
-    ->daily()
+    ->dailyAt('03:00')
     ->withoutOverlapping()
     ->onOneServer();
 Schedule::command('nmrxiv:delete-citations')->weekly();

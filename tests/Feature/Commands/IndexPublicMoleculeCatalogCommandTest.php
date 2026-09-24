@@ -34,7 +34,7 @@ class IndexPublicMoleculeCatalogCommandTest extends TestCase
         );
 
         $this->assertNotNull($event);
-        $this->assertSame('0 0 * * *', $event->expression);
+        $this->assertSame('0 3 * * *', $event->expression);
         $this->assertTrue($event->withoutOverlapping);
     }
 
