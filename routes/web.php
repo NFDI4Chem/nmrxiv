@@ -11,6 +11,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BagitViewerController;
 use App\Http\Controllers\CASController;
 use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
@@ -103,9 +104,19 @@ Route::get('/faqs', function () {
     return Inertia::render('FAQs');
 })->name('faqs');
 
+Route::get('/sustainability', function () {
+    return Inertia::render('Sustainability');
+})->name('sustainability');
+
 Route::get('/predict', function () {
     return Inertia::render('Predict');
 })->name('predict');
+
+Route::get('/bagit-viewer', [BagitViewerController::class, 'show'])
+    ->name('bagit-viewer');
+
+Route::get('/bagit-viewer/download', [BagitViewerController::class, 'download'])
+    ->name('bagit-viewer.download');
 
 Route::get('/stats', [PublicStatsController::class, 'index'])->name('stats');
 
