@@ -240,6 +240,11 @@ const linkSections = [
         links: [
             { name: "About nmrXiv", href: "/about-us", external: false },
             {
+                name: "Sustainability",
+                href: "/sustainability",
+                external: false,
+            },
+            {
                 name: "Contributors",
                 href: "https://docs.nmrxiv.org/contribution/contributors.html",
                 external: true,
