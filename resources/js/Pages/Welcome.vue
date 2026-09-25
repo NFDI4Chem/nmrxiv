@@ -135,7 +135,7 @@
                         class="inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
                     >
                         <BeakerIcon class="h-4 w-4" aria-hidden="true" />
-                        Predict NMR spectra from a structure
+                        Predict ¹H / ¹³C NMR from a structure
                     </Link>
                 </div>
             </div>
