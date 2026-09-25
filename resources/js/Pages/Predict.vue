@@ -273,7 +273,7 @@
                         <!-- Results: structure (1) + NMRium (4) -->
                         <div
                             v-if="showResults && !isPredicting"
-                            class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl"
+                            class="relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl"
                         >
                             <div
                                 class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-6 py-4"
@@ -297,31 +297,94 @@
                                 </button>
                             </div>
                             <div
-                                class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-5 sm:p-6"
+                                class="grid grid-cols-1 items-start gap-4 p-4 pb-20 lg:grid-cols-5 sm:p-6 sm:pb-20"
                             >
                                 <div
-                                    class="flex flex-col rounded-md border border-gray-200 bg-gray-50 p-3 lg:col-span-1"
+                                    class="flex flex-col gap-3 self-start lg:col-span-1"
                                 >
-                                    <p
-                                        class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500"
-                                    >
-                                        Structure
-                                    </p>
                                     <div
-                                        class="flex flex-1 items-center justify-center overflow-hidden"
+                                        class="flex flex-col rounded-md border border-gray-200 bg-gray-50 p-3"
                                     >
-                                        <!-- OCL SVG is generated locally — do not run through sanitizeHtml (it strips <svg>). -->
-                                        <div
-                                            v-if="predictedStructureSvg"
-                                            class="flex w-full max-w-full items-center justify-center [&_svg]:max-h-full [&_svg]:max-w-full"
-                                            v-html="predictedStructureSvg"
-                                        />
-                                        <p v-else class="text-sm text-gray-400">
-                                            Structure unavailable
+                                        <p
+                                            class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500"
+                                        >
+                                            Structure
                                         </p>
+                                        <div
+                                            class="flex items-center justify-center overflow-hidden"
+                                        >
+                                            <!-- OCL SVG is generated locally — do not run through sanitizeHtml (it strips <svg>). -->
+                                            <div
+                                                v-if="predictedStructureSvg"
+                                                class="flex w-full max-w-full items-center justify-center [&_svg]:h-auto [&_svg]:max-w-full"
+                                                v-html="predictedStructureSvg"
+                                            />
+                                            <p
+                                                v-else
+                                                class="text-sm text-gray-400"
+                                            >
+                                                Structure unavailable
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="rounded-md border border-gray-200 bg-white p-3"
+                                    >
+                                        <p
+                                            class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500"
+                                        >
+                                            Parameters
+                                        </p>
+                                        <dl class="space-y-1.5 text-xs">
+                                            <div
+                                                v-for="row in predictionParameterRows"
+                                                :key="row.label"
+                                                class="flex items-baseline justify-between gap-2"
+                                            >
+                                                <dt
+                                                    class="shrink-0 text-gray-500"
+                                                >
+                                                    {{ row.label }}
+                                                </dt>
+                                                <dd
+                                                    class="text-right font-medium text-gray-900"
+                                                >
+                                                    {{ row.value }}
+                                                </dd>
+                                            </div>
+                                        </dl>
                                     </div>
                                 </div>
                                 <div class="min-w-0 lg:col-span-4">
+                                    <div
+                                        v-if="predictedNuclei.length > 1"
+                                        class="mb-2 flex flex-wrap gap-2"
+                                        role="tablist"
+                                        aria-label="Predicted spectra"
+                                    >
+                                        <button
+                                            v-for="nucleus in predictedNuclei"
+                                            :key="nucleus"
+                                            type="button"
+                                            role="tab"
+                                            class="inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors"
+                                            :class="
+                                                activePredictedTab === nucleus
+                                                    ? 'border-gray-900 bg-gray-900 text-white'
+                                                    : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                            "
+                                            :aria-selected="
+                                                activePredictedTab === nucleus
+                                            "
+                                            @click="
+                                                selectPredictedSpectrumTab(
+                                                    nucleus
+                                                )
+                                            "
+                                        >
+                                            {{ formatNucleusLabel(nucleus) }}
+                                        </button>
+                                    </div>
                                     <iframe
                                         name="PredictionNMRiumIframe"
                                         frameborder="0"
@@ -333,6 +396,23 @@
                                     />
                                 </div>
                             </div>
+                            <a
+                                href="https://nmrshiftdb.nmr.uni-koeln.de/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="absolute bottom-3 left-3 z-10 flex flex-col items-start gap-1 rounded-md bg-white px-2.5 py-1.5 no-underline"
+                            >
+                                <span
+                                    class="text-[11px] font-medium uppercase tracking-wide text-gray-400"
+                                >
+                                    Powered by
+                                </span>
+                                <img
+                                    src="/img/nmrshiftdb-logo.png"
+                                    alt="NMRShiftDB"
+                                    class="h-12 w-auto object-contain"
+                                />
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -353,6 +433,7 @@ import OCL from "openchemlib";
 import { createStructureEditor } from "@/Utils/structureEditor";
 import {
     postNmriumLoad,
+    requestSelectTab,
     resolveNmriumTargetOrigin,
 } from "@/Utils/nmriumTabPreference.js";
 
@@ -364,6 +445,21 @@ const SPECTRA_BY_TYPE = {
 
 const PREDICT_TIMEOUT_MS = 130000;
 const PREDICTED_MOLECULE_ID = "predicted-molecule";
+
+/** Defaults match NMRKit nmrshift OpenAPI options. */
+const DEFAULT_NMRSHIFT_OPTIONS = {
+    solvent: "Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO)",
+    frequency: 400,
+    lineWidth: 1,
+    nbPoints: 1024,
+    peakShape: "lorentzian",
+    tolerance: 0.001,
+};
+
+const SPECTRUM_LABELS = {
+    proton: "¹H",
+    carbon: "¹³C",
+};
 
 export default {
     components: {
@@ -388,6 +484,8 @@ export default {
             showResults: false,
             predictedMolfile: "",
             predictedStructureSvg: "",
+            predictedNuclei: [],
+            activePredictedTab: null,
             pendingNmriumPayload: null,
             nmriumIframeReady: false,
             nmriumPayloadPosted: false,
@@ -431,6 +529,39 @@ export default {
             const sep = base.includes("?") ? "&" : "?";
 
             return `${base}${sep}id=${this.nmriumInstanceId}`;
+        },
+        predictionParameterRows() {
+            const options = DEFAULT_NMRSHIFT_OPTIONS;
+            const spectra = (SPECTRA_BY_TYPE[this.predictionType] ?? []).map(
+                (type) => SPECTRUM_LABELS[type] ?? type
+            );
+
+            return [
+                {
+                    label: "Spectra",
+                    value: spectra.join(" + ") || "—",
+                },
+                {
+                    label: "Solvent",
+                    value: "DMSO-d₆",
+                },
+                {
+                    label: "Frequency",
+                    value: `${options.frequency} MHz`,
+                },
+                {
+                    label: "Line width",
+                    value: `${options.lineWidth} Hz`,
+                },
+                {
+                    label: "Points",
+                    value: String(options.nbPoints),
+                },
+                {
+                    label: "Peak shape",
+                    value: options.peakShape,
+                },
+            ];
         },
     },
     mounted() {
@@ -582,7 +713,7 @@ export default {
                     type: "nmrium",
                 },
                 this.nmriumTargetOrigin(),
-                null
+                this.activePredictedTab
             );
             this.nmriumPayloadPosted = true;
 
@@ -720,6 +851,50 @@ export default {
 
             return payload;
         },
+        formatNucleusLabel(nucleus) {
+            if (nucleus === "1H") {
+                return "¹H";
+            }
+            if (nucleus === "13C") {
+                return "¹³C";
+            }
+
+            return nucleus;
+        },
+        nucleiFromPayload(payload) {
+            const spectra = payload?.data?.spectra;
+            if (!Array.isArray(spectra)) {
+                return [];
+            }
+
+            const nuclei = [];
+            for (const spectrum of spectra) {
+                const nucleus = spectrum?.info?.nucleus;
+                if (
+                    typeof nucleus === "string" &&
+                    nucleus &&
+                    !nuclei.includes(nucleus)
+                ) {
+                    nuclei.push(nucleus);
+                }
+            }
+
+            return nuclei;
+        },
+        selectPredictedSpectrumTab(nucleus) {
+            if (!nucleus) {
+                return;
+            }
+
+            this.activePredictedTab = nucleus;
+
+            const iframe = this.predictionNmriumWindow();
+            if (!iframe) {
+                return;
+            }
+
+            requestSelectTab(iframe, nucleus, this.nmriumTargetOrigin());
+        },
         storeNmriumPayload(responseData, molfile) {
             const normalizedMolfile = this.ensureMolfileHeader(
                 molfile,
@@ -730,12 +905,18 @@ export default {
             this.pendingNmriumPayload = markRaw(
                 this.buildNmriumPayload(responseData, normalizedMolfile)
             );
+            this.predictedNuclei = this.nucleiFromPayload(
+                this.pendingNmriumPayload
+            );
+            this.activePredictedTab = this.predictedNuclei[0] ?? null;
         },
         resetToEditor() {
             this.clearDeliveryTimeouts();
             this.showResults = false;
             this.predictedMolfile = "";
             this.predictedStructureSvg = "";
+            this.predictedNuclei = [];
+            this.activePredictedTab = null;
             this.pendingNmriumPayload = null;
             this.nmriumIframeReady = false;
             this.nmriumPayloadPosted = false;
@@ -810,6 +991,7 @@ export default {
                     engine: "nmrshift",
                     structure,
                     spectra,
+                    options: { ...DEFAULT_NMRSHIFT_OPTIONS },
                 },
                 { timeout: PREDICT_TIMEOUT_MS }
             );
@@ -873,6 +1055,8 @@ export default {
             this.errorMessage = "";
             this.predictedMolfile = "";
             this.predictedStructureSvg = "";
+            this.predictedNuclei = [];
+            this.activePredictedTab = null;
             this.pendingNmriumPayload = null;
             this.nmriumPayloadPosted = false;
             this.nmriumIframeReady = false;
