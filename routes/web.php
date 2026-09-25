@@ -109,7 +109,9 @@ Route::get('/sustainability', function () {
 })->name('sustainability');
 
 Route::get('/predict', function () {
-    return Inertia::render('Predict');
+    return Inertia::render('Predict', [
+        'nmrPredictUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/predict/',
+    ]);
 })->name('predict');
 
 Route::get('/bagit-viewer', [BagitViewerController::class, 'show'])
