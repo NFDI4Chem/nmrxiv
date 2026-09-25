@@ -6,6 +6,7 @@ namespace App\Support\Nmr;
 
 use App\Models\Dataset;
 use App\Models\Study;
+use App\Models\Team;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -19,16 +20,21 @@ final class MoleculeExperimentTypeCounts
     ) {}
 
     /**
+     * Pass a team to count only public spectra from that workspace's studies
+     * (owner-restricted for personal teams).
+     *
      * @param  array<int, int>  $moleculeIds
      * @return array<int, array<string, int>>
      */
-    public function forPublicCatalog(array $moleculeIds): array
+    public function forPublicCatalog(array $moleculeIds, ?Team $team = null): array
     {
         if ($moleculeIds === []) {
             return [];
         }
 
-        $datasetRows = $this->fetchPublicDatasetRows($moleculeIds);
+        [$scopeSql, $scopeBindings] = $this->teamScopeSql($team);
+
+        $datasetRows = $this->fetchPublicDatasetRows($moleculeIds, $scopeSql, $scopeBindings);
         $counts = $this->accumulateFromDatasetRows($datasetRows);
 
         $studiesWithDatasetSpectra = [];
@@ -38,7 +44,7 @@ final class MoleculeExperimentTypeCounts
             }
         }
 
-        $studyRows = $this->fetchPublicStudyNmriumRows($moleculeIds);
+        $studyRows = $this->fetchPublicStudyNmriumRows($moleculeIds, $scopeSql, $scopeBindings);
         foreach ($studyRows as $row) {
             $studyId = (int) $row->study_id;
             if (isset($studiesWithDatasetSpectra[$studyId])) {
@@ -59,10 +65,32 @@ final class MoleculeExperimentTypeCounts
     }
 
     /**
+     * @return array{0: string, 1: list<int>}
+     */
+    private function teamScopeSql(?Team $team): array
+    {
+        if ($team === null) {
+            return ['', []];
+        }
+
+        $sql = ' AND st.team_id = ?'
+            .' AND (st.project_id IS NULL OR EXISTS (SELECT 1 FROM projects p WHERE p.id = st.project_id AND p.is_deleted = false))';
+        $bindings = [(int) $team->id];
+
+        if ($team->personal_team) {
+            $sql .= ' AND st.owner_id = ?';
+            $bindings[] = (int) $team->user_id;
+        }
+
+        return [$sql, $bindings];
+    }
+
+    /**
      * @param  array<int, int>  $moleculeIds
+     * @param  list<int>  $scopeBindings
      * @return list<object{molecule_id: int|string, study_id: int|string, dataset_id: int|string, type: ?string, nmrium_info: mixed}>
      */
-    private function fetchPublicDatasetRows(array $moleculeIds): array
+    private function fetchPublicDatasetRows(array $moleculeIds, string $scopeSql = '', array $scopeBindings = []): array
     {
         $placeholders = implode(',', array_fill(0, count($moleculeIds), '?'));
         $datasetNotDeleted = $this->datasetNotDeletedSql('d');
@@ -86,16 +114,18 @@ WHERE ms.molecule_id IN ({$placeholders})
   AND (d.is_archived IS NULL OR d.is_archived = false)
   AND {$datasetNotDeleted}
   AND {$datasetSpectra}
+  {$scopeSql}
 SQL,
-            array_merge([Dataset::class], $moleculeIds),
+            array_merge([Dataset::class], $moleculeIds, $scopeBindings),
         );
     }
 
     /**
      * @param  array<int, int>  $moleculeIds
+     * @param  list<int>  $scopeBindings
      * @return list<object{molecule_id: int|string, study_id: int|string, nmrium_info: mixed}>
      */
-    private function fetchPublicStudyNmriumRows(array $moleculeIds): array
+    private function fetchPublicStudyNmriumRows(array $moleculeIds, string $scopeSql = '', array $scopeBindings = []): array
     {
         $placeholders = implode(',', array_fill(0, count($moleculeIds), '?'));
         $studyNotDeleted = '(st.is_deleted IS NULL OR st.is_deleted = false)';
@@ -114,8 +144,9 @@ WHERE ms.molecule_id IN ({$placeholders})
   AND st.is_archived = false
   AND {$studyNotDeleted}
   AND {$studySpectra}
+  {$scopeSql}
 SQL,
-            array_merge([Study::class], $moleculeIds),
+            array_merge([Study::class], $moleculeIds, $scopeBindings),
         );
     }
 

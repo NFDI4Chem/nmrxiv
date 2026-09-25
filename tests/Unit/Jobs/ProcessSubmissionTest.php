@@ -15,6 +15,7 @@ use App\Models\Citation;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
+use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -421,6 +422,66 @@ class ProcessSubmissionTest extends TestCase
 
             $this->assertEquals(json_encode([['name' => 'Homo sapiens']]), $study->species);
         }
+    }
+
+    public function test_sample_mode_copies_project_license_to_detached_studies_and_datasets(): void
+    {
+        Storage::fake('local');
+        Event::fake();
+
+        $license = License::factory()->create();
+        $this->project->update([
+            'release_date' => now()->subMinute(),
+            'license_id' => $license->id,
+        ]);
+
+        $this->draft->project_enabled = false;
+        $environment = env('APP_ENV', 'local');
+        $this->draft->path = $environment.'/draft-'.$this->draft->id;
+        $this->draft->save();
+
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'license_id' => null,
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'draft_id' => $this->draft->id,
+            'project_id' => $this->project->id,
+            'license_id' => null,
+        ]);
+
+        FileSystemObject::create([
+            'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
+            'type' => 'directory',
+            'name' => 'study',
+            'slug' => 'study',
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
+            'path' => $this->draft->path,
+            'status' => 'present',
+        ]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('assign')->once()->with(Mockery::on(function ($studies) use ($license) {
+            return $studies->every(fn ($study) => $study->project_id === null && $study->license_id === $license->id);
+        }));
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once();
+
+        $projectPublisher = Mockery::mock(PublishProject::class);
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+
+        $this->assertEquals($license->id, $study->fresh()->license_id);
+        $this->assertEquals($license->id, $dataset->fresh()->license_id);
     }
 
     public function test_handle_dispatches_archives_after_project_mode_publish(): void

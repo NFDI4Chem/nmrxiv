@@ -245,9 +245,15 @@ trait HasDOI
             array_push($relatedIdentifiers, $relatedIdentifier);
         }
 
-        if (! $this->license_id) {
-            if ($this instanceof Study || $this instanceof Dataset) {
-                $this->license_id = $this->project->license_id;
+        if (! $this->license_id && ($this instanceof Study || $this instanceof Dataset)) {
+            $inheritedLicenseId = $this->project?->license_id;
+
+            if ($this instanceof Dataset) {
+                $inheritedLicenseId ??= $this->study?->license_id;
+            }
+
+            if ($inheritedLicenseId) {
+                $this->license_id = $inheritedLicenseId;
                 $this->save();
             }
         }

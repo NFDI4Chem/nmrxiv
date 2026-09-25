@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Support\Dashboard\CompoundLibraryRankedStudiesQuery;
 use App\Support\Dashboard\WorkspaceMoleculeAggregates;
+use App\Support\Public\PublicCompoundLibrary;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,7 +20,7 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function dashboard(DashboardIndexRequest $request)
+    public function dashboard(DashboardIndexRequest $request, PublicCompoundLibrary $compoundLibrary)
     {
         $user = $request->user();
         $team = $user->currentTeam;
@@ -51,6 +52,8 @@ class DashboardController extends Controller
                 'hasSamples' => false,
                 'teamRole' => $user->teamRole($team),
                 'user' => $user,
+                'compoundLibraryUrl' => null,
+                'publicCompoundsCount' => null,
             ]);
         }
 
@@ -76,6 +79,8 @@ class DashboardController extends Controller
                 'hasSamples' => $hasSamples,
                 'teamRole' => $user->teamRole($team),
                 'user' => $user,
+                'compoundLibraryUrl' => $team->compoundLibraryUrl(),
+                'publicCompoundsCount' => null,
             ]);
         }
 
@@ -130,6 +135,10 @@ class DashboardController extends Controller
             'hasSamples' => $hasSamples,
             'teamRole' => $user->teamRole($team),
             'user' => $user,
+            'compoundLibraryUrl' => $team->compoundLibraryUrl(),
+            'publicCompoundsCount' => $filters['tab'] === 'samples'
+                ? $compoundLibrary->publicMoleculesQuery($team)->count()
+                : null,
         ]);
     }
 

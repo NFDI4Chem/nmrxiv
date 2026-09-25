@@ -409,19 +409,27 @@
                     aria-labelledby="dashboard-samples-heading"
                     class="flex w-full min-w-0 flex-col gap-6"
                 >
-                    <header>
-                        <h2
-                            id="dashboard-samples-heading"
-                            class="text-lg font-semibold tracking-tight text-gray-900"
-                        >
-                            Compound library
-                        </h2>
-                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                            Every compound record in this workspace, including
-                            entries inside projects and standalone submissions.
-                            Search, filter by visibility, then open a record to
-                            continue.
-                        </p>
+                    <header class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <h2
+                                id="dashboard-samples-heading"
+                                class="text-lg font-semibold tracking-tight text-gray-900"
+                            >
+                                Compound library
+                            </h2>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                Every compound record in this workspace,
+                                including entries inside projects and standalone
+                                submissions. Search, filter by visibility, then
+                                open a record to continue.
+                            </p>
+                        </div>
+                        <ShareCompoundLibrary
+                            v-if="compoundLibraryUrl"
+                            class="shrink-0"
+                            :url="compoundLibraryUrl"
+                            :public-count="publicCompoundsCount"
+                        />
                     </header>
 
                     <div
@@ -898,6 +906,7 @@ import EmptySearchState from "@/Shared/EmptySearchState.vue";
 import StatusFilter from "@/Shared/StatusFilter.vue";
 import Pagination from "@/Shared/Pagination.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
+import ShareCompoundLibrary from "@/Shared/ShareCompoundLibrary.vue";
 import {
     ClockIcon,
     StarIcon,
@@ -923,6 +932,7 @@ export default {
         StatusFilter,
         Pagination,
         StudyCard,
+        ShareCompoundLibrary,
         Link,
         UserGroupIcon,
         ClockIcon,
@@ -969,6 +979,14 @@ export default {
         workspaceStudies: {
             type: Array,
             default: () => [],
+        },
+        compoundLibraryUrl: {
+            type: String,
+            default: null,
+        },
+        publicCompoundsCount: {
+            type: Number,
+            default: null,
         },
     },
     setup() {
