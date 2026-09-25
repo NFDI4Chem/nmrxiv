@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Laravel\Jetstream\Events\TeamCreated;
 use Laravel\Jetstream\Events\TeamDeleted;
 use Laravel\Jetstream\Events\TeamUpdated;
@@ -31,6 +32,39 @@ class Team extends JetstreamTeam
     protected $appends = [
         'profile_photo_url',
     ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'compound_library_code',
+    ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Team $team): void {
+            $team->compound_library_code ??= static::generateCompoundLibraryCode();
+        });
+    }
+
+    /**
+     * Unguessable identifier used in the shareable compound library URL.
+     */
+    public static function generateCompoundLibraryCode(): string
+    {
+        do {
+            $code = Str::random(16);
+        } while (static::query()->where('compound_library_code', $code)->exists());
+
+        return $code;
+    }
+
+    public function compoundLibraryUrl(): string
+    {
+        return route('public.compound-library', ['team' => $this->compound_library_code]);
+    }
 
     /**
      * The event map for the model.
