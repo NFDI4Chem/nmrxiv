@@ -126,6 +126,20 @@
                 </div>
             </div>
 
+            <div class="relative border-t border-gray-100">
+                <div
+                    class="mx-auto flex max-w-6xl justify-center px-6 py-6 sm:px-8 lg:px-12"
+                >
+                    <Link
+                        :href="route('predict')"
+                        class="inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
+                    >
+                        <BeakerIcon class="h-4 w-4" aria-hidden="true" />
+                        Predict NMR spectra from a structure
+                    </Link>
+                </div>
+            </div>
+
             <!-- Repository stats (secondary to hero search) -->
             <div class="relative border-t border-gray-100">
                 <div

@@ -104,7 +104,9 @@ Route::get('/faqs', function () {
 })->name('faqs');
 
 Route::get('/predict', function () {
-    return Inertia::render('Predict');
+    return Inertia::render('Predict', [
+        'nmrPredictUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/predict/',
+    ]);
 })->name('predict');
 
 Route::get('/stats', [PublicStatsController::class, 'index'])->name('stats');
