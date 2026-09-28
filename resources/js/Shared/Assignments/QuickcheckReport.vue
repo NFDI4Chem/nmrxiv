@@ -51,26 +51,15 @@
                 <div
                     class="space-y-2 text-xs text-gray-600 dark:text-slate-300"
                 >
-                    <p>
-                        Predictions from
-                        <a
-                            href="https://nmrshiftdb.nmr.uni-koeln.de/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="font-medium text-teal-700 underline decoration-dotted underline-offset-2 dark:text-teal-300"
-                            >nmrshiftdb2</a
-                        >
-                        (HOSE codes) in {{ report.solvent }}. The prediction is
-                        a reference, not the truth: a poor fit flags assignments
-                        for a second look.
-                    </p>
-                    <p v-if="structureUrl && !structureFailed">
-                        The structure carries the author's carbon and proton
-                        labels.
-                        <template v-if="structure.flagged.length">
-                            Highlighted atoms need review or do not fit the
-                            prediction.
-                        </template>
+                    <p
+                        v-if="
+                            structureUrl &&
+                            !structureFailed &&
+                            structure.flagged.length
+                        "
+                    >
+                        Highlighted atoms need review or do not fit the
+                        prediction.
                     </p>
                     <p
                         v-if="anyInDatabase"
