@@ -223,6 +223,24 @@
                                                         sample
                                                     </button>
                                                 </MenuItem>
+                                                <MenuItem v-slot="{ active }">
+                                                    <Link
+                                                        :href="
+                                                            route(
+                                                                'bagit-viewer'
+                                                            )
+                                                        "
+                                                        :class="[
+                                                            active
+                                                                ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                                                                : 'text-gray-700 dark:text-gray-200',
+                                                            'block w-full px-4 py-2 text-left text-sm font-medium',
+                                                        ]"
+                                                    >
+                                                        View offline with the
+                                                        nmrXiv BagIt Viewer
+                                                    </Link>
+                                                </MenuItem>
                                             </MenuItems>
                                         </transition>
                                     </Menu>
