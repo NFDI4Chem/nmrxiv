@@ -13,6 +13,7 @@ use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
 use App\Http\Controllers\API\Schemas\DataCite\DOIController;
 use App\Http\Controllers\API\SearchController;
+use App\Http\Controllers\API\SpectrumQueryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,6 +40,12 @@ Route::prefix('v1')->group(function () {
         Route::get('metadata', [SearchController::class, 'metadata'])->name('metadata');
         Route::get('metadata/facets', [SearchController::class, 'metadataFacets'])->name('metadata.facets');
         Route::get('metadata/stats', [SearchController::class, 'metadataStats'])->name('metadata.stats');
+        Route::get('spectra', [SearchController::class, 'spectra'])->name('spectra');
+        Route::post('spectra/parse', [SpectrumQueryController::class, 'parseFile'])
+            ->middleware('throttle:spectra-parse')
+            ->name('spectra.parse');
+        Route::post('spectra/peaks', [SpectrumQueryController::class, 'parsePeaks'])->name('spectra.peaks');
+        Route::get('spectra/example', [SpectrumQueryController::class, 'example'])->name('spectra.example');
         Route::post('compounds/{smiles?}', [SearchController::class, 'search'])->name('compounds');
     });
 

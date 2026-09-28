@@ -94,6 +94,15 @@ class RouteServiceProvider extends ServiceProvider
             ];
         });
 
+        // Each spectrum upload is processed by NMRKit, which is slow and shared.
+        RateLimiter::for('spectra-parse', function (Request $request) {
+            if (app()->environment('testing')) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
         // ALTCHA challenge generation rate limiting to prevent challenge farming
         RateLimiter::for('altcha-challenge', function (Request $request) {
             if (app()->environment('testing')) {
