@@ -4,6 +4,7 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { prepareOfflineHtml } from './src/build/prepareOfflineHtml.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const version = process.env.BAGIT_VIEWER_VERSION || '1.0.0';
@@ -47,6 +48,7 @@ function inlineSiblingAssets() {
                 fs.unlinkSync(assetPath);
             }
 
+            html = prepareOfflineHtml(html);
             fs.writeFileSync(htmlPath, html);
             fs.writeFileSync(
                 path.join(distDir, 'nmrxiv-bagit-viewer.html'),
