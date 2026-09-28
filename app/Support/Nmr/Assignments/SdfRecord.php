@@ -22,7 +22,7 @@ final readonly class SdfRecord
 
         $end = preg_match('/^M {2}END[^\n]*$/m', $record, $match, PREG_OFFSET_CAPTURE);
         if ($end !== 1) {
-            throw new InvalidAssignmentFileException('The file does not contain a molfile (no "M  END" line).');
+            throw new InvalidAssignmentFileException('No structure found in this file. Use an SD or NMReDATA file that contains the structure.');
         }
 
         $molfileEnd = $match[0][1] + strlen($match[0][0]);

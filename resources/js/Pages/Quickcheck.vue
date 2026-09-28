@@ -16,10 +16,11 @@
                         <p
                             class="mx-auto mt-3 max-w-3xl text-base text-gray-500 sm:text-lg"
                         >
-                            Check ¹³C and ¹H assignments against nmrshiftdb2
-                            predictions before you submit: a quality mark per
-                            nucleus, the atoms that do not fit, and likely
-                            interchanged assignments.
+                            Compare your ¹³C and ¹H shift assignments with
+                            shifts predicted by nmrshiftdb2 before you submit.
+                            You get a score for each nucleus, the atoms whose
+                            shifts do not match, and assignments that may be
+                            swapped.
                         </p>
                     </div>
 
@@ -53,9 +54,9 @@
                                 <div v-show="mode === 'file'" class="space-y-4">
                                     <p class="text-sm text-gray-600">
                                         Upload the SD file exported from Mnova
-                                        with assignments (it carries the
-                                        structure and the CHEMICAL_SHIFTS tags)
-                                        or an NMReDATA file.
+                                        with your assignments (it contains the
+                                        structure and the assigned shifts), or
+                                        an NMReDATA file.
                                     </p>
                                     <label
                                         class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-10 text-sm font-medium text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-50"
@@ -93,11 +94,11 @@
                                     class="space-y-4"
                                 >
                                     <p class="text-sm text-gray-600">
-                                        Draw or paste the structure; atom
-                                        numbers are shown in the editor. For ¹H
-                                        rows, enter the number of the atom that
-                                        carries the proton. Equivalent atoms
-                                        share a row (e.g. “2, 6”).
+                                        Draw or paste the structure; the editor
+                                        shows the atom numbers. For a ¹H shift,
+                                        enter the number of the atom the proton
+                                        is attached to. Put equivalent atoms in
+                                        one row, e.g. “2, 6”.
                                     </p>
                                     <div
                                         id="quickcheckEditor"

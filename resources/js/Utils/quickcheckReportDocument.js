@@ -1,6 +1,14 @@
 import OCL from "openchemlib";
-
-const NUCLEUS_LABELS = { "13C": "¹³C", "1H": "¹H" };
+import {
+    ASSIGNMENT_RESULT_LABELS,
+    ATOM_STATUS_LABELS,
+    ROW_STATUS_LABELS,
+    VERDICT_TEXT,
+    issueText,
+    nucleusLabel,
+    reasonLabel,
+    resultLabel,
+} from "@/Utils/quickcheckTerms.js";
 
 const SOURCE_LABELS = {
     nmrium: "NMRium assignments",
@@ -10,26 +18,10 @@ const SOURCE_LABELS = {
 };
 
 const VERDICTS = {
-    accept: {
-        tone: "good",
-        title: "Assignments fit the predicted spectra",
-        hint: "The shift list and the atom assignments agree with the nmrshiftdb2 prediction.",
-    },
-    review: {
-        tone: "warn",
-        title: "Some assignments need a second look",
-        hint: "Check the flagged atoms, ideally against 2D correlations (HSQC, HMBC).",
-    },
-    reject: {
-        tone: "bad",
-        title: "Assignments disagree with the predicted spectra",
-        hint: "A wrong structure, misassigned atoms or a referencing problem are the common causes.",
-    },
-    not_assessable: {
-        tone: "neutral",
-        title: "Assignments could not be assessed",
-        hint: "No atom could be compared with a prediction.",
-    },
+    accept: { tone: "good", ...VERDICT_TEXT.accept },
+    review: { tone: "warn", ...VERDICT_TEXT.review },
+    reject: { tone: "bad", ...VERDICT_TEXT.reject },
+    not_assessable: { tone: "neutral", ...VERDICT_TEXT.not_assessable },
 };
 
 const RESULT_TONES = {
@@ -40,30 +32,31 @@ const RESULT_TONES = {
 };
 
 const ATOM_STATUSES = {
-    green: { tone: "good", label: "Fits" },
-    yellow: { tone: "warn", label: "Borderline" },
-    red: { tone: "bad", label: "Does not fit" },
-    missing: { tone: "bad", label: "Missing" },
-    impossible: { tone: "neutral", label: "No prediction" },
+    green: { tone: "good", label: ATOM_STATUS_LABELS.green },
+    yellow: { tone: "warn", label: ATOM_STATUS_LABELS.yellow },
+    red: { tone: "bad", label: ATOM_STATUS_LABELS.red },
+    missing: { tone: "bad", label: ATOM_STATUS_LABELS.missing },
+    impossible: { tone: "neutral", label: ATOM_STATUS_LABELS.impossible },
 };
 
 const ROW_STATUSES = {
-    ok: { tone: "good", label: "Fits" },
-    review: { tone: "warn", label: "Review" },
-    fail: { tone: "bad", label: "Does not fit" },
-    not_assessable: { tone: "neutral", label: "Not assessable" },
+    ok: { tone: "good", label: ROW_STATUS_LABELS.ok },
+    review: { tone: "warn", label: ROW_STATUS_LABELS.review },
+    fail: { tone: "bad", label: ROW_STATUS_LABELS.fail },
+    not_assessable: {
+        tone: "neutral",
+        label: ROW_STATUS_LABELS.not_assessable,
+    },
 };
 
 const ASSIGNMENT_RESULTS = {
-    consistent: { tone: "good", label: "Consistent" },
-    review: { tone: "warn", label: "Review" },
-    inconsistent: { tone: "bad", label: "Inconsistent" },
-    not_assessable: { tone: "neutral", label: "Not assessable" },
-};
-
-const REASONS = {
-    low_confidence_prediction: "low-confidence prediction",
-    diastereotopic_pair_mean: "CH₂ pair mean",
+    consistent: { tone: "good", label: ASSIGNMENT_RESULT_LABELS.consistent },
+    review: { tone: "warn", label: ASSIGNMENT_RESULT_LABELS.review },
+    inconsistent: { tone: "bad", label: ASSIGNMENT_RESULT_LABELS.inconsistent },
+    not_assessable: {
+        tone: "neutral",
+        label: ASSIGNMENT_RESULT_LABELS.not_assessable,
+    },
 };
 
 const STYLES = `
@@ -187,8 +180,8 @@ function cssString(value) {
     return `"${String(value).replace(/["\\\n\r]/g, " ")}"`;
 }
 
-function nucleusLabel(nucleus) {
-    return NUCLEUS_LABELS[nucleus] || nucleus;
+function environmentMatch(spheres) {
+    return spheres ? `${spheres} bonds` : "—";
 }
 
 function formatShift(value, nucleus) {
@@ -252,14 +245,14 @@ function findings(report) {
     for (const suggestion of check.suggestions || []) {
         items.push({
             tone: "bad",
-            html: `<strong>Possible interchange of ${escapeHtml(
+            html: `<strong>${escapeHtml(
                 suggestion.labels?.[0]
             )} and ${escapeHtml(
                 suggestion.labels?.[1]
-            )}.</strong> Swapping them reduces the deviation by ${formatShift(
+            )} may be swapped.</strong> Exchanging the two assignments brings the shifts ${formatShift(
                 suggestion.error_reduction,
                 suggestion.nucleus
-            )} ppm.`,
+            )} ppm closer to the prediction.`,
         });
     }
 
@@ -275,20 +268,16 @@ function findings(report) {
                     rows.length === 1 ? "" : "s"
                 } ${
                     status === "fail"
-                        ? rows.length === 1
-                            ? "does"
-                            : "do"
-                        : rows.length === 1
-                        ? "needs"
-                        : "need"
-                } ${
-                    status === "fail" ? "not fit the prediction" : "review"
+                        ? `${
+                              rows.length === 1 ? "does" : "do"
+                          } not match the prediction`
+                        : `${rows.length === 1 ? "needs" : "need"} checking`
                 }:</strong> ${rows
                     .map(
                         (row) =>
                             `${escapeHtml(row.label)} (${nucleusLabel(
                                 row.nucleus
-                            )}, Δ ${formatSigned(row.delta, row.nucleus)} ppm)`
+                            )}, Δδ ${formatSigned(row.delta, row.nucleus)} ppm)`
                     )
                     .join(", ")}.`,
             });
@@ -300,7 +289,7 @@ function findings(report) {
             tone: "warn",
             html: `<strong>${nucleusLabel(
                 issue.nucleus
-            )}:</strong> ${escapeHtml(issue.message)}${
+            )}:</strong> ${escapeHtml(issueText(issue))}${
                 issue.labels?.length
                     ? ` (${escapeHtml(issue.labels.join(", "))})`
                     : ""
@@ -321,9 +310,9 @@ function findings(report) {
             .join(", ");
         items.push({
             tone: "warn",
-            html: `<strong>Possible referencing error.</strong> All shifts are offset from the prediction by a similar amount (${escapeHtml(
+            html: `<strong>Possible referencing error.</strong> All shifts differ from the prediction by about the same amount (${escapeHtml(
                 offsets
-            )}). Check the spectrum referencing.`,
+            )}). Check the shift referencing (TMS or residual solvent signal).`,
         });
     }
 
@@ -331,14 +320,14 @@ function findings(report) {
     if (nuclei.some((nucleus) => report.reports[nucleus].in_database_likely)) {
         items.push({
             tone: "neutral",
-            html: "<strong>Compound probably in nmrshiftdb2.</strong> Most atoms match 6-sphere HOSE codes with very small deviations, so this fit is not independent evidence.",
+            html: "<strong>Compound probably already in nmrshiftdb2.</strong> Almost every atom matches a reference environment six bonds deep with a very small shift difference, so a good score here is expected and does not independently confirm the assignments.",
         });
     }
 
     if (!items.some((item) => item.tone === "bad" || item.tone === "warn")) {
         items.unshift({
             tone: "good",
-            html: "<strong>No problems found.</strong> Every compared shift fits the prediction within tolerance.",
+            html: "<strong>No problems found.</strong> Every compared shift matches the prediction within the expected range.",
         });
     }
 
@@ -366,7 +355,7 @@ function nucleusSection(report, nucleus) {
                 <td class="num">${formatShift(row.observed, nucleus)}</td>
                 <td class="num">${formatShift(row.predicted, nucleus)}</td>
                 <td class="num">${formatShift(row.deviation, nucleus)}</td>
-                <td class="num">${row.spheres || "—"}</td>
+                <td class="num">${environmentMatch(row.spheres)}</td>
                 <td>${pill(status)}</td>
                 <td class="hose">${escapeHtml(row.hose_code || "—")}</td>
             </tr>`;
@@ -375,39 +364,34 @@ function nucleusSection(report, nucleus) {
 
     return `<section>
         <h2>${nucleusLabel(nucleus)} shift comparison
-            <span class="aside">Mark <b>${escapeHtml(
+            <span class="aside">Score <b>${escapeHtml(
                 data.mark
             )}/10</b> · ${pill({
         tone: resultTone,
-        label: data.result,
+        label: resultLabel(data.result),
     })}</span>
         </h2>
         <div class="penalties">
-            <span>Mean deviation <b>${escapeHtml(
+            <span>Mean |Δδ| <b>${escapeHtml(
                 penalties.mean_deviation?.ppm
-            )} ppm</b> (−${escapeHtml(penalties.mean_deviation?.points)})</span>
-            <span>Red or missing <b>${escapeHtml(
+            )} ppm</b></span>
+            <span>Not matching or not assigned <b>${escapeHtml(
                 penalties.red_or_missing?.count
-            )}</b> (−${escapeHtml(penalties.red_or_missing?.points)})</span>
+            )}</b></span>
             <span>Borderline <b>${escapeHtml(
                 penalties.yellow?.count
-            )}</b> (−${escapeHtml(penalties.yellow?.points)})</span>
-            <span>Fitting shifts <b>${escapeHtml(
+            )}</b></span>
+            <span>Matching shifts <b>${escapeHtml(
                 stats.accept ?? "—"
             )} of ${escapeHtml(stats.total ?? "—")}</b></span>
         </div>
         <table>
             <thead><tr>
                 <th>Atom</th><th class="num">δ obs. (ppm)</th><th class="num">δ pred. (ppm)</th>
-                <th class="num">Deviation</th><th class="num">Spheres</th><th>Status</th><th>HOSE code</th>
+                <th class="num">|Δδ| (ppm)</th><th class="num">Env. match</th><th>Status</th><th>HOSE code</th>
             </tr></thead>
             <tbody>${rows}</tbody>
         </table>
-        ${
-            data.mark_is_approximate
-                ? '<p class="note">nmrshiftdb2 does not publish its mark formula; this mark approximates it from the same penalties.</p>'
-                : ""
-        }
     </section>`;
 }
 
@@ -430,7 +414,7 @@ function assignmentSection(report) {
                 .map(
                     (reason) =>
                         `<span class="reason">${escapeHtml(
-                            REASONS[reason] || reason.replace(/_/g, " ")
+                            reasonLabel(reason)
                         )}</span>`
                 )
                 .join("");
@@ -440,7 +424,7 @@ function assignmentSection(report) {
                 <td class="num">${formatShift(row.observed, row.nucleus)}</td>
                 <td class="num">${formatShift(row.predicted, row.nucleus)}</td>
                 <td class="num">${formatSigned(row.delta, row.nucleus)}</td>
-                <td class="num">${row.spheres ?? "—"}</td>
+                <td class="num">${environmentMatch(row.spheres)}</td>
                 <td>${pill(status)}${reasons}</td>
             </tr>`;
         })
@@ -448,17 +432,17 @@ function assignmentSection(report) {
 
     return `<section>
         <h2>Assignment check <span class="aside">${pill(result)}</span></h2>
-        <p class="lead">Are the shifts on the right atoms? Each assigned signal is compared with the prediction for its atoms. Δ = observed − predicted.</p>
+        <p class="lead">Each assigned signal is compared with the predicted shift of its atoms. Δδ = δ observed − δ predicted.</p>
         <table>
             <thead><tr>
-                <th>Assignment</th><th>Nucleus</th><th class="num">Observed</th><th class="num">Predicted</th>
-                <th class="num">Δ (ppm)</th><th class="num">Spheres</th><th>Status</th>
+                <th>Assignment</th><th>Nucleus</th><th class="num">δ obs. (ppm)</th><th class="num">δ pred. (ppm)</th>
+                <th class="num">Δδ (ppm)</th><th class="num">Env. match</th><th>Status</th>
             </tr></thead>
             <tbody>${rows}</tbody>
         </table>
         ${
             report.adjustments?.length
-                ? `<p class="note">${report.adjustments.length} identical shift(s) on different atoms were sent 0.001 ppm apart so that nmrshiftdb2 keeps them as separate signals.</p>`
+                ? `<p class="note">${report.adjustments.length} identical shift(s) on non-equivalent atoms were offset by 0.001 ppm so that each is compared as a separate signal.</p>`
                 : ""
         }
     </section>`;
@@ -471,16 +455,16 @@ function kpis(report) {
             const data = report.reports[nucleus];
             const stats = data.statistics || {};
             return `<div class="kpi">
-                <div class="label">${nucleusLabel(nucleus)} mark</div>
+                <div class="label">${nucleusLabel(nucleus)} score</div>
                 <div class="value">${escapeHtml(
                     data.mark
                 )}<small> / 10</small></div>
                 <div class="sub">${pill({
                     tone: RESULT_TONES[data.result] || "neutral",
-                    label: data.result,
+                    label: resultLabel(data.result),
                 })} ${escapeHtml(stats.accept ?? 0)} of ${escapeHtml(
                 stats.total ?? 0
-            )} shifts fit</div>
+            )} shifts match</div>
             </div>`;
         });
 
@@ -493,9 +477,9 @@ function kpis(report) {
         <div class="value text">${escapeHtml(result.label)}</div>
         <div class="sub">${
             rows.filter((row) => row.status === "ok").length
-        } of ${rows.length} assignments fit${
+        } of ${rows.length} assignments match${
         check.suggestions?.length
-            ? ` · ${check.suggestions.length} possible interchange${
+            ? ` · ${check.suggestions.length} possible swap${
                   check.suggestions.length === 1 ? "" : "s"
               }`
             : ""
@@ -638,7 +622,7 @@ export function quickcheckReportHtml({
                     )}" alt="Structure with the author's atom labels">
                     <figcaption>Submitted structure with the author's carbon and proton labels.${
                         hasFlaggedAtoms
-                            ? " Highlighted atoms need review or do not fit the prediction."
+                            ? " Highlighted atoms need checking or do not match the prediction."
                             : ""
                     }</figcaption>
                 </figure>`
@@ -712,11 +696,11 @@ ${assignmentSection(report)}
 
 <section class="methods">
     <h2>Method and interpretation</h2>
-    <p>Each assigned shift is compared with a prediction from <a href="https://nmrshiftdb.nmr.uni-koeln.de/">nmrshiftdb2</a>, based on HOSE codes of up to six spheres, in ${escapeHtml(
+    <p>Each assigned shift is compared with the shift predicted by <a href="https://nmrshiftdb.nmr.uni-koeln.de/">nmrshiftdb2</a> in ${escapeHtml(
         report.solvent || "the given solvent"
-    )}. For each nucleus the quickcheck gives a mark from 1 to 10, with penalties for the mean deviation, for shifts outside the expected range or missing (red) and for borderline shifts (yellow).</p>
-    <p>The assignment check asks whether the shifts sit on the right atoms: every assigned signal is compared with the prediction for its atoms, and swaps between assignments that lower the total deviation are reported as possible interchanges. Predictions from fewer than four HOSE spheres are too uncertain to fail an assignment and can at most ask for review.</p>
-    <p>The prediction is a reference, not the truth. A poor fit flags assignments for a second look; a good fit does not prove the structure. Atom labels are the author's and atom numbers refer to the submitted structure.</p>
+    )}. The prediction uses HOSE codes: it looks up reference atoms whose environment matches up to six bonds around the atom ("Env. match"). The more bonds match, the more reliable the prediction.</p>
+    <p>Each nucleus gets a score out of 10. Points are taken off for the mean shift difference, for shifts that do not match or are not assigned, and for borderline shifts. The assignment check then looks at each assigned signal and reports pairs of assignments that fit the prediction better when swapped. Predictions matching fewer than four bonds are too uncertain to reject an assignment; they can only ask for it to be checked.</p>
+    <p>The prediction is a guide, not proof. A poor match points to assignments worth checking, ideally with HSQC and HMBC; a good match does not prove the structure. Atom labels are the author's, and atom numbers refer to the submitted structure.</p>
 </section>
 
 <div class="colophon">

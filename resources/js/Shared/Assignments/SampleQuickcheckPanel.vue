@@ -228,19 +228,19 @@ const POLL_INTERVAL_MS = 3000;
 
 const VERDICT_STYLES = {
     accept: [
-        "Fits prediction",
+        "Matches prediction",
         "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
     ],
     review: [
-        "Needs review",
+        "Needs checking",
         "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
     ],
     reject: [
-        "Disagrees with prediction",
+        "Does not match prediction",
         "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200",
     ],
     not_assessable: [
-        "Not assessable",
+        "Not checked",
         "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300",
     ],
 };

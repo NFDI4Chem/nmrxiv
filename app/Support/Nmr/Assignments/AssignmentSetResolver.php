@@ -62,7 +62,7 @@ final class AssignmentSetResolver
         }
 
         throw new InvalidAssignmentFileException(
-            'No assignments found. Expected NMReDATA (NMREDATA_ASSIGNMENT) or an Mnova export (CHEMICAL_SHIFTS.13C / CHEMICAL_SHIFTS.1H).'
+            'No assigned shifts found in this file. Export the SD file from Mnova with the assignments, or use an NMReDATA file.'
         );
     }
 

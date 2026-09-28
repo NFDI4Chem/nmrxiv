@@ -55,7 +55,7 @@ class StudyAssignmentValidationController extends Controller
             ]);
         }
         if ($set === null || $set->assignedCount() === 0) {
-            throw ValidationException::withMessages(['assignments' => 'None of the shifts is assigned to an atom.']);
+            throw ValidationException::withMessages(['assignments' => 'None of the shifts is linked to an atom in the structure.']);
         }
 
         $pending = $study->assignmentValidations()

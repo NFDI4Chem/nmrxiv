@@ -21,7 +21,8 @@
                     {{ nucleusLabel(nucleus) }}
                     {{ report.reports[nucleus].mark }}/10
                     <span class="font-normal text-gray-500 dark:text-slate-400"
-                        >· {{ report.reports[nucleus].result }}</span
+                        >·
+                        {{ resultLabel(report.reports[nucleus].result) }}</span
                     >
                 </span>
                 <button
@@ -58,7 +59,7 @@
                             structure.flagged.length
                         "
                     >
-                        Highlighted atoms need review or do not fit the
+                        Highlighted atoms need checking or do not match the
                         prediction.
                     </p>
                     <p
@@ -68,9 +69,9 @@
                         "
                         class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
                     >
-                        All shifts are offset from the prediction by a similar
-                        amount ({{ offsetText }}). Check the spectrum
-                        referencing.
+                        All shifts differ from the prediction by about the same
+                        amount ({{ offsetText }}). Check the shift referencing
+                        (TMS or residual solvent signal).
                     </p>
                 </div>
             </div>
@@ -82,10 +83,10 @@
                     class="flex flex-wrap items-baseline justify-between gap-2 border-b border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-800/60"
                 >
                     <h4 class="font-semibold text-gray-900 dark:text-slate-100">
-                        Quality report
+                        Shift comparison
                     </h4>
                     <p class="text-xs text-gray-600 dark:text-slate-300">
-                        Overall mark (1 to 10) per nucleus
+                        Score out of 10 for each nucleus
                     </p>
                 </header>
                 <div class="min-h-0 flex-1 overflow-auto">
@@ -100,10 +101,19 @@
                                 class="text-left font-medium text-gray-600 dark:text-slate-300"
                             >
                                 <th class="px-3 py-2">Atom</th>
-                                <th class="px-3 py-2 text-right">δ (ppm)</th>
-                                <th class="px-3 py-2 text-right">Predicted</th>
-                                <th class="px-3 py-2 text-right">Deviation</th>
-                                <th class="px-3 py-2 text-right">Spheres</th>
+                                <th class="px-3 py-2 text-right">
+                                    δ obs. (ppm)
+                                </th>
+                                <th class="px-3 py-2 text-right">
+                                    δ pred. (ppm)
+                                </th>
+                                <th class="px-3 py-2 text-right">|Δδ|</th>
+                                <th
+                                    class="cursor-help whitespace-nowrap px-3 py-2 text-right"
+                                    :title="environmentMatchHint"
+                                >
+                                    Env. match
+                                </th>
                                 <th class="px-3 py-2">HOSE code</th>
                             </tr>
                         </thead>
@@ -125,7 +135,7 @@
                                         <span
                                             class="font-semibold text-gray-900 dark:text-slate-100"
                                         >
-                                            {{ nucleusLabel(nucleus) }} · mark
+                                            {{ nucleusLabel(nucleus) }} · score
                                             {{
                                                 report.reports[nucleus].mark
                                             }}/10
@@ -133,43 +143,17 @@
                                                 class="font-normal text-gray-500 dark:text-slate-400"
                                                 >·
                                                 {{
-                                                    report.reports[nucleus]
-                                                        .result
+                                                    resultLabel(
+                                                        report.reports[nucleus]
+                                                            .result
+                                                    )
                                                 }}</span
                                             >
                                         </span>
                                         <span
                                             class="text-[11px] text-gray-500 dark:text-slate-400"
                                         >
-                                            Mean deviation
-                                            {{
-                                                report.reports[nucleus]
-                                                    .penalties.mean_deviation
-                                                    .ppm
-                                            }}
-                                            ppm (−{{
-                                                report.reports[nucleus]
-                                                    .penalties.mean_deviation
-                                                    .points
-                                            }}) · red or missing
-                                            {{
-                                                report.reports[nucleus]
-                                                    .penalties.red_or_missing
-                                                    .count
-                                            }}
-                                            (−{{
-                                                report.reports[nucleus]
-                                                    .penalties.red_or_missing
-                                                    .points
-                                            }}) · yellow
-                                            {{
-                                                report.reports[nucleus]
-                                                    .penalties.yellow.count
-                                            }}
-                                            (−{{
-                                                report.reports[nucleus]
-                                                    .penalties.yellow.points
-                                            }})
+                                            {{ scoreSummary(nucleus) }}
                                         </span>
                                     </div>
                                 </th>
@@ -192,9 +176,7 @@
                                         "
                                         class="ml-1 font-normal text-gray-500 dark:text-slate-400"
                                         >({{
-                                            row.status === "missing"
-                                                ? "missing"
-                                                : "no prediction"
+                                            atomStatusLabel(row.status)
                                         }})</span
                                     >
                                 </td>
@@ -207,8 +189,10 @@
                                 <td class="px-3 py-1.5 text-right tabular-nums">
                                     {{ formatShift(row.deviation, nucleus) }}
                                 </td>
-                                <td class="px-3 py-1.5 text-right tabular-nums">
-                                    {{ row.spheres || "—" }}
+                                <td
+                                    class="whitespace-nowrap px-3 py-1.5 text-right tabular-nums"
+                                >
+                                    {{ environmentMatch(row.spheres) }}
                                 </td>
                                 <td
                                     class="max-w-[12rem] truncate px-3 py-1.5 font-mono text-[11px] text-gray-500 dark:text-slate-400"
@@ -251,17 +235,16 @@
                     :key="'swap-' + index"
                     class="rounded-md bg-red-50 px-2 py-1.5 text-red-900 ring-1 ring-red-200 dark:bg-red-950/40 dark:text-red-100 dark:ring-red-900/50"
                 >
-                    Possible interchange of
                     <strong>{{ suggestion.labels[0] }}</strong> and
-                    <strong>{{ suggestion.labels[1] }}</strong
-                    >: swapping them reduces the deviation by
+                    <strong>{{ suggestion.labels[1] }}</strong> may be swapped:
+                    exchanging the two assignments brings the shifts
                     {{
                         formatShift(
                             suggestion.error_reduction,
                             suggestion.nucleus
                         )
                     }}
-                    ppm.
+                    ppm closer to the prediction.
                 </li>
                 <li
                     v-for="(issue, index) in report.assignment_check.issues"
@@ -271,7 +254,7 @@
                     <span class="font-medium"
                         >{{ nucleusLabel(issue.nucleus) }}:</span
                     >
-                    {{ issue.message }}
+                    {{ issueText(issue) }}
                     <span
                         v-if="issue.labels.length"
                         class="text-amber-800 dark:text-amber-200"
@@ -291,10 +274,20 @@
                         >
                             <th class="px-3 py-2">Assignment</th>
                             <th class="px-3 py-2">Nucleus</th>
-                            <th class="px-3 py-2 text-right">Observed</th>
-                            <th class="px-3 py-2 text-right">Predicted</th>
-                            <th class="px-3 py-2 text-right">Δ</th>
-                            <th class="px-3 py-2 text-right">Spheres</th>
+                            <th class="px-3 py-2 text-right">δ obs. (ppm)</th>
+                            <th class="px-3 py-2 text-right">δ pred. (ppm)</th>
+                            <th
+                                class="px-3 py-2 text-right"
+                                title="Observed minus predicted shift"
+                            >
+                                Δδ (ppm)
+                            </th>
+                            <th
+                                class="cursor-help px-3 py-2 text-right"
+                                :title="environmentMatchHint"
+                            >
+                                Env. match
+                            </th>
                             <th class="px-3 py-2">Status</th>
                         </tr>
                     </thead>
@@ -325,8 +318,10 @@
                             <td class="px-3 py-1.5 text-right tabular-nums">
                                 {{ formatSigned(row.delta, row.nucleus) }}
                             </td>
-                            <td class="px-3 py-1.5 text-right tabular-nums">
-                                {{ row.spheres ?? "—" }}
+                            <td
+                                class="whitespace-nowrap px-3 py-1.5 text-right tabular-nums"
+                            >
+                                {{ environmentMatch(row.spheres) }}
                             </td>
                             <td class="px-3 py-1.5">
                                 <span
@@ -350,9 +345,9 @@
                 v-if="report.adjustments && report.adjustments.length"
                 class="px-4 py-2 text-[11px] text-gray-500 dark:text-slate-400"
             >
-                {{ report.adjustments.length }} identical shift(s) on different
-                atoms were sent 0.001 ppm apart so that nmrshiftdb2 keeps them
-                as separate signals.
+                {{ report.adjustments.length }} identical shift(s) on
+                non-equivalent atoms were offset by 0.001 ppm so that each is
+                compared as a separate signal.
             </p>
         </section>
     </div>
@@ -364,39 +359,39 @@ import {
     quickcheckDepictionUrl,
 } from "@/Utils/quickcheck.js";
 import { printQuickcheckReport } from "@/Utils/quickcheckReportDocument.js";
-
-const NUCLEUS_LABELS = { "13C": "¹³C", "1H": "¹H" };
+import {
+    ASSIGNMENT_RESULT_LABELS,
+    ATOM_STATUS_LABELS,
+    ENVIRONMENT_MATCH_HINT,
+    ROW_STATUS_LABELS,
+    VERDICT_TEXT,
+    issueText,
+    nucleusLabel,
+    reasonLabel,
+    resultLabel,
+} from "@/Utils/quickcheckTerms.js";
 
 const VERDICTS = {
     accept: {
-        title: "Assignments fit the predicted spectra",
-        hint: "Shift list and atom assignments agree with nmrshiftdb2.",
+        ...VERDICT_TEXT.accept,
         box: "border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30",
         text: "text-emerald-900 dark:text-emerald-100",
     },
     review: {
-        title: "Some assignments need a second look",
-        hint: "Check the highlighted atoms, ideally against 2D correlations.",
+        ...VERDICT_TEXT.review,
         box: "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30",
         text: "text-amber-900 dark:text-amber-100",
     },
     reject: {
-        title: "Assignments disagree with the predicted spectra",
-        hint: "Wrong structure, misassigned atoms or referencing problems are common causes.",
+        ...VERDICT_TEXT.reject,
         box: "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30",
         text: "text-red-900 dark:text-red-100",
     },
     not_assessable: {
-        title: "Assignments could not be assessed",
-        hint: "No atom could be compared with a prediction.",
+        ...VERDICT_TEXT.not_assessable,
         box: "border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/60",
         text: "text-gray-900 dark:text-slate-100",
     },
-};
-
-const REASONS = {
-    low_confidence_prediction: "low-confidence prediction",
-    diastereotopic_pair_mean: "CH₂ pair mean",
 };
 
 export default {
@@ -420,6 +415,7 @@ export default {
     },
     data() {
         return {
+            environmentMatchHint: ENVIRONMENT_MATCH_HINT,
             structureFailed: false,
             highlightedUrl: "",
             highlightTarget: "",
@@ -471,12 +467,7 @@ export default {
         },
         assignmentResultLabel() {
             return (
-                {
-                    consistent: "Consistent",
-                    review: "Review",
-                    inconsistent: "Inconsistent",
-                    not_assessable: "Not assessable",
-                }[this.report.assignment_check.result] ||
+                ASSIGNMENT_RESULT_LABELS[this.report.assignment_check.result] ||
                 this.report.assignment_check.result
             );
         },
@@ -559,8 +550,23 @@ export default {
             this.highlightTarget = "";
             this.highlightedUrl = "";
         },
-        nucleusLabel(nucleus) {
-            return NUCLEUS_LABELS[nucleus] || nucleus;
+        nucleusLabel,
+        resultLabel,
+        reasonLabel,
+        issueText,
+        atomStatusLabel(status) {
+            return ATOM_STATUS_LABELS[status] || status;
+        },
+        environmentMatch(spheres) {
+            return spheres ? `${spheres} bonds` : "—";
+        },
+        scoreSummary(nucleus) {
+            const { penalties } = this.report.reports[nucleus];
+            return [
+                `mean |Δδ| ${penalties.mean_deviation.ppm} ppm`,
+                `${penalties.red_or_missing.count} not matching or not assigned`,
+                `${penalties.yellow.count} borderline`,
+            ].join(" · ");
         },
         formatShift(value, nucleus) {
             if (value === null || value === undefined) {
@@ -598,17 +604,7 @@ export default {
             }[status];
         },
         rowStatusLabel(status) {
-            return (
-                {
-                    ok: "fits",
-                    review: "review",
-                    fail: "does not fit",
-                    not_assessable: "not assessable",
-                }[status] || status
-            );
-        },
-        reasonLabel(reason) {
-            return REASONS[reason] || reason.replace(/_/g, " ");
+            return ROW_STATUS_LABELS[status] || status;
         },
         print() {
             printQuickcheckReport({

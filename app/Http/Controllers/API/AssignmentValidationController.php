@@ -53,7 +53,7 @@ class AssignmentValidationController extends Controller
         }
 
         if ($set === null || $set->assignedCount() === 0) {
-            $message = 'None of the shifts is assigned to an atom.';
+            $message = 'None of the shifts is linked to an atom in the structure.';
 
             return response()->json(['message' => $message, 'errors' => ['assignments' => [$message]]], 422);
         }

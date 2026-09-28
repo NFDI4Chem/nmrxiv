@@ -89,7 +89,7 @@ class AssignmentFileReadersTest extends TestCase
         $molfileOnly = explode('> <', $this->fixture('trimethoxybenzaldehyde.nmredata.sdf'))[0];
 
         $this->expectException(InvalidAssignmentFileException::class);
-        $this->expectExceptionMessage('No assignments found');
+        $this->expectExceptionMessage('No assigned shifts found');
 
         $this->resolver()->fromFile($molfileOnly);
     }
