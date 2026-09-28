@@ -42,7 +42,7 @@
                     class="relative h-72 rounded-lg bg-white sm:h-96 lg:h-auto lg:min-h-[20rem] lg:flex-1"
                 >
                     <img
-                        :src="structureUrl"
+                        :src="highlightedUrl || structureUrl"
                         alt="Structure with the author's atom labels"
                         class="absolute inset-0 h-full w-full object-contain"
                         @error="structureFailed = true"
@@ -89,7 +89,10 @@
                     </p>
                 </header>
                 <div class="min-h-0 flex-1 overflow-auto">
-                    <table class="min-w-full text-xs">
+                    <table
+                        class="min-w-full text-xs"
+                        @mouseleave="clearHighlight"
+                    >
                         <thead
                             class="sticky top-0 z-10 bg-gray-50 shadow-[0_1px_0_0] shadow-gray-200 dark:bg-slate-800 dark:shadow-slate-700"
                         >
@@ -175,7 +178,8 @@
                                 v-for="(row, index) in report.reports[nucleus]
                                     .atoms"
                                 :key="nucleus + '-atom-' + index"
-                                :class="atomRowClass(row.status)"
+                                :class="[atomRowClass(row.status), hoverClass]"
+                                @mouseenter="highlightRow(nucleus, row.atoms)"
                             >
                                 <td
                                     class="whitespace-nowrap px-3 py-1.5 font-medium"
@@ -279,6 +283,7 @@
             <div class="mt-3 overflow-x-auto">
                 <table
                     class="min-w-full divide-y divide-gray-200 text-xs dark:divide-slate-700"
+                    @mouseleave="clearHighlight"
                 >
                     <thead class="bg-gray-50 dark:bg-slate-800/60">
                         <tr
@@ -300,6 +305,8 @@
                             v-for="(row, index) in report.assignment_check.rows"
                             :key="'row-' + index"
                             class="text-gray-800 dark:text-slate-200"
+                            :class="hoverClass"
+                            @mouseenter="highlightRow(row.nucleus, row.atoms)"
                         >
                             <td
                                 class="whitespace-nowrap px-3 py-1.5 font-medium"
@@ -414,6 +421,8 @@ export default {
     data() {
         return {
             structureFailed: false,
+            highlightedUrl: "",
+            highlightTarget: "",
         };
     },
     computed: {
@@ -438,6 +447,14 @@ export default {
                 this.structure.cxsmiles,
                 this.structure.flagged
             );
+        },
+        canHighlight() {
+            return Boolean(this.structureUrl && !this.structureFailed);
+        },
+        hoverClass() {
+            return this.canHighlight
+                ? "hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-sky-400"
+                : "";
         },
         offsetText() {
             const offset = this.report.assignment_check.offset || {};
@@ -473,7 +490,75 @@ export default {
             );
         },
     },
+    watch: {
+        structureUrl() {
+            this.preloaded = false;
+            this.clearHighlight();
+        },
+    },
+    created() {
+        this.loadedHighlights = new Set();
+    },
     methods: {
+        highlightUrl(nucleus, atoms) {
+            return quickcheckDepictionUrl(
+                this.$page.props.CM_API,
+                this.structure.cxsmiles,
+                this.structure.highlightIds(nucleus, atoms)
+            );
+        },
+        loadHighlight(url, onLoad) {
+            if (this.loadedHighlights.has(url)) {
+                onLoad?.();
+                return;
+            }
+            const image = new Image();
+            image.onload = () => {
+                this.loadedHighlights.add(url);
+                onLoad?.();
+            };
+            image.src = url;
+        },
+        preloadHighlights() {
+            if (!this.canHighlight || this.preloaded) {
+                return;
+            }
+            this.preloaded = true;
+            const rows = [
+                ...this.nuclei.flatMap((nucleus) =>
+                    this.report.reports[nucleus].atoms.map((row) => [
+                        nucleus,
+                        row.atoms,
+                    ])
+                ),
+                ...(this.report.assignment_check.rows || []).map((row) => [
+                    row.nucleus,
+                    row.atoms,
+                ]),
+            ];
+            new Set(
+                rows.map(([nucleus, atoms]) =>
+                    this.highlightUrl(nucleus, atoms)
+                )
+            ).forEach((url) => this.loadHighlight(url));
+        },
+        highlightRow(nucleus, atoms) {
+            if (!this.canHighlight || !atoms?.length) {
+                return;
+            }
+            this.preloadHighlights();
+            const url = this.highlightUrl(nucleus, atoms);
+            this.highlightTarget = url;
+            this.loadHighlight(url, () => {
+                if (this.highlightTarget === url) {
+                    this.highlightedUrl = url;
+                }
+            });
+        },
+        clearHighlight() {
+            this.highlightTarget = "";
+            this.highlightedUrl = "";
+        },
         nucleusLabel(nucleus) {
             return NUCLEUS_LABELS[nucleus] || nucleus;
         },

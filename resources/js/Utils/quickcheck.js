@@ -186,7 +186,9 @@ function orderedSmiles(molecule, explicitHydrogens = new Set()) {
  *
  * @param {string} molfile
  * @param {object} report NMRKit validation report
- * @returns {{ cxsmiles: string, atomIds: (atoms: number[]) => number[], flagged: number[] }|null}
+ * @returns {{ cxsmiles: string, atomIds: (atoms: number[]) => number[], highlightIds: (nucleus: string, atoms: number[]) => number[], flagged: number[] }|null}
+ *   highlightIds: SMILES positions to highlight for a report row; ¹H rows
+ *   point at the explicit hydrogens of their carriers
  */
 export function quickcheckCxsmiles(molfile, report) {
     if (!molfile) {
@@ -263,7 +265,15 @@ export function quickcheckCxsmiles(molfile, report) {
             return null;
         }
 
-        return { cxsmiles, atomIds, flagged: [...flagged] };
+        const highlightIds = (nucleus, atoms) => {
+            const hydrogenPositions =
+                nucleus === "1H" ? hydrogenIds(atoms) : [];
+            return hydrogenPositions.length
+                ? hydrogenPositions
+                : atomIds(atoms);
+        };
+
+        return { cxsmiles, atomIds, highlightIds, flagged: [...flagged] };
     } catch (error) {
         console.error("Unable to prepare the Quickcheck structure:", error);
         return null;
