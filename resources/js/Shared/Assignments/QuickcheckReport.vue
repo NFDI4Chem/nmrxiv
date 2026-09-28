@@ -35,181 +35,215 @@
             </div>
         </div>
 
-        <div class="grid gap-5 lg:grid-cols-3">
-            <div
-                v-if="structureUrl && !structureFailed"
-                class="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 dark:border-slate-700 lg:col-span-2"
-            >
-                <img
-                    :src="structureUrl"
-                    alt="Structure with the author's atom labels"
-                    class="aspect-[4/3] w-full max-w-xl object-contain"
-                    @error="structureFailed = true"
-                />
-            </div>
-            <div
-                class="space-y-2 text-xs text-gray-600 dark:text-slate-300"
-                :class="structureUrl && !structureFailed ? '' : 'lg:col-span-3'"
-            >
-                <p>
-                    Predictions from
-                    <a
-                        href="https://nmrshiftdb.nmr.uni-koeln.de/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="font-medium text-teal-700 underline decoration-dotted underline-offset-2 dark:text-teal-300"
-                        >nmrshiftdb2</a
+        <div class="grid gap-5 lg:grid-cols-2">
+            <div class="flex min-w-0 flex-col gap-3">
+                <div
+                    v-if="structureUrl && !structureFailed"
+                    class="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 dark:border-slate-700"
+                >
+                    <img
+                        :src="structureUrl"
+                        alt="Structure with the author's atom labels"
+                        class="aspect-[4/3] w-full object-contain"
+                        @error="structureFailed = true"
+                    />
+                </div>
+                <div
+                    class="space-y-2 text-xs text-gray-600 dark:text-slate-300"
+                >
+                    <p>
+                        Predictions from
+                        <a
+                            href="https://nmrshiftdb.nmr.uni-koeln.de/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="font-medium text-teal-700 underline decoration-dotted underline-offset-2 dark:text-teal-300"
+                            >nmrshiftdb2</a
+                        >
+                        (HOSE codes) in {{ report.solvent }}. The prediction is
+                        a reference, not the truth: a poor fit flags assignments
+                        for a second look.
+                    </p>
+                    <p v-if="structureUrl && !structureFailed">
+                        The structure carries the author's carbon and proton
+                        labels.
+                        <template v-if="structure.flagged.length">
+                            Highlighted atoms need review or do not fit the
+                            prediction.
+                        </template>
+                    </p>
+                    <p
+                        v-if="anyInDatabase"
+                        class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
                     >
-                    (HOSE codes) in {{ report.solvent }}. The prediction is a
-                    reference, not the truth: a poor fit flags assignments for a
-                    second look.
-                </p>
-                <p v-if="structureUrl && !structureFailed">
-                    The structure carries the author's carbon and proton labels.
-                    <template v-if="structure.flagged.length">
-                        Highlighted atoms need review or do not fit the
-                        prediction.
-                    </template>
-                </p>
-                <p
-                    v-if="anyInDatabase"
-                    class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
-                >
-                    Most atoms match 6-sphere HOSE codes with very small
-                    deviations. The compound is probably already in nmrshiftdb2,
-                    so this fit is not independent evidence.
-                </p>
-                <p
-                    v-if="
-                        report.assignment_check.offset
-                            ?.suspected_referencing_error
-                    "
-                    class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
-                >
-                    All shifts are offset from the prediction by a similar
-                    amount ({{ offsetText }}). Check the spectrum referencing.
-                </p>
+                        Most atoms match 6-sphere HOSE codes with very small
+                        deviations. The compound is probably already in
+                        nmrshiftdb2, so this fit is not independent evidence.
+                    </p>
+                    <p
+                        v-if="
+                            report.assignment_check.offset
+                                ?.suspected_referencing_error
+                        "
+                        class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
+                    >
+                        All shifts are offset from the prediction by a similar
+                        amount ({{ offsetText }}). Check the spectrum
+                        referencing.
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <section
-            v-for="nucleus in nuclei"
-            :key="'report-' + nucleus"
-            class="overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700"
-        >
-            <header
-                class="flex flex-wrap items-baseline justify-between gap-2 border-b border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-800/60"
+            <section
+                class="flex max-h-[28rem] min-w-0 flex-col overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700 lg:max-h-[36rem]"
             >
-                <h4 class="font-semibold text-gray-900 dark:text-slate-100">
-                    {{ nucleusLabel(nucleus) }} quality report
-                </h4>
-                <p class="text-xs text-gray-600 dark:text-slate-300">
-                    Overall mark
-                    <span
-                        class="text-base font-bold text-gray-900 dark:text-slate-100"
-                        >{{ report.reports[nucleus].mark }}</span
-                    >
-                    (out of 1 to 10) · Result:
-                    <span class="font-semibold"
-                        >{{ report.reports[nucleus].mark }}/{{
-                            report.reports[nucleus].result
-                        }}</span
-                    >
-                </p>
-            </header>
-            <div
-                class="space-y-1 px-4 py-2 text-xs text-gray-600 dark:text-slate-300"
-            >
-                <p>
-                    Mean deviation
-                    {{ report.reports[nucleus].penalties.mean_deviation.ppm }}
-                    ppm: −{{
-                        report.reports[nucleus].penalties.mean_deviation.points
-                    }}
-                    · Red or missing shifts
-                    {{
-                        report.reports[nucleus].penalties.red_or_missing.count
-                    }}: −{{
-                        report.reports[nucleus].penalties.red_or_missing.points
-                    }}
-                    · Yellow shifts
-                    {{ report.reports[nucleus].penalties.yellow.count }}: −{{
-                        report.reports[nucleus].penalties.yellow.points
-                    }}
-                </p>
-                <p
-                    v-if="report.reports[nucleus].mark_is_approximate"
-                    class="text-[11px] text-gray-500 dark:text-slate-400"
+                <header
+                    class="flex flex-wrap items-baseline justify-between gap-2 border-b border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-800/60"
                 >
-                    nmrshiftdb2 does not publish its mark formula; this mark
-                    approximates it from the same penalties.
-                </p>
-            </div>
-            <div class="overflow-x-auto">
-                <table
-                    class="min-w-full divide-y divide-gray-200 text-xs dark:divide-slate-700"
-                >
-                    <thead class="bg-gray-50 dark:bg-slate-800/60">
-                        <tr
-                            class="text-left font-medium text-gray-600 dark:text-slate-300"
+                    <h4 class="font-semibold text-gray-900 dark:text-slate-100">
+                        Quality report
+                    </h4>
+                    <p class="text-xs text-gray-600 dark:text-slate-300">
+                        Overall mark (1 to 10) per nucleus
+                    </p>
+                </header>
+                <div class="min-h-0 flex-1 overflow-auto">
+                    <table class="min-w-full text-xs">
+                        <thead
+                            class="sticky top-0 z-10 bg-gray-50 shadow-[0_1px_0_0] shadow-gray-200 dark:bg-slate-800 dark:shadow-slate-700"
                         >
-                            <th class="px-3 py-2">Atom</th>
-                            <th class="px-3 py-2 text-right">δ (ppm)</th>
-                            <th class="px-3 py-2 text-right">Predicted</th>
-                            <th class="px-3 py-2 text-right">Deviation</th>
-                            <th class="px-3 py-2 text-right">HOSE spheres</th>
-                            <th class="px-3 py-2">HOSE code</th>
-                        </tr>
-                    </thead>
-                    <tbody
-                        class="divide-y divide-gray-100 dark:divide-slate-800"
-                    >
-                        <tr
-                            v-for="(row, index) in report.reports[nucleus]
-                                .atoms"
-                            :key="nucleus + '-atom-' + index"
-                            :class="atomRowClass(row.status)"
-                        >
-                            <td
-                                class="whitespace-nowrap px-3 py-1.5 font-medium"
+                            <tr
+                                class="text-left font-medium text-gray-600 dark:text-slate-300"
                             >
-                                {{ row.label }}
-                                <span
-                                    v-if="
-                                        row.status === 'missing' ||
-                                        row.status === 'impossible'
-                                    "
-                                    class="ml-1 font-normal text-gray-500 dark:text-slate-400"
-                                    >({{
-                                        row.status === "missing"
-                                            ? "missing"
-                                            : "no prediction"
-                                    }})</span
+                                <th class="px-3 py-2">Atom</th>
+                                <th class="px-3 py-2 text-right">δ (ppm)</th>
+                                <th class="px-3 py-2 text-right">Predicted</th>
+                                <th class="px-3 py-2 text-right">Deviation</th>
+                                <th class="px-3 py-2 text-right">Spheres</th>
+                                <th class="px-3 py-2">HOSE code</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            v-for="nucleus in nuclei"
+                            :key="'report-' + nucleus"
+                            class="divide-y divide-gray-100 dark:divide-slate-800"
+                        >
+                            <tr
+                                class="border-t border-gray-200 bg-gray-100 dark:border-slate-700 dark:bg-slate-800/80"
+                            >
+                                <th
+                                    colspan="6"
+                                    class="px-3 py-1.5 text-left font-normal"
                                 >
-                            </td>
-                            <td class="px-3 py-1.5 text-right tabular-nums">
-                                {{ formatShift(row.observed, nucleus) }}
-                            </td>
-                            <td class="px-3 py-1.5 text-right tabular-nums">
-                                {{ formatShift(row.predicted, nucleus) }}
-                            </td>
-                            <td class="px-3 py-1.5 text-right tabular-nums">
-                                {{ formatShift(row.deviation, nucleus) }}
-                            </td>
-                            <td class="px-3 py-1.5 text-right tabular-nums">
-                                {{ row.spheres || "—" }}
-                            </td>
-                            <td
-                                class="max-w-[16rem] truncate px-3 py-1.5 font-mono text-[11px] text-gray-500 dark:text-slate-400"
-                                :title="row.hose_code || ''"
+                                    <div
+                                        class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
+                                    >
+                                        <span
+                                            class="font-semibold text-gray-900 dark:text-slate-100"
+                                        >
+                                            {{ nucleusLabel(nucleus) }} · mark
+                                            {{
+                                                report.reports[nucleus].mark
+                                            }}/10
+                                            <span
+                                                class="font-normal text-gray-500 dark:text-slate-400"
+                                                >·
+                                                {{
+                                                    report.reports[nucleus]
+                                                        .result
+                                                }}</span
+                                            >
+                                        </span>
+                                        <span
+                                            class="text-[11px] text-gray-500 dark:text-slate-400"
+                                        >
+                                            Mean deviation
+                                            {{
+                                                report.reports[nucleus]
+                                                    .penalties.mean_deviation
+                                                    .ppm
+                                            }}
+                                            ppm (−{{
+                                                report.reports[nucleus]
+                                                    .penalties.mean_deviation
+                                                    .points
+                                            }}) · red or missing
+                                            {{
+                                                report.reports[nucleus]
+                                                    .penalties.red_or_missing
+                                                    .count
+                                            }}
+                                            (−{{
+                                                report.reports[nucleus]
+                                                    .penalties.red_or_missing
+                                                    .points
+                                            }}) · yellow
+                                            {{
+                                                report.reports[nucleus]
+                                                    .penalties.yellow.count
+                                            }}
+                                            (−{{
+                                                report.reports[nucleus]
+                                                    .penalties.yellow.points
+                                            }})
+                                        </span>
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr
+                                v-for="(row, index) in report.reports[nucleus]
+                                    .atoms"
+                                :key="nucleus + '-atom-' + index"
+                                :class="atomRowClass(row.status)"
                             >
-                                {{ row.hose_code || "—" }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                                <td
+                                    class="whitespace-nowrap px-3 py-1.5 font-medium"
+                                >
+                                    {{ row.label }}
+                                    <span
+                                        v-if="
+                                            row.status === 'missing' ||
+                                            row.status === 'impossible'
+                                        "
+                                        class="ml-1 font-normal text-gray-500 dark:text-slate-400"
+                                        >({{
+                                            row.status === "missing"
+                                                ? "missing"
+                                                : "no prediction"
+                                        }})</span
+                                    >
+                                </td>
+                                <td class="px-3 py-1.5 text-right tabular-nums">
+                                    {{ formatShift(row.observed, nucleus) }}
+                                </td>
+                                <td class="px-3 py-1.5 text-right tabular-nums">
+                                    {{ formatShift(row.predicted, nucleus) }}
+                                </td>
+                                <td class="px-3 py-1.5 text-right tabular-nums">
+                                    {{ formatShift(row.deviation, nucleus) }}
+                                </td>
+                                <td class="px-3 py-1.5 text-right tabular-nums">
+                                    {{ row.spheres || "—" }}
+                                </td>
+                                <td
+                                    class="max-w-[12rem] truncate px-3 py-1.5 font-mono text-[11px] text-gray-500 dark:text-slate-400"
+                                    :title="row.hose_code || ''"
+                                >
+                                    {{ row.hose_code || "—" }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p
+                    v-if="anyApproximateMark"
+                    class="border-t border-gray-200 px-4 py-1.5 text-[11px] text-gray-500 dark:border-slate-700 dark:text-slate-400"
+                >
+                    nmrshiftdb2 does not publish its mark formula; these marks
+                    approximate it from the same penalties.
+                </p>
+            </section>
+        </div>
 
         <section
             class="overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700"
@@ -436,6 +470,11 @@ export default {
                 cmApi,
                 this.structure.cxsmiles,
                 this.structure.flagged
+            );
+        },
+        anyApproximateMark() {
+            return this.nuclei.some(
+                (nucleus) => this.report.reports[nucleus].mark_is_approximate
             );
         },
         anyInDatabase() {
