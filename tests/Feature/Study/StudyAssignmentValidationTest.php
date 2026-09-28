@@ -11,6 +11,7 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use App\Support\Nmr\Assignments\AssignmentSetResolver;
+use App\Support\Nmr\Assignments\NmrkitAssignmentValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\UploadedFile;
@@ -48,7 +49,7 @@ class StudyAssignmentValidationTest extends TestCase
     public static function report(string $verdict = 'accept', string $assignmentResult = 'consistent'): array
     {
         return [
-            'engine' => ['name' => 'nmrshift', 'source' => 'nmrshiftdb2 quickcheck', 'url' => 'https://nmrshiftdb.test'],
+            'engine' => ['name' => 'prediction', 'source' => 'shift prediction', 'url' => 'https://prediction.test'],
             'solvent' => 'Chloroform-D1 (CDCl3)',
             'verdict' => $verdict,
             'reports' => [
@@ -185,7 +186,7 @@ class StudyAssignmentValidationTest extends TestCase
     public function test_unavailable_servlet_fails_the_check_after_the_last_try(): void
     {
         config(['nmrxiv.assignment_validation.job_tries' => 1]);
-        Http::fake(['nmrkit.test/*' => Http::response(['detail' => ['message' => 'nmrshiftdb2 quickcheck is unavailable']], 503)]);
+        Http::fake(['nmrkit.test/*' => Http::response(['detail' => ['message' => 'Upstream prediction servlet is unavailable']], 503)]);
 
         $this->actingAs($this->owner)
             ->post(route('dashboard.studies.assignment-validation.store', $this->study), [
@@ -194,7 +195,7 @@ class StudyAssignmentValidationTest extends TestCase
             ], ['Accept' => 'application/json'])
             ->assertAccepted()
             ->assertJsonPath('validation.status', 'failed')
-            ->assertJsonPath('validation.error', 'nmrshiftdb2 quickcheck is unavailable');
+            ->assertJsonPath('validation.error', NmrkitAssignmentValidator::UNAVAILABLE_MESSAGE);
     }
 
     public function test_only_study_editors_can_queue_or_view_checks(): void

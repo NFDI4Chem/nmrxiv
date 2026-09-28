@@ -13,7 +13,7 @@ use Throwable;
 
 /**
  * Runs one queued Quickcheck through NMRKit and stores the report. When the
- * nmrshiftdb2 servlet is unavailable the job backs off and retries; invalid
+ * prediction is unavailable the job backs off and retries; invalid
  * input fails immediately.
  */
 class ValidateStudyAssignments implements ShouldQueue

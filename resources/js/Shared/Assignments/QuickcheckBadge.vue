@@ -4,7 +4,7 @@
             type="button"
             class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
             :class="toneClass"
-            :title="'nmrshiftdb2 Quickcheck of the assignments'"
+            :title="'Quickcheck of the assignments'"
             @click="open = true"
         >
             <span class="font-semibold">Quickcheck</span>

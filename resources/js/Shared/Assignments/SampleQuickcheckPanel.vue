@@ -16,10 +16,9 @@
                 <p
                     class="mt-0.5 max-w-2xl text-xs text-gray-600 dark:text-slate-300"
                 >
-                    Compares your ¹³C and ¹H assignments with nmrshiftdb2
-                    predictions for the sample structure, like the nmrshiftdb2
-                    Quickcheck. Reviewers see the result and your confirmation
-                    on the published sample.
+                    Compares your ¹³C and ¹H assignments with the predicted
+                    shifts for the sample structure. Reviewers see the result
+                    and your confirmation on the published sample.
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -88,7 +87,7 @@
                 >
                     {{
                         validation.status === "running"
-                            ? "Predicting spectra with nmrshiftdb2…"
+                            ? "Checking assignments…"
                             : "Quickcheck queued…"
                     }}
                     <span class="font-normal text-gray-500 dark:text-slate-400"

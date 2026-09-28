@@ -148,11 +148,6 @@
                         </span>
                         <span class="min-w-0 flex-1">
                             <span
-                                class="block text-[11px] font-medium uppercase tracking-wide text-gray-400"
-                            >
-                                Free tool
-                            </span>
-                            <span
                                 class="block text-sm font-semibold text-gray-800"
                             >
                                 {{ tool.title }}
@@ -353,7 +348,7 @@ const NMR_TOOLS = [
         route: "predict",
         title: "Predict ¹H and ¹³C NMR spectra",
         description:
-            "Draw, paste or import a structure and get the predicted shifts from nmrshiftdb2.",
+            "Draw, paste or import a structure and get the predicted ¹H and ¹³C shifts.",
         icon: BeakerIcon,
         iconClass: "bg-sky-50 text-sky-600 ring-sky-100",
     },

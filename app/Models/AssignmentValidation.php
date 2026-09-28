@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * One nmrshiftdb2 Quickcheck run of a sample's assignments. The author can
+ * One Quickcheck run of a sample's assignments. The author can
  * confirm a completed run; the prediction is a reference, so confirming an
  * inconsistent result is allowed but needs a note.
  */

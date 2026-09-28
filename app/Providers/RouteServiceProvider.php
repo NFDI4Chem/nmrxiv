@@ -74,7 +74,7 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        // Each public Quickcheck calls the shared nmrshiftdb2 servlet.
+        // Each public Quickcheck calls the shared prediction service.
         RateLimiter::for('assignment-quickcheck', function (Request $request) {
             return [
                 Limit::perMinute((int) config('nmrxiv.assignment_validation.public_per_minute'))->by($request->ip()),

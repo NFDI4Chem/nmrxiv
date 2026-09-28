@@ -320,7 +320,7 @@ function findings(report) {
     if (nuclei.some((nucleus) => report.reports[nucleus].in_database_likely)) {
         items.push({
             tone: "neutral",
-            html: "<strong>Compound probably already in nmrshiftdb2.</strong> Almost every atom matches a reference environment six bonds deep with a very small shift difference, so a good score here is expected and does not independently confirm the assignments.",
+            html: "<strong>Compound probably already in the prediction database.</strong> Almost every atom matches a reference environment six bonds deep with a very small shift difference, so a good score here is expected and does not independently confirm the assignments.",
         });
     }
 
@@ -607,7 +607,6 @@ export function quickcheckReportHtml({
         ...(details.items || []),
         ...(source ? [{ label: "Input", value: source }] : []),
         { label: "Solvent", value: report.solvent || "—" },
-        { label: "Prediction", value: "nmrshiftdb2 (HOSE codes)" },
     ]
         .slice(0, 8)
         .map(
@@ -674,8 +673,6 @@ export function quickcheckReportHtml({
         .map((item) => `<li class="tone-${item.tone}">${item.html}</li>`)
         .join("");
 
-    const engine = report.engine || {};
-
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -733,17 +730,15 @@ ${assignmentSection(report)}
 
 <section class="methods">
     <h2>Method and interpretation</h2>
-    <p>Each assigned shift is compared with the shift predicted by <a href="https://nmrshiftdb.nmr.uni-koeln.de/">nmrshiftdb2</a> in ${escapeHtml(
+    <p>Each assigned shift is compared with the predicted shift in ${escapeHtml(
         report.solvent || "the given solvent"
-    )}. The prediction uses HOSE codes: it looks up reference atoms whose environment matches up to six bonds around the atom ("Env. match"). The more bonds match, the more reliable the prediction.</p>
+    )}. The prediction looks up reference atoms whose environment matches up to six bonds around the atom ("Env. match"). The more bonds match, the more reliable the prediction.</p>
     <p>Each nucleus gets a score out of 10. Points are taken off for the mean shift difference, for shifts that do not match or are not assigned, and for borderline shifts. The assignment check then looks at each assigned signal and reports pairs of assignments that fit the prediction better when swapped. Predictions matching fewer than four bonds are too uncertain to reject an assignment; they can only ask for it to be checked.</p>
     <p>The prediction is a guide, not proof. A poor match points to assignments worth checking, ideally with HSQC and HMBC; a good match does not prove the structure. Atom labels are the author's, and atom numbers refer to the submitted structure.</p>
 </section>
 
 <div class="colophon">
-    <span>Generated with nmrXiv Assignment Quickcheck · validation by NMRKit${
-        engine.source ? ` using ${escapeHtml(engine.source)}` : ""
-    }</span>
+    <span>Generated with nmrXiv Assignment Quickcheck</span>
     <span>${escapeHtml(generated)}</span>
 </div>
 </body>

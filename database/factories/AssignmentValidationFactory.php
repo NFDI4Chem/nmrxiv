@@ -6,6 +6,7 @@ use App\Enums\AssignmentSource;
 use App\Enums\AssignmentValidationStatus;
 use App\Models\AssignmentValidation;
 use App\Models\Study;
+use App\Support\Nmr\Assignments\NmrkitAssignmentValidator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -57,7 +58,7 @@ class AssignmentValidationFactory extends Factory
         ]);
     }
 
-    public function failed(string $error = 'The nmrshiftdb2 quickcheck is currently unavailable.'): static
+    public function failed(string $error = NmrkitAssignmentValidator::UNAVAILABLE_MESSAGE): static
     {
         return $this->state(fn (array $attributes) => [
             'status' => AssignmentValidationStatus::Failed,

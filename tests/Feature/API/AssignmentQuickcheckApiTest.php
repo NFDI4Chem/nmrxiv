@@ -6,6 +6,7 @@ use App\Models\AssignmentValidation;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use App\Support\Nmr\Assignments\NmrkitAssignmentValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -73,7 +74,7 @@ class AssignmentQuickcheckApiTest extends TestCase
     {
         Http::fakeSequence('nmrkit.test/*')
             ->push(['detail' => ['message' => 'Only V2000 molfiles are supported']], 422)
-            ->push(['detail' => ['message' => 'nmrshiftdb2 quickcheck is unavailable']], 503);
+            ->push(['detail' => ['message' => 'Upstream prediction servlet is unavailable']], 503);
 
         $this->postJson(route('api.quickcheck'), $this->manualPayload())
             ->assertUnprocessable()
@@ -81,7 +82,7 @@ class AssignmentQuickcheckApiTest extends TestCase
 
         $this->postJson(route('api.quickcheck'), $this->manualPayload())
             ->assertServiceUnavailable()
-            ->assertJsonPath('message', 'nmrshiftdb2 quickcheck is unavailable');
+            ->assertJsonPath('message', NmrkitAssignmentValidator::UNAVAILABLE_MESSAGE);
     }
 
     public function test_quickcheck_is_rate_limited_per_ip(): void

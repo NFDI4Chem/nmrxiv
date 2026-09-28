@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 /**
- * nmrshiftdb2 Quickcheck of a sample's assignments in the submission flow:
+ * Quickcheck of a sample's assignments in the submission flow:
  * status for polling, queueing a check, and the author's confirmation.
  */
 class StudyAssignmentValidationController extends Controller

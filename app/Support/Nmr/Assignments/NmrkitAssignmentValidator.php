@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Http;
 
 /**
  * Client for NMRKit's `POST /latest/validate/assignments`, which checks the
- * assignments against nmrshiftdb2 quickcheck predictions.
+ * assignments against predicted shifts.
  */
 class NmrkitAssignmentValidator
 {
+    public const UNAVAILABLE_MESSAGE = 'The shift prediction is currently unavailable. Please try again later.';
+
     /**
      * @return array<string, mixed>
      *
@@ -33,9 +35,7 @@ class NmrkitAssignmentValidator
         }
 
         if ($response->failed()) {
-            throw new AssignmentValidationUnavailableException(
-                $this->errorMessage($response, 'The nmrshiftdb2 quickcheck is currently unavailable.')
-            );
+            throw new AssignmentValidationUnavailableException(self::UNAVAILABLE_MESSAGE);
         }
 
         $report = $response->json();

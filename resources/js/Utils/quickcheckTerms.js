@@ -3,7 +3,7 @@ export const NUCLEUS_LABELS = { "13C": "¹³C", "1H": "¹H" };
 export const VERDICT_TEXT = {
     accept: {
         title: "Assignments match the predicted shifts",
-        hint: "The assigned shifts agree with the nmrshiftdb2 prediction.",
+        hint: "The assigned shifts agree with the predicted shifts.",
     },
     review: {
         title: "Some assignments need checking",
@@ -19,7 +19,7 @@ export const VERDICT_TEXT = {
     },
 };
 
-/** nmrshiftdb2 result per nucleus. */
+/** Prediction result per nucleus. */
 export const RESULT_LABELS = {
     accept: "good fit",
     revise: "needs checking",
@@ -27,7 +27,7 @@ export const RESULT_LABELS = {
     reject: "poor fit",
 };
 
-/** nmrshiftdb2 status per atom in the shift comparison. */
+/** Prediction status per atom in the shift comparison. */
 export const ATOM_STATUS_LABELS = {
     green: "matches",
     yellow: "borderline",
@@ -56,7 +56,7 @@ export const REASON_LABELS = {
 };
 
 export const ENVIRONMENT_MATCH_HINT =
-    "How many bonds around the atom match a reference environment in nmrshiftdb2 (HOSE code spheres, 1 to 6). More bonds give a more reliable prediction.";
+    "How many bonds around the atom match a reference environment (1 to 6). More bonds give a more reliable prediction.";
 
 export function nucleusLabel(nucleus) {
     return NUCLEUS_LABELS[nucleus] || nucleus;

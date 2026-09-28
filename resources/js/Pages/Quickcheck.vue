@@ -17,10 +17,9 @@
                             class="mx-auto mt-3 max-w-3xl text-base text-gray-500 sm:text-lg"
                         >
                             Compare your ¹³C and ¹H shift assignments with
-                            shifts predicted by nmrshiftdb2 before you submit.
-                            You get a score for each nucleus, the atoms whose
-                            shifts do not match, and assignments that may be
-                            swapped.
+                            predicted shifts before you submit. You get a score
+                            for each nucleus, the atoms whose shifts do not
+                            match, and assignments that may be swapped.
                         </p>
                     </div>
 
@@ -240,7 +239,7 @@
                                     >
                                         {{
                                             isChecking
-                                                ? "Checking with nmrshiftdb2…"
+                                                ? "Checking assignments…"
                                                 : "Run Quickcheck"
                                         }}
                                     </button>
@@ -491,7 +490,7 @@ export default {
             if (status === 503) {
                 return (
                     error.response.data?.message ||
-                    "nmrshiftdb2 is not reachable right now. Please try again later."
+                    "The shift prediction is not available right now. Please try again later."
                 );
             }
             const errors = error.response?.data?.errors;

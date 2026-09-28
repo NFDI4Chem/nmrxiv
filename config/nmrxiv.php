@@ -66,9 +66,9 @@ return [
     | Assignment Quickcheck
     |--------------------------------------------------------------------------
     |
-    | 1H/13C assignments are checked by NMRKit against nmrshiftdb2 quickcheck
-    | predictions. The servlet is a shared university service, so failed
-    | calls back off and the public endpoint is rate limited per IP.
+    | 1H/13C assignments are checked by NMRKit against predicted shifts. The
+    | prediction is a shared service, so failed calls back off and the public
+    | endpoint is rate limited per IP.
     |
     */
 

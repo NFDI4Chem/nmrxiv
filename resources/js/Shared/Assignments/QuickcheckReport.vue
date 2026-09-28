@@ -44,7 +44,7 @@
                 >
                     <div
                         class="relative h-16 w-16 shrink-0"
-                        :title="`nmrshiftdb2 score: ${card.mark} out of 10`"
+                        :title="`Score: ${card.mark} out of 10`"
                     >
                         <svg
                             viewBox="0 0 36 36"

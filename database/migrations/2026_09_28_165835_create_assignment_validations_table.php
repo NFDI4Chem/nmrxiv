@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * nmrshiftdb2 Quickcheck runs of a sample's 1H/13C assignments, with the
+     * Quickcheck runs of a sample's 1H/13C assignments, with the
      * author's confirmation. `input` is the assignment set sent to NMRKit and
      * `report` its response, both stored as-is.
      */
