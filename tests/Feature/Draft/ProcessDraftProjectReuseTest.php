@@ -195,6 +195,8 @@ class ProcessDraftProjectReuseTest extends TestCase
     {
         Queue::fake();
 
+        config(['services.chemotion_tracker.enabled' => false]);
+
         $this->draft->update([
             'eln' => 'chemotion',
             'external_id' => 'eln-123',
