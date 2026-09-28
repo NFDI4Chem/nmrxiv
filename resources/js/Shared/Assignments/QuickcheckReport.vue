@@ -234,13 +234,6 @@
                     >{{ assignmentResultLabel }}</span
                 >
             </header>
-            <p class="px-4 pt-2 text-xs text-gray-600 dark:text-slate-300">
-                Are the shifts on the right atoms? Each assigned signal is
-                compared with the prediction for its atoms. Predictions from
-                fewer than 4 HOSE spheres are too uncertain to fail an
-                assignment and can at most ask for review.
-            </p>
-
             <ul
                 v-if="
                     report.assignment_check.suggestions.length ||
