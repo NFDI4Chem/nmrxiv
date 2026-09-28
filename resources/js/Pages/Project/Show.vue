@@ -113,6 +113,17 @@
                     <b>Info: </b> You are viewing the project in read-only mode.
                 </div>
             </div>
+            <div
+                v-if="
+                    canUpdateProject &&
+                    ['queued', 'processing', 'failed'].includes(
+                        String(project.status || '').toLowerCase()
+                    )
+                "
+                class="border-b bg-gray-50 px-4 py-6 dark:border-gray-800 dark:bg-gray-950"
+            >
+                <ProcessingLogs :project="project" />
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="w-full space-y-3 pt-6">
@@ -1374,6 +1385,7 @@ import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
 import ManageFundingReference from "@/Shared/ManageFundingReference.vue";
+import ProcessingLogs from "@/Shared/ProcessingLogs.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
@@ -1408,6 +1420,7 @@ export default {
         ToolTip,
         ManageCitation,
         ManageFundingReference,
+        ProcessingLogs,
         Citation,
         Publish,
         AuthorCard,

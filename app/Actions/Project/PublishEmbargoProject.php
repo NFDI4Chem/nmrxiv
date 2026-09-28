@@ -60,6 +60,8 @@ class PublishEmbargoProject
             $project->save();
         });
 
+        app(AssignIdentifier::class)->reserveProjectIdentifier($project);
+
         Log::info('embargo_publish_trace', [
             'stage' => 'publish_embargo_project_action_dispatch_process_submission',
             'project_id' => $project->id,

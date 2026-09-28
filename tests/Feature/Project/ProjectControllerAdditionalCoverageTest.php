@@ -221,21 +221,38 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
 
     public function test_status_endpoint_returns_project_status_and_logs()
     {
-        $this->project->update([
-            'status' => 'processing',
-            'process_logs' => ['step1' => 'completed', 'step2' => 'in_progress'],
+        $this->privateProject->users()->attach($this->owner, [
+            'role' => 'creator',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
-        $this->project->refresh();
+
+        $this->privateProject->update([
+            'status' => 'processing',
+            'process_logs' => [
+                [
+                    'timestamp' => now()->toISOString(),
+                    'level' => 'INFO',
+                    'stage' => 'started',
+                    'message' => 'Publish processing started.',
+                    'context' => [],
+                ],
+            ],
+        ]);
+        $this->privateProject->refresh();
 
         $response = $this->actingAs($this->owner)
-            ->get("/projects/status/{$this->project->id}/queue");
+            ->get("/projects/status/{$this->privateProject->id}/queue");
 
         $response->assertStatus(200);
-        // Just check that we get a response with status and logs keys
         $response->assertJsonStructure([
             'status',
             'logs',
+            'last_activity_at',
+            'is_stale',
+            'has_draft',
         ]);
+        $response->assertJsonPath('status', 'processing');
     }
 
     public function test_status_endpoint_handles_null_project()

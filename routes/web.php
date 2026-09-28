@@ -232,6 +232,9 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
         ->name('project.status');
 
+    Route::post('projects/{project}/publish/retry', [ProjectController::class, 'retryPublish'])
+        ->name('project.publish.retry');
+
     Route::get('projects/{project}/validation', [ProjectController::class, 'validationReport'])
         ->name('project.validation');
 
