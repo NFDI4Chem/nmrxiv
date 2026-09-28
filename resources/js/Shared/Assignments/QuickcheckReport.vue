@@ -39,17 +39,17 @@
             <div class="flex min-w-0 flex-col gap-3">
                 <div
                     v-if="structureUrl && !structureFailed"
-                    class="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 dark:border-slate-700"
+                    class="relative h-72 rounded-lg bg-white sm:h-96 lg:h-auto lg:min-h-[20rem] lg:flex-1"
                 >
                     <img
                         :src="structureUrl"
                         alt="Structure with the author's atom labels"
-                        class="aspect-[4/3] w-full object-contain"
+                        class="absolute inset-0 h-full w-full object-contain"
                         @error="structureFailed = true"
                     />
                 </div>
                 <div
-                    class="space-y-2 text-xs text-gray-600 dark:text-slate-300"
+                    class="space-y-2 text-xs text-gray-600 empty:hidden dark:text-slate-300"
                 >
                     <p
                         v-if="
