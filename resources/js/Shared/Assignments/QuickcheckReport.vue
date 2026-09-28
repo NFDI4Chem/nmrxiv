@@ -65,7 +65,7 @@
                     second look.
                 </p>
                 <p v-if="structureUrl && !structureFailed">
-                    The structure carries the author's atom labels.
+                    The structure carries the author's carbon and proton labels.
                     <template v-if="structure.flagged.length">
                         Highlighted atoms need review or do not fit the
                         prediction.

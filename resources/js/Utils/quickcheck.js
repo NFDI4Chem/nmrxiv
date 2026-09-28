@@ -47,11 +47,15 @@ function safeLabel(value) {
 /**
  * SMILES of the heavy atoms, each in brackets with its hydrogen count,
  * written in a known order so atom values and highlights can be attached.
+ * Atoms listed in `explicitHydrogens` get their hydrogens as `[H]` branches.
  *
  * @param {import("openchemlib").Molecule} molecule
- * @returns {{ smiles: string, order: number[] }} order: OCL index per SMILES position
+ * @param {Set<number>} explicitHydrogens OCL indices of heavy atoms
+ * @returns {{ smiles: string, size: number, positions: Map<number, number>, hydrogens: Map<number, number[]> }}
+ *   size: atoms written, positions: SMILES position per heavy OCL index,
+ *   hydrogens: SMILES positions of the explicit hydrogens per OCL index
  */
-function orderedSmiles(molecule) {
+function orderedSmiles(molecule, explicitHydrogens = new Set()) {
     const atomCount = molecule.getAllAtoms();
     const isHydrogen = (atom) => molecule.getAtomicNo(atom) === 1;
     const neighbours = (atom) => {
@@ -94,7 +98,9 @@ function orderedSmiles(molecule) {
                 : `${charge > 0 ? "+" : "-"}${
                       Math.abs(charge) > 1 ? Math.abs(charge) : ""
                   }`;
-        const hydrogens = molecule.getAllHydrogens(atom);
+        const hydrogens = explicitHydrogens.has(atom)
+            ? 0
+            : molecule.getAllHydrogens(atom);
         const hydrogenText =
             hydrogens === 0 ? "" : `H${hydrogens > 1 ? hydrogens : ""}`;
         return `[${mass || ""}${molecule.getAtomLabel(
@@ -102,7 +108,9 @@ function orderedSmiles(molecule) {
         )}${hydrogenText}${chargeText}]`;
     };
 
-    const order = [];
+    const positions = new Map();
+    const hydrogens = new Map();
+    let position = 0;
     const written = new Array(atomCount).fill(false);
     const openRings = new Map();
     const freeDigits = [];
@@ -111,7 +119,7 @@ function orderedSmiles(molecule) {
 
     const write = (atom, parentBond) => {
         written[atom] = true;
-        order.push(atom);
+        positions.set(atom, position++);
         let text = atomToken(atom);
 
         for (const next of neighbours(atom)) {
@@ -130,6 +138,15 @@ function orderedSmiles(molecule) {
                 openRings.set(next.bond, digit);
                 text += bondSymbol(next.bond) + digitText(digit);
             }
+        }
+
+        if (explicitHydrogens.has(atom)) {
+            const positions = [];
+            for (let i = 0; i < molecule.getAllHydrogens(atom); i++) {
+                positions.push(position++);
+                text += "([H])";
+            }
+            hydrogens.set(atom, positions);
         }
 
         const children = neighbours(atom).filter(
@@ -152,13 +169,20 @@ function orderedSmiles(molecule) {
         }
     }
 
-    return { smiles: components.join("."), order };
+    return {
+        smiles: components.join("."),
+        size: position,
+        positions,
+        hydrogens,
+    };
 }
 
 /**
- * CXSMILES of the author's structure with the author's carbon labels as atom
- * values, for the Cheminformatics Microservice depiction. Report atom numbers
- * refer to the author's molfile; `atomIds` maps them to SMILES positions.
+ * CXSMILES of the author's structure with the author's carbon and proton
+ * labels as atom values, for the Cheminformatics Microservice depiction.
+ * Protons with a label are written as explicit hydrogens on their carrier.
+ * Report atom numbers refer to the author's molfile; `atomIds` maps them to
+ * SMILES positions.
  *
  * @param {string} molfile
  * @param {object} report NMRKit validation report
@@ -174,26 +198,61 @@ export function quickcheckCxsmiles(molfile, report) {
         molecule.removeAtomCustomLabels();
         molecule.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
         const toOcl = molfileToOclIndex(molfile, molecule);
-        const { smiles, order } = orderedSmiles(molecule);
-        const position = new Map(order.map((atom, i) => [atom, i]));
+
+        const protonLabels = new Map();
+        for (const row of report?.reports?.["1H"]?.atoms || []) {
+            const carrier = toOcl.get(row.atoms?.[0]);
+            if (row.atoms?.length !== 1 || carrier === undefined) {
+                continue;
+            }
+            const label = safeLabel(row.label);
+            const labels = protonLabels.get(carrier) || [];
+            if (label && !labels.includes(label)) {
+                labels.push(label);
+            }
+            protonLabels.set(carrier, labels);
+        }
+        const withProtons = new Set(
+            [...protonLabels.keys()].filter(
+                (atom) => molecule.getAllHydrogens(atom) > 0
+            )
+        );
+
+        const { smiles, size, positions, hydrogens } = orderedSmiles(
+            molecule,
+            withProtons
+        );
 
         const atomIds = (atoms) =>
             (atoms || [])
-                .map((atom) => position.get(toOcl.get(atom)))
+                .map((atom) => positions.get(toOcl.get(atom)))
                 .filter((index) => index !== undefined);
+        const hydrogenIds = (atoms) =>
+            (atoms || []).flatMap(
+                (atom) => hydrogens.get(toOcl.get(atom)) || []
+            );
 
-        const values = new Array(order.length).fill("");
+        const values = new Array(size).fill("");
         for (const row of report?.reports?.["13C"]?.atoms || []) {
             const [index] = atomIds(row.atoms?.length === 1 ? row.atoms : []);
             if (index !== undefined && row.label) {
                 values[index] = safeLabel(row.label);
             }
         }
+        for (const [carrier, labels] of protonLabels) {
+            (hydrogens.get(carrier) || []).forEach((index, i) => {
+                values[index] = labels[i] || "";
+            });
+        }
 
         const flagged = new Set();
         for (const row of report?.assignment_check?.rows || []) {
             if (row.status === "fail" || row.status === "review") {
-                atomIds(row.atoms).forEach((index) => flagged.add(index));
+                const ids =
+                    row.nucleus === "1H"
+                        ? hydrogenIds(row.atoms)
+                        : atomIds(row.atoms);
+                ids.forEach((index) => flagged.add(index));
             }
         }
 
@@ -225,6 +284,7 @@ export function quickcheckDepictionUrl(cmApi, cxsmiles, atomIds = []) {
         width: "640",
         height: "480",
         annotate: "atomvalue",
+        hydrogen_display: "Provided",
         CIP: "false",
     });
     if (atomIds.length) {
