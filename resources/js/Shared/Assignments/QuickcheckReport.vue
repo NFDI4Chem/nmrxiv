@@ -62,14 +62,6 @@
                         prediction.
                     </p>
                     <p
-                        v-if="anyInDatabase"
-                        class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
-                    >
-                        Most atoms match 6-sphere HOSE codes with very small
-                        deviations. The compound is probably already in
-                        nmrshiftdb2, so this fit is not independent evidence.
-                    </p>
-                    <p
                         v-if="
                             report.assignment_check.offset
                                 ?.suspected_referencing_error
@@ -452,11 +444,6 @@ export default {
                 cmApi,
                 this.structure.cxsmiles,
                 this.structure.flagged
-            );
-        },
-        anyInDatabase() {
-            return this.nuclei.some(
-                (nucleus) => this.report.reports[nucleus].in_database_likely
             );
         },
         offsetText() {
