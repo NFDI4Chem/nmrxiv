@@ -269,7 +269,7 @@
                         </div>
 
                         <div v-if="result" class="space-y-4">
-                            <div class="flex justify-end print:hidden">
+                            <div class="flex justify-end gap-2 print:hidden">
                                 <button
                                     type="button"
                                     class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -277,8 +277,17 @@
                                 >
                                     ← Check other assignments
                                 </button>
+                                <button
+                                    type="button"
+                                    class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    @click="$refs.report.print()"
+                                >
+                                    Print / save as PDF
+                                </button>
                             </div>
                             <QuickcheckReport
+                                ref="report"
+                                :printable="false"
                                 :report="result.report"
                                 :molfile="result.input.structure.molfile"
                                 :details="reportDetails"
