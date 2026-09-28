@@ -117,6 +117,8 @@ class StatsPageTest extends TestCase
             'has_nmrium' => true,
         ]);
 
+        $this->indexPublicMoleculeCatalog([$molecule->id]);
+
         return $molecule;
     }
 }

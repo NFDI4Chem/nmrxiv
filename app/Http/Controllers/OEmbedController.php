@@ -152,10 +152,14 @@ class OEmbedController extends Controller
                 return response()->json(['error' => 'Content not found'], 404);
             }
 
-            // Safely get thumbnail URL
+            // Safely get thumbnail URL. Study exposes `study_photo_urls`
+            // (array); Dataset exposes `dataset_photo_url` (single string).
             $thumbnailUrl = null;
-            if (isset($model->study_preview_urls) && is_array($model->study_preview_urls) && ! empty($model->study_preview_urls)) {
-                $thumbnailUrl = filter_var($model->study_preview_urls[0], FILTER_VALIDATE_URL) ?: null;
+            $previewUrls = $model->study_photo_urls ?? null;
+            if (is_array($previewUrls) && ! empty($previewUrls)) {
+                $thumbnailUrl = filter_var($previewUrls[0], FILTER_VALIDATE_URL) ?: null;
+            } elseif (! empty($model->dataset_photo_url)) {
+                $thumbnailUrl = filter_var($model->dataset_photo_url, FILTER_VALIDATE_URL) ?: null;
             }
 
             // Sanitize all text outputs to prevent XSS

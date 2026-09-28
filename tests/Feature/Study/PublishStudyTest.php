@@ -7,7 +7,10 @@ use App\Actions\Study\UpdateStudy;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Dataset;
 use App\Models\License;
+use App\Models\Molecule;
+use App\Models\NMRium;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\Ticker;
@@ -66,6 +69,50 @@ class PublishStudyTest extends TestCase
             $dataset->refresh();
             $this->assertTrue($dataset->is_public);
         }
+    }
+
+    public function test_publish_indexes_linked_molecule_in_public_catalog(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'is_public' => false,
+            'is_archived' => false,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $this->team->id,
+            'owner_id' => $this->user->id,
+            'project_id' => $this->project->id,
+            'type' => '1H NMR - 1D',
+            'is_public' => false,
+            'is_archived' => false,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        ['info' => ['experiment' => '1D', 'nucleus' => '1H']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFalse($molecule->fresh()->has_public_spectra);
+
+        (new PublishStudy)->publish($study);
+
+        $this->assertTrue($molecule->fresh()->has_public_spectra);
     }
 
     public function test_publication_dispatches_bagit_job_for_public_study_with_download_url(): void

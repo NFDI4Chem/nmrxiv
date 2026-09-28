@@ -4,6 +4,7 @@ namespace Tests\Unit\Jobs;
 
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
 use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
@@ -15,6 +16,7 @@ use App\Models\Citation;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
+use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -120,6 +122,7 @@ class ProcessSubmissionTest extends TestCase
         ]);
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $assigner->shouldReceive('assign')->once()->with(Mockery::type(Project::class));
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -132,7 +135,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->never();
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
         $this->project->refresh();
         $this->assertSame('published', $this->project->status);
@@ -172,6 +175,7 @@ class ProcessSubmissionTest extends TestCase
         $draftId = $this->draft->id;
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $assigner->shouldReceive('assign')->once();
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -183,7 +187,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
         $this->assertNull(Project::find($projectId));
         $this->assertNull(Draft::find($draftId));
@@ -220,6 +224,7 @@ class ProcessSubmissionTest extends TestCase
         ]);
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $assigner->shouldReceive('assign')->once();
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -232,7 +237,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->once();
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
         $this->assertNull(Project::find($this->project->id));
         $this->assertNull(Draft::find($this->draft->id));
@@ -273,6 +278,7 @@ class ProcessSubmissionTest extends TestCase
         ]);
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $assigner->shouldReceive('assign')->once();
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -284,7 +290,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
         $dataset->refresh();
         $this->assertNull($dataset->draft_id);
@@ -395,6 +401,7 @@ class ProcessSubmissionTest extends TestCase
         }
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $assigner->shouldReceive('assign')->once();
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -406,7 +413,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher->shouldReceive('publish')->twice()->with(Mockery::type(Study::class));
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
         foreach ([$studyOne->id, $studyTwo->id] as $studyId) {
             $study = Study::with('studyAuthors')->find($studyId);
@@ -421,6 +428,67 @@ class ProcessSubmissionTest extends TestCase
 
             $this->assertEquals(json_encode([['name' => 'Homo sapiens']]), $study->species);
         }
+    }
+
+    public function test_sample_mode_copies_project_license_to_detached_studies_and_datasets(): void
+    {
+        Storage::fake('local');
+        Event::fake();
+
+        $license = License::factory()->create();
+        $this->project->update([
+            'release_date' => now()->subMinute(),
+            'license_id' => $license->id,
+        ]);
+
+        $this->draft->project_enabled = false;
+        $environment = env('APP_ENV', 'local');
+        $this->draft->path = $environment.'/draft-'.$this->draft->id;
+        $this->draft->save();
+
+        $study = Study::factory()->create([
+            'project_id' => $this->project->id,
+            'license_id' => null,
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'draft_id' => $this->draft->id,
+            'project_id' => $this->project->id,
+            'license_id' => null,
+        ]);
+
+        FileSystemObject::create([
+            'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
+            'type' => 'directory',
+            'name' => 'study',
+            'slug' => 'study',
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
+            'path' => $this->draft->path,
+            'status' => 'present',
+        ]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
+        $assigner->shouldReceive('assign')->once()->with(Mockery::on(function ($studies) use ($license) {
+            return $studies->every(fn ($study) => $study->project_id === null && $study->license_id === $license->id);
+        }));
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once();
+
+        $projectPublisher = Mockery::mock(PublishProject::class);
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
+
+        $this->assertEquals($license->id, $study->fresh()->license_id);
+        $this->assertEquals($license->id, $dataset->fresh()->license_id);
     }
 
     public function test_handle_dispatches_archives_after_project_mode_publish(): void
@@ -458,6 +526,7 @@ class ProcessSubmissionTest extends TestCase
         ]);
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $assigner->shouldReceive('assign')->once();
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -469,7 +538,7 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher = Mockery::mock(PublishStudy::class);
 
         $job = new ProcessSubmission($this->project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
         Bus::assertDispatched(ArchiveProject::class, fn ($dispatched) => $dispatched->project->id === $this->project->id);
         Bus::assertDispatched(ArchiveStudy::class, fn ($dispatched) => $dispatched->project->id === $this->project->id);
@@ -488,6 +557,83 @@ class ProcessSubmissionTest extends TestCase
 
         $userIds = array_map(fn ($user) => $user->id, $sendList);
         $this->assertContains($creator->id, $userIds);
+    }
+
+    public function test_failed_sets_status_and_logs_exception_details(): void
+    {
+        $job = new ProcessSubmission($this->project);
+        $exception = new \RuntimeException('license_id on null');
+
+        $job->failed($exception);
+
+        $this->project->refresh();
+        $this->assertSame('failed', $this->project->status);
+
+        $logs = app(ProjectProcessingLogger::class)->getLogs($this->project);
+        $this->assertNotEmpty($logs);
+
+        $last = $logs[array_key_last($logs)];
+        $this->assertSame('ERROR', $last['level']);
+        $this->assertSame('failed', $last['stage']);
+        $this->assertStringContainsString('license_id on null', $last['message']);
+        $this->assertSame(\RuntimeException::class, $last['context']['exception']);
+        $this->assertArrayHasKey('file', $last['context']);
+    }
+
+    public function test_failed_does_nothing_when_project_was_deleted(): void
+    {
+        $projectId = $this->project->id;
+        $job = new ProcessSubmission($this->project);
+
+        $this->project->delete();
+
+        $job->failed(new \RuntimeException('gone'));
+
+        $this->assertNull(Project::find($projectId));
+    }
+
+    public function test_handle_records_stage_log_entries_on_project_mode(): void
+    {
+        Storage::fake('local');
+        Bus::fake([ArchiveProject::class, ArchiveStudy::class]);
+        Event::fake();
+
+        $this->draft->update(['project_enabled' => true]);
+        $this->project->update([
+            'release_date' => now()->addDays(3),
+            'status' => 'queued',
+        ]);
+
+        Study::factory()->create(['project_id' => $this->project->id]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
+        $assigner->shouldReceive('assign')->once()->with(Mockery::type(Project::class));
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once()->with(Mockery::type(Project::class));
+
+        $projectPublisher = Mockery::mock(PublishProject::class);
+        $projectPublisher->shouldReceive('publish')->never();
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->never();
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
+
+        $this->project->refresh();
+        $this->assertSame('embargo', $this->project->status);
+
+        $logs = app(ProjectProcessingLogger::class)->getLogs($this->project);
+        $stages = array_column($logs, 'stage');
+
+        $this->assertContains('started', $stages);
+        $this->assertContains('moving_files', $stages);
+        $this->assertContains('files_moved', $stages);
+        $this->assertContains('draft_removed', $stages);
+        $this->assertContains('embargo', $stages);
+        $this->assertContains('completed', $stages);
     }
 
     protected function tearDown(): void

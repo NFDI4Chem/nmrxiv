@@ -27,6 +27,8 @@ const STATUS_LABELS = {
     published: "Published",
     complete: "Complete",
     processing: "Processing",
+    queued: "Queued",
+    failed: "Failed",
 };
 
 export default {
@@ -101,6 +103,10 @@ export default {
                 // Processing states - Blue theme
                 processing:
                     "bg-blue-100 text-blue-800 dark:bg-green-900 dark:text-blue-200",
+                queued: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+
+                // Failure states - Red theme
+                failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
             };
 
             return (

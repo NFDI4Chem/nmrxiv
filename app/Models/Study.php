@@ -85,6 +85,7 @@ class Study extends Model implements Auditable
             'processing_logs' => 'array',
             'metadata_bagit_generation_logs' => 'array',
             'hifsa_data' => 'array',
+            'study_photo_path' => 'array',
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'is_archived' => 'boolean',
@@ -104,8 +105,7 @@ class Study extends Model implements Auditable
     protected $appends = [
         'public_url',
         'private_url',
-        'study_photo_url',
-        'study_preview_urls',
+        'study_photo_urls',
         'is_published',
         'is_bookmarked',
     ];
@@ -145,33 +145,22 @@ class Study extends Model implements Auditable
     }
 
     /**
-     * Get the URL to the study's profile photo.
+     * Get the public URLs for the study's photo(s). `study_photo_path` holds
+     * a JSON array of dataset spectrum image paths (backfilled from the
+     * study's BagIt archive by nmrxiv:backfill-dataset-photo), converted
+     * here to their public disk URLs.
      *
-     * @return string
+     * @return array<int, string>
      */
-    public function getStudyPhotoUrlAttribute()
+    public function getStudyPhotoUrlsAttribute(): array
     {
-        return $this->study_photo_path
-                    ? Storage::disk(config('filesystems.default_public'))->url($this->study_photo_path)
-                    : '';
-    }
+        $paths = is_array($this->study_photo_path) ? $this->study_photo_path : [];
+        $disk = Storage::disk(config('filesystems.default_public'));
 
-    /**
-     * Get the URL to the study's datasets preview.
-     *
-     * @return string
-     */
-    public function getStudyPreviewUrlsAttribute()
-    {
-        $dataset_urls = $this->datasets->pluck('dataset_photo_url');
-        $urls = [];
-        foreach ($dataset_urls as $dataset_url) {
-            if ($dataset_url) {
-                array_push($urls, $dataset_url);
-            }
-        }
-
-        return $urls;
+        return array_values(array_filter(array_map(
+            fn ($path) => $path ? $disk->url($path) : null,
+            $paths
+        )));
     }
 
     /**

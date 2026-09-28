@@ -486,24 +486,6 @@ class StudyDataManagementTest extends TestCase
         $this->assertSame('nmrium-side', $merged[0]['id'], 'saved entry must win on dedup');
     }
 
-    public function test_can_save_study_snapshot(): void
-    {
-        $svgContent = '<svg><rect width="100" height="100"/></svg>';
-
-        $this->actingAs($this->user)
-            ->post(route('dashboard.study.snapshot', $this->study), [
-                'img' => $svgContent,
-            ])
-            ->assertStatus(200);
-
-        $expectedPath = '/projects/'.$this->study->project->uuid.'/'.$this->study->slug.'.svg';
-
-        Storage::disk(config('filesystems.default_public', 'public'))->assertExists($expectedPath);
-
-        $this->study->refresh();
-        $this->assertEquals($expectedPath, $this->study->study_photo_path);
-    }
-
     public function test_can_add_molecule_to_study(): void
     {
         $sample = Sample::factory()->create(['study_id' => $this->study->id]);
@@ -671,12 +653,6 @@ class StudyDataManagementTest extends TestCase
         $this->actingAs($otherUser)
             ->post(route('dashboard.studies.nmriumInfo', $this->study), [
                 'data' => ['spectra' => []],
-            ])
-            ->assertStatus(403);
-
-        $this->actingAs($otherUser)
-            ->post(route('dashboard.study.snapshot', $this->study), [
-                'img' => '<svg></svg>',
             ])
             ->assertStatus(403);
 

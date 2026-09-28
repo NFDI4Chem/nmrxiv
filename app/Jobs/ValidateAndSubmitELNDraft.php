@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Draft\ProcessDraft;
+use App\Actions\Project\AssignIdentifier;
 use App\Models\Draft;
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -74,6 +75,8 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             $project->release_date = $draft->release_date;
             $project->status = 'queued';
             $project->save();
+
+            app(AssignIdentifier::class)->reserveProjectIdentifier($project);
 
             // Process validation
             $validation = $project->validation;

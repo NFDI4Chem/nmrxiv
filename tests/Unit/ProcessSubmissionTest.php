@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
 use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
@@ -25,13 +26,14 @@ class ProcessSubmissionTest extends TestCase
         $project->status = 'queued';
         $project->setRelation('draft', null);
 
-        $project->shouldReceive('fresh')->once()->andReturn($project);
+        $project->shouldReceive('fresh')->twice()->andReturn($project);
 
         $studiesRelation = Mockery::mock(HasMany::class);
         $studiesRelation->shouldReceive('exists')->once()->andReturn(false);
         $project->shouldReceive('studies')->once()->andReturn($studiesRelation);
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->once()->with($project)->andReturn($project);
         $assigner->shouldNotReceive('assign');
 
         $updater = Mockery::mock(UpdateDOI::class);
@@ -46,8 +48,11 @@ class ProcessSubmissionTest extends TestCase
         $detachStudyFilesystemFromDraft = Mockery::mock(DetachStudyFilesystemFromDraft::class);
         $detachStudyFilesystemFromDraft->shouldNotReceive('detach');
 
+        $logger = Mockery::mock(ProjectProcessingLogger::class);
+        $logger->shouldReceive('log')->once();
+
         $job = new ProcessSubmission($project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, $detachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, $detachStudyFilesystemFromDraft, $logger);
 
         $this->assertSame('queued', $project->status);
     }
@@ -60,10 +65,11 @@ class ProcessSubmissionTest extends TestCase
         $project->status = 'complete';
         $project->setRelation('draft', null);
 
-        $project->shouldReceive('fresh')->once()->andReturn($project);
+        $project->shouldReceive('fresh')->twice()->andReturn($project);
         $project->shouldNotReceive('save');
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->once()->with($project)->andReturn($project);
         $updater = Mockery::mock(UpdateDOI::class);
         $projectPublisher = Mockery::mock(PublishProject::class);
         $studyPublisher = Mockery::mock(PublishStudy::class);
@@ -71,8 +77,11 @@ class ProcessSubmissionTest extends TestCase
         $detachStudyFilesystemFromDraft = Mockery::mock(DetachStudyFilesystemFromDraft::class);
         $detachStudyFilesystemFromDraft->shouldNotReceive('detach');
 
+        $logger = Mockery::mock(ProjectProcessingLogger::class);
+        $logger->shouldNotReceive('log');
+
         $job = new ProcessSubmission($project);
-        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, $detachStudyFilesystemFromDraft);
+        $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, $detachStudyFilesystemFromDraft, $logger);
 
         $this->assertSame('complete', $project->status);
     }

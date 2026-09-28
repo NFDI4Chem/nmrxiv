@@ -1568,7 +1568,7 @@
         :show="showDownloadTerms"
         :download-url="pendingDownloadUrl"
         :download-identifier="pendingDownloadIdentifier"
-        :license-title="project?.license?.title || study?.license?.title"
+        :license-title="licenseTitle"
         @close="closeDownloadTerms"
     />
 </template>
@@ -1703,6 +1703,7 @@ export default {
      * @prop {Boolean} readonly - Whether the browser is in read-only mode
      * @prop {String} height - Tailwind height classes for the root #fs-dropzone (e.g. h-full min-h-0 when the parent establishes height via flex).
      * @prop {Object} project - Project object for public file access (optional)
+     * @prop {Object} study - Study object for public file access (optional)
      * @prop {Boolean} treeOnly - Show only the folder tree (hide details panel)
      */
     props: [
@@ -1710,6 +1711,7 @@ export default {
         "readonly",
         "height",
         "project",
+        "study",
         "treeOnly",
         "studies",
         "submittedStudyIds",
@@ -1912,15 +1914,32 @@ export default {
             }
         },
 
+        resolvedStudy() {
+            if (this.study) {
+                return this.study;
+            }
+
+            return (
+                this.$page.props.study?.data ?? this.$page.props.study ?? null
+            );
+        },
+
+        licenseTitle() {
+            return (
+                this.project?.license?.title ||
+                this.resolvedStudy?.license?.title ||
+                null
+            );
+        },
+
         downloadTrackingIdentifier() {
             if (this.project) {
                 return this.trackingIdentifier(this.project);
             }
 
-            const study =
-                this.$page.props.study?.data ?? this.$page.props.study;
-
-            return study ? this.trackingIdentifier(study) : null;
+            return this.resolvedStudy
+                ? this.trackingIdentifier(this.resolvedStudy)
+                : null;
         },
 
         /**
@@ -4094,9 +4113,14 @@ export default {
             let targetId = null;
 
             // First try to use the selected parameter from URL
-            if (selectedParam) {
-                targetId = parseInt(selectedParam);
-            } else {
+            if (selectedParam && selectedParam !== "undefined") {
+                const parsed = parseInt(selectedParam, 10);
+                if (!Number.isNaN(parsed)) {
+                    targetId = parsed;
+                }
+            }
+
+            if (targetId == null) {
                 // Fall back to last expanded folder
                 const expandedIds = Array.from(this.expandedFolders);
                 if (expandedIds.length === 0) return;

@@ -1,8 +1,18 @@
 <template>
     <a>
         <div>
-            <InertiaLink :href="resolvedHref">
+            <component
+                :is="locked ? 'div' : 'InertiaLink'"
+                v-bind="linkAttributes"
+            >
                 <div class="relative overflow-hidden rounded-t">
+                    <span
+                        v-if="locked"
+                        class="pointer-events-none absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-gray-900/80 px-2 py-0.5 text-[11px] font-medium leading-5 text-white shadow-sm"
+                    >
+                        <LockClosedIcon class="h-3 w-3" aria-hidden="true" />
+                        Unpublished
+                    </span>
                     <Depictor2D
                         v-if="
                             molecule.canonical_smiles &&
@@ -226,7 +236,7 @@
         >
       </div> -->
                 <!-- </div> -->
-            </InertiaLink>
+            </component>
         </div>
     </a>
 </template>
@@ -234,11 +244,13 @@
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import MolecularFormula from "@/Shared/MolecularFormula.vue";
 import { Link as InertiaLink } from "@inertiajs/vue3";
+import { LockClosedIcon } from "@heroicons/vue/20/solid";
 export default {
     components: {
         Depictor2D,
         MolecularFormula,
         InertiaLink,
+        LockClosedIcon,
     },
     props: {
         molecule: {
@@ -263,6 +275,13 @@ export default {
             type: String,
             default: null,
         },
+        /**
+         * Renders the card without a link and with an "Unpublished" badge.
+         */
+        locked: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -271,6 +290,17 @@ export default {
         };
     },
     computed: {
+        linkAttributes() {
+            if (this.locked) {
+                return {
+                    class: "block cursor-default",
+                    "aria-disabled": "true",
+                    title: "This compound has not been published yet",
+                };
+            }
+
+            return { href: this.resolvedHref };
+        },
         resolvedHref() {
             if (this.href != null && String(this.href).trim() !== "") {
                 return this.href;
@@ -341,7 +371,7 @@ export default {
                 parts.push(
                     `${kinds} experiment type${
                         kinds === 1 ? "" : "s"
-                    } · ${total} spectrum${total === 1 ? "" : "a"}`
+                    } · ${total} ${total === 1 ? "spectrum" : "spectra"}`
                 );
             }
 

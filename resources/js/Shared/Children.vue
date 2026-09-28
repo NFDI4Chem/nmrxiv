@@ -1089,13 +1089,18 @@ export default {
             // Parse current URL parameters
             const urlParams = new URLSearchParams(window.location.search);
 
-            // Set or update the selected parameter
-            urlParams.set("selected", selectedId);
+            // Synthetic roots have no id; clear any stale selected param
+            if (selectedId == null || selectedId === "") {
+                urlParams.delete("selected");
+            } else {
+                urlParams.set("selected", selectedId);
+            }
 
             // Construct new URL with updated parameters
-            const newUrl = `${
-                window.location.pathname
-            }?${urlParams.toString()}`;
+            const query = urlParams.toString();
+            const newUrl = query
+                ? `${window.location.pathname}?${query}`
+                : window.location.pathname;
 
             const state =
                 window.history.state && typeof window.history.state === "object"

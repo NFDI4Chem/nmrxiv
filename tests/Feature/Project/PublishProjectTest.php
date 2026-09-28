@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Team;
+use App\Models\Ticker;
 use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -659,5 +660,61 @@ class PublishProjectTest extends TestCase
         $dataset->refresh();
         $this->assertEquals($this->project->license_id, $study->license_id);
         $this->assertEquals($this->project->license_id, $dataset->license_id);
+    }
+
+    public function test_publish_reserves_public_identifier_while_draft_still_attached(): void
+    {
+        Queue::fake();
+
+        foreach (['project', 'study', 'dataset', 'sample', 'molecule'] as $type) {
+            Ticker::query()->create(['type' => $type, 'index' => 0]);
+        }
+
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'project_enabled' => true,
+        ]);
+        $this->project->forceFill([
+            'draft_id' => $draft->id,
+            'identifier' => null,
+        ])->save();
+
+        $response = $this->actingAs($this->user)
+            ->withHeader('X-Inertia', 'true')
+            ->from('/publish/'.$draft->id)
+            ->put("/dashboard/projects/{$this->project->id}/publish", [
+                'release_date' => now()->format('Y-m-d H:i:s'),
+                'enableProjectMode' => false,
+            ]);
+
+        $this->project->refresh();
+
+        $this->assertSame('queued', $this->project->status);
+        $this->assertSame($draft->id, $this->project->draft_id);
+        $this->assertSame('NMRXIV:P1', $this->project->identifier);
+        $response->assertRedirect('/project/P1');
+        $response->assertSessionHas('success', 'Your submission has been queued for processing.');
+    }
+
+    public function test_dashboard_project_show_redirects_to_public_url_while_draft_still_attached(): void
+    {
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'project_enabled' => true,
+        ]);
+        $this->project->forceFill([
+            'draft_id' => $draft->id,
+            'identifier' => 324235,
+            'status' => 'processing',
+        ])->save();
+
+        $response = $this->actingAs($this->user)
+            ->get('/dashboard/projects/'.$this->project->id.'?edit=release_date');
+
+        $response->assertRedirect();
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringContainsString('/project/P324235', $location);
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
+        $this->assertSame('release_date', $query['edit'] ?? null);
     }
 }

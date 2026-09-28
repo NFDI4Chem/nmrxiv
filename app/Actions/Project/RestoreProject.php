@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Support\Public\PublicMoleculeCatalogIndexer;
 
 class RestoreProject
 {
@@ -21,6 +22,8 @@ class RestoreProject
             }
             $project->is_archived = false;
             $project->save();
+
+            app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
         } else {
             $project->studies()->update(['is_deleted' => false]);
             foreach ($project->studies as $study) {

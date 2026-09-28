@@ -1370,6 +1370,11 @@
                             Go to Dashboard
                         </Link>
                     </div>
+                    <ProcessingLogs
+                        v-if="project"
+                        :project="project"
+                        @status-changed="status = $event"
+                    />
                 </div>
                 <div class="w-full">
                     <div
@@ -1568,6 +1573,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
 import ManageFundingReference from "@/Shared/ManageFundingReference.vue";
+import ProcessingLogs from "@/Shared/ProcessingLogs.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
@@ -1592,6 +1598,7 @@ export default {
         AuthorCard,
         ManageCitation,
         ManageFundingReference,
+        ProcessingLogs,
         Datepicker,
         VueTagsInput,
         SelectRich,
@@ -2260,14 +2267,17 @@ export default {
                                 ),
                                 this.publishForm
                             )
-                            .catch((err) => {
-                                this.errors = err.response.data.errors;
-                                this.validation =
-                                    err.response.data.validation.report;
-                            })
                             .then((response) => {
                                 this.status = response.data.project.status;
-                                // this.trackProject();
+                            })
+                            .catch((err) => {
+                                this.errors =
+                                    err.response?.data?.errors ??
+                                    "Publishing failed. Please try again.";
+                                if (err.response?.data?.validation?.report) {
+                                    this.validation =
+                                        err.response.data.validation.report;
+                                }
                             });
                     },
                     onError: () => {

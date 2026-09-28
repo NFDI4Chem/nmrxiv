@@ -3,6 +3,7 @@
 namespace Tests\Unit\Jobs;
 
 use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
 use App\Jobs\ProcessProject;
@@ -91,6 +92,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -99,7 +101,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
 
         $this->assertEquals('complete', $this->project->fresh()->status);
     }
@@ -110,6 +112,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -118,7 +121,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
 
         $this->assertDatabaseMissing('drafts', ['id' => $this->draft->id]);
     }
@@ -129,6 +132,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -139,7 +143,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
     }
 
     public function test_handle_updates_doi_after_processing(): void
@@ -148,6 +152,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -158,7 +163,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
     }
 
     public function test_handle_publishes_project_if_release_date_is_past(): void
@@ -170,6 +175,7 @@ class ProcessProjectJobTest extends TestCase
         $this->project->save();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -180,7 +186,7 @@ class ProcessProjectJobTest extends TestCase
         }));
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
     }
 
     public function test_handle_does_not_publish_project_if_release_date_is_future(): void
@@ -192,6 +198,7 @@ class ProcessProjectJobTest extends TestCase
         $this->project->save();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -200,7 +207,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
     }
 
     public function test_handle_sends_notification_to_project_owner(): void
@@ -209,6 +216,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -217,7 +225,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
 
         Notification::assertSentTo($this->project->owner, DraftProcessedNotification::class);
     }
@@ -228,6 +236,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -236,12 +245,11 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
 
         $this->project->refresh();
-        $this->assertNotNull($this->project->process_logs);
-        $decodedLogs = json_decode($this->project->process_logs, true);
-        $this->assertIsArray($decodedLogs);
+        $this->assertIsArray($this->project->process_logs);
+        $this->assertNotEmpty($this->project->process_logs);
     }
 
     public function test_handle_clears_draft_id_from_project(): void
@@ -250,6 +258,7 @@ class ProcessProjectJobTest extends TestCase
         Notification::fake();
 
         $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
         $updater = Mockery::mock(UpdateDOI::class);
         $publisher = Mockery::mock(PublishProject::class);
 
@@ -258,7 +267,7 @@ class ProcessProjectJobTest extends TestCase
         $publisher->shouldReceive('publish')->never();
 
         $job = new ProcessProject($this->project);
-        $job->handle($assigner, $updater, $publisher);
+        $job->handle($assigner, $updater, $publisher, new ProjectProcessingLogger);
 
         $this->project->refresh();
         $this->assertNull($this->project->draft_id);
