@@ -16,6 +16,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Publish Processing
+    |--------------------------------------------------------------------------
+    |
+    | When a project stays in queued/processing without new log activity for
+    | longer than this many minutes, the status endpoint marks it as stale.
+    |
+    */
+
+    'publish' => [
+        'stale_after_minutes' => (int) env('PUBLISH_STALE_AFTER_MINUTES', 30),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Spectra Parsing Configuration
     |--------------------------------------------------------------------------
     |

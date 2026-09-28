@@ -3,6 +3,7 @@
 namespace App\Actions\Community;
 
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
+use App\Actions\Project\AssignIdentifier;
 use App\Jobs\ProcessSubmission;
 use App\Models\Draft;
 use App\Models\License;
@@ -87,6 +88,8 @@ class PublishCommunityStudies
 
             $this->detachStudyFilesystemFromDraft->execute($draft, $queuedIds);
         });
+
+        app(AssignIdentifier::class)->reserveProjectIdentifier($project->fresh());
 
         ProcessSubmission::dispatch($project->fresh(), $queuedIds, preserveDraft: true);
 

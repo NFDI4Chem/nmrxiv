@@ -75,6 +75,7 @@ class Project extends Model implements Auditable
             'provisional_doi_registered_at' => 'datetime',
             'release_date' => 'datetime',
             'deleted_on' => 'datetime',
+            'process_logs' => 'array',
         ];
     }
 
