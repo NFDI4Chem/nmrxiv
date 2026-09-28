@@ -233,54 +233,30 @@ class StudyModelTest extends TestCase
         $this->assertNull($studyWithoutId->identifier);
     }
 
-    public function test_it_generates_study_photo_url_when_path_exists(): void
+    public function test_it_generates_study_photo_urls_when_paths_exist(): void
     {
         Storage::fake('local');
 
         $study = Study::factory()->create([
-            'study_photo_path' => 'photos/study.jpg',
+            'study_photo_path' => ['photos/study1.jpg', 'photos/study2.jpg'],
         ]);
 
-        $this->assertNotEmpty($study->study_photo_url);
-        $this->assertStringContainsString('photos/study.jpg', $study->study_photo_url);
+        $urls = $study->study_photo_urls;
+
+        $this->assertIsArray($urls);
+        $this->assertCount(2, $urls);
+        $urlString = implode('|', $urls);
+        $this->assertStringContainsString('photos/study1.jpg', $urlString);
+        $this->assertStringContainsString('photos/study2.jpg', $urlString);
     }
 
-    public function test_it_returns_empty_study_photo_url_when_no_path(): void
+    public function test_it_returns_empty_study_photo_urls_when_no_path(): void
     {
         $study = Study::factory()->create([
             'study_photo_path' => null,
         ]);
 
-        $this->assertEquals('', $study->study_photo_url);
-    }
-
-    public function test_it_generates_study_preview_urls_from_datasets(): void
-    {
-        Storage::fake('local');
-
-        $study = Study::factory()->create();
-        $dataset1 = Dataset::factory()->create([
-            'study_id' => $study->id,
-            'dataset_photo_path' => 'photos/dataset1.jpg',
-        ]);
-        $dataset2 = Dataset::factory()->create([
-            'study_id' => $study->id,
-            'dataset_photo_path' => 'photos/dataset2.jpg',
-        ]);
-        $dataset3 = Dataset::factory()->create([
-            'study_id' => $study->id,
-            'dataset_photo_path' => null,
-        ]);
-
-        $previewUrls = $study->study_preview_urls;
-
-        $this->assertIsArray($previewUrls);
-        $this->assertCount(2, $previewUrls); // Only datasets with photo paths
-
-        // Check that both URLs contain the expected paths (order might vary)
-        $urlString = implode('|', $previewUrls);
-        $this->assertStringContainsString('photos/dataset1.jpg', $urlString);
-        $this->assertStringContainsString('photos/dataset2.jpg', $urlString);
+        $this->assertEquals([], $study->study_photo_urls);
     }
 
     public function test_it_generates_study_experiment_types_from_datasets(): void
@@ -661,8 +637,7 @@ class StudyModelTest extends TestCase
         $appends = [
             'public_url',
             'private_url',
-            'study_photo_url',
-            'study_preview_urls',
+            'study_photo_urls',
             'is_published',
             'is_bookmarked',
         ];

@@ -5,7 +5,10 @@ namespace Tests\Unit\Actions\Project;
 use App\Actions\Project\RestoreProject;
 use App\Models\Dataset;
 use App\Models\Draft;
+use App\Models\Molecule;
+use App\Models\NMRium;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -32,6 +35,53 @@ class RestoreProjectTest extends TestCase
         $this->action->restore($project);
 
         $this->assertFalse($project->fresh()->is_archived);
+    }
+
+    public function test_restore_public_project_indexes_public_catalog_molecules(): void
+    {
+        $project = Project::factory()->create([
+            'is_public' => true,
+            'is_archived' => true,
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'is_public' => true,
+            'is_archived' => true,
+            'is_deleted' => false,
+        ]);
+
+        $molecule = Molecule::factory()->create();
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+        $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'team_id' => $study->team_id,
+            'owner_id' => $study->owner_id,
+            'project_id' => $project->id,
+            'type' => '1H NMR - 1D',
+            'is_public' => true,
+            'is_archived' => true,
+            'is_deleted' => false,
+            'has_nmrium' => true,
+        ]);
+
+        NMRium::factory()->forDataset($dataset)->create([
+            'nmrium_info' => [
+                'data' => [
+                    'spectra' => [
+                        ['info' => ['experiment' => '1D', 'nucleus' => '1H']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFalse($molecule->fresh()->has_public_spectra);
+
+        $this->action->restore($project);
+
+        $this->assertTrue($molecule->fresh()->has_public_spectra);
     }
 
     public function test_restore_public_project_unarchives_studies()

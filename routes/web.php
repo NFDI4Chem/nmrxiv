@@ -5,11 +5,13 @@ use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\CurationController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\AltchaController;
 use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BagitViewerController;
 use App\Http\Controllers\CASController;
 use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
@@ -46,6 +48,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
+use Spatie\Honeypot\ProtectAgainstSpam;
 use Spatie\WelcomeNotification\WelcomesNewUsers;
 
 Route::prefix('auth')->group(function () {
@@ -101,16 +104,32 @@ Route::get('/faqs', function () {
     return Inertia::render('FAQs');
 })->name('faqs');
 
+Route::get('/sustainability', function () {
+    return Inertia::render('Sustainability');
+})->name('sustainability');
+
 Route::get('/predict', function () {
-    return Inertia::render('Predict');
+    return Inertia::render('Predict', [
+        'nmrPredictUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/predict/',
+    ]);
 })->name('predict');
+
+Route::get('/bagit-viewer', [BagitViewerController::class, 'show'])
+    ->name('bagit-viewer');
+
+Route::get('/bagit-viewer/download', [BagitViewerController::class, 'download'])
+    ->name('bagit-viewer.download');
 
 Route::get('/stats', [PublicStatsController::class, 'index'])->name('stats');
 
-// Custom support bubble route with rate limiting and enhanced security
+// Custom support bubble route with rate limiting, ALTCHA and honeypot spam protection
 Route::post('support-bubble', [SupportBubbleController::class, 'submit'])
-    ->middleware(['throttle:support-bubble'])
+    ->middleware(['throttle:support-bubble', ProtectAgainstSpam::class])
     ->name('supportBubble.submit');
+
+Route::get('altcha/challenge', [AltchaController::class, 'challenge'])
+    ->middleware(['throttle:altcha-challenge'])
+    ->name('altcha.challenge');
 
 Route::impersonate();
 
@@ -334,8 +353,6 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.studies.nmrium');
         Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
             ->name('dashboard.studies.nmriumInfo');
-        Route::post('studies/{study}/snapshot', [StudyController::class, 'snapshot'])
-            ->name('dashboard.study.snapshot');
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');

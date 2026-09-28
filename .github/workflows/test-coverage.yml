@@ -63,6 +63,12 @@ jobs:
 
     - name: Build front-end assets
       run: npm run build
+
+    - name: Install, test, and build BagIt viewer
+      run: |
+        npm --prefix resources/bagit-viewer ci
+        npm --prefix resources/bagit-viewer test
+        npm --prefix resources/bagit-viewer run build
     
     - name: Run tests and collect coverage
       run: vendor/bin/phpunit --coverage-clover coverage.xml --display-skipped

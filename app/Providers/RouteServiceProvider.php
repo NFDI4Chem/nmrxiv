@@ -74,7 +74,9 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        // Support bubble rate limiting to prevent spam
+        // Support bubble rate limiting to prevent spam.
+        // ALTCHA + honeypot handle the bulk of bot/spam blocking, so this only
+        // needs to guard against abusive bursts, not legitimate retries.
         RateLimiter::for('support-bubble', function (Request $request) {
             // Skip rate limiting in testing environment
             if (app()->environment('testing')) {
@@ -83,13 +85,22 @@ class RouteServiceProvider extends ServiceProvider
 
             return [
                 // Allow 5 submissions per minute per IP
-                Limit::perMinute(1)->by($request->ip()),
+                Limit::perMinute(5)->by($request->ip()),
                 // Allow 20 submissions per hour per IP
-                Limit::perHour(5)->by($request->ip()),
+                Limit::perHour(20)->by($request->ip()),
                 // Allow 50 submissions per day per IP
-                Limit::perDay(20)->by($request->ip()),
+                Limit::perDay(50)->by($request->ip()),
 
             ];
+        });
+
+        // ALTCHA challenge generation rate limiting to prevent challenge farming
+        RateLimiter::for('altcha-challenge', function (Request $request) {
+            if (app()->environment('testing')) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(20)->by($request->ip());
         });
     }
 }
