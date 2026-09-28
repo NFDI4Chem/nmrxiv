@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Services\DOI\DOIService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -962,6 +963,40 @@ class HasDOIModelTest extends TestCase
         $dataset->refresh();
         $this->assertEquals($license->id, $dataset->license_id);
         $this->assertIsArray($metadata['rightsList']);
+    }
+
+    public function test_get_metadata_dataset_without_project_inherits_study_license(): void
+    {
+        $license = License::factory()->create(['spdx_id' => 'CC0-1.0']);
+        $study = Study::factory()->create([
+            'project_id' => null,
+            'license_id' => $license->id,
+            'owner_id' => User::factory()->create()->id,
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => null,
+            'license_id' => null,
+        ]);
+
+        $metadata = $dataset->getMetadata();
+
+        $this->assertEquals($license->id, $dataset->fresh()->license_id);
+        $this->assertEquals('CC0-1.0', $metadata['rightsList'][0]['rightsIdentifier']);
+    }
+
+    public function test_get_metadata_study_without_project_or_license_does_not_dereference_null_project(): void
+    {
+        $study = Study::factory()->create([
+            'project_id' => null,
+            'license_id' => null,
+            'owner_id' => User::factory()->create()->id,
+        ]);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $study->getMetadata();
     }
 
     public function test_add_related_identifiers_for_study_without_project(): void

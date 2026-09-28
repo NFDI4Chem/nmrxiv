@@ -30,12 +30,18 @@
                 <span
                     v-for="molecule in molecules"
                     :key="moleculeKey(molecule)"
-                    class="rounded-lg border shadow hover:shadow-lg"
+                    :class="[
+                        molecule.is_locked
+                            ? 'bg-gray-50/60'
+                            : 'shadow hover:shadow-lg',
+                        'rounded-lg border',
+                    ]"
                 >
                     <MoleculeCard
                         :molecule="molecule"
                         :href="publicCompoundHref(molecule)"
                         :show-annotation-stars="false"
+                        :locked="Boolean(molecule.is_locked)"
                     />
                 </span>
             </div>

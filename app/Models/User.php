@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\DefaultSpectrumTab;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -91,6 +92,28 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         $this->preferences = $preferences === [] ? null : $preferences;
+    }
+
+    /**
+     * Human-readable name: `name`, else first and last name, else username.
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::get(function (): ?string {
+            $candidates = [
+                $this->name,
+                trim(($this->first_name ?? '').' '.($this->last_name ?? '')),
+                $this->username,
+            ];
+
+            foreach ($candidates as $candidate) {
+                if (is_string($candidate) && trim($candidate) !== '') {
+                    return trim($candidate);
+                }
+            }
+
+            return null;
+        });
     }
 
     /**
