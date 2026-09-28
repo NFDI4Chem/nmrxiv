@@ -1,0 +1,515 @@
+<template>
+    <div class="quickcheck-report space-y-5 text-sm">
+        <div
+            class="flex flex-wrap items-start justify-between gap-3 rounded-lg border px-4 py-3"
+            :class="verdictStyle.box"
+        >
+            <div class="min-w-0">
+                <p class="text-base font-semibold" :class="verdictStyle.text">
+                    {{ verdictStyle.title }}
+                </p>
+                <p class="mt-0.5 text-xs text-gray-600 dark:text-slate-300">
+                    {{ verdictStyle.hint }}
+                </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <span
+                    v-for="nucleus in nuclei"
+                    :key="'mark-' + nucleus"
+                    class="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-gray-800 ring-1 ring-gray-200 dark:bg-slate-900/60 dark:text-slate-100 dark:ring-slate-700"
+                >
+                    {{ nucleusLabel(nucleus) }}
+                    {{ report.reports[nucleus].mark }}/10
+                    <span class="font-normal text-gray-500 dark:text-slate-400"
+                        >· {{ report.reports[nucleus].result }}</span
+                    >
+                </span>
+                <button
+                    v-if="printable"
+                    type="button"
+                    class="rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 print:hidden dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                    @click="print"
+                >
+                    Print / save as PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="grid gap-5 lg:grid-cols-3">
+            <div
+                v-if="structureSvg"
+                class="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 dark:border-slate-700"
+            >
+                <div class="w-full max-w-xs" v-html="structureSvg"></div>
+            </div>
+            <div
+                class="space-y-2 text-xs text-gray-600 dark:text-slate-300"
+                :class="structureSvg ? 'lg:col-span-2' : 'lg:col-span-3'"
+            >
+                <p>
+                    Predictions from
+                    <a
+                        href="https://nmrshiftdb.nmr.uni-koeln.de/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="font-medium text-teal-700 underline decoration-dotted underline-offset-2 dark:text-teal-300"
+                        >nmrshiftdb2</a
+                    >
+                    (HOSE codes) in {{ report.solvent }}. The prediction is a
+                    reference, not the truth: a poor fit flags assignments for a
+                    second look.
+                </p>
+                <p v-if="structureSvg">
+                    Atom colours:
+                    <span
+                        class="font-medium text-emerald-700 dark:text-emerald-400"
+                        >green</span
+                    >
+                    fits,
+                    <span
+                        class="font-medium text-orange-600 dark:text-orange-400"
+                        >orange</span
+                    >
+                    needs review,
+                    <span class="font-medium text-red-600 dark:text-red-400"
+                        >red</span
+                    >
+                    does not fit the prediction.
+                </p>
+                <p
+                    v-if="anyInDatabase"
+                    class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
+                >
+                    Most atoms match 6-sphere HOSE codes with very small
+                    deviations. The compound is probably already in nmrshiftdb2,
+                    so this fit is not independent evidence.
+                </p>
+                <p
+                    v-if="
+                        report.assignment_check.offset
+                            ?.suspected_referencing_error
+                    "
+                    class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
+                >
+                    All shifts are offset from the prediction by a similar
+                    amount ({{ offsetText }}). Check the spectrum referencing.
+                </p>
+            </div>
+        </div>
+
+        <section
+            v-for="nucleus in nuclei"
+            :key="'report-' + nucleus"
+            class="overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700"
+        >
+            <header
+                class="flex flex-wrap items-baseline justify-between gap-2 border-b border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-800/60"
+            >
+                <h4 class="font-semibold text-gray-900 dark:text-slate-100">
+                    {{ nucleusLabel(nucleus) }} quality report
+                </h4>
+                <p class="text-xs text-gray-600 dark:text-slate-300">
+                    Overall mark
+                    <span
+                        class="text-base font-bold text-gray-900 dark:text-slate-100"
+                        >{{ report.reports[nucleus].mark }}</span
+                    >
+                    (out of 1 to 10) · Result:
+                    <span class="font-semibold"
+                        >{{ report.reports[nucleus].mark }}/{{
+                            report.reports[nucleus].result
+                        }}</span
+                    >
+                </p>
+            </header>
+            <div
+                class="space-y-1 px-4 py-2 text-xs text-gray-600 dark:text-slate-300"
+            >
+                <p>
+                    Mean deviation
+                    {{ report.reports[nucleus].penalties.mean_deviation.ppm }}
+                    ppm: −{{
+                        report.reports[nucleus].penalties.mean_deviation.points
+                    }}
+                    · Red or missing shifts
+                    {{
+                        report.reports[nucleus].penalties.red_or_missing.count
+                    }}: −{{
+                        report.reports[nucleus].penalties.red_or_missing.points
+                    }}
+                    · Yellow shifts
+                    {{ report.reports[nucleus].penalties.yellow.count }}: −{{
+                        report.reports[nucleus].penalties.yellow.points
+                    }}
+                </p>
+                <p
+                    v-if="report.reports[nucleus].mark_is_approximate"
+                    class="text-[11px] text-gray-500 dark:text-slate-400"
+                >
+                    nmrshiftdb2 does not publish its mark formula; this mark
+                    approximates it from the same penalties.
+                </p>
+            </div>
+            <div class="overflow-x-auto">
+                <table
+                    class="min-w-full divide-y divide-gray-200 text-xs dark:divide-slate-700"
+                >
+                    <thead class="bg-gray-50 dark:bg-slate-800/60">
+                        <tr
+                            class="text-left font-medium text-gray-600 dark:text-slate-300"
+                        >
+                            <th class="px-3 py-2">Atom</th>
+                            <th class="px-3 py-2 text-right">δ (ppm)</th>
+                            <th class="px-3 py-2 text-right">Predicted</th>
+                            <th class="px-3 py-2 text-right">Deviation</th>
+                            <th class="px-3 py-2 text-right">HOSE spheres</th>
+                            <th class="px-3 py-2">HOSE code</th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        class="divide-y divide-gray-100 dark:divide-slate-800"
+                    >
+                        <tr
+                            v-for="(row, index) in report.reports[nucleus]
+                                .atoms"
+                            :key="nucleus + '-atom-' + index"
+                            :class="atomRowClass(row.status)"
+                        >
+                            <td
+                                class="whitespace-nowrap px-3 py-1.5 font-medium"
+                            >
+                                {{ row.label }}
+                                <span
+                                    v-if="
+                                        row.status === 'missing' ||
+                                        row.status === 'impossible'
+                                    "
+                                    class="ml-1 font-normal text-gray-500 dark:text-slate-400"
+                                    >({{
+                                        row.status === "missing"
+                                            ? "missing"
+                                            : "no prediction"
+                                    }})</span
+                                >
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ formatShift(row.observed, nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ formatShift(row.predicted, nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ formatShift(row.deviation, nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ row.spheres || "—" }}
+                            </td>
+                            <td
+                                class="max-w-[16rem] truncate px-3 py-1.5 font-mono text-[11px] text-gray-500 dark:text-slate-400"
+                                :title="row.hose_code || ''"
+                            >
+                                {{ row.hose_code || "—" }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section
+            class="overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700"
+        >
+            <header
+                class="flex flex-wrap items-baseline justify-between gap-2 border-b border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-800/60"
+            >
+                <h4 class="font-semibold text-gray-900 dark:text-slate-100">
+                    Assignment check
+                </h4>
+                <span
+                    class="rounded-full px-2 py-0.5 text-xs font-semibold"
+                    :class="assignmentResultClass"
+                    >{{ assignmentResultLabel }}</span
+                >
+            </header>
+            <p class="px-4 pt-2 text-xs text-gray-600 dark:text-slate-300">
+                Are the shifts on the right atoms? Each assigned signal is
+                compared with the prediction for its atoms. Predictions from
+                fewer than 4 HOSE spheres are too uncertain to fail an
+                assignment and can at most ask for review.
+            </p>
+
+            <ul
+                v-if="
+                    report.assignment_check.suggestions.length ||
+                    report.assignment_check.issues.length
+                "
+                class="mx-4 mt-3 space-y-1.5 text-xs"
+            >
+                <li
+                    v-for="(suggestion, index) in report.assignment_check
+                        .suggestions"
+                    :key="'swap-' + index"
+                    class="rounded-md bg-red-50 px-2 py-1.5 text-red-900 ring-1 ring-red-200 dark:bg-red-950/40 dark:text-red-100 dark:ring-red-900/50"
+                >
+                    Possible interchange of
+                    <strong>{{ suggestion.labels[0] }}</strong> and
+                    <strong>{{ suggestion.labels[1] }}</strong
+                    >: swapping them reduces the deviation by
+                    {{
+                        formatShift(
+                            suggestion.error_reduction,
+                            suggestion.nucleus
+                        )
+                    }}
+                    ppm.
+                </li>
+                <li
+                    v-for="(issue, index) in report.assignment_check.issues"
+                    :key="'issue-' + index"
+                    class="rounded-md bg-amber-50 px-2 py-1.5 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-900/50"
+                >
+                    <span class="font-medium"
+                        >{{ nucleusLabel(issue.nucleus) }}:</span
+                    >
+                    {{ issue.message }}
+                    <span
+                        v-if="issue.labels.length"
+                        class="text-amber-800 dark:text-amber-200"
+                        >({{ issue.labels.join(", ") }})</span
+                    >
+                </li>
+            </ul>
+
+            <div class="mt-3 overflow-x-auto">
+                <table
+                    class="min-w-full divide-y divide-gray-200 text-xs dark:divide-slate-700"
+                >
+                    <thead class="bg-gray-50 dark:bg-slate-800/60">
+                        <tr
+                            class="text-left font-medium text-gray-600 dark:text-slate-300"
+                        >
+                            <th class="px-3 py-2">Assignment</th>
+                            <th class="px-3 py-2">Nucleus</th>
+                            <th class="px-3 py-2 text-right">Observed</th>
+                            <th class="px-3 py-2 text-right">Predicted</th>
+                            <th class="px-3 py-2 text-right">Δ</th>
+                            <th class="px-3 py-2 text-right">Spheres</th>
+                            <th class="px-3 py-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        class="divide-y divide-gray-100 dark:divide-slate-800"
+                    >
+                        <tr
+                            v-for="(row, index) in report.assignment_check.rows"
+                            :key="'row-' + index"
+                            class="text-gray-800 dark:text-slate-200"
+                        >
+                            <td
+                                class="whitespace-nowrap px-3 py-1.5 font-medium"
+                            >
+                                {{ row.label }}
+                            </td>
+                            <td class="px-3 py-1.5">
+                                {{ nucleusLabel(row.nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ formatShift(row.observed, row.nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ formatShift(row.predicted, row.nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ formatSigned(row.delta, row.nucleus) }}
+                            </td>
+                            <td class="px-3 py-1.5 text-right tabular-nums">
+                                {{ row.spheres ?? "—" }}
+                            </td>
+                            <td class="px-3 py-1.5">
+                                <span
+                                    class="rounded-full px-2 py-0.5 font-semibold"
+                                    :class="rowStatusClass(row.status)"
+                                    >{{ rowStatusLabel(row.status) }}</span
+                                >
+                                <span
+                                    v-for="reason in row.reasons"
+                                    :key="reason"
+                                    class="ml-1 text-[11px] text-gray-500 dark:text-slate-400"
+                                    >{{ reasonLabel(reason) }}</span
+                                >
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p
+                v-if="report.adjustments && report.adjustments.length"
+                class="px-4 py-2 text-[11px] text-gray-500 dark:text-slate-400"
+            >
+                {{ report.adjustments.length }} identical shift(s) on different
+                atoms were sent 0.001 ppm apart so that nmrshiftdb2 keeps them
+                as separate signals.
+            </p>
+        </section>
+    </div>
+</template>
+
+<script>
+import { quickcheckStructureSvg } from "@/Utils/quickcheck.js";
+
+const NUCLEUS_LABELS = { "13C": "¹³C", "1H": "¹H" };
+
+const VERDICTS = {
+    accept: {
+        title: "Assignments fit the predicted spectra",
+        hint: "Shift list and atom assignments agree with nmrshiftdb2.",
+        box: "border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30",
+        text: "text-emerald-900 dark:text-emerald-100",
+    },
+    review: {
+        title: "Some assignments need a second look",
+        hint: "Check the highlighted atoms, ideally against 2D correlations.",
+        box: "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30",
+        text: "text-amber-900 dark:text-amber-100",
+    },
+    reject: {
+        title: "Assignments disagree with the predicted spectra",
+        hint: "Wrong structure, misassigned atoms or referencing problems are common causes.",
+        box: "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30",
+        text: "text-red-900 dark:text-red-100",
+    },
+    not_assessable: {
+        title: "Assignments could not be assessed",
+        hint: "No atom could be compared with a prediction.",
+        box: "border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/60",
+        text: "text-gray-900 dark:text-slate-100",
+    },
+};
+
+const REASONS = {
+    low_confidence_prediction: "low-confidence prediction",
+    diastereotopic_pair_mean: "CH₂ pair mean",
+};
+
+export default {
+    props: {
+        report: {
+            type: Object,
+            required: true,
+        },
+        molfile: {
+            type: String,
+            default: "",
+        },
+        printable: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    computed: {
+        nuclei() {
+            return ["13C", "1H"].filter(
+                (nucleus) => this.report.reports?.[nucleus]
+            );
+        },
+        verdictStyle() {
+            return VERDICTS[this.report.verdict] || VERDICTS.not_assessable;
+        },
+        structureSvg() {
+            return quickcheckStructureSvg(this.molfile, this.report);
+        },
+        anyInDatabase() {
+            return this.nuclei.some(
+                (nucleus) => this.report.reports[nucleus].in_database_likely
+            );
+        },
+        offsetText() {
+            const offset = this.report.assignment_check.offset || {};
+            return ["13C", "1H"]
+                .filter((nucleus) => typeof offset[nucleus] === "number")
+                .map(
+                    (nucleus) =>
+                        `${this.nucleusLabel(nucleus)} ${this.formatSigned(
+                            offset[nucleus],
+                            nucleus
+                        )} ppm`
+                )
+                .join(", ");
+        },
+        assignmentResultLabel() {
+            return (
+                {
+                    consistent: "Consistent",
+                    review: "Review",
+                    inconsistent: "Inconsistent",
+                    not_assessable: "Not assessable",
+                }[this.report.assignment_check.result] ||
+                this.report.assignment_check.result
+            );
+        },
+        assignmentResultClass() {
+            return this.rowStatusClass(
+                {
+                    consistent: "ok",
+                    review: "review",
+                    inconsistent: "fail",
+                }[this.report.assignment_check.result] || "not_assessable"
+            );
+        },
+    },
+    methods: {
+        nucleusLabel(nucleus) {
+            return NUCLEUS_LABELS[nucleus] || nucleus;
+        },
+        formatShift(value, nucleus) {
+            if (value === null || value === undefined) {
+                return "—";
+            }
+            return Number(value).toFixed(nucleus === "1H" ? 2 : 1);
+        },
+        formatSigned(value, nucleus) {
+            if (value === null || value === undefined) {
+                return "—";
+            }
+            const text = this.formatShift(Math.abs(value), nucleus);
+            return value < 0 ? `−${text}` : `+${text}`;
+        },
+        atomRowClass(status) {
+            return {
+                green: "bg-emerald-50/70 text-emerald-950 dark:bg-emerald-950/20 dark:text-emerald-100",
+                yellow: "bg-amber-50 text-amber-950 dark:bg-amber-950/30 dark:text-amber-100",
+                red: "bg-red-50 text-red-950 dark:bg-red-950/30 dark:text-red-100",
+                missing:
+                    "bg-red-50/60 text-red-950 dark:bg-red-950/20 dark:text-red-100",
+                impossible: "text-gray-500 dark:text-slate-400",
+            }[status];
+        },
+        rowStatusClass(status) {
+            return {
+                ok: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
+                review: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+                fail: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200",
+                not_assessable:
+                    "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300",
+            }[status];
+        },
+        rowStatusLabel(status) {
+            return (
+                {
+                    ok: "fits",
+                    review: "review",
+                    fail: "does not fit",
+                    not_assessable: "not assessable",
+                }[status] || status
+            );
+        },
+        reasonLabel(reason) {
+            return REASONS[reason] || reason.replace(/_/g, " ");
+        },
+        print() {
+            window.print();
+        },
+    },
+};
+</script>

@@ -128,7 +128,7 @@
 
             <div class="relative border-t border-gray-100">
                 <div
-                    class="mx-auto flex max-w-6xl justify-center px-6 py-6 sm:px-8 lg:px-12"
+                    class="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-8 gap-y-2 px-6 py-6 sm:px-8 lg:px-12"
                 >
                     <Link
                         :href="route('predict')"
@@ -136,6 +136,13 @@
                     >
                         <BeakerIcon class="h-4 w-4" aria-hidden="true" />
                         Predict ¹H / ¹³C NMR from a structure
+                    </Link>
+                    <Link
+                        :href="route('quickcheck')"
+                        class="inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
+                    >
+                        <CheckBadgeIcon class="h-4 w-4" aria-hidden="true" />
+                        Quickcheck your ¹H / ¹³C assignments
                     </Link>
                 </div>
             </div>
@@ -288,6 +295,7 @@ import {
     UsersIcon,
     CloudArrowUpIcon,
     BeakerIcon,
+    CheckBadgeIcon,
     UserGroupIcon,
     ShieldCheckIcon,
     LockClosedIcon,
@@ -330,6 +338,7 @@ export default {
         ChevronDownIcon,
         CloudArrowUpIcon,
         BeakerIcon,
+        CheckBadgeIcon,
         UserGroupIcon,
         ShieldCheckIcon,
         LockClosedIcon,

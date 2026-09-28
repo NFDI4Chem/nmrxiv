@@ -32,6 +32,7 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\PublicSearchController;
 use App\Http\Controllers\PublicStatsController;
 use App\Http\Controllers\RorController;
+use App\Http\Controllers\StudyAssignmentValidationController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
@@ -114,6 +115,12 @@ Route::get('/predict', function () {
         'nmrPredictUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/predict/',
     ]);
 })->name('predict');
+
+Route::get('/quickcheck', function () {
+    return Inertia::render('Quickcheck', [
+        'quickcheckUrl' => route('api.quickcheck'),
+    ]);
+})->name('quickcheck');
 
 Route::get('/bagit-viewer', [BagitViewerController::class, 'show'])
     ->name('bagit-viewer');
@@ -381,6 +388,13 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.dataset.snapshot');
         Route::put('datasets/{dataset}/assignments', [DatasetController::class, 'updateAssignments'])
             ->name('dashboard.datasets.assignments.update');
+
+        Route::get('studies/{study}/assignment-validation', [StudyAssignmentValidationController::class, 'show'])
+            ->name('dashboard.studies.assignment-validation.show');
+        Route::post('studies/{study}/assignment-validation', [StudyAssignmentValidationController::class, 'store'])
+            ->name('dashboard.studies.assignment-validation.store');
+        Route::post('studies/{study}/assignment-validation/{validation}/confirm', [StudyAssignmentValidationController::class, 'confirm'])
+            ->name('dashboard.studies.assignment-validation.confirm');
 
         Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
             ->name('dashboard.draft.show');

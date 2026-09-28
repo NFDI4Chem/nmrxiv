@@ -16,11 +16,17 @@
                     <!-- Header controls section -->
                     <div class="mt-3">
                         <!-- DOI Badge (left aligned) -->
-                        <div class="float-left">
+                        <div
+                            class="float-left flex flex-wrap items-center gap-2"
+                        >
                             <DOIBadge
                                 :doi="study.data.doi"
                                 color="bg-yellow-300"
                             ></DOIBadge>
+                            <QuickcheckBadge
+                                v-if="study.data.is_public"
+                                :study-id="study.data.id"
+                            />
                         </div>
 
                         <!-- Desktop layout controls (right aligned) -->
@@ -616,6 +622,7 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import QuickcheckBadge from "@/Shared/Assignments/QuickcheckBadge.vue";
 import MolecularInfoPanel from "@/Shared/MolecularInfoPanel.vue";
 import MixtureCompositionDisplay from "@/Shared/MixtureCompositionDisplay.vue";
 import Tag from "@/Shared/Tag.vue";
@@ -634,6 +641,7 @@ export default {
         MenuItems,
         SpectraViewer,
         DOIBadge,
+        QuickcheckBadge,
         MolecularInfoPanel,
         MixtureCompositionDisplay,
         Tag,
