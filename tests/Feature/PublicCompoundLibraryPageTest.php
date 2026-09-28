@@ -10,6 +10,7 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class PublicCompoundLibraryPageTest extends TestCase
@@ -130,6 +131,15 @@ class PublicCompoundLibraryPageTest extends TestCase
         $this->assertNotSame($team->compound_library_code, $otherTeam->compound_library_code);
         $this->assertArrayNotHasKey('compound_library_code', $team->toArray());
         $this->assertSame(url('/library/'.$team->compound_library_code), $team->compoundLibraryUrl());
+    }
+
+    public function test_library_code_is_assigned_when_model_events_are_faked(): void
+    {
+        Event::fake();
+
+        $team = Team::factory()->create();
+
+        $this->assertMatchesRegularExpression('/^[A-Za-z0-9]{16}$/', $team->compound_library_code);
     }
 
     public function test_unpublished_compounds_are_listed_as_locked_after_published_ones(): void

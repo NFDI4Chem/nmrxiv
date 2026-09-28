@@ -42,11 +42,27 @@ class Team extends JetstreamTeam
         'compound_library_code',
     ];
 
-    protected static function booted(): void
+    /**
+     * Assign the library code during insert, which still runs when model events are faked.
+     */
+    public function usesUniqueIds(): bool
     {
-        static::creating(function (Team $team): void {
-            $team->compound_library_code ??= static::generateCompoundLibraryCode();
-        });
+        return true;
+    }
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['compound_library_code'];
+    }
+
+    public function newUniqueId(): string
+    {
+        return static::generateCompoundLibraryCode();
     }
 
     /**
