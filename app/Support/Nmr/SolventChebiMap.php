@@ -68,7 +68,7 @@ class SolventChebiMap
      * (₀-₉) so "DMSO-d6", "DMSO d6", "DMSO_d6", and "dmsod6" all collapse
      * to the same key.
      */
-    private static function normalize(string $name): string
+    public static function normalize(string $name): string
     {
         $subscripts = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'];
         $digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];

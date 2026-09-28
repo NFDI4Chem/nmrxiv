@@ -2,6 +2,7 @@
 
 namespace App\Actions\Study;
 
+use App\Jobs\DetectDatasetSignals;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Study;
 use App\Services\ChemotionRepositoryTrackerService;
@@ -29,6 +30,7 @@ class PublishStudy
         app(PublicMoleculeCatalogIndexer::class)->refreshForStudy($study);
         if ($study->is_public && $study->has_nmrium && filled($study->download_url)) {
             ProcessMetadataExtractionBagitGenerationJob::dispatch($study->id);
+            DetectDatasetSignals::dispatch($study->id);
         }
 
         // Track publication if this is an ELN submission

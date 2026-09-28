@@ -61,4 +61,34 @@ return [
         'api_timeout' => (int) env('SPECTRA_API_TIMEOUT', 300),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Spectrum Search Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Chemical-shift search on the public Spectra tab. Tolerances and offsets
+    | are in ppm, keyed by nucleus. Uploaded spectra are stored briefly under
+    | `temp_prefix` on the default disk so NMRKit can fetch them by URL.
+    |
+    */
+
+    'spectra_search' => [
+        'nuclei' => ['1H', '13C'],
+
+        'closeness' => [
+            '1H' => ['strict' => 0.02, 'normal' => 0.05, 'relaxed' => 0.10],
+            '13C' => ['strict' => 0.5, 'normal' => 1.0, 'relaxed' => 2.0],
+        ],
+        'max_tolerance' => ['1H' => 0.5, '13C' => 5.0],
+        'max_offset' => ['1H' => 0.1, '13C' => 1.5],
+        'min_matches_for_offset' => 3,
+        'plausible_range' => ['1H' => [-2, 16], '13C' => [-20, 250]],
+        'solvent_window' => ['1H' => 0.05, '13C' => 0.6],
+        'max_rows_per_nucleus' => 100,
+        'candidate_limit' => (int) env('SPECTRA_SEARCH_CANDIDATE_LIMIT', 500),
+
+        'upload_max_kb' => (int) env('SPECTRA_SEARCH_UPLOAD_MAX_KB', 204800),
+        'temp_prefix' => env('SPECTRA_SEARCH_TEMP_PREFIX', 'spectra-search'),
+    ],
+
 ];

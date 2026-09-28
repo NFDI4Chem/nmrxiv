@@ -2,6 +2,7 @@
 
 namespace App\Actions\Project;
 
+use App\Jobs\DetectDatasetSignals;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Project;
 use App\Support\Public\PublicMoleculeCatalogIndexer;
@@ -24,6 +25,7 @@ class PublishProject
             $study->save();
             if ($study->has_nmrium && filled($study->download_url)) {
                 ProcessMetadataExtractionBagitGenerationJob::dispatch($study->id);
+                DetectDatasetSignals::dispatch($study->id);
             }
             $datasets = $study->datasets;
             foreach ($datasets as $dataset) {
