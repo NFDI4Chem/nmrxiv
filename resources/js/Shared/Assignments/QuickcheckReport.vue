@@ -37,14 +37,19 @@
 
         <div class="grid gap-5 lg:grid-cols-3">
             <div
-                v-if="structureSvg"
-                class="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 dark:border-slate-700"
+                v-if="structureUrl && !structureFailed"
+                class="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 dark:border-slate-700 lg:col-span-2"
             >
-                <div class="w-full max-w-xs" v-html="structureSvg"></div>
+                <img
+                    :src="structureUrl"
+                    alt="Structure with the author's atom labels"
+                    class="aspect-[4/3] w-full max-w-xl object-contain"
+                    @error="structureFailed = true"
+                />
             </div>
             <div
                 class="space-y-2 text-xs text-gray-600 dark:text-slate-300"
-                :class="structureSvg ? 'lg:col-span-2' : 'lg:col-span-3'"
+                :class="structureUrl && !structureFailed ? '' : 'lg:col-span-3'"
             >
                 <p>
                     Predictions from
@@ -59,22 +64,12 @@
                     reference, not the truth: a poor fit flags assignments for a
                     second look.
                 </p>
-                <p v-if="structureSvg">
-                    Atom colours:
-                    <span
-                        class="font-medium text-emerald-700 dark:text-emerald-400"
-                        >green</span
-                    >
-                    fits,
-                    <span
-                        class="font-medium text-orange-600 dark:text-orange-400"
-                        >orange</span
-                    >
-                    needs review,
-                    <span class="font-medium text-red-600 dark:text-red-400"
-                        >red</span
-                    >
-                    does not fit the prediction.
+                <p v-if="structureUrl && !structureFailed">
+                    The structure carries the author's atom labels.
+                    <template v-if="structure.flagged.length">
+                        Highlighted atoms need review or do not fit the
+                        prediction.
+                    </template>
                 </p>
                 <p
                     v-if="anyInDatabase"
@@ -356,7 +351,10 @@
 </template>
 
 <script>
-import { quickcheckStructureSvg } from "@/Utils/quickcheck.js";
+import {
+    quickcheckCxsmiles,
+    quickcheckDepictionUrl,
+} from "@/Utils/quickcheck.js";
 
 const NUCLEUS_LABELS = { "13C": "¹³C", "1H": "¹H" };
 
@@ -407,6 +405,11 @@ export default {
             default: true,
         },
     },
+    data() {
+        return {
+            structureFailed: false,
+        };
+    },
     computed: {
         nuclei() {
             return ["13C", "1H"].filter(
@@ -416,8 +419,19 @@ export default {
         verdictStyle() {
             return VERDICTS[this.report.verdict] || VERDICTS.not_assessable;
         },
-        structureSvg() {
-            return quickcheckStructureSvg(this.molfile, this.report);
+        structure() {
+            return quickcheckCxsmiles(this.molfile, this.report);
+        },
+        structureUrl() {
+            const cmApi = this.$page?.props?.CM_API;
+            if (!this.structure || !cmApi) {
+                return "";
+            }
+            return quickcheckDepictionUrl(
+                cmApi,
+                this.structure.cxsmiles,
+                this.structure.flagged
+            );
         },
         anyInDatabase() {
             return this.nuclei.some(
@@ -473,6 +487,9 @@ export default {
                 return "—";
             }
             const text = this.formatShift(Math.abs(value), nucleus);
+            if (Number(text) === 0) {
+                return text;
+            }
             return value < 0 ? `−${text}` : `+${text}`;
         },
         atomRowClass(status) {

@@ -1,96 +1,239 @@
 import OCL from "openchemlib";
 
-const STATUS_RANK = { not_assessable: 0, ok: 1, review: 2, fail: 3 };
-
-const STATUS_COLOR = {
-    ok: OCL.Molecule.cAtomColorDarkGreen,
-    review: OCL.Molecule.cAtomColorOrange,
-    fail: OCL.Molecule.cAtomColorRed,
-};
+const MAX_SMILES_LENGTH = 5000;
 
 /**
- * openchemlib moves explicit hydrogens behind the heavy atoms, so a 1-based
- * molfile index maps to a different 0-based OCL index when the molfile
- * lists H atoms in between (Mnova exports do).
+ * openchemlib reorders atoms when a molfile lists explicit hydrogens between
+ * heavy atoms (Mnova exports do), so 1-based molfile numbers are mapped to
+ * 0-based OCL indices by their coordinates, which OCL keeps with y inverted.
  *
  * @param {string} molfile
+ * @param {import("openchemlib").Molecule} molecule parsed from the same molfile
  * @returns {Map<number, number>}
  */
-export function molfileToOclIndex(molfile) {
+export function molfileToOclIndex(molfile, molecule) {
     const lines = molfile.replace(/\r\n?/g, "\n").split("\n");
-    const counts = lines[3] || "";
-    const atomCount = parseInt(counts.slice(0, 3), 10) || 0;
-    const symbols = [];
-    for (let i = 0; i < atomCount; i++) {
-        symbols.push((lines[4 + i] || "").slice(31, 34).trim());
+    const atomCount = parseInt((lines[3] || "").slice(0, 3), 10) || 0;
+    const key = (x, y) => `${Math.round(x * 1000)}:${Math.round(y * 1000)}`;
+
+    const byPosition = new Map();
+    for (let i = 0; i < molecule.getAllAtoms(); i++) {
+        const position = key(molecule.getAtomX(i), -molecule.getAtomY(i));
+        byPosition.set(position, [...(byPosition.get(position) || []), i]);
     }
 
-    const heavy = symbols.filter((symbol) => symbol !== "H").length;
     const map = new Map();
-    let heavyIndex = 0;
-    let hydrogenIndex = heavy;
-    symbols.forEach((symbol, index) => {
-        map.set(index + 1, symbol === "H" ? hydrogenIndex++ : heavyIndex++);
-    });
+    for (let atom = 1; atom <= atomCount; atom++) {
+        const line = lines[3 + atom] || "";
+        const candidates = byPosition.get(
+            key(parseFloat(line.slice(0, 10)), parseFloat(line.slice(10, 20)))
+        );
+        const index = candidates?.find(
+            (candidate) =>
+                molecule.getAtomLabel(candidate) === line.slice(31, 34).trim()
+        );
+        map.set(atom, index ?? candidates?.[0] ?? atom - 1);
+    }
 
     return map;
 }
 
+function safeLabel(value) {
+    return String(value ?? "")
+        .replace(/[^\w'′./+\-()]/g, "")
+        .slice(0, 16);
+}
+
 /**
- * Structure image with atoms coloured by their worst assignment status and
- * annotated with the author's carbon labels.
+ * SMILES of the heavy atoms, each in brackets with its hydrogen count,
+ * written in a known order so atom values and highlights can be attached.
+ *
+ * @param {import("openchemlib").Molecule} molecule
+ * @returns {{ smiles: string, order: number[] }} order: OCL index per SMILES position
+ */
+function orderedSmiles(molecule) {
+    const atomCount = molecule.getAllAtoms();
+    const isHydrogen = (atom) => molecule.getAtomicNo(atom) === 1;
+    const neighbours = (atom) => {
+        const list = [];
+        for (let i = 0; i < molecule.getAllConnAtoms(atom); i++) {
+            const next = molecule.getConnAtom(atom, i);
+            if (!isHydrogen(next)) {
+                list.push({ atom: next, bond: molecule.getConnBond(atom, i) });
+            }
+        }
+        return list;
+    };
+
+    const visited = new Array(atomCount).fill(false);
+    const treeBonds = new Set();
+    const ringBonds = new Set();
+    const explore = (atom, parentBond) => {
+        visited[atom] = true;
+        for (const next of neighbours(atom)) {
+            if (next.bond === parentBond || treeBonds.has(next.bond)) {
+                continue;
+            }
+            if (visited[next.atom]) {
+                ringBonds.add(next.bond);
+            } else {
+                treeBonds.add(next.bond);
+                explore(next.atom, next.bond);
+            }
+        }
+    };
+
+    const bondSymbol = (bond) =>
+        ({ 2: "=", 3: "#" }[molecule.getBondOrder(bond)] || "");
+    const atomToken = (atom) => {
+        const mass = molecule.getAtomMass(atom);
+        const charge = molecule.getAtomCharge(atom);
+        const chargeText =
+            charge === 0
+                ? ""
+                : `${charge > 0 ? "+" : "-"}${
+                      Math.abs(charge) > 1 ? Math.abs(charge) : ""
+                  }`;
+        const hydrogens = molecule.getAllHydrogens(atom);
+        const hydrogenText =
+            hydrogens === 0 ? "" : `H${hydrogens > 1 ? hydrogens : ""}`;
+        return `[${mass || ""}${molecule.getAtomLabel(
+            atom
+        )}${hydrogenText}${chargeText}]`;
+    };
+
+    const order = [];
+    const written = new Array(atomCount).fill(false);
+    const openRings = new Map();
+    const freeDigits = [];
+    let nextDigit = 1;
+    const digitText = (digit) => (digit < 10 ? `${digit}` : `%${digit}`);
+
+    const write = (atom, parentBond) => {
+        written[atom] = true;
+        order.push(atom);
+        let text = atomToken(atom);
+
+        for (const next of neighbours(atom)) {
+            if (!ringBonds.has(next.bond)) {
+                continue;
+            }
+            if (openRings.has(next.bond)) {
+                const digit = openRings.get(next.bond);
+                openRings.delete(next.bond);
+                freeDigits.push(digit);
+                text += digitText(digit);
+            } else if (!written[next.atom]) {
+                const digit = freeDigits.length
+                    ? freeDigits.sort((a, b) => a - b).shift()
+                    : nextDigit++;
+                openRings.set(next.bond, digit);
+                text += bondSymbol(next.bond) + digitText(digit);
+            }
+        }
+
+        const children = neighbours(atom).filter(
+            (next) => next.bond !== parentBond && treeBonds.has(next.bond)
+        );
+        children.forEach((child, i) => {
+            const branch =
+                bondSymbol(child.bond) + write(child.atom, child.bond);
+            text += i < children.length - 1 ? `(${branch})` : branch;
+        });
+
+        return text;
+    };
+
+    const components = [];
+    for (let atom = 0; atom < atomCount; atom++) {
+        if (!visited[atom] && !isHydrogen(atom)) {
+            explore(atom, -1);
+            components.push(write(atom, -1));
+        }
+    }
+
+    return { smiles: components.join("."), order };
+}
+
+/**
+ * CXSMILES of the author's structure with the author's carbon labels as atom
+ * values, for the Cheminformatics Microservice depiction. Report atom numbers
+ * refer to the author's molfile; `atomIds` maps them to SMILES positions.
  *
  * @param {string} molfile
  * @param {object} report NMRKit validation report
- * @param {number} size
- * @returns {string}
+ * @returns {{ cxsmiles: string, atomIds: (atoms: number[]) => number[], flagged: number[] }|null}
  */
-export function quickcheckStructureSvg(molfile, report, size = 320) {
+export function quickcheckCxsmiles(molfile, report) {
     if (!molfile) {
-        return "";
+        return null;
     }
 
     try {
         const molecule = OCL.Molecule.fromMolfile(molfile);
         molecule.removeAtomCustomLabels();
-        const toOcl = molfileToOclIndex(molfile);
+        molecule.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
+        const toOcl = molfileToOclIndex(molfile, molecule);
+        const { smiles, order } = orderedSmiles(molecule);
+        const position = new Map(order.map((atom, i) => [atom, i]));
 
-        const worst = new Map();
-        for (const row of report?.assignment_check?.rows || []) {
-            for (const atom of row.atoms || []) {
-                const current = worst.get(atom);
-                if (
-                    !current ||
-                    STATUS_RANK[row.status] > STATUS_RANK[current]
-                ) {
-                    worst.set(atom, row.status);
-                }
-            }
-        }
+        const atomIds = (atoms) =>
+            (atoms || [])
+                .map((atom) => position.get(toOcl.get(atom)))
+                .filter((index) => index !== undefined);
 
-        worst.forEach((status, atom) => {
-            const index = toOcl.get(atom);
-            if (index !== undefined && STATUS_COLOR[status] !== undefined) {
-                molecule.setAtomColor(index, STATUS_COLOR[status]);
-            }
-        });
-
+        const values = new Array(order.length).fill("");
         for (const row of report?.reports?.["13C"]?.atoms || []) {
-            const index = toOcl.get(row.atoms?.[0]);
-            const label = String(row.label || "")
-                .replace(/^C-?/, "")
-                .replace(/[^\w'′".,/+\-() ]/g, "")
-                .slice(0, 12);
-            if (index !== undefined && label) {
-                molecule.setAtomCustomLabel(index, `]${label}`);
+            const [index] = atomIds(row.atoms?.length === 1 ? row.atoms : []);
+            if (index !== undefined && row.label) {
+                values[index] = safeLabel(row.label);
             }
         }
 
-        return molecule.toSVG(size, size, undefined, { autoCropMargin: 12 });
+        const flagged = new Set();
+        for (const row of report?.assignment_check?.rows || []) {
+            if (row.status === "fail" || row.status === "review") {
+                atomIds(row.atoms).forEach((index) => flagged.add(index));
+            }
+        }
+
+        const cxsmiles = values.some(Boolean)
+            ? `${smiles} |$_AV:${values.join(";")}$|`
+            : smiles;
+        if (cxsmiles.length > MAX_SMILES_LENGTH) {
+            return null;
+        }
+
+        return { cxsmiles, atomIds, flagged: [...flagged] };
     } catch (error) {
-        console.error("Unable to render Quickcheck structure:", error);
-        return "";
+        console.error("Unable to prepare the Quickcheck structure:", error);
+        return null;
     }
+}
+
+/**
+ * Cheminformatics Microservice URL of the 2D depiction.
+ *
+ * @param {string} cmApi base URL, e.g. https://api.naturalproducts.net/latest/
+ * @param {string} cxsmiles
+ * @param {number[]} atomIds 0-based SMILES positions to highlight
+ * @returns {string}
+ */
+export function quickcheckDepictionUrl(cmApi, cxsmiles, atomIds = []) {
+    const params = new URLSearchParams({
+        smiles: cxsmiles,
+        width: "640",
+        height: "480",
+        annotate: "atomvalue",
+        CIP: "false",
+    });
+    if (atomIds.length) {
+        params.set("atomIds", atomIds.join(","));
+    }
+
+    return `${cmApi.replace(/\/?$/, "/")}depict/2D_enhanced?${params
+        .toString()
+        .replace(/\+/g, "%20")}`;
 }
 
 /**
