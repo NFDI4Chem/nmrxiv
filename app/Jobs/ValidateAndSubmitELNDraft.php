@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ProcessDraft;
 use App\Models\Draft;
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -45,7 +46,7 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                 'draft_id' => $draft->id,
             ]);
 
-            $project = $draft->project;
+            $project = app(ProcessDraft::class)->resolveDraftProject($draft);
             if (! $project) {
                 Log::error('No project found for draft in finalizer', ['draft_id' => $draft->id]);
 

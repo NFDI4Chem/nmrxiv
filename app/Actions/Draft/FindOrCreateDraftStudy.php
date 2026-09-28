@@ -27,6 +27,7 @@ class FindOrCreateDraftStudy
             $this->updateFolderWithStudy($folder, $study);
         } else {
             $this->reassignStudyToProject($study, $project);
+            $this->syncFolderToProject($folder, $study, $project);
         }
 
         return $study;
@@ -83,5 +84,18 @@ class FindOrCreateDraftStudy
 
         $study->sample()->update(['project_id' => $project->id]);
         $study->datasets()->update(['project_id' => $project->id]);
+    }
+
+    /**
+     * Persist the study folder onto the project used by this process run.
+     */
+    private function syncFolderToProject(FileSystemObject $folder, Study $study, Project $project): void
+    {
+        $folder->project_id = $project->id;
+        $folder->study_id = $study->id;
+
+        if ($folder->isDirty()) {
+            $folder->save();
+        }
     }
 }

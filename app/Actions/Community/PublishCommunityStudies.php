@@ -3,6 +3,7 @@
 namespace App\Actions\Community;
 
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
+use App\Actions\Draft\ProcessDraft;
 use App\Jobs\ProcessSubmission;
 use App\Models\Draft;
 use App\Models\License;
@@ -16,6 +17,7 @@ class PublishCommunityStudies
 {
     public function __construct(
         private DetachStudyFilesystemFromDraft $detachStudyFilesystemFromDraft,
+        private ProcessDraft $processDraft,
     ) {}
 
     /**
@@ -32,7 +34,7 @@ class PublishCommunityStudies
             ]);
         }
 
-        $project = Project::query()->where('draft_id', $draft->id)->first();
+        $project = $this->processDraft->resolveDraftProject($draft);
 
         if (! $project) {
             throw ValidationException::withMessages([

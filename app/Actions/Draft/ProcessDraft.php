@@ -44,6 +44,9 @@ class ProcessDraft
 
         // Process the draft within a database transaction
         return DB::transaction(function () use ($draft, $user, $user_id, $team, $team_id) {
+            // Serialize concurrent process / provisional-DOI creates for this draft.
+            Draft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
+
             // Create or update project (validation is handled by the respective actions)
             $project = $this->createOrUpdateProject($draft, $user_id, $team_id, $user, $team);
 
@@ -108,15 +111,19 @@ class ProcessDraft
      * Pick the existing project for this draft.
      *
      * A draft can accumulate more than one project row (retries, concurrent
-     * process requests). `first()` without an order then often returns an
-     * empty newer project while studies still belong to an older one, so
-     * finalizeProcessing sees zero studies and redirects.
+     * process requests). Prefer the project that already owns the most studies
+     * (lowest id on a tie); otherwise the oldest project for this draft.
      */
     public function resolveDraftProject(Draft $draft): ?Project
     {
         $studyProjectId = Study::query()
+            ->select('project_id')
+            ->selectRaw('COUNT(*) as studies_count')
             ->where('draft_id', $draft->id)
             ->whereNotNull('project_id')
+            ->groupBy('project_id')
+            ->orderByDesc('studies_count')
+            ->orderBy('project_id')
             ->value('project_id');
 
         if ($studyProjectId) {
