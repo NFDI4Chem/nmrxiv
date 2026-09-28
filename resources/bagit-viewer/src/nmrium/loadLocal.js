@@ -2,7 +2,11 @@ import { markRaw } from 'vue';
 import { FileCollection } from 'file-collection';
 import init from '@zakodium/nmrium-core-plugins';
 import { Filters1DManager, Filters2DManager } from 'nmr-processing';
-import { basename, normalizePath } from '../bag/sources.js';
+import { basename } from '../bag/sources.js';
+import {
+    fileFromPayloadEntry,
+    payloadFileRelativePath,
+} from './payloadFiles.js';
 
 let sharedCore = null;
 
@@ -40,30 +44,17 @@ export async function prepareLocalNmriumFiles(bag, nmriumParsed) {
     const spectrumFiles = [];
 
     for (const entry of bag.entries) {
-        const path = normalizePath(entry.path);
-        if (!path.startsWith('data/')) {
+        const relativePath = payloadFileRelativePath(entry.path);
+        if (!relativePath) {
             continue;
         }
 
-        const name = basename(path).toLowerCase();
-        if (
-            name.endsWith('.jdf') ||
-            name.endsWith('.dx') ||
-            name.endsWith('.jdx') ||
-            name.endsWith('.jcamp') ||
-            name.endsWith('.nmr')
-        ) {
-            const blob = await entry.getBlob();
-            spectrumFiles.push(
-                new File([blob], basename(path), {
-                    type: blob.type || 'application/octet-stream',
-                }),
-            );
-        }
+        const blob = await entry.getBlob();
+        spectrumFiles.push(fileFromPayloadEntry(blob, relativePath));
     }
 
     if (spectrumFiles.length === 0) {
-        warnings.push('No raw spectrum files (.jdf/.dx) found in bag payload');
+        warnings.push('No spectrum files found in the bag payload');
 
         return { state: null, aggregator: null, warnings, core };
     }
@@ -76,6 +67,13 @@ export async function prepareLocalNmriumFiles(bag, nmriumParsed) {
         });
 
         applyOnLoadProcessing(state);
+
+        const spectra = state?.data?.spectra;
+        if (!Array.isArray(spectra) || spectra.length === 0) {
+            warnings.push('No spectra could be parsed from the bag payload');
+
+            return { state: null, aggregator: null, warnings, core };
+        }
 
         if (nmriumParsed) {
             mergeStoredAnnotations(state, nmriumParsed, warnings);
