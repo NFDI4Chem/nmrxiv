@@ -492,6 +492,43 @@ function kpis(report) {
     return tiles.join("");
 }
 
+const GREEK = {
+    α: "alpha",
+    β: "beta",
+    γ: "gamma",
+    δ: "delta",
+    ε: "epsilon",
+    ω: "omega",
+};
+
+/**
+ * PDF file name (without extension, which the browser adds):
+ * `<slugified title without extension>-quickcheck-nmrxiv-<YYYY-MM-DD_HH-mm>`.
+ *
+ * @param {string} title file name or sample name
+ * @param {Date} [date]
+ * @returns {string}
+ */
+export function quickcheckPdfName(title, date = new Date()) {
+    const slug =
+        String(title || "")
+            .replace(/\.(sdf|sd|nmredata|mol|txt)$/i, "")
+            .normalize("NFKD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[αβγδεω]/gi, (letter) => GREEK[letter.toLowerCase()])
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 80)
+            .replace(/-+$/, "") || "assignments";
+    const pad = (value) => String(value).padStart(2, "0");
+    const stamp = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+        date.getDate()
+    )}_${pad(date.getHours())}-${pad(date.getMinutes())}`;
+
+    return `${slug}-quickcheck-nmrxiv-${stamp}`;
+}
+
 /**
  * Report document details of a stored study validation.
  *
@@ -643,7 +680,7 @@ export function quickcheckReportHtml({
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>${escapeHtml(title)} – nmrXiv Quickcheck</title>
+<title>${escapeHtml(quickcheckPdfName(title, generatedAt))}</title>
 <style>${STYLES}
 @page { @bottom-left { content: ${cssString(
         `nmrXiv Assignment Quickcheck · ${title}`
