@@ -1,38 +1,122 @@
 <template>
     <div class="quickcheck-report space-y-5 text-sm">
-        <div
-            class="flex flex-wrap items-start justify-between gap-3 rounded-lg border px-4 py-3"
-            :class="verdictStyle.box"
-        >
-            <div class="min-w-0">
-                <p class="text-base font-semibold" :class="verdictStyle.text">
-                    {{ verdictStyle.title }}
-                </p>
-                <p class="mt-0.5 text-xs text-gray-600 dark:text-slate-300">
-                    {{ verdictStyle.hint }}
-                </p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <span
-                    v-for="nucleus in nuclei"
-                    :key="'mark-' + nucleus"
-                    class="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-gray-800 ring-1 ring-gray-200 dark:bg-slate-900/60 dark:text-slate-100 dark:ring-slate-700"
-                >
-                    {{ nucleusLabel(nucleus) }}
-                    {{ report.reports[nucleus].mark }}/10
-                    <span class="font-normal text-gray-500 dark:text-slate-400"
-                        >·
-                        {{ resultLabel(report.reports[nucleus].result) }}</span
-                    >
-                </span>
+        <div class="rounded-xl border p-4" :class="verdictStyle.box">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex min-w-0 items-start gap-3">
+                    <component
+                        :is="verdictStyle.icon"
+                        class="h-6 w-6 shrink-0"
+                        :class="verdictStyle.iconClass"
+                        aria-hidden="true"
+                    />
+                    <div class="min-w-0">
+                        <p
+                            class="text-base font-semibold"
+                            :class="verdictStyle.text"
+                        >
+                            {{ verdictStyle.title }}
+                        </p>
+                        <p
+                            class="mt-0.5 text-xs text-gray-600 dark:text-slate-300"
+                        >
+                            {{ verdictStyle.hint }}
+                        </p>
+                    </div>
+                </div>
                 <button
                     v-if="printable"
                     type="button"
-                    class="rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 print:hidden dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                    class="shrink-0 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 print:hidden dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     @click="print"
                 >
                     Print / save as PDF
                 </button>
+            </div>
+            <div
+                v-if="scoreCards.length"
+                class="mt-4 grid gap-3"
+                :class="{ 'sm:grid-cols-2': scoreCards.length > 1 }"
+            >
+                <div
+                    v-for="card in scoreCards"
+                    :key="'score-' + card.nucleus"
+                    class="flex items-center gap-4 rounded-lg bg-white/90 p-3 shadow-sm ring-1 ring-black/5 dark:bg-slate-900/60 dark:ring-white/10"
+                >
+                    <div
+                        class="relative h-16 w-16 shrink-0"
+                        :title="`nmrshiftdb2 score: ${card.mark} out of 10`"
+                    >
+                        <svg
+                            viewBox="0 0 36 36"
+                            class="h-full w-full -rotate-90"
+                        >
+                            <circle
+                                cx="18"
+                                cy="18"
+                                r="15.9155"
+                                fill="none"
+                                stroke-width="3.5"
+                                class="stroke-gray-200 dark:stroke-slate-700"
+                            />
+                            <circle
+                                cx="18"
+                                cy="18"
+                                r="15.9155"
+                                fill="none"
+                                stroke-width="3.5"
+                                stroke-linecap="round"
+                                :stroke-dasharray="`${card.percent} 100`"
+                                :class="card.tone.ring"
+                            />
+                        </svg>
+                        <div
+                            class="absolute inset-0 flex items-baseline justify-center pt-5 leading-none"
+                        >
+                            <span
+                                class="text-xl font-bold text-gray-900 dark:text-white"
+                                >{{ card.mark }}</span
+                            >
+                            <span
+                                class="text-[10px] font-medium text-gray-500 dark:text-slate-400"
+                                >/10</span
+                            >
+                        </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <p
+                                class="font-semibold text-gray-900 dark:text-white"
+                            >
+                                {{ nucleusLabel(card.nucleus) }} shifts
+                            </p>
+                            <span
+                                class="rounded-full px-2 py-0.5 text-xs font-medium"
+                                :class="card.tone.pill"
+                                >{{ card.result }}</span
+                            >
+                        </div>
+                        <div
+                            class="mt-2 flex h-1.5 gap-px overflow-hidden rounded-full bg-gray-100 dark:bg-slate-800"
+                            role="img"
+                            :aria-label="card.summary"
+                        >
+                            <div
+                                v-for="segment in card.segments"
+                                :key="segment.key"
+                                :class="segment.class"
+                                :style="{ width: segment.width }"
+                            />
+                        </div>
+                        <p
+                            class="mt-1.5 text-xs text-gray-600 dark:text-slate-300"
+                        >
+                            {{ card.summary }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-slate-400">
+                            Average deviation {{ card.deviation }} ppm
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -370,29 +454,70 @@ import {
     reasonLabel,
     resultLabel,
 } from "@/Utils/quickcheckTerms.js";
+import {
+    CheckCircleIcon,
+    ExclamationTriangleIcon,
+    MinusCircleIcon,
+    XCircleIcon,
+} from "@heroicons/vue/24/solid";
 
 const VERDICTS = {
     accept: {
         ...VERDICT_TEXT.accept,
+        icon: CheckCircleIcon,
+        iconClass: "text-emerald-500",
         box: "border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30",
         text: "text-emerald-900 dark:text-emerald-100",
     },
     review: {
         ...VERDICT_TEXT.review,
+        icon: ExclamationTriangleIcon,
+        iconClass: "text-amber-500",
         box: "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30",
         text: "text-amber-900 dark:text-amber-100",
     },
     reject: {
         ...VERDICT_TEXT.reject,
+        icon: XCircleIcon,
+        iconClass: "text-red-500",
         box: "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30",
         text: "text-red-900 dark:text-red-100",
     },
     not_assessable: {
         ...VERDICT_TEXT.not_assessable,
+        icon: MinusCircleIcon,
+        iconClass: "text-gray-400",
         box: "border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/60",
         text: "text-gray-900 dark:text-slate-100",
     },
 };
+
+const SCORE_TONES = {
+    accept: {
+        ring: "stroke-emerald-500",
+        pill: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
+    },
+    revise: {
+        ring: "stroke-amber-500",
+        pill: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+    },
+    reject: {
+        ring: "stroke-red-500",
+        pill: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200",
+    },
+    none: {
+        ring: "stroke-gray-400",
+        pill: "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-200",
+    },
+};
+SCORE_TONES.warning = SCORE_TONES.revise;
+
+const SCORE_SEGMENTS = [
+    { key: "green", class: "bg-emerald-500" },
+    { key: "yellow", class: "bg-amber-400" },
+    { key: "red", class: "bg-red-500" },
+    { key: "missing", class: "bg-gray-400 dark:bg-slate-500" },
+];
 
 export default {
     props: {
@@ -429,6 +554,43 @@ export default {
         },
         verdictStyle() {
             return VERDICTS[this.report.verdict] || VERDICTS.not_assessable;
+        },
+        scoreCards() {
+            return this.nuclei.map((nucleus) => {
+                const { mark, result, atoms, penalties } =
+                    this.report.reports[nucleus];
+                const counts = { green: 0, yellow: 0, red: 0, missing: 0 };
+                (atoms || []).forEach((row) => {
+                    if (row.status in counts) {
+                        counts[row.status] += 1;
+                    }
+                });
+                const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                const label = this.resultLabel(result);
+                const summary = [
+                    `${counts.green} of ${total} atoms match`,
+                    counts.yellow && `${counts.yellow} borderline`,
+                    counts.red && `${counts.red} don't match`,
+                    counts.missing && `${counts.missing} not assigned`,
+                ]
+                    .filter(Boolean)
+                    .join(" · ");
+                return {
+                    nucleus,
+                    mark,
+                    percent: Math.max(0, Math.min(100, Number(mark) * 10)),
+                    result: label.charAt(0).toUpperCase() + label.slice(1),
+                    tone: SCORE_TONES[result] || SCORE_TONES.none,
+                    summary,
+                    deviation: penalties?.mean_deviation?.ppm ?? "—",
+                    segments: SCORE_SEGMENTS.filter(
+                        (segment) => counts[segment.key]
+                    ).map((segment) => ({
+                        ...segment,
+                        width: `${(counts[segment.key] / total) * 100}%`,
+                    })),
+                };
+            });
         },
         structure() {
             return quickcheckCxsmiles(this.molfile, this.report);
