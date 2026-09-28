@@ -16,6 +16,7 @@ use App\Http\Controllers\CASController;
 use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\CommunityContributionController;
+use App\Http\Controllers\CompoundLibraryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
@@ -109,7 +110,9 @@ Route::get('/sustainability', function () {
 })->name('sustainability');
 
 Route::get('/predict', function () {
-    return Inertia::render('Predict');
+    return Inertia::render('Predict', [
+        'nmrPredictUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/predict/',
+    ]);
 })->name('predict');
 
 Route::get('/bagit-viewer', [BagitViewerController::class, 'show'])
@@ -506,6 +509,10 @@ Route::get('{id}', function ($id) {
 
 // Search / browse page
 Route::get('/compounds', [ApplicationController::class, 'compounds'])->name('compounds');
+
+Route::get('/library/{team:compound_library_code}', [CompoundLibraryController::class, 'show'])
+    ->whereAlphaNumeric('team')
+    ->name('public.compound-library');
 
 Route::get('/search', [PublicSearchController::class, 'index'])->name('search');
 

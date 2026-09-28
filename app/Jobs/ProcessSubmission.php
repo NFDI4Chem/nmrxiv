@@ -262,19 +262,21 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $study->draft_id = null;
                         $study->project_id = null;
 
-                        foreach ($study->datasets as $dataset) {
-                            $dataset->draft_id = null;
-                            $dataset->project_id = null;
-                            $dataset->save();
-                        }
-
                         $this->copyProjectMetadataToStudy(
                             $study,
                             $projectAuthorPivot,
                             $projectCitationsArray,
                             $projectTagNames,
-                            $projectSpecies
+                            $projectSpecies,
+                            $project->license_id
                         );
+
+                        foreach ($study->datasets as $dataset) {
+                            $dataset->draft_id = null;
+                            $dataset->project_id = null;
+                            $dataset->license_id ??= $study->license_id;
+                            $dataset->save();
+                        }
 
                         $study->status = 'complete';
                         $study->save();
@@ -578,8 +580,13 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         array $authorPivot,
         ?array $citationsArray,
         array $tagNames,
-        $species
+        $species,
+        ?int $licenseId = null
     ): void {
+        if ($licenseId !== null && empty($study->license_id)) {
+            $study->license_id = $licenseId;
+        }
+
         if (! empty($authorPivot)) {
             $study->studyAuthors()->syncWithoutDetaching($authorPivot);
         }
