@@ -55,6 +55,7 @@
                         v-if="validation.report"
                         :report="validation.report"
                         :molfile="validation.molfile || ''"
+                        :details="reportDetails"
                     />
                 </div>
             </template>
@@ -71,6 +72,7 @@
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import QuickcheckReport from "@/Shared/Assignments/QuickcheckReport.vue";
+import { quickcheckDetails } from "@/Utils/quickcheckReportDocument.js";
 
 export default {
     components: {
@@ -83,6 +85,14 @@ export default {
             type: Number,
             required: true,
         },
+        studyName: {
+            type: String,
+            default: "",
+        },
+        doi: {
+            type: String,
+            default: "",
+        },
     },
     data() {
         return {
@@ -91,6 +101,12 @@ export default {
         };
     },
     computed: {
+        reportDetails() {
+            return quickcheckDetails(this.validation, {
+                title: this.studyName,
+                doi: this.doi,
+            });
+        },
         presentMarks() {
             return Object.fromEntries(
                 Object.entries(this.validation?.marks || {}).filter(

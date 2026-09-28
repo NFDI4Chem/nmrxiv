@@ -2251,6 +2251,9 @@
                                                                                         :study-id="
                                                                                             selectedStudy.id
                                                                                         "
+                                                                                        :study-name="
+                                                                                            selectedStudy.name
+                                                                                        "
                                                                                     />
                                                                                 </div>
                                                                             </section>

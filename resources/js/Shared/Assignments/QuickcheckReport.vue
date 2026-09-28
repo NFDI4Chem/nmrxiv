@@ -355,6 +355,7 @@ import {
     quickcheckCxsmiles,
     quickcheckDepictionUrl,
 } from "@/Utils/quickcheck.js";
+import { printQuickcheckReport } from "@/Utils/quickcheckReportDocument.js";
 
 const NUCLEUS_LABELS = { "13C": "¹³C", "1H": "¹H" };
 
@@ -403,6 +404,10 @@ export default {
         printable: {
             type: Boolean,
             default: true,
+        },
+        details: {
+            type: Object,
+            default: () => ({}),
         },
     },
     data() {
@@ -525,7 +530,14 @@ export default {
             return REASONS[reason] || reason.replace(/_/g, " ");
         },
         print() {
-            window.print();
+            printQuickcheckReport({
+                report: this.report,
+                molfile: this.molfile,
+                structureUrl: this.structureFailed ? "" : this.structureUrl,
+                hasFlaggedAtoms: Boolean(this.structure?.flagged.length),
+                details: this.details,
+                logoUrl: `${window.location.origin}/img/logo.svg`,
+            });
         },
     },
 };

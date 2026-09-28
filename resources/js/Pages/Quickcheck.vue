@@ -280,6 +280,7 @@
                             <QuickcheckReport
                                 :report="result.report"
                                 :molfile="result.input.structure.molfile"
+                                :details="reportDetails"
                             />
                         </div>
                     </div>
@@ -361,6 +362,15 @@ export default {
             return this.rows.filter(
                 (row) => row.shift !== "" && row.shift !== null
             );
+        },
+        reportDetails() {
+            return {
+                title:
+                    this.mode === "file" && this.file
+                        ? this.file.name
+                        : "Manually entered assignments",
+                source: this.result?.input?.structure?.source,
+            };
         },
         canSubmit() {
             return this.mode === "file"

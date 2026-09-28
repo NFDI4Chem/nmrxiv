@@ -26,6 +26,8 @@
                             <QuickcheckBadge
                                 v-if="study.data.is_public"
                                 :study-id="study.data.id"
+                                :study-name="study.data.name"
+                                :doi="study.data.doi || ''"
                             />
                         </div>
 

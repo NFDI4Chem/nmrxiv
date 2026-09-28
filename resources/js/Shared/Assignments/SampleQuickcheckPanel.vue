@@ -154,6 +154,7 @@
                     v-if="showReport && validation.report"
                     :report="validation.report"
                     :molfile="validation.molfile || ''"
+                    :details="reportDetails"
                 />
 
                 <div
@@ -221,6 +222,7 @@
 
 <script>
 import QuickcheckReport from "@/Shared/Assignments/QuickcheckReport.vue";
+import { quickcheckDetails } from "@/Utils/quickcheckReportDocument.js";
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -252,6 +254,10 @@ export default {
             type: Number,
             required: true,
         },
+        studyName: {
+            type: String,
+            default: "",
+        },
     },
     data() {
         return {
@@ -268,6 +274,11 @@ export default {
     computed: {
         endpoint() {
             return `/dashboard/studies/${this.studyId}/assignment-validation`;
+        },
+        reportDetails() {
+            return quickcheckDetails(this.validation, {
+                title: this.studyName,
+            });
         },
         isPending() {
             return ["queued", "running"].includes(this.validation?.status);
