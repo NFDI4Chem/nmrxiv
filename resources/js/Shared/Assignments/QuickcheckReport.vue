@@ -235,13 +235,6 @@
                         </tbody>
                     </table>
                 </div>
-                <p
-                    v-if="anyApproximateMark"
-                    class="border-t border-gray-200 px-4 py-1.5 text-[11px] text-gray-500 dark:border-slate-700 dark:text-slate-400"
-                >
-                    nmrshiftdb2 does not publish its mark formula; these marks
-                    approximate it from the same penalties.
-                </p>
             </section>
         </div>
 
@@ -470,11 +463,6 @@ export default {
                 cmApi,
                 this.structure.cxsmiles,
                 this.structure.flagged
-            );
-        },
-        anyApproximateMark() {
-            return this.nuclei.some(
-                (nucleus) => this.report.reports[nucleus].mark_is_approximate
             );
         },
         anyInDatabase() {
