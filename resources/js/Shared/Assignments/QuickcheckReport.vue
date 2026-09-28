@@ -570,7 +570,10 @@ export default {
                 const summary = [
                     `${counts.green} of ${total} atoms match`,
                     counts.yellow && `${counts.yellow} borderline`,
-                    counts.red && `${counts.red} don't match`,
+                    counts.red &&
+                        `${counts.red} ${
+                            counts.red === 1 ? "doesn't" : "don't"
+                        } match`,
                     counts.missing && `${counts.missing} not assigned`,
                 ]
                     .filter(Boolean)
