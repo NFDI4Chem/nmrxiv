@@ -417,6 +417,45 @@ class ValidationModelTest extends TestCase
         $this->assertArrayHasKey('project', $validation->report);
     }
 
+    public function test_process_scores_studies_when_an_earlier_empty_project_shares_validation(): void
+    {
+        $validation = new Validation;
+        $validation->save();
+
+        Project::factory()->create([
+            'validation_id' => $validation->id,
+            'name' => 'Empty sibling',
+        ]);
+
+        $project = Project::factory()->create([
+            'validation_id' => $validation->id,
+            'name' => 'Project with studies',
+        ]);
+
+        $study = Study::factory()->create([
+            'validation_id' => $validation->id,
+            'project_id' => $project->id,
+            'name' => 'Sample A',
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+        ]);
+
+        config(['validations.default' => 'v1']);
+        config(['validations.v1.project' => []]);
+        config(['validations.v1.study' => []]);
+        config(['validations.v1.dataset' => []]);
+
+        $validation->process();
+        $validation->refresh();
+
+        $this->assertCount(1, $validation->report['project']['studies']);
+        $this->assertSame($study->id, $validation->report['project']['studies'][0]['id']);
+        $this->assertSame('Sample A', $validation->report['project']['studies'][0]['name']);
+    }
+
     public function test_process_method_handles_project_with_studies()
     {
         $validation = new Validation;

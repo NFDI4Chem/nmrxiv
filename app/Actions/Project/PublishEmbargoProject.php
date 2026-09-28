@@ -105,7 +105,7 @@ class PublishEmbargoProject
         $project->release_date = now()->startOfDay()->toDateString();
         $project->save();
 
-        $validation->process();
+        $validation->process(project: $project);
         $publishAttemptValidation = $validation->fresh();
 
         if (! $publishAttemptValidation['report']['project']['status']) {
@@ -115,7 +115,7 @@ class PublishEmbargoProject
                 $project->refresh();
 
                 if ($project->validation) {
-                    $project->validation->process();
+                    $project->validation->process(project: $project);
                 }
             }
 

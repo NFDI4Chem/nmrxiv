@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Models\Sample;
+use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -225,6 +227,53 @@ class UploadTest extends TestCase
             ->get('/publish/'.$draft->id);
 
         $response->assertStatus(200);
+    }
+
+    public function test_publish_uses_the_draft_project_that_has_studies_not_a_later_empty_sibling(): void
+    {
+        $validation = Validation::factory()->create();
+        $draft = Draft::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+        ]);
+
+        $ownedProject = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'validation_id' => $validation->id,
+            'license_id' => null,
+        ]);
+
+        $study = Study::factory()->create([
+            'name' => 'sample-a',
+            'project_id' => $ownedProject->id,
+            'team_id' => $this->user->currentTeam->id,
+            'owner_id' => $this->user->id,
+            'draft_id' => $draft->id,
+            'license_id' => null,
+        ]);
+        Sample::factory()->create([
+            'name' => 'sample-a_sample',
+            'study_id' => $study->id,
+            'project_id' => $ownedProject->id,
+        ]);
+
+        $otherUser = User::factory()->withPersonalTeam()->create();
+        Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $otherUser->id,
+            'team_id' => $otherUser->currentTeam->id,
+            'license_id' => null,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get('/publish/'.$draft->id);
+
+        $response->assertStatus(200);
+
+        $page = $this->inertiaPageFromResponse($response);
+        $this->assertSame($ownedProject->id, $page['props']['project']['id']);
     }
 
     public function test_publish_processes_project_validation(): void

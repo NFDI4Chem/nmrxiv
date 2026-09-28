@@ -45,10 +45,10 @@ class ChemotionRepositoryTrackerService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.chemotion_tracker.base_url');
-        $this->clientId = config('services.chemotion_tracker.client_id');
-        $this->username = config('services.chemotion_tracker.username');
-        $this->password = config('services.chemotion_tracker.password');
+        $this->baseUrl = (string) config('services.chemotion_tracker.base_url');
+        $this->clientId = (string) config('services.chemotion_tracker.client_id');
+        $this->username = (string) config('services.chemotion_tracker.username');
+        $this->password = (string) config('services.chemotion_tracker.password');
     }
 
     /**

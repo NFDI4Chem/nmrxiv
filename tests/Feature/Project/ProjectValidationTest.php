@@ -200,4 +200,36 @@ class ProjectValidationTest extends TestCase
         $this->assertNotNull($validation->report);
         $this->assertIsArray($validation->report);
     }
+
+    public function test_validation_report_includes_studies_when_an_empty_sibling_shares_validation(): void
+    {
+        $validation = Validation::factory()->create();
+        $this->project->validation()->associate($validation);
+        $this->project->save();
+
+        Project::factory()->create([
+            'validation_id' => $validation->id,
+            'name' => 'Empty sibling',
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->personalTeam()->id,
+        ]);
+
+        $study = Study::factory()->for($this->project)->create([
+            'name' => 'NMR sample',
+            'owner_id' => $this->user->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $this->project->id,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('project.validation', $this->project));
+
+        $response->assertStatus(200)
+            ->assertJsonPath('report.project.studies.0.id', $study->id)
+            ->assertJsonPath('report.project.studies.0.name', 'NMR sample');
+    }
 }

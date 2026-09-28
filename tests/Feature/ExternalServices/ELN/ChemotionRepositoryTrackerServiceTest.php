@@ -306,6 +306,19 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
         $this->assertFalse($service->isEnabled());
     }
 
+    public function test_service_can_be_resolved_without_credentials(): void
+    {
+        config([
+            'services.chemotion_tracker.enabled' => false,
+            'services.chemotion_tracker.username' => null,
+            'services.chemotion_tracker.password' => null,
+        ]);
+
+        $service = app(ChemotionRepositoryTrackerService::class);
+
+        $this->assertFalse($service->isEnabled());
+    }
+
     public function test_status_validation(): void
     {
         // Test valid statuses
