@@ -52,6 +52,10 @@ All experiments (datasets) belonging to one sample should go to one folder. It m
 
 The sample rules apply when the user needs, for example, to add an exported JCAMP file to their Bruker data. The JCAMP file should added to the level of study it represents as it is one dataset. Same goes for other formats such as **.nmrium**, or **.nmredata**. It means in one study folder you can find JCAMP files and NMReData files at the same level next to Bruker folders (as long all of them belong to the same sample).
 
+#### Adding HiFSA Analyses
+
+HiFSA results (the Cosmic Truth PDF report and `_export.zip`) are not datasets. Put them in a folder named `hifsa`, either inside the study folder or next to the folder that holds the raw data. See [HiFSA](/advanced-guides/hifsa/hifsa.html) for details.
+
 ### Group Studies per Project
 
 All the data submitted to **[nmrXiv](https://nmrxiv.org/)** in one process is grouped as a project. Therefore, make sure that you group related studies together in one folder. How those studies are related is up to the user. They can be a collection of studies used for teaching, or a collection used in a thesis. They can also be a part of one investigation (several samples from one source).
