@@ -71,6 +71,14 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Data Quality',
+        items: [
+          { text: 'Data Completeness Scores', link: '/data-quality/overview.md' },
+          { text: 'Why Each Experiment Matters', link: '/data-quality/experiments.md' },
+          { text: 'Library and Contributor Stars', link: '/data-quality/contributor-stars.md' },
+        ],
+      },
+      {
         text: 'Developers Guides',
         items: [
           { text: 'Architecture', link: '/developer-guides/architecture.md' },
@@ -99,7 +107,8 @@ export default defineConfig({
             ]
           },
           { text: 'Code Contribution Guidelines', link: '/developer-guides/code-contribution-guidelines.md' },
-          { text: 'API', link: '/developer-guides/api.md' }
+          { text: 'API', link: '/developer-guides/api.md' },
+          { text: 'Data Quality Scoring', link: '/developer-guides/data-quality-scoring.md' },
         ],
       },
       {
