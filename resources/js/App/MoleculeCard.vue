@@ -41,44 +41,11 @@
                         v-if="showAnnotationStars"
                         class="mb-2 flex items-center"
                     >
-                        <div class="mb-1 flex items-center">
-                            <svg
-                                v-for="index in starCount"
-                                :key="'y-' + index"
-                                class="inline text-yellow-400 h-4 w-4 flex-shrink-0"
-                                x-state:on="Active"
-                                x-state:off="Inactive"
-                                x-state-description='Active: "text-yellow-400", Inactive: "text-gray-200"'
-                                x-description="Heroicon name: mini/star"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                                    clip-rule="evenodd"
-                                ></path>
-                            </svg>
-                            <svg
-                                v-for="index in inactiveStarCount"
-                                :key="'n-' + index"
-                                class="inline text-gray-200 h-4 w-4 flex-shrink-0"
-                                x-state-description='undefined: "text-yellow-400", undefined: "text-gray-200"'
-                                x-description="Heroicon name: mini/star"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                                    clip-rule="evenodd"
-                                ></path>
-                            </svg>
-                        </div>
+                        <DataCompletenessBadge
+                            :tier="starCount"
+                            :breakdown="molecule.quality_breakdown"
+                            variant="compact"
+                        />
                     </div>
                     <div class="space-y-2">
                         <template v-if="displayTitle">
@@ -243,12 +210,14 @@
 <script>
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import MolecularFormula from "@/Shared/MolecularFormula.vue";
+import DataCompletenessBadge from "@/Shared/DataCompletenessBadge.vue";
 import { Link as InertiaLink } from "@inertiajs/vue3";
 import { LockClosedIcon } from "@heroicons/vue/20/solid";
 export default {
     components: {
         Depictor2D,
         MolecularFormula,
+        DataCompletenessBadge,
         InertiaLink,
         LockClosedIcon,
     },
@@ -378,15 +347,18 @@ export default {
             return parts.join(" · ");
         },
         starCount() {
+            // Prefer team-scoped tier when the library page attaches it.
+            const teamTier = Number(this.molecule?.team_quality_tier);
+            if (Number.isFinite(teamTier) && teamTier >= 0) {
+                return Math.min(5, Math.floor(teamTier));
+            }
+
             const n = Number(this.molecule?.annotation_level);
             if (!Number.isFinite(n) || n < 0) {
                 return 0;
             }
 
             return Math.min(5, Math.floor(n));
-        },
-        inactiveStarCount() {
-            return Math.max(0, 5 - this.starCount);
         },
         displayTitle() {
             const iupac = this.molecule?.iupac_name;
