@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\Project;
 use App\Support\Public\PublicMoleculeCatalogIndexer;
 
@@ -33,5 +34,6 @@ class PublishProject
         }
 
         app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
+        dispatch(ScoreMoleculeQuality::forProject($project));
     }
 }

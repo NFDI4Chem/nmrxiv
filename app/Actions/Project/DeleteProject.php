@@ -2,6 +2,7 @@
 
 namespace App\Actions\Project;
 
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\User;
@@ -32,6 +33,7 @@ class DeleteProject
             $project->save();
 
             app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
+            dispatch(ScoreMoleculeQuality::forProject($project));
 
             return;
         }

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Project;
 
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\Project;
 use App\Support\Public\PublicMoleculeCatalogIndexer;
 
@@ -24,6 +25,7 @@ class RestoreProject
             $project->save();
 
             app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
+            dispatch(ScoreMoleculeQuality::forProject($project));
         } else {
             $project->studies()->update(['is_deleted' => false]);
             foreach ($project->studies as $study) {
