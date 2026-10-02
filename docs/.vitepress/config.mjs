@@ -106,6 +106,7 @@ export default defineConfig({
         text: 'Advance Guides',
         items: [
           { text: 'NMRium', link: '/advanced-guides/nmrium/nmrium.md' },  
+          { text: 'HiFSA', link: '/advanced-guides/hifsa/hifsa.md' },
           { text: 'NMR Repositories Overview',
             items: [
               { text: 'Background', link: '/advanced-guides/nmr-repositories/background.md'},
