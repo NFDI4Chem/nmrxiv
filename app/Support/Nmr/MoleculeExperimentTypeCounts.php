@@ -7,6 +7,7 @@ namespace App\Support\Nmr;
 use App\Models\Dataset;
 use App\Models\Study;
 use App\Models\Team;
+use App\Support\Quality\SpectrumDescriptor;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -62,6 +63,124 @@ final class MoleculeExperimentTypeCounts
         }
 
         return $counts;
+    }
+
+    /**
+     * Structured spectrum descriptors for quality scoring (same visibility SQL
+     * as {@see forPublicCatalog()}).
+     *
+     * @param  array<int, int>  $moleculeIds
+     * @return array<int, list<SpectrumDescriptor>>
+     */
+    public function descriptorsForPublicCatalog(array $moleculeIds, ?Team $team = null): array
+    {
+        if ($moleculeIds === []) {
+            return [];
+        }
+
+        [$scopeSql, $scopeBindings] = $this->teamScopeSql($team);
+
+        /** @var array<int, list<SpectrumDescriptor>> $descriptors */
+        $descriptors = [];
+
+        $datasetRows = $this->fetchPublicDatasetRows($moleculeIds, $scopeSql, $scopeBindings);
+        $studiesWithDatasetSpectra = [];
+
+        foreach ($datasetRows as $row) {
+            $moleculeId = (int) $row->molecule_id;
+            $datasetId = (int) $row->dataset_id;
+            $studyId = (int) $row->study_id;
+            $spectra = $this->labeler->spectraFromNmriumInfo($row->nmrium_info);
+
+            if ($spectra !== []) {
+                $studiesWithDatasetSpectra[$studyId] = true;
+                foreach ($spectra as $spectrum) {
+                    $descriptors[$moleculeId][] = SpectrumDescriptor::fromNmriumSpectrum(
+                        $spectrum,
+                        $datasetId,
+                        $studyId,
+                        fn (array $s): ?int => $this->labeler->guessSpectrumDimension($s),
+                    );
+                }
+
+                continue;
+            }
+
+            // Fall back to dataset.type when NMRium spectra are absent.
+            foreach ($this->labeler->labelsFromDatasetType(is_string($row->type ?? null) ? $row->type : null) as $label) {
+                $descriptor = $this->descriptorFromLabel($label, $datasetId, $studyId);
+                if ($descriptor !== null) {
+                    $descriptors[$moleculeId][] = $descriptor;
+                }
+            }
+        }
+
+        $studyRows = $this->fetchPublicStudyNmriumRows($moleculeIds, $scopeSql, $scopeBindings);
+        foreach ($studyRows as $row) {
+            $studyId = (int) $row->study_id;
+            if (isset($studiesWithDatasetSpectra[$studyId])) {
+                continue;
+            }
+
+            $moleculeId = (int) $row->molecule_id;
+            foreach ($this->labeler->spectraFromNmriumInfo($row->nmrium_info) as $spectrum) {
+                $descriptors[$moleculeId][] = SpectrumDescriptor::fromNmriumSpectrum(
+                    $spectrum,
+                    null,
+                    $studyId,
+                    fn (array $s): ?int => $this->labeler->guessSpectrumDimension($s),
+                );
+            }
+        }
+
+        return $descriptors;
+    }
+
+    /**
+     * Best-effort parse of a display label like `1H NMR - 1D` into a descriptor.
+     */
+    private function descriptorFromLabel(string $label, ?int $datasetId, ?int $studyId): ?SpectrumDescriptor
+    {
+        $trimmed = trim($label);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $nuclei = [];
+        $experiment = null;
+        $dimension = null;
+
+        if (preg_match('/^(.+?)\s+NMR(?:\s+-\s+(.+))?$/i', $trimmed, $matches)) {
+            $nucleusPart = trim($matches[1]);
+            foreach (preg_split('/\s*-\s*/', $nucleusPart) ?: [] as $part) {
+                $part = trim($part);
+                if ($part !== '') {
+                    $nuclei[] = $part;
+                }
+            }
+            $experimentPart = isset($matches[2]) ? strtolower(trim($matches[2])) : null;
+            if ($experimentPart !== null && $experimentPart !== '') {
+                if (preg_match('/^(\d+)d$/', $experimentPart, $dimMatch)) {
+                    $dimension = (int) $dimMatch[1];
+                    $experiment = $experimentPart;
+                } else {
+                    $experiment = $experimentPart;
+                    $dimension = 2;
+                }
+            }
+        }
+
+        if ($nuclei === [] && $experiment === null) {
+            return null;
+        }
+
+        return new SpectrumDescriptor(
+            dimension: $dimension,
+            nuclei: $nuclei,
+            experiment: $experiment,
+            datasetId: $datasetId,
+            studyId: $studyId,
+        );
     }
 
     /**

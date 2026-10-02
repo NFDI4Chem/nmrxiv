@@ -125,6 +125,11 @@ class Team extends JetstreamTeam
         return $this->hasMany(Project::class);
     }
 
+    public function moleculeQualityScores(): HasMany
+    {
+        return $this->hasMany(TeamMoleculeQualityScore::class);
+    }
+
     public function activeProjects(): HasMany
     {
         return $this->hasMany(Project::class)->where([['is_deleted', false], ['is_archived', false]]);

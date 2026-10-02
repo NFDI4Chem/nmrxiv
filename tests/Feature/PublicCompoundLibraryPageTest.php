@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Team;
+use App\Models\TeamMoleculeQualityScore;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -94,7 +95,7 @@ class PublicCompoundLibraryPageTest extends TestCase
     {
         $page = $this->libraryPage();
 
-        foreach (['library', 'compounds', 'stats', 'techniques', 'filters'] as $prop) {
+        foreach (['library', 'compounds', 'stats', 'techniques', 'filters', 'quality'] as $prop) {
             $this->assertArrayHasKey($prop, $page['props']);
         }
 
@@ -103,6 +104,8 @@ class PublicCompoundLibraryPageTest extends TestCase
             $this->owner->currentTeam->compoundLibraryUrl(),
             $page['props']['library']['share_url']
         );
+        $this->assertSame(0, $page['props']['quality']['stars']);
+        $this->assertArrayHasKey('tier_counts', $page['props']['quality']);
     }
 
     public function test_personal_library_name_falls_back_to_first_and_last_name(): void
@@ -231,6 +234,46 @@ class PublicCompoundLibraryPageTest extends TestCase
         $alpha = $this->createCompound(moleculeAttributes: ['name' => 'Alpha compound']);
 
         $this->assertSame([$alpha->id, $zeta->id], $this->compoundIds($this->libraryPage('?sort=name')));
+    }
+
+    public function test_sort_by_quality_orders_by_annotation_level(): void
+    {
+        $low = $this->createCompound(moleculeAttributes: ['name' => 'Low', 'annotation_level' => 1]);
+        $high = $this->createCompound(moleculeAttributes: ['name' => 'High', 'annotation_level' => 4]);
+
+        $this->assertSame(
+            [$high->id, $low->id],
+            $this->compoundIds($this->libraryPage('?sort=quality'))
+        );
+        $this->assertSame('quality', $this->libraryPage('?sort=quality')['props']['filters']['sort']);
+    }
+
+    public function test_library_exposes_team_quality_tier_on_cards(): void
+    {
+        $molecule = $this->createCompound(moleculeAttributes: ['annotation_level' => 2]);
+
+        TeamMoleculeQualityScore::factory()->create([
+            'team_id' => $this->owner->currentTeam->id,
+            'molecule_id' => $molecule->id,
+            'tier' => 4,
+            'breakdown' => [
+                'version' => 1,
+                'tier' => 4,
+                'tier_label' => 'Full elucidation set',
+                'criteria' => [],
+                'bonuses' => [],
+                'next_tier_missing' => [],
+            ],
+            'rubric_version' => 1,
+        ]);
+
+        $page = $this->libraryPage();
+        $card = collect($page['props']['compounds']['data'])->firstWhere('id', $molecule->id);
+
+        $this->assertNotNull($card);
+        $this->assertSame(4, $card['team_quality_tier']);
+        $this->assertSame(1, $page['props']['quality']['stars']);
+        $this->assertSame(1, $page['props']['quality']['high_quality_compounds']);
     }
 
     public function test_invalid_sort_falls_back_to_recent(): void
