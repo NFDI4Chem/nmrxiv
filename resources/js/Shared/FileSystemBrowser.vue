@@ -269,6 +269,45 @@
                                 </span>
                             </div>
 
+                            <!-- Zip file warning (zip archives are not processed) -->
+                            <div
+                                v-if="zipFiles.length > 0"
+                                class="mt-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-left text-sm text-yellow-800"
+                                role="alert"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <p class="font-semibold">
+                                        <ExclamationCircleIcon
+                                            class="mr-1 inline h-5 w-5 text-yellow-500"
+                                            aria-hidden="true"
+                                        />
+                                        Zip file(s) uploaded that cannot be
+                                        processed
+                                    </p>
+                                    <button
+                                        type="button"
+                                        class="text-xs font-medium text-yellow-700 underline hover:text-yellow-900"
+                                        @click="zipWarningDismissed = true"
+                                    >
+                                        Dismiss
+                                    </button>
+                                </div>
+                                <p class="mt-1">
+                                    Please unzip the files and upload them again
+                                    before proceeding. If you proceed anyway,
+                                    these files won't get processed.
+                                </p>
+                                <ul class="mt-1 list-inside list-disc">
+                                    <li
+                                        v-for="zipName in zipFiles"
+                                        :key="zipName"
+                                        class="truncate"
+                                    >
+                                        {{ zipName }}
+                                    </li>
+                                </ul>
+                            </div>
+
                             <!-- Upload progress section (shown during upload) -->
                             <div v-if="dropzone" class="relative mt-5">
                                 <!-- Progress bar -->
@@ -1757,6 +1796,9 @@ export default {
             logFilter: "Error", // Current log filter selection
             logFilters: ["Error", "Success", "Queued", "Inprogress"], // Available log filters
             uploadBatchErrors: [], // Batch upload error messages
+            zipFilesDetected: [], // Names of zip files added (not processable)
+            serverZipFiles: [], // Zip files stored for this draft (from server)
+            zipWarningDismissed: false, // User dismissed the zip warning banner
             showErrorBatchLogs: false, // Toggle for error log display
             showLogsDialog: false, // Modal dialog for detailed logs
             currentLog: null, // Currently processing file log
@@ -1815,6 +1857,16 @@ export default {
      * Computed properties
      */
     computed: {
+        /**
+         * Zip files stored on the server plus those queued this session,
+         * so the warning survives navigating away and back.
+         */
+        zipFiles() {
+            if (this.zipWarningDismissed) return [];
+            return [
+                ...new Set([...this.serverZipFiles, ...this.zipFilesDetected]),
+            ];
+        },
         /**
          * Get the base URL from page props
          * @returns {String} Base application URL
@@ -2542,6 +2594,34 @@ export default {
         },
 
         /**
+         * Fetch zip files stored for this draft (including ones inside
+         * folders that are not loaded in the tree yet).
+         */
+        loadServerZipFiles() {
+            if (!this.draft || !this.draft.id) return;
+            axios
+                .get(`/dashboard/drafts/${this.draft.id}/zip-files`)
+                .then((response) => {
+                    this.serverZipFiles = response.data.zip_files ?? [];
+                    // Server list is authoritative once uploads are stored
+                    this.zipFilesDetected = [];
+                })
+                .catch(() => {});
+        },
+
+        /**
+         * Whether a queued file is a zip archive (not processable by the server).
+         */
+        isZipFile(file) {
+            return (
+                /\.zip$/i.test(file.name || "") ||
+                ["application/zip", "application/x-zip-compressed"].includes(
+                    file.type
+                )
+            );
+        },
+
+        /**
          * Wait until Dropzone's file queue stops growing, then run checksums.
          * Folder drag/drop (and large picks) can add files in waves with pauses
          * longer than a fixed debounce; polling until length stabilizes ensures
@@ -3131,6 +3211,7 @@ export default {
                         this.$emit("loading", false);
                         this.loading = false;
                         this.missing_files = response.data.missing_files;
+                        this.loadServerZipFiles();
 
                         // Apply expanded state and select last expanded folder
                         this.$nextTick(async () => {
@@ -3555,6 +3636,13 @@ export default {
                             status: "Queued",
                             messages: [],
                         };
+                    }
+                    if (vm.isZipFile(file)) {
+                        const zipName = file.fullPath || file.name;
+                        if (!vm.zipFilesDetected.includes(zipName)) {
+                            vm.zipFilesDetected.push(zipName);
+                        }
+                        vm.zipWarningDismissed = false;
                     }
                     vm.selectedFSO.push(file);
                     vm.scheduleChecksumsAfterFilesQueued();

@@ -92,6 +92,26 @@ class DraftController extends Controller
     }
 
     /**
+     * List zip archives anywhere in the draft's file tree (the tree itself is
+     * loaded lazily, so the client cannot see nested ones).
+     */
+    public function zipFiles(Request $request, Draft $draft): JsonResponse
+    {
+        $this->authorize('updateDraft', $draft);
+
+        $zipFiles = FileSystemObject::query()
+            ->where('draft_id', $draft->id)
+            ->where('type', 'file')
+            ->where('is_deleted', false)
+            ->where('name', 'like', '%.zip')
+            ->pluck('relative_url')
+            ->map(fn ($url) => ltrim($url, '/'))
+            ->values();
+
+        return response()->json(['zip_files' => $zipFiles]);
+    }
+
+    /**
      * Load additional root-level sample folders when the draft uses paginated loading.
      */
     public function sampleFolders(Request $request, Draft $draft): JsonResponse
