@@ -3,6 +3,7 @@
 namespace Tests\Unit\Actions\Project;
 
 use App\Actions\Project\PublishProject;
+use App\Jobs\DetectDatasetSignals;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Dataset;
 use App\Models\Project;
@@ -69,6 +70,7 @@ class PublishProjectTest extends TestCase
         Queue::assertPushed(ProcessMetadataExtractionBagitGenerationJob::class, function ($job) use ($study2) {
             return $job->studyId === $study2->id;
         });
+        Queue::assertPushed(DetectDatasetSignals::class, 2);
     }
 
     public function test_publish_makes_all_datasets_public()

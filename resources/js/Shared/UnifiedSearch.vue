@@ -77,25 +77,38 @@
             </div>
             <div
                 v-else-if="heroSearchType.type === 'spectra'"
-                class="rounded-3xl border border-gray-200 bg-white p-8 shadow-lg ring-1 ring-gray-900/5 text-center"
+                class="overflow-hidden rounded-3xl border border-gray-200 bg-white text-left shadow-lg ring-1 ring-gray-900/5"
             >
                 <div
-                    class="mx-auto flex size-12 items-center justify-center rounded-full bg-gray-100 text-gray-500"
+                    class="max-h-[min(70vh,42rem)] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6"
                 >
-                    <ChartBarIcon class="h-6 w-6" aria-hidden="true" />
+                    <PeakListSearchContent
+                        compact
+                        @search-params-updated="handlePeakListParams"
+                    />
                 </div>
-                <h2 class="mt-4 text-lg font-semibold text-gray-900">
-                    Spectra search
-                </h2>
-                <p class="mt-2 text-sm leading-relaxed text-gray-600">
-                    Upload NMR spectra to find similar data. This feature is
-                    coming soon.
-                </p>
-                <span
-                    class="mt-4 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                <div
+                    class="flex items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/50 px-5 py-4 sm:px-6"
                 >
-                    Coming soon
-                </span>
+                    <p
+                        class="text-left text-xs text-gray-500"
+                        aria-live="polite"
+                    >
+                        {{ peakSearchStatus }}
+                    </p>
+                    <button
+                        type="button"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+                        :disabled="!canPerformPeakSearch"
+                        @click="performPeakListSearch"
+                    >
+                        <MagnifyingGlassIcon
+                            class="h-4 w-4 shrink-0"
+                            aria-hidden="true"
+                        />
+                        Search
+                    </button>
+                </div>
             </div>
             <div
                 v-else-if="heroSearchType.type === 'advanced'"
@@ -436,69 +449,9 @@
                         </DialogPanel>
                     </TransitionChild>
 
-                    <!-- Spectra Upload View -->
+                    <!-- Spectra / Peak List Search View -->
                     <TransitionChild
-                        v-if="showSpectraUpload"
-                        as="template"
-                        enter="ease-out duration-200"
-                        enter-from="opacity-0 scale-95"
-                        enter-to="opacity-100 scale-100"
-                        leave="ease-in duration-150"
-                        leave-from="opacity-100 scale-100"
-                        leave-to="opacity-0 scale-95"
-                    >
-                        <DialogPanel
-                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
-                        >
-                            <!-- Main Content -->
-                            <div class="flex-1 overflow-y-auto">
-                                <div class="px-4 py-6 max-w-6xl mx-auto">
-                                    <SpectraUploadContent
-                                        @files-uploaded="handleSpectraFiles"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Footer with Actions -->
-                            <div
-                                class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
-                            >
-                                <a
-                                    href="#"
-                                    autofocus
-                                    class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
-                                    @click.prevent="backToOptions"
-                                >
-                                    Cancel
-                                </a>
-                                <a
-                                    href="#"
-                                    :class="
-                                        spectraFiles.length === 0
-                                            ? 'opacity-50 cursor-not-allowed'
-                                            : 'hover:bg-gray-800'
-                                    "
-                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
-                                    @click.prevent="performSpectraSearch"
-                                >
-                                    Search
-                                    {{
-                                        spectraFiles.length > 0
-                                            ? `(${spectraFiles.length} file${
-                                                  spectraFiles.length > 1
-                                                      ? "s"
-                                                      : ""
-                                              })`
-                                            : ""
-                                    }}
-                                </a>
-                            </div>
-                        </DialogPanel>
-                    </TransitionChild>
-
-                    <!-- Peak List Search View -->
-                    <TransitionChild
-                        v-if="showPeakListSearch"
+                        v-if="showSpectraUpload || showPeakListSearch"
                         as="template"
                         enter="ease-out duration-200"
                         enter-from="opacity-0 scale-95"
@@ -533,13 +486,20 @@
                                 >
                                     Cancel
                                 </a>
-                                <a
-                                    href="#"
-                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
-                                    @click.prevent="performPeakListSearch"
+                                <p
+                                    class="hidden text-xs text-gray-500 sm:block"
+                                    aria-live="polite"
+                                >
+                                    {{ peakSearchStatus }}
+                                </p>
+                                <button
+                                    type="button"
+                                    :disabled="!canPerformPeakSearch"
+                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+                                    @click="performPeakListSearch"
                                 >
                                     Search
-                                </a>
+                                </button>
                             </div>
                         </DialogPanel>
                     </TransitionChild>
@@ -625,7 +585,6 @@ import {
 } from "@heroicons/vue/24/outline";
 import { loadOpenChemLib } from "@/Utils/structureEditor";
 import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
-import SpectraUploadContent from "@/Shared/SpectraUploadContent.vue";
 import PeakListSearchContent from "@/Shared/PeakListSearchContent.vue";
 import MetadataSearchContent from "@/Shared/MetadataSearchContent.vue";
 
@@ -641,7 +600,6 @@ export default {
         AdjustmentsHorizontalIcon,
         ChartBarIcon,
         StructureEditorContent,
-        SpectraUploadContent,
         PeakListSearchContent,
         MetadataSearchContent,
     },
@@ -664,7 +622,6 @@ export default {
         const heroStructureEditor = shallowRef(null);
         const modalStructureEditor = shallowRef(null);
         const structureSearchType = ref("exact");
-        const spectraFiles = ref([]);
         const peakListParams = ref(null);
         const metadataParams = ref(null);
         const searchButton = ref(null);
@@ -692,7 +649,7 @@ export default {
                 type: "spectra",
                 label: "Spectra",
                 icon: ChartBarIcon,
-                comingSoon: true,
+                comingSoon: false,
             },
             {
                 type: "advanced",
@@ -740,8 +697,6 @@ export default {
         watch(
             () => heroSearchType.value.type,
             (newType, oldType) => {
-                spectraFiles.value = [];
-
                 if (props.variant !== "hero") {
                     return;
                 }
@@ -761,7 +716,7 @@ export default {
         const heroPlaceholder = computed(() => {
             switch (heroSearchType.value.type) {
                 case "spectra":
-                    return "Upload NMR spectra to find similar data...";
+                    return "Drop a spectrum or type the peaks you are looking for...";
                 case "structure":
                     return "Compound name, SMILES, InChI, InChIKey...";
                 case "metadata":
@@ -777,9 +732,23 @@ export default {
             () => heroSearchQuery.value.trim() !== ""
         );
 
-        const canPerformHeroSpectraSearch = computed(
-            () => spectraFiles.value.length > 0
+        const canPerformPeakSearch = computed(
+            () => peakListParams.value?.canSearch === true
         );
+
+        const peakSearchStatus = computed(() => {
+            const count = peakListParams.value?.peakCount ?? 0;
+
+            if (count === 0) {
+                return "Add at least one peak to search for";
+            }
+
+            if (!canPerformPeakSearch.value) {
+                return "Fix the highlighted peaks to search";
+            }
+
+            return `${count} ${count === 1 ? "peak" : "peaks"} ready`;
+        });
 
         const canPerformHeroStructureSearch = computed(
             () => heroHasStructure.value
@@ -890,11 +859,11 @@ export default {
                 category: "Spectra Search",
                 title: "NMR Spectra",
                 description:
-                    "Upload raw NMR data from Bruker or JEOL to find similar spectra.",
+                    "Drop a Bruker, Varian or JEOL folder, or a JCAMP-DX file, to find similar spectra.",
                 image: "/img/instrument-format.png",
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
-                comingSoon: true,
+                comingSoon: false,
             },
             {
                 type: "peaks",
@@ -905,7 +874,7 @@ export default {
                 image: "/img/spectra-format.png",
                 bgClass: "bg-amber-100",
                 iconClass: "text-amber-600",
-                comingSoon: true,
+                comingSoon: false,
             },
             {
                 type: "metadata",
@@ -972,7 +941,6 @@ export default {
             showSpectraUpload.value = false;
             showPeakListSearch.value = false;
             showMetadataSearch.value = false;
-            spectraFiles.value = [];
             peakListParams.value = null;
             metadataParams.value = null;
             modalStructureEditor.value = null;
@@ -1011,14 +979,6 @@ export default {
 
             // Handle spectra search - show upload interface
             if (type === "spectra") {
-                const spectraOption = searchOptions.find(
-                    (option) => option.type === "spectra"
-                );
-
-                if (spectraOption?.comingSoon) {
-                    return;
-                }
-
                 showSpectraUpload.value = true;
                 return;
             }
@@ -1116,15 +1076,10 @@ export default {
             showSpectraUpload.value = false;
             showPeakListSearch.value = false;
             showMetadataSearch.value = false;
-            spectraFiles.value = [];
             peakListParams.value = null;
             metadataParams.value = null;
             selectedType.value = null;
             modalStructureEditor.value = null;
-        };
-
-        const handleSpectraFiles = (files) => {
-            spectraFiles.value = files;
         };
 
         const handlePeakListParams = (params) => {
@@ -1157,26 +1112,17 @@ export default {
             });
         };
 
-        const performSpectraSearch = () => {
-            if (!canPerformHeroSpectraSearch.value) {
-                return;
-            }
-            // TODO: Implement spectra file upload and search
-            // For now, just log the files
-            console.log("Searching with spectra files:", spectraFiles.value);
-            alert(
-                `Ready to search with ${spectraFiles.value.length} file(s). Upload functionality will be implemented next.`
-            );
-        };
-
         const performPeakListSearch = () => {
-            if (!peakListParams.value || !peakListParams.value.peaks) {
-                alert("Please enter at least one chemical peak");
+            if (!canPerformPeakSearch.value) {
                 return;
             }
-            // TODO: Implement peak list search
-            console.log("Searching with peak list:", peakListParams.value);
-            alert("Peak list search functionality will be implemented next.");
+
+            router.visit(
+                buildSearchPagePath(
+                    SEARCH_SCOPE.SPECTRA,
+                    peakListParams.value.params
+                )
+            );
         };
 
         const performMetadataSearch = () => {
@@ -1225,6 +1171,10 @@ export default {
 
                     if (searchParam === "structure") {
                         showStructureEditor.value = true;
+                    } else if (searchParam === "spectra") {
+                        showSpectraUpload.value = true;
+                    } else if (searchParam === "peaks") {
+                        showPeakListSearch.value = true;
                     }
                 }
             }
@@ -1242,7 +1192,6 @@ export default {
             onHeroStructureEditorReady,
             onModalStructureEditorReady,
             structureSearchType,
-            spectraFiles,
             peakListParams,
             metadataParams,
             metadataActiveFilterCount,
@@ -1253,7 +1202,8 @@ export default {
             heroPlaceholder,
             canPerformHeroTextSearch,
             canPerformHeroStructureSearch,
-            canPerformHeroSpectraSearch,
+            canPerformPeakSearch,
+            peakSearchStatus,
             canPerformHeroAdvancedSearch,
             heroStructureActionLabel,
             onHeroSearchInput,
@@ -1265,11 +1215,9 @@ export default {
             closeModal,
             selectAndProceed,
             backToOptions,
-            handleSpectraFiles,
             handlePeakListParams,
             handleMetadataParams,
             performStructureSearch,
-            performSpectraSearch,
             performPeakListSearch,
             performMetadataSearch,
         };

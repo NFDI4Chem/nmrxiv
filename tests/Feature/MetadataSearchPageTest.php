@@ -31,6 +31,23 @@ class MetadataSearchPageTest extends TestCase
                 ->where('initialParams', []));
     }
 
+    public function test_spectra_search_page_renders_shell_with_initial_params(): void
+    {
+        $this->get('/search?scope=spectra&'.http_build_query([
+            'peaks' => ['1H' => '3.75:3H:s;!9.5-10.5', '13C' => ''],
+            'mode' => 'whole',
+            'closeness' => 'relaxed',
+        ]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Public/SpectraSearch')
+                ->where('scope', 'spectra')
+                ->where('initialParams.peaks', ['1H' => '3.75:3H:s;!9.5-10.5'])
+                ->where('initialParams.mode', 'whole')
+                ->where('initialParams.closeness', 'relaxed')
+                ->where('perPage', 12));
+    }
+
     public function test_metadata_search_page_accepts_stats_legend_query_params(): void
     {
         $this->get('/search?scope=metadata&proton_frequency=600&nmr_method=hmbc&q=dimension+2')
