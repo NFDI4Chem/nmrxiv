@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AssignmentValidationController;
 use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
@@ -78,6 +79,14 @@ Route::prefix('v1')->group(function () {
     Route::get('datasets/{dataset}/nmriumInfo', [NmriumController::class, 'dataset'])
         ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
         ->name('api.datasets.nmrium');
+
+    Route::get('samples/{study}/assignment-validation', [AssignmentValidationController::class, 'sample'])
+        ->where('study', '([0-9]+|(NMRXIV:)?(S|s)[0-9]+)')
+        ->name('api.samples.assignment-validation');
+
+    Route::post('quickcheck', [AssignmentValidationController::class, 'quickcheck'])
+        ->middleware('throttle:assignment-quickcheck')
+        ->name('api.quickcheck');
 
     Route::get('/{id}', [DataController::class, 'id'])
         ->name('public.api.project');

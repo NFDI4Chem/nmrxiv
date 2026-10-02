@@ -91,4 +91,28 @@ return [
         'temp_prefix' => env('SPECTRA_SEARCH_TEMP_PREFIX', 'spectra-search'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Assignment Quickcheck
+    |--------------------------------------------------------------------------
+    |
+    | 1H/13C assignments are checked by NMRKit against predicted shifts. The
+    | prediction is a shared service, so failed calls back off and the public
+    | endpoint is rate limited per IP.
+    |
+    */
+
+    'assignment_validation' => [
+        'url' => env(
+            'ASSIGNMENT_VALIDATION_URL',
+            rtrim((string) env('NMRKIT_URL', 'https://nmrkit.nmrxiv.org'), '/').'/latest/validate/assignments'
+        ),
+        'timeout' => (int) env('ASSIGNMENT_VALIDATION_TIMEOUT', 150),
+        'queue' => env('ASSIGNMENT_VALIDATION_QUEUE', 'default'),
+        'job_tries' => (int) env('ASSIGNMENT_VALIDATION_JOB_TRIES', 4),
+        'backoff' => array_map('intval', explode(',', env('ASSIGNMENT_VALIDATION_BACKOFF', '60,300,900'))),
+        'public_per_minute' => (int) env('ASSIGNMENT_QUICKCHECK_PER_MINUTE', 6),
+        'max_file_kb' => (int) env('ASSIGNMENT_VALIDATION_MAX_FILE_KB', 2048),
+    ],
+
 ];
