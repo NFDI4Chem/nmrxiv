@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\DatasetResource;
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Sample;
@@ -193,6 +194,8 @@ class DatasetController extends Controller
         }
 
         $dataset->save();
+
+        dispatch(ScoreMoleculeQuality::forStudy($study));
 
         return response()->json([
             'id' => $dataset->id,

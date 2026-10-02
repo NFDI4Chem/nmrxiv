@@ -4,6 +4,7 @@ namespace Tests\Feature\Project;
 
 use App\Events\ProjectArchival;
 use App\Events\ProjectDeletion;
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
@@ -60,8 +61,8 @@ class ProjectArchivalAndDeletionTest extends ProjectFeatureTestCase
         $this->project->refresh();
         $this->assertTrue($this->project->is_archived);
 
-        // The archival action is synchronous, no job is dispatched
-        Queue::assertNothingPushed();
+        // Archival itself is synchronous; quality scoring is queued as a side effect
+        Queue::assertPushed(ScoreMoleculeQuality::class, 1);
 
         Event::assertDispatched(ProjectArchival::class, function ($event) {
             return $event->project->id === $this->project->id;
@@ -263,8 +264,8 @@ class ProjectArchivalAndDeletionTest extends ProjectFeatureTestCase
         $this->assertTrue($this->project->is_archived);
         $this->assertTrue($project2->is_archived);
 
-        // Archival is synchronous, no jobs are dispatched
-        Queue::assertNothingPushed();
+        // Archival itself is synchronous; quality scoring is queued per project
+        Queue::assertPushed(ScoreMoleculeQuality::class, 2);
     }
 
     public function test_published_project_can_be_archived()
@@ -301,7 +302,7 @@ class ProjectArchivalAndDeletionTest extends ProjectFeatureTestCase
         $this->assertTrue($this->project->is_archived);
         $this->assertTrue($this->project->is_public); // Should remain public
 
-        Queue::assertNothingPushed();
+        Queue::assertPushed(ScoreMoleculeQuality::class, 1);
     }
 
     public function test_project_deletion_marks_project_and_studies_as_deleted()
@@ -404,8 +405,8 @@ class ProjectArchivalAndDeletionTest extends ProjectFeatureTestCase
         $response1->assertRedirect();
         $response2->assertRedirect(); // Second call will un-archive since it's a toggle
 
-        // No jobs are dispatched (synchronous)
-        Queue::assertNothingPushed();
+        // Quality scoring is unique per project, so concurrent toggles coalesce to one job
+        Queue::assertPushed(ScoreMoleculeQuality::class, 1);
 
         // After two toggles, project should be back to not archived
         $this->project->refresh();

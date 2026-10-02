@@ -26,7 +26,7 @@ class CASServiceTest extends TestCase
 
         // Set up CAS configuration for tests
         Config::set('services.cas.api_token', 'test-api-token');
-        Config::set('services.cas.base_url', 'https://commonchemistry.cas.org/api');
+        Config::set('services.cas.base_url', 'https://commonchemistry.cas.org/direct-api');
     }
 
     public function test_fetch_cas_data_requires_cas_rn_parameter(): void

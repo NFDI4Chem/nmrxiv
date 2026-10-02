@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PublicCompoundLibraryRequest;
 use App\Models\Molecule;
 use App\Models\Team;
+use App\Models\TeamMoleculeQualityScore;
 use App\Support\Public\PublicCompoundLibrary;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,7 +30,14 @@ class CompoundLibraryController extends Controller
         $library->applySort($query, $filters['sort']);
 
         $compounds = $query->paginate(self::PER_PAGE)->withQueryString();
-        $compounds->getCollection()->each(function (Molecule $molecule) use ($aggregates): void {
+
+        $teamScores = TeamMoleculeQualityScore::query()
+            ->where('team_id', $team->id)
+            ->whereIn('molecule_id', $compounds->getCollection()->pluck('id'))
+            ->get()
+            ->keyBy('molecule_id');
+
+        $compounds->getCollection()->each(function (Molecule $molecule) use ($aggregates, $teamScores): void {
             $isPublished = PublicCompoundLibrary::isPublished($molecule);
             $map = $aggregates['technique_map'][$isPublished ? 'public' : 'private'];
 
@@ -39,6 +47,13 @@ class CompoundLibraryController extends Controller
                 $isPublished ? $molecule->library_public_samples_count : $molecule->library_samples_count
             );
             $molecule->setAttribute('workspace_experiment_type_counts', $map[$molecule->id] ?? []);
+
+            $teamScore = $teamScores->get($molecule->id);
+            if ($teamScore) {
+                $molecule->setAttribute('team_quality_tier', $teamScore->tier);
+                $molecule->setAttribute('quality_breakdown', $teamScore->breakdown);
+            }
+
             $molecule->makeHidden(['library_has_public_study', 'library_public_samples_count', 'library_samples_count']);
         });
 
@@ -56,6 +71,7 @@ class CompoundLibraryController extends Controller
             'stats' => $aggregates['stats'],
             'unpublished' => $aggregates['unpublished'],
             'techniques' => $aggregates['techniques'],
+            'quality' => $library->qualitySummary($team),
             'filters' => $filters,
         ]);
     }

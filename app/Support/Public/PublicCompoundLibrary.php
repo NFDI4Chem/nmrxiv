@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class PublicCompoundLibrary
 {
-    public const SORT_OPTIONS = ['recent', 'name', 'weight_asc', 'weight_desc', 'samples'];
+    public const SORT_OPTIONS = ['recent', 'name', 'weight_asc', 'weight_desc', 'samples', 'quality'];
 
     public const VISIBILITY_OPTIONS = ['all', 'public', 'private'];
 
@@ -42,6 +42,8 @@ final class PublicCompoundLibrary
         'molecules.canonical_smiles',
         'molecules.molecular_formula',
         'molecules.molecular_weight',
+        'molecules.annotation_level',
+        'molecules.quality_breakdown',
         'molecules.created_at',
     ];
 
@@ -231,6 +233,9 @@ final class PublicCompoundLibrary
                 ->orderByRaw('CASE WHEN molecules.molecular_weight IS NULL THEN 1 ELSE 0 END')
                 ->orderByDesc('molecules.molecular_weight'),
             'samples' => $query->orderByDesc('library_samples_count'),
+            'quality' => $query
+                ->orderByDesc('molecules.annotation_level')
+                ->orderByDesc('molecules.created_at'),
             default => $query
                 ->orderByDesc('library_has_public_study')
                 ->orderByDesc('molecules.created_at'),
@@ -265,6 +270,22 @@ final class PublicCompoundLibrary
             self::AGGREGATES_CACHE_SECONDS,
             fn (): array => $this->buildAggregates($team),
         );
+    }
+
+    /**
+     * Contributor stars derived from team-scoped molecule scores.
+     *
+     * @return array{
+     *     stars: int,
+     *     high_quality_compounds: int,
+     *     tier_counts: array<int, int>,
+     *     next_level: array{stars: int, needed: int, qualifying_tier: int}|null,
+     *     rubric_version: int
+     * }
+     */
+    public function qualitySummary(Team $team): array
+    {
+        return app(MoleculeQualityScorer::class)->contributorSummary($team);
     }
 
     /**

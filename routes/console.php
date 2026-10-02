@@ -28,6 +28,10 @@ Schedule::command('nmrxiv:index-public-molecule-catalog')
     ->withoutOverlapping()
     ->onOneServer();
 Schedule::command('nmrxiv:clean-spectra-search-uploads')->hourly()->onOneServer();
+Schedule::command('nmrxiv:score-molecules')
+    ->dailyAt('03:30')
+    ->withoutOverlapping()
+    ->onOneServer();
 Schedule::command('nmrxiv:delete-citations')->weekly();
 Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {
