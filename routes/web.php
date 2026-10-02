@@ -394,6 +394,8 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.provisional-doi.destroy');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/zip-files', [DraftController::class, 'zipFiles'])
+            ->name('dashboard.draft.zip-files');
         Route::get('drafts/{draft}/sample-folders', [DraftController::class, 'sampleFolders'])
             ->name('dashboard.draft.sample-folders');
         Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
