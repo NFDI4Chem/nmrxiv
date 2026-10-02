@@ -40,7 +40,7 @@
                     <MoleculeCard
                         :molecule="molecule"
                         :href="publicCompoundHref(molecule)"
-                        :show-annotation-stars="false"
+                        :show-annotation-stars="true"
                         :locked="Boolean(molecule.is_locked)"
                     />
                 </span>
@@ -59,7 +59,7 @@
                         v-if="primaryMolecule(study)"
                         :molecule="primaryMolecule(study)"
                         :href="route('dashboard.studies', [study.id])"
-                        :show-annotation-stars="false"
+                        :show-annotation-stars="true"
                     />
                     <Link
                         v-else

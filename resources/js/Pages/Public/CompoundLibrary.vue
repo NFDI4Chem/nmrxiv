@@ -118,6 +118,98 @@
                             </div>
                         </div>
                     </dl>
+
+                    <section
+                        v-if="quality"
+                        aria-labelledby="library-quality-heading"
+                        class="mt-6 rounded-xl bg-white/70 p-5 shadow-sm ring-1 ring-gray-900/5 backdrop-blur"
+                    >
+                        <div
+                            class="flex flex-wrap items-start justify-between gap-4"
+                        >
+                            <div class="min-w-0">
+                                <h2
+                                    id="library-quality-heading"
+                                    class="text-sm font-semibold text-gray-900"
+                                >
+                                    Data quality
+                                </h2>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Contributor stars based on compounds with a
+                                    full elucidation set (4★+) from this
+                                    workspace.
+                                </p>
+                                <div
+                                    class="mt-3 flex flex-wrap items-center gap-3"
+                                >
+                                    <DataCompletenessBadge
+                                        :tier="quality.stars"
+                                        variant="compact"
+                                        force-stars
+                                    />
+                                    <span
+                                        class="text-sm tabular-nums text-gray-700"
+                                    >
+                                        {{
+                                            formatNumber(
+                                                quality.high_quality_compounds
+                                            )
+                                        }}
+                                        fully characterised
+                                        {{
+                                            quality.high_quality_compounds === 1
+                                                ? "compound"
+                                                : "compounds"
+                                        }}
+                                    </span>
+                                </div>
+                                <p
+                                    v-if="quality.next_level"
+                                    class="mt-2 text-xs text-gray-500"
+                                >
+                                    {{ quality.next_level.needed }} more
+                                    {{ quality.next_level.qualifying_tier }}★+
+                                    compounds to reach
+                                    {{ quality.next_level.stars }}★.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                class="text-xs font-semibold text-indigo-600 hover:text-indigo-500"
+                                @click="showQualityInfo = true"
+                            >
+                                How is this scored?
+                            </button>
+                        </div>
+                        <div v-if="qualityTierTotal > 0" class="mt-4">
+                            <div
+                                class="flex h-2 w-full overflow-hidden rounded-full bg-gray-100"
+                                role="img"
+                                :aria-label="qualityDistributionLabel"
+                            >
+                                <span
+                                    v-for="bar in qualityTierBars"
+                                    :key="bar.tier"
+                                    :class="bar.color"
+                                    class="block h-full"
+                                    :style="{ width: bar.width }"
+                                    :title="`${bar.tier}★: ${bar.count}`"
+                                ></span>
+                            </div>
+                            <p
+                                class="mt-2 text-[11px] tabular-nums text-gray-500"
+                            >
+                                <span
+                                    v-for="(bar, index) in qualityTierBars"
+                                    :key="'l-' + bar.tier"
+                                >
+                                    <template v-if="index > 0"> · </template>
+                                    {{ bar.tier }}★
+                                    {{ formatNumber(bar.count) }}
+                                </span>
+                            </p>
+                        </div>
+                    </section>
                 </div>
             </div>
         </template>
@@ -492,6 +584,10 @@
                 />
             </div>
         </div>
+        <DataCompletenessInfoModal
+            :show="showQualityInfo"
+            @close="showQualityInfo = false"
+        />
     </app-layout>
 </template>
 
@@ -514,6 +610,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import CompoundCards from "@/Shared/CompoundCards.vue";
 import Pagination from "@/Shared/Pagination.vue";
 import EmptySearchState from "@/Shared/EmptySearchState.vue";
+import DataCompletenessBadge from "@/Shared/DataCompletenessBadge.vue";
+import DataCompletenessInfoModal from "@/Shared/DataCompletenessInfoModal.vue";
 import { publicEmptyStateSectionClasses } from "@/Utils/publicEmptyStateClasses.js";
 
 export default {
@@ -522,6 +620,8 @@ export default {
         CompoundCards,
         Pagination,
         EmptySearchState,
+        DataCompletenessBadge,
+        DataCompletenessInfoModal,
         Menu,
         MenuButton,
         MenuItem,
@@ -554,6 +654,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        quality: {
+            type: Object,
+            default: null,
+        },
         filters: {
             type: Object,
             default: () => ({
@@ -582,6 +686,7 @@ export default {
                 { name: "Recently added", value: "recent" },
                 { name: "Name (A–Z)", value: "name" },
                 { name: "Most samples", value: "samples" },
+                { name: "Highest data completeness", value: "quality" },
                 { name: "Molecular weight (low → high)", value: "weight_asc" },
                 { name: "Molecular weight (high → low)", value: "weight_desc" },
             ],
@@ -590,6 +695,7 @@ export default {
             copiedTimer: null,
             showAllTechniques: false,
             techniquePreviewCount: 6,
+            showQualityInfo: false,
         };
     },
     computed: {
@@ -616,6 +722,47 @@ export default {
                       month: "short",
                       day: "numeric",
                   });
+        },
+        qualityTierTotal() {
+            if (!this.quality?.tier_counts) {
+                return 0;
+            }
+
+            return Object.values(this.quality.tier_counts).reduce(
+                (sum, n) => sum + (Number(n) || 0),
+                0
+            );
+        },
+        qualityTierBars() {
+            const colors = {
+                0: "bg-gray-300",
+                1: "bg-amber-200",
+                2: "bg-amber-300",
+                3: "bg-amber-400",
+                4: "bg-amber-500",
+                5: "bg-amber-600",
+            };
+            const total = this.qualityTierTotal || 1;
+            const bars = [];
+            for (let tier = 5; tier >= 0; tier--) {
+                const count = Number(this.quality?.tier_counts?.[tier]) || 0;
+                if (count === 0) {
+                    continue;
+                }
+                bars.push({
+                    tier,
+                    count,
+                    width: `${Math.max(2, (count / total) * 100)}%`,
+                    color: colors[tier],
+                });
+            }
+
+            return bars;
+        },
+        qualityDistributionLabel() {
+            return this.qualityTierBars
+                .map((b) => `${b.tier} stars: ${b.count}`)
+                .join(", ");
         },
         statTiles() {
             return [
