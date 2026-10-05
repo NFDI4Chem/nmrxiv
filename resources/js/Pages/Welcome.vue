@@ -128,14 +128,40 @@
 
             <div class="relative border-t border-gray-100">
                 <div
-                    class="mx-auto flex max-w-6xl justify-center px-6 py-6 sm:px-8 lg:px-12"
+                    class="mx-auto grid max-w-4xl grid-cols-1 gap-3 px-6 py-8 sm:grid-cols-2 sm:px-8 lg:px-12"
                 >
                     <Link
-                        :href="route('predict')"
-                        class="inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
+                        v-for="tool in nmrTools"
+                        :key="tool.route"
+                        :href="route(tool.route)"
+                        class="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                     >
-                        <BeakerIcon class="h-4 w-4" aria-hidden="true" />
-                        Predict ¹H / ¹³C NMR from a structure
+                        <span
+                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1"
+                            :class="tool.iconClass"
+                        >
+                            <component
+                                :is="tool.icon"
+                                class="h-5 w-5"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span class="min-w-0 flex-1">
+                            <span
+                                class="block text-sm font-semibold text-gray-800"
+                            >
+                                {{ tool.title }}
+                            </span>
+                            <span
+                                class="mt-0.5 block text-xs leading-relaxed text-gray-500"
+                            >
+                                {{ tool.description }}
+                            </span>
+                        </span>
+                        <ArrowRightIcon
+                            class="h-4 w-4 shrink-0 text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-gray-700"
+                            aria-hidden="true"
+                        />
                     </Link>
                 </div>
             </div>
@@ -288,11 +314,13 @@ import {
     UsersIcon,
     CloudArrowUpIcon,
     BeakerIcon,
+    CheckBadgeIcon,
     UserGroupIcon,
     ShieldCheckIcon,
     LockClosedIcon,
     GlobeAltIcon,
     DocumentCheckIcon,
+    ArrowRightIcon,
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
@@ -315,6 +343,25 @@ const Search = [
     },
 ];
 
+const NMR_TOOLS = [
+    {
+        route: "predict",
+        title: "Predict ¹H and ¹³C NMR spectra",
+        description:
+            "Draw, paste or import a structure and get the predicted ¹H and ¹³C shifts.",
+        icon: BeakerIcon,
+        iconClass: "bg-sky-50 text-sky-600 ring-sky-100",
+    },
+    {
+        route: "quickcheck",
+        title: "Quickcheck your assignments",
+        description:
+            "Upload your ¹H / ¹³C assignments and see which shifts do not match the prediction.",
+        icon: CheckBadgeIcon,
+        iconClass: "bg-emerald-50 text-emerald-600 ring-emerald-100",
+    },
+];
+
 export default {
     components: {
         Head,
@@ -330,11 +377,13 @@ export default {
         ChevronDownIcon,
         CloudArrowUpIcon,
         BeakerIcon,
+        CheckBadgeIcon,
         UserGroupIcon,
         ShieldCheckIcon,
         LockClosedIcon,
         GlobeAltIcon,
         DocumentCheckIcon,
+        ArrowRightIcon,
         ToolTip,
         Projects,
         FlashMessages,
@@ -354,6 +403,7 @@ export default {
     setup() {
         return {
             Search,
+            nmrTools: NMR_TOOLS,
         };
     },
 

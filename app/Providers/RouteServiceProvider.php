@@ -74,6 +74,14 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Each public Quickcheck calls the shared prediction service.
+        RateLimiter::for('assignment-quickcheck', function (Request $request) {
+            return [
+                Limit::perMinute((int) config('nmrxiv.assignment_validation.public_per_minute'))->by($request->ip()),
+                Limit::perDay(200)->by($request->ip()),
+            ];
+        });
+
         // Support bubble rate limiting to prevent spam.
         // ALTCHA + honeypot handle the bulk of bot/spam blocking, so this only
         // needs to guard against abusive bursts, not legitimate retries.

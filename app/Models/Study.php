@@ -256,6 +256,24 @@ class Study extends Model implements Auditable
         return $this->hasMany(Dataset::class)->orderBy('name');
     }
 
+    public function assignmentValidations(): HasMany
+    {
+        return $this->hasMany(AssignmentValidation::class)->latest('id');
+    }
+
+    public function latestAssignmentValidation(): HasOne
+    {
+        return $this->hasOne(AssignmentValidation::class)->latestOfMany();
+    }
+
+    public function latestCompletedAssignmentValidation(): HasOne
+    {
+        return $this->hasOne(AssignmentValidation::class)->ofMany(
+            ['id' => 'max'],
+            fn (Builder $query) => $query->where('status', 'completed'),
+        );
+    }
+
     /**
      * Get the user with the given email if belongs to the study
      *
