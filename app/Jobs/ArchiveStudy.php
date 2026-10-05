@@ -283,6 +283,10 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
 
                         $study->internal_status = 'complete';
                         $study->save();
+
+                        if ($study->is_public) {
+                            DetectDatasetSignals::dispatch($study->id);
+                        }
                     } else {
                         Log::info("Study {$study->id}: No fsObject found, marking complete");
 
