@@ -2657,6 +2657,41 @@
             </div>
         </div>
 
+        <!-- Zip files warning modal -->
+        <jet-dialog-modal
+            :show="showZipWarning"
+            @close="showZipWarning = false"
+        >
+            <template #title>Zip file(s) cannot be processed</template>
+            <template #content>
+                <p class="text-sm text-gray-700">
+                    Please unzip the files and upload them again before
+                    proceeding. If you proceed anyway, these files won't get
+                    processed.
+                </p>
+                <ul class="mt-3 list-inside list-disc text-sm text-gray-600">
+                    <li
+                        v-for="zipName in zipWarningFiles"
+                        :key="zipName"
+                        class="truncate"
+                    >
+                        {{ zipName }}
+                    </li>
+                </ul>
+            </template>
+            <template #footer>
+                <jet-secondary-button
+                    class="cursor-pointer"
+                    @click="showZipWarning = false"
+                >
+                    Cancel
+                </jet-secondary-button>
+                <jet-button class="ml-2" @click="proceedDespiteZipFiles()">
+                    Proceed Anyway
+                </jet-button>
+            </template>
+        </jet-dialog-modal>
+
         <!-- Processing Logs Modal -->
         <jet-dialog-modal
             :show="showLogsDialog"
@@ -3224,6 +3259,8 @@ export default {
             }),
             showSummary: true,
             showLogsDialog: false,
+            showZipWarning: false,
+            zipWarningFiles: [],
             showCompositionHelpModal: false,
             selectedDraftForLogs: null,
 
@@ -4273,10 +4310,24 @@ export default {
             this.loading = status;
         },
         process() {
+            const zips = this.$refs.fsbRef?.zipFiles ?? [];
+            if (zips.length > 0) {
+                this.zipWarningFiles = [...zips];
+                this.showZipWarning = true;
+                return;
+            }
+            this.proceedToNextStep();
+        },
+        proceedDespiteZipFiles() {
+            this.showZipWarning = false;
+            this.proceedToNextStep();
+        },
+        proceedToNextStep() {
             this.errorMessage = null;
             this.filesErrorMessage = null;
             let foldersExist = false;
-            this.$refs.fsbRef.file.children.forEach((fso) => {
+            const rootChildren = this.$refs.fsbRef?.file?.children ?? [];
+            rootChildren.forEach((fso) => {
                 if (fso.has_children) {
                     foldersExist = true;
                 }
@@ -4287,7 +4338,7 @@ export default {
             }
             if (
                 this.$refs.fsbRef.file &&
-                this.$refs.fsbRef.file.children.length > 0 &&
+                rootChildren.length > 0 &&
                 foldersExist &&
                 this.studiesExist
             ) {
@@ -4297,13 +4348,10 @@ export default {
                     (a) => a.text
                 );
             } else {
-                if (
-                    this.$refs.fsbRef.file.children.length > 0 &&
-                    !foldersExist
-                ) {
+                if (rootChildren.length > 0 && !foldersExist) {
                     this.filesErrorMessage =
                         "Spectra files needs to be organised into folders. Please create a folder corresponding to each sample and add all your NMR spectroscopic experiment output files are added to the corresponding folders";
-                } else if (this.$refs.fsbRef.file.children.length <= 0) {
+                } else if (rootChildren.length <= 0) {
                     this.filesErrorMessage =
                         "Please upload spectral data to proceed.";
                 } else if (!this.studiesExist) {
