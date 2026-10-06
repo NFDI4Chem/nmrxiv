@@ -57,5 +57,7 @@ return [
         'provider' => env('CAS_PROVIDER', 'CAS_CommonChemistry'),
         'api_token' => env('CAS_API_TOKEN'),
         'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org/direct-api'),
+        // The direct-api rejects keys (401) unless this x-origin header is sent
+        'origin' => env('COMMON_CHEMISTRY_ORIGIN', 'https://commonchemistry.cas.org/api-overview'),
     ],
 ];
