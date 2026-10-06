@@ -302,7 +302,8 @@ class CASServiceTest extends TestCase
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.example.com/detail?cas_rn=50-00-0' &&
                    $request->method() === 'GET' &&
-                   $request->hasHeader('X-API-KEY', 'test-token');
+                   $request->hasHeader('X-API-KEY', 'test-token') &&
+                   $request->hasHeader('x-origin', 'https://commonchemistry.cas.org/api-overview');
         });
     }
 
@@ -356,7 +357,8 @@ class CASServiceTest extends TestCase
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.example.com/search?q=C%3DO' &&
                    $request->method() === 'GET' &&
-                   $request->hasHeader('X-API-KEY', 'test-token');
+                   $request->hasHeader('X-API-KEY', 'test-token') &&
+                   $request->hasHeader('x-origin', 'https://commonchemistry.cas.org/api-overview');
         });
     }
 
