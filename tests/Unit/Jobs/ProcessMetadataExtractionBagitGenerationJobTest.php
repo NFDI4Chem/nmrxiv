@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Jobs;
 
+use App\Jobs\GenerateDatasetPhotosFromBagitJob;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\License;
 use App\Models\Project;
@@ -10,9 +11,12 @@ use App\Models\User;
 use App\Models\Validation;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
+use App\Support\Bagit\DatasetPhotoBackfiller;
+use App\Support\Bagit\DatasetPhotoBackfillResult;
 use Exception;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -309,6 +313,90 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
                 data_get($study->metadata_bagit_generation_logs, 'last_error_message')
             );
         }
+    }
+
+    public function test_handle_dispatches_dataset_photo_generation_after_the_bag_is_built(): void
+    {
+        Storage::fake('local');
+        Notification::fake();
+        Bus::fake([GenerateDatasetPhotosFromBagitJob::class]);
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
+        ]);
+
+        $study = $this->makeStudy();
+        $this->fakeSuccessfulPipeline($study);
+
+        (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+
+        Bus::assertDispatched(
+            GenerateDatasetPhotosFromBagitJob::class,
+            fn (GenerateDatasetPhotosFromBagitJob $job) => $job->studyId === $study->id && $job->force === true
+        );
+    }
+
+    public function test_dataset_photo_generation_is_not_dispatched_when_the_bag_fails(): void
+    {
+        Storage::fake('local');
+        Bus::fake([GenerateDatasetPhotosFromBagitJob::class]);
+
+        config([
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+        ]);
+
+        $study = $this->makeStudy();
+        Http::fake([$study->download_url => Http::response('nope', 500)]);
+
+        try {
+            (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+            $this->fail('Expected the bag generation to throw.');
+        } catch (Exception) {
+            // expected
+        }
+
+        Bus::assertNotDispatched(GenerateDatasetPhotosFromBagitJob::class);
+    }
+
+    public function test_a_failing_dataset_photo_step_never_fails_the_bag(): void
+    {
+        Storage::fake('local');
+        Notification::fake();
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'local',
+            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
+            'filesystems.default_public' => 'local',
+        ]);
+
+        // The sync queue runs the photo job inline, so its exception would
+        // bubble straight into the bag job if the dispatch were not isolated.
+        $this->app->instance(DatasetPhotoBackfiller::class, new class extends DatasetPhotoBackfiller
+        {
+            public function backfillStudy(Study $study, ?string $folderName = null, bool $force = false, bool $dryRun = false): DatasetPhotoBackfillResult
+            {
+                throw new RuntimeException('photo step exploded');
+            }
+        });
+
+        $study = $this->makeStudy();
+        $this->fakeSuccessfulPipeline($study);
+
+        (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+
+        $study->refresh();
+        $this->assertSame('completed', $study->metadata_bagit_generation_status);
+        $this->assertNotNull($study->bagit_archive_link);
+        Notification::assertSentTo([$study->owner], BagitGenerationSucceededNotification::class);
     }
 
     public function test_handle_continues_without_bio_schema_when_fetch_fails(): void

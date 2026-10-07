@@ -2,12 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
-use App\Models\Dataset;
 use App\Models\Study;
-use App\Support\Bagit\BagitArchive;
+use App\Support\Bagit\DatasetPhotoBackfiller;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -49,16 +46,12 @@ class BackfillDatasetPhotoFromBagit extends Command
     /**
      * Execute the console command.
      *
-     * This matches each dataset against the spectra listed in the bag's own
-     * .nmrium file — read fresh, right now, from the archive — rather than
-     * whatever is already stored in the study's `nmrium` row. Spectrum ids
-     * are just a random id assigned by whichever tool last parsed the raw
-     * data; an older, separately-submitted `nmrium_info` would have its own,
-     * unrelated ids that can never line up with the ids in *this* bag's
-     * images. Matching and image lookup therefore both stay within the same
-     * bag read, and studies.nmrium is never read or written by this command.
+     * The per-study matching and photo writing lives in
+     * DatasetPhotoBackfiller (which also documents why the bag's own .nmrium
+     * is used rather than studies.nmrium); this command only discovers the
+     * bag folders and reports the outcome.
      */
-    public function handle(): int
+    public function handle(DatasetPhotoBackfiller $backfiller): int
     {
         $sourceDisk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
         $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
@@ -89,7 +82,7 @@ class BackfillDatasetPhotoFromBagit extends Command
         $bar->setFormat('verbose');
 
         foreach ($folders as $folderName) {
-            $this->processFolder($sourceDisk, $basePath, $folderName);
+            $this->processFolder($backfiller, $folderName);
             $bar->advance();
         }
 
@@ -113,9 +106,11 @@ class BackfillDatasetPhotoFromBagit extends Command
     }
 
     /**
-     * Backfill photos for every dataset belonging to a single study's bag.
+     * Backfill photos for every dataset belonging to a single study's bag,
+     * folding the outcome into the run's totals. Any unexpected error is
+     * reported against this folder only, so one bad bag never aborts the run.
      */
-    private function processFolder(Filesystem $sourceDisk, string $basePath, string $folderName): void
+    private function processFolder(DatasetPhotoBackfiller $backfiller, string $folderName): void
     {
         $identifier = (int) substr($folderName, 1);
 
@@ -130,162 +125,32 @@ class BackfillDatasetPhotoFromBagit extends Command
             return;
         }
 
-        $study->loadMissing(['fsObject', 'draft', 'project', 'datasets.fsObject']);
-
-        $remoteBagDir = "{$basePath}/{$folderName}";
-        $archive = BagitArchive::open($sourceDisk, $remoteBagDir);
-
-        if ($archive === null) {
-            $this->skippedNoFile++;
-            $this->line("  [skip] {$folderName}: no .nmrium file found under {$remoteBagDir}");
-
-            return;
-        }
-
         try {
-            $contents = $archive->readNmrium();
-
-            if ($contents === null) {
-                $this->skippedNoFile++;
-                $this->line("  [skip] {$folderName}: failed to read .nmrium file under {$remoteBagDir}");
-
-                return;
-            }
-
-            $decoded = json_decode($contents, true);
-
-            if (! is_array($decoded)) {
-                $this->skippedNoFile++;
-                $this->line("  [skip] {$folderName}: invalid JSON in .nmrium file under {$remoteBagDir}");
-
-                return;
-            }
-
-            // Same envelope-unwrap as nmrxiv:backfill-study-nmrium, but kept
-            // purely in memory here — never persisted to studies.nmrium.
-            $nmriumInfo = $decoded['nmriumState'] ?? $decoded;
-
-            if (! isset($nmriumInfo['data']['spectra']) || ! is_array($nmriumInfo['data']['spectra'])) {
-                $this->skippedNoFile++;
-                $this->line("  [skip] {$folderName}: unexpected .nmrium structure (missing data.spectra)");
-
-                return;
-            }
-
-            // Collect every dataset's photo path (freshly written or already
-            // present) so the study's own study_photo_path can be kept as
-            // the combined array of all its datasets' photos.
-            $datasetPhotoPaths = [];
-            foreach ($study->datasets as $dataset) {
-                $path = $this->processDataset($study, $dataset, $nmriumInfo, $archive);
-                if ($path !== null) {
-                    $datasetPhotoPaths[] = $path;
-                }
-            }
-
-            if (! $this->option('dry-run') && $datasetPhotoPaths !== []) {
-                $this->updateStudyPhotoPath($study, $datasetPhotoPaths);
-            }
-        } finally {
-            $archive->close();
-        }
-    }
-
-    /**
-     * Backfill a single dataset's photo, matching it against the bag's own
-     * (freshly-read) spectra list — not the study's stored nmrium_info.
-     *
-     * @param  array<string, mixed>  $nmriumInfo
-     * @return string|null The dataset's photo path (new or pre-existing), or null if it has none.
-     */
-    private function processDataset(Study $study, Dataset $dataset, array $nmriumInfo, BagitArchive $archive): ?string
-    {
-        if ($dataset->dataset_photo_path && ! $this->option('force')) {
-            $this->skippedHasPhoto++;
-
-            return $dataset->dataset_photo_path;
-        }
-
-        // Wire the already-loaded (and already eager-loaded fsObject/draft)
-        // study back onto the dataset so BioschemasHelper's own `$dataset->study`
-        // lookup doesn't re-query it per dataset.
-        $dataset->setRelation('study', $study);
-
-        // Match against the bag's own spectra list, read fresh above — not
-        // $study->nmrium->nmrium_info, which may hold an older, separately
-        // submitted payload with unrelated spectrum ids.
-        $matched = BioschemasHelper::collectStudySpectraMatchingDatasetFromPayload($dataset, $nmriumInfo);
-
-        if ($matched === []) {
-            $this->skippedNoMatch++;
-
-            return null;
-        }
-
-        $imageBytes = null;
-        foreach ($matched as $spectrum) {
-            $spectrumId = $spectrum['id'] ?? null;
-            if (is_string($spectrumId)) {
-                $imageBytes = $archive->readImage($spectrumId);
-                if ($imageBytes !== null) {
-                    break;
-                }
-            }
-        }
-
-        if ($imageBytes === null) {
-            $this->skippedNoImage++;
-
-            return null;
-        }
-
-        if ($this->option('dry-run')) {
-            $this->line("  [dry-run] Would set dataset_photo_path for dataset {$dataset->identifier}");
-
-            return null;
-        }
-
-        try {
-            $path = $study->project
-                ? '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.png'
-                : '/samples/'.$study->uuid.'/'.$dataset->slug.'.png';
-
-            Storage::disk(config('filesystems.default_public'))->put($path, $imageBytes, 'public');
-
-            $dataset->update(['dataset_photo_path' => $path]);
-
-            $this->processed++;
-
-            return $path;
+            $result = $backfiller->backfillStudy(
+                $study,
+                $folderName,
+                (bool) $this->option('force'),
+                (bool) $this->option('dry-run'),
+            );
         } catch (Throwable $e) {
             $this->failed++;
-            $this->error("  [failed] dataset {$dataset->identifier}: {$e->getMessage()}");
-            Log::error("Backfill dataset photo failed for dataset {$dataset->id}: {$e->getMessage()}");
+            $this->error("  [failed] {$folderName}: {$e->getMessage()}");
+            Log::error("Backfill dataset photo failed for study folder {$folderName}: {$e->getMessage()}");
 
-            return null;
-        }
-    }
-
-    /**
-     * Combine every dataset photo path into the study's own study_photo_path
-     * (a JSON array), only writing when it has actually changed.
-     *
-     * @param  list<string>  $datasetPhotoPaths
-     */
-    private function updateStudyPhotoPath(Study $study, array $datasetPhotoPaths): void
-    {
-        $combined = array_values(array_unique($datasetPhotoPaths));
-        $existing = is_array($study->study_photo_path) ? $study->study_photo_path : [];
-
-        $combinedSorted = $combined;
-        $existingSorted = $existing;
-        sort($combinedSorted);
-        sort($existingSorted);
-
-        if ($combinedSorted === $existingSorted) {
             return;
         }
 
-        $study->update(['study_photo_path' => $combined]);
+        foreach ($result->messages as $message) {
+            $message['type'] === 'error'
+                ? $this->error($message['text'])
+                : $this->line($message['text']);
+        }
+
+        $this->processed += $result->processed;
+        $this->skippedHasPhoto += $result->skippedHasPhoto;
+        $this->skippedNoFile += $result->skippedNoFile;
+        $this->skippedNoMatch += $result->skippedNoMatch;
+        $this->skippedNoImage += $result->skippedNoImage;
+        $this->failed += $result->failed;
     }
 }
