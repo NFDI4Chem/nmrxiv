@@ -11,8 +11,11 @@ use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use App\Support\Bagit\DatasetPhotoBackfiller;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
+use RuntimeException;
 use Tests\TestCase;
 
 class GenerateDatasetPhotosFromBagitJobTest extends TestCase
@@ -93,6 +96,40 @@ class GenerateDatasetPhotosFromBagitJobTest extends TestCase
 
         $this->assertNull($dataset->refresh()->dataset_photo_path);
         $this->assertNull($study->refresh()->study_photo_path);
+    }
+
+    public function test_it_throws_when_a_photo_cannot_be_written_so_the_queue_retries(): void
+    {
+        [$study, $dataset] = $this->makeStudyWithDataset(304, 'proton');
+        $this->putBag('S304', 'proton', 'png-bytes');
+
+        // A disk configured with throw => false returns false instead of throwing.
+        $failing = Mockery::mock(FilesystemAdapter::class);
+        $failing->shouldReceive('put')->andReturn(false);
+        Storage::set('failing', $failing);
+        config(['filesystems.default_public' => 'failing']);
+
+        try {
+            (new GenerateDatasetPhotosFromBagitJob($study->id))->handle(app(DatasetPhotoBackfiller::class));
+            $this->fail('Expected the job to throw when a photo write fails.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('failed', $e->getMessage());
+        }
+
+        $this->assertNull($dataset->refresh()->dataset_photo_path);
+    }
+
+    public function test_it_keeps_the_existing_photo_when_its_replacement_cannot_be_made(): void
+    {
+        [$study, $dataset] = $this->makeStudyWithDataset(305, 'proton');
+        $dataset->update(['dataset_photo_path' => '/old/photo.png']);
+        // The bag has no spectrum matching this dataset, so there is nothing to replace it with.
+        $this->putBag('S305', 'unrelated', 'png-bytes');
+
+        (new GenerateDatasetPhotosFromBagitJob($study->id))->handle(app(DatasetPhotoBackfiller::class));
+
+        $this->assertSame('/old/photo.png', $dataset->refresh()->dataset_photo_path);
+        $this->assertSame(['/old/photo.png'], $study->refresh()->study_photo_path);
     }
 
     private function putBag(string $folderName, string $datasetName, string $imageBytes): void

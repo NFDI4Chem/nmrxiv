@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -83,6 +84,12 @@ class GenerateDatasetPhotosFromBagitJob implements ShouldQueue
         }
 
         Log::info("Dataset photos for study {$study->id} ({$study->identifier}): {$result->processed} written, {$result->skippedNoMatch} without a matching spectrum, {$result->skippedNoImage} without a snapshot image, {$result->failed} failed");
+
+        // Surface per-dataset failures so the queue applies tries/backoff and
+        // failed(); a retry only re-runs this job, never the bag build.
+        if ($result->failed > 0) {
+            throw new RuntimeException("{$result->failed} dataset photo(s) failed for study {$study->id}");
+        }
     }
 
     /**

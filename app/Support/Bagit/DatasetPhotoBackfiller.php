@@ -7,6 +7,7 @@ use App\Models\Dataset;
 use App\Models\Study;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -107,7 +108,7 @@ class DatasetPhotoBackfiller
      * (freshly-read) spectra list — not the study's stored nmrium_info.
      *
      * @param  array<string, mixed>  $nmriumInfo
-     * @return string|null The dataset's photo path (new or pre-existing), or null if it has none.
+     * @return string|null The dataset's photo path (new or pre-existing), or null if it has none. A pre-existing path is kept when its replacement cannot be produced, so the study's combined list never drifts from the dataset's own column.
      */
     private function processDataset(
         Study $study,
@@ -137,7 +138,7 @@ class DatasetPhotoBackfiller
         if ($matched === []) {
             $result->skippedNoMatch++;
 
-            return null;
+            return $dataset->dataset_photo_path;
         }
 
         $imageBytes = null;
@@ -154,7 +155,7 @@ class DatasetPhotoBackfiller
         if ($imageBytes === null) {
             $result->skippedNoImage++;
 
-            return null;
+            return $dataset->dataset_photo_path;
         }
 
         if ($dryRun) {
@@ -168,7 +169,10 @@ class DatasetPhotoBackfiller
                 ? '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.png'
                 : '/samples/'.$study->uuid.'/'.$dataset->slug.'.png';
 
-            Storage::disk(config('filesystems.default_public'))->put($path, $imageBytes, 'public');
+            // put() returns false (rather than throwing) on disks configured with throw => false.
+            if (! Storage::disk(config('filesystems.default_public'))->put($path, $imageBytes, 'public')) {
+                throw new RuntimeException("could not write {$path}");
+            }
 
             $dataset->update(['dataset_photo_path' => $path]);
 
@@ -180,7 +184,7 @@ class DatasetPhotoBackfiller
             $result->error("  [failed] dataset {$dataset->identifier}: {$e->getMessage()}");
             Log::error("Backfill dataset photo failed for dataset {$dataset->id}: {$e->getMessage()}");
 
-            return null;
+            return $dataset->dataset_photo_path;
         }
     }
 
