@@ -18,24 +18,18 @@ export function folderStudyId(folder) {
 }
 
 /**
- * Whether a filesystem row represents a draft sample folder.
+ * Whether a filesystem row represents a draft sample folder: annotation marked
+ * it as a study because it directly holds recognised NMR data (Bruker, Varian,
+ * Magritek, JEOL or JCAMP-DX), or it is already linked to a study.
  *
- * @param {{ model_type?: string, study_id?: number|null, type?: string, level?: number, has_children?: boolean }} folder
+ * @param {{ model_type?: string, study_id?: number|null, type?: string }} folder
  */
 export function isDraftSampleFolder(folder) {
     if (!folder || folder.type !== "directory") {
         return false;
     }
 
-    if (folder.model_type === "study") {
-        return true;
-    }
-
-    if (folderStudyId(folder) != null) {
-        return true;
-    }
-
-    return Number(folder.level) === 0 && folder.has_children !== false;
+    return folder.model_type === "study" || folderStudyId(folder) != null;
 }
 
 /**

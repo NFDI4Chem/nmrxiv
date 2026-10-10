@@ -20,6 +20,7 @@ use App\Http\Controllers\CompoundLibraryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\DraftArchiveController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\FundingReferenceController;
@@ -420,6 +421,10 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.sample-folder.reset');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
+        Route::get('drafts/{draft}/archives', [DraftArchiveController::class, 'index'])
+            ->name('dashboard.draft.archives.index');
+        Route::post('drafts/{draft}/archives/extract', [DraftArchiveController::class, 'extract'])
+            ->name('dashboard.draft.archives.extract');
         Route::get('drafts/{draft}/hifsa/{filesystemobject}', [DraftController::class, 'hifsaFile'])
             ->name('dashboard.draft.hifsa');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
