@@ -106,6 +106,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             Log::info("Successfully processed study {$study->id} ({$study->identifier}): {$result['imageCount']} images saved to {$result['location']}");
 
+            $this->dispatchDatasetPhotoGeneration($study);
+
             if ($study->owner) {
                 Notification::send($study->owner, new BagitGenerationSucceededNotification(
                     $study->fresh(),
@@ -124,6 +126,19 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * Queue the dataset photo step now that the bag exists. The bag is already
+     * complete at this point, so nothing here may fail or retry this job.
+     */
+    protected function dispatchDatasetPhotoGeneration(Study $study): void
+    {
+        try {
+            GenerateDatasetPhotosFromBagitJob::dispatch($study->id);
+        } catch (Throwable $e) {
+            Log::warning("Could not generate dataset photos for study {$study->id}: {$e->getMessage()}");
         }
     }
 
