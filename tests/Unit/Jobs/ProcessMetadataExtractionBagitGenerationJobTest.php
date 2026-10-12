@@ -279,6 +279,34 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertEmpty(glob(storage_path('app/bagit_work_*')));
     }
 
+    public function test_the_archive_zip_survives_when_the_storage_disk_and_path_match_the_archive_location(): void
+    {
+        Notification::fake();
+
+        $adapter = new InMemoryFlysystemAdapter;
+        $this->registerMemoryDisk('spectra_memory', $adapter);
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
+            'nmrxiv.spectra_parsing.storage_path' => 'archive',
+            'filesystems.default_public' => 'spectra_memory',
+        ]);
+
+        $study = $this->makeStudy();
+        $adapter->files['archive/S213/stale-from-previous-run.txt'] = 'stale';
+
+        $this->fakeSuccessfulPipeline($study);
+
+        (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+
+        $this->assertArrayHasKey('archive/S213/S213.zip', $adapter->files);
+        $this->assertArrayHasKey('archive/S213/bagit.txt', $adapter->files);
+        $this->assertArrayNotHasKey('archive/S213/stale-from-previous-run.txt', $adapter->files);
+    }
+
     public function test_handle_marks_study_as_failed_when_archive_upload_is_rejected_by_the_disk(): void
     {
         Storage::fake('local');
@@ -791,6 +819,11 @@ class InMemoryFlysystemAdapter implements FlysystemAdapterContract
 {
     /** @var array<string, string> */
     public array $files = [];
+
+    public function getUrl(string $path): string
+    {
+        return 'https://memory.test/'.ltrim($path, '/');
+    }
 
     /** @var array<string, bool> */
     public array $directories = [];
