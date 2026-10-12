@@ -254,6 +254,11 @@
                                         <div :id="dropzoneHiddenInputId" />
                                     </form>
 
+                                    <div class="text-sm text-gray-400">
+                                        Zip archives are extracted automatically
+                                        after upload.
+                                    </div>
+
                                     <!-- Help link to submission guides -->
                                     <div class="text-sm text-gray-400">
                                         Need help? Check out our
@@ -593,109 +598,6 @@
                         />
                         View logs
                     </div>
-                    <jet-dialog-modal
-                        :show="showLogsDialog"
-                        @close="showLogsDialog = false"
-                    >
-                        <template #title>
-                            <div class="block">
-                                File logs
-                                <div class="inline float-right">
-                                    <select
-                                        v-model="logFilter"
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                    >
-                                        <option
-                                            v-for="filter in logFilters"
-                                            :key="filter"
-                                            :value="filter"
-                                        >
-                                            {{ filter }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #content>
-                            <div
-                                class="relative h-[74vh] overflow-x-auto z-0 mt-1 rounded-lg"
-                            >
-                                <ul
-                                    v-if="Object.keys(filteredLogs).length > 0"
-                                    role="list"
-                                    class="divide-y divide-gray-200"
-                                >
-                                    <li
-                                        v-for="file in Object.keys(
-                                            filteredLogs
-                                        )"
-                                        :key="file"
-                                        class="py-4 flex items-start"
-                                    >
-                                        <CheckIcon
-                                            v-if="
-                                                logs[file].status == 'Success'
-                                            "
-                                            class="h-5 w-5 inline text-green-400"
-                                            aria-hidden="true"
-                                        />
-                                        <ArrowUpTrayIcon
-                                            v-if="
-                                                logs[file].status ==
-                                                'Inprogress'
-                                            "
-                                            class="h-5 w-5 inline text-yellow-400"
-                                            aria-hidden="true"
-                                        />
-                                        <EllipsisVerticalIcon
-                                            v-if="
-                                                logs[file].status ==
-                                                'Inprogress'
-                                            "
-                                            class="h-5 w-5 inline text-gray-400"
-                                            aria-hidden="true"
-                                        />
-                                        <ExclamationCircleIcon
-                                            v-if="logs[file].status == 'Error'"
-                                            class="h-5 w-5 inline text-red-400"
-                                            aria-hidden="true"
-                                        />
-                                        <div class="ml-3">
-                                            <p
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ file }}
-                                            </p>
-                                            <p
-                                                v-for="message in logs[file]
-                                                    .messages"
-                                                :key="message"
-                                                class="text-sm text-gray-400"
-                                            >
-                                                {{ message }}
-                                            </p>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <div v-else class="mt-10">
-                                    <i class="text-gray-400"
-                                        >No logs with the status
-                                        {{ logFilter }}</i
-                                    >
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #footer>
-                            <jet-secondary-button
-                                class="cursor-pointer"
-                                @click="toggleShowLogsDialog"
-                            >
-                                Close
-                            </jet-secondary-button>
-                        </template>
-                    </jet-dialog-modal>
                 </aside>
 
                 <!-- Resize handle -->
@@ -1432,7 +1334,7 @@
                 status != null) ||
             precentageUpload > 0
         "
-        class="w-full h-screen mx-84 px-10 fixed block top-0 left-0 bg-white opacity-90 z-50"
+        class="w-full h-screen px-10 fixed block top-0 left-0 bg-white opacity-90 z-50"
     >
         <div
             role="status"
@@ -1454,16 +1356,30 @@
                     fill="currentFill"
                 />
             </svg>
-            <div class="mt-4 w-64 h-84">
+            <div class="mt-4 w-64">
                 <div class="h-2 mb-2 text-xs flex rounded-md bg-gray-200">
                     <div
-                        :style="'width: ' + precentageUpload + '%'"
+                        :style="'width: ' + uploadProgressPercent + '%'"
                         class="shadow-none flex rounded-md flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
                     ></div>
                 </div>
-                {{ status }}&emsp;({{ uploadedFilesCount }}/{{
-                    totalFilesCount
-                }})
+                {{ status }}
+                <template v-if="!extractingArchives && totalFilesCount > 0"
+                    >&emsp;({{ uploadedFilesCount }}/{{
+                        totalFilesCount
+                    }})</template
+                >
+                <div v-if="extractingArchives" class="text-sm text-gray-500">
+                    <template v-if="archiveProgress.total > 0">
+                        {{ archiveProgress.extracted }} of
+                        {{ archiveProgress.total }} files extracted
+                    </template>
+                    <template v-else>Downloading archive to server…</template>
+                </div>
+                <div v-else-if="uploadBytesLabel" class="text-sm text-gray-500">
+                    {{ Math.floor(uploadProgressPercent) }}% &middot;
+                    {{ uploadBytesLabel }}
+                </div>
             </div>
             <div class="w-64 text-gray-700 truncate">
                 <small
@@ -1483,6 +1399,90 @@
             </button>
         </div>
     </div>
+    <jet-dialog-modal :show="showLogsDialog" @close="showLogsDialog = false">
+        <template #title>
+            <div class="block">
+                File logs
+                <div class="inline float-right">
+                    <select
+                        v-model="logFilter"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    >
+                        <option
+                            v-for="filter in logFilters"
+                            :key="filter"
+                            :value="filter"
+                        >
+                            {{ filter }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </template>
+
+        <template #content>
+            <div class="relative h-[74vh] overflow-x-auto z-0 mt-1 rounded-lg">
+                <ul
+                    v-if="Object.keys(filteredLogs).length > 0"
+                    role="list"
+                    class="divide-y divide-gray-200"
+                >
+                    <li
+                        v-for="file in Object.keys(filteredLogs)"
+                        :key="file"
+                        class="py-4 flex items-start"
+                    >
+                        <CheckIcon
+                            v-if="logs[file].status == 'Success'"
+                            class="h-5 w-5 inline text-green-400"
+                            aria-hidden="true"
+                        />
+                        <ArrowUpTrayIcon
+                            v-if="logs[file].status == 'Inprogress'"
+                            class="h-5 w-5 inline text-yellow-400"
+                            aria-hidden="true"
+                        />
+                        <EllipsisVerticalIcon
+                            v-if="logs[file].status == 'Inprogress'"
+                            class="h-5 w-5 inline text-gray-400"
+                            aria-hidden="true"
+                        />
+                        <ExclamationCircleIcon
+                            v-if="logs[file].status == 'Error'"
+                            class="h-5 w-5 inline text-red-400"
+                            aria-hidden="true"
+                        />
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ file }}
+                            </p>
+                            <p
+                                v-for="message in logs[file].messages"
+                                :key="message"
+                                class="text-sm text-gray-400"
+                            >
+                                {{ message }}
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+                <div v-else class="mt-10">
+                    <i class="text-gray-400"
+                        >No logs with the status {{ logFilter }}</i
+                    >
+                </div>
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button
+                class="cursor-pointer"
+                @click="toggleShowLogsDialog"
+            >
+                Close
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
     <jet-confirmation-modal
         :show="fsoBeingDeleted"
         @close="fsoBeingDeleted = null"
@@ -1745,6 +1745,8 @@ export default {
             dropzone: null, // Dropzone.js instance
             fullScreen: false, // Fullscreen mode toggle (unused)
             precentageUpload: 0, // Upload progress percentage
+            uploadedBytes: 0, // Bytes sent to storage in the current queue
+            uploadTotalBytes: 0, // Total bytes queued for upload
             busy: false, // General busy state indicator
             loading: false, // File loading state
 
@@ -1796,6 +1798,13 @@ export default {
             // Debounce: folder drag/drop adds files asynchronously; wait before checksums
             checksumScheduleTimer: null,
 
+            // Uploaded zip archives queued for server-side extraction
+            pendingArchiveKeys: [], // Storage keys of zips uploaded in the current queue
+            archiveLogKeys: {}, // Storage key -> upload log key, for reporting failures
+            extractingArchives: false,
+            archiveExtractionTimer: null,
+            archiveProgress: { extracted: 0, total: 0 }, // Files written so far across the archives being extracted
+
             // Paginated root sample folders (drafts with many samples)
             sampleFoldersPagination: null,
             loadingMoreSampleFolders: false,
@@ -1815,6 +1824,40 @@ export default {
      * Computed properties
      */
     computed: {
+        /**
+         * Upload progress by bytes sent, so a single large file (e.g. a zip
+         * archive) visibly advances instead of sitting at 0% until it completes.
+         * @returns {Number} Percentage between 0 and 100
+         */
+        uploadProgressPercent() {
+            if (this.extractingArchives) {
+                return this.archiveProgress.total > 0
+                    ? (this.archiveProgress.extracted /
+                          this.archiveProgress.total) *
+                          100
+                    : 0;
+            }
+            if (this.uploadTotalBytes > 0) {
+                return Math.min(
+                    100,
+                    (this.uploadedBytes / this.uploadTotalBytes) * 100
+                );
+            }
+            return this.precentageUpload;
+        },
+
+        /**
+         * @returns {String|null} e.g. "68.2 MB of 144.56 MB"
+         */
+        uploadBytesLabel() {
+            if (this.uploadTotalBytes <= 0) {
+                return null;
+            }
+            return `${ChecksumCalculator.formatFileSize(
+                this.uploadedBytes
+            )} of ${ChecksumCalculator.formatFileSize(this.uploadTotalBytes)}`;
+        },
+
         /**
          * Get the base URL from page props
          * @returns {String} Base application URL
@@ -2091,6 +2134,11 @@ export default {
 
     beforeUnmount() {
         this.teardownSampleFoldersInfiniteScroll();
+
+        if (this.archiveExtractionTimer != null) {
+            clearTimeout(this.archiveExtractionTimer);
+            this.archiveExtractionTimer = null;
+        }
 
         // Clear file tree state before component unmounts
         this.clearURLParameters();
@@ -2498,7 +2546,12 @@ export default {
          */
         handleQueueComplete() {
             this.status = "UPLOAD COMPLETE";
-            this.annotate();
+            const archiveKeys = this.pendingArchiveKeys.splice(0);
+            if (archiveKeys.length > 0) {
+                this.extractArchives(archiveKeys);
+            } else if (!this.extractingArchives) {
+                this.annotate();
+            }
             this.currentLog = null;
             if (this.dropzone) {
                 this.dropzone.removeAllFiles();
@@ -2508,12 +2561,184 @@ export default {
                 this.checksumScheduleTimer = null;
             }
             this.precentageUpload = 0;
+            this.uploadedBytes = 0;
+            this.uploadTotalBytes = 0;
             this.totalFilesCount = 0;
             this.uploadedFilesCount = 0;
+            if (this.extractingArchives) {
+                return;
+            }
             this.updateBusyStatus(false);
             setTimeout(() => {
                 this.status = null;
             }, 5000);
+        },
+
+        /**
+         * Mirrors FileSystemObject::isExtractableArchive(): HiFSA export zips
+         * must stay zipped.
+         *
+         * @param {string} storageKey - Storage key of the uploaded file
+         * @returns {boolean}
+         */
+        isExtractableArchive(storageKey) {
+            const segments = storageKey.toLowerCase().split("/");
+            const name = segments.pop();
+            return (
+                name.endsWith(".zip") &&
+                !name.endsWith("_export.zip") &&
+                !segments.includes("hifsa")
+            );
+        },
+
+        /**
+         * Add the bytes sent since the file's last progress report to the
+         * queue-wide counter.
+         *
+         * @param {File} file - Dropzone file being uploaded
+         * @param {Number} bytesSent - Bytes of this file sent so far
+         */
+        trackUploadedBytes(file, bytesSent) {
+            const previous = file.reportedBytesSent || 0;
+            if (bytesSent > previous) {
+                this.uploadedBytes += bytesSent - previous;
+                file.reportedBytesSent = bytesSent;
+            }
+        },
+
+        /**
+         * Queue server-side extraction of uploaded zip archives, wait for it
+         * to finish, then annotate and reload the tree.
+         *
+         * @param {string[]} archiveKeys - Storage keys of the uploaded zips
+         */
+        async extractArchives(archiveKeys) {
+            this.extractingArchives = true;
+            this.updateBusyStatus(true);
+            this.status = "EXTRACTING ARCHIVES";
+
+            try {
+                await axios.post(
+                    `/dashboard/drafts/${this.draft.id}/archives/extract`,
+                    { keys: archiveKeys }
+                );
+                await this.waitForArchiveExtraction(archiveKeys);
+            } catch (error) {
+                console.error(
+                    "Failed to extract archives",
+                    error?.response?.data || error
+                );
+                this.uploadBatchErrors.push(
+                    error?.response?.data?.message ||
+                        "Zip archives could not be queued for extraction."
+                );
+            } finally {
+                this.extractingArchives = false;
+                this.archiveProgress = { extracted: 0, total: 0 };
+                this.annotate();
+            }
+        },
+
+        /**
+         * Poll until none of the given archives are pending or extracting.
+         * Gives up after an hour, matching the extraction job timeout.
+         *
+         * @param {string[]} archiveKeys - Storage keys of the uploaded zips
+         * @returns {Promise<void>}
+         */
+        waitForArchiveExtraction(archiveKeys) {
+            const pollIntervalMs = 3000;
+            const maxWaitMs = 60 * 60 * 1000;
+            const startedAt = Date.now();
+            const watchedPaths = new Set(
+                archiveKeys.map((key) => "/" + key.replace(/^\/+/, ""))
+            );
+
+            return new Promise((resolve) => {
+                const poll = () => {
+                    this.archiveExtractionTimer = null;
+                    axios
+                        .get(`/dashboard/drafts/${this.draft.id}/archives`)
+                        .then(({ data }) => {
+                            const archives = (data.archives || []).filter(
+                                (archive) => watchedPaths.has(archive.path)
+                            );
+                            const active = archives.filter((archive) =>
+                                ["pending", "processing"].includes(
+                                    archive.status
+                                )
+                            );
+
+                            if (active.length === 0) {
+                                this.reportArchiveFailures(
+                                    archives.filter(
+                                        (archive) => archive.status === "failed"
+                                    )
+                                );
+                                resolve();
+                                return;
+                            }
+
+                            const label =
+                                active.length === 1
+                                    ? active[0].name
+                                    : `${active.length} ARCHIVES`;
+                            const extracted = active.reduce(
+                                (sum, archive) =>
+                                    sum + (archive.extracted || 0),
+                                0
+                            );
+                            const total = active.reduce(
+                                (sum, archive) => sum + (archive.total || 0),
+                                0
+                            );
+                            this.archiveProgress = { extracted, total };
+                            this.status =
+                                total > 0
+                                    ? `EXTRACTING ${label}`
+                                    : `PREPARING ${label} FOR EXTRACTION`;
+                            schedule();
+                        })
+                        .catch(() => schedule());
+                };
+
+                const schedule = () => {
+                    if (Date.now() - startedAt > maxWaitMs) {
+                        resolve();
+                        return;
+                    }
+                    this.archiveExtractionTimer = setTimeout(
+                        poll,
+                        pollIntervalMs
+                    );
+                };
+
+                poll();
+            });
+        },
+
+        /**
+         * Surface failed extractions in the upload logs.
+         *
+         * @param {Array<{path: string, name: string, error: ?string}>} archives
+         */
+        reportArchiveFailures(archives) {
+            archives.forEach((archive) => {
+                const key = archive.path.replace(/^\/+/, "");
+                const logKey = this.archiveLogKeys[key] || archive.name;
+                const log = this.logs[logKey] || { messages: [] };
+
+                this.logs[logKey] = {
+                    status: "Error",
+                    messages: [
+                        ...log.messages,
+                        `Extraction failed: ${
+                            archive.error || "unknown error"
+                        }`,
+                    ],
+                };
+                delete this.archiveLogKeys[key];
+            });
         },
 
         /**
@@ -2523,6 +2748,8 @@ export default {
             // Reset all upload-related state
             this.status = null;
             this.precentageUpload = 0;
+            this.uploadedBytes = 0;
+            this.uploadTotalBytes = 0;
             this.totalFilesCount = 0;
             this.uploadedFilesCount = 0;
             this.currentLog = null;
@@ -2613,6 +2840,11 @@ export default {
                         if (vm.totalFilesCount === vm.selectedFSO.length) {
                             clearInterval(timer);
                             vm.status = "BATCH UPLOAD STARTED";
+                            vm.uploadedBytes = 0;
+                            vm.uploadTotalBytes = vm.dropzone.files.reduce(
+                                (total, file) => total + (file.size || 0),
+                                0
+                            );
                             vm.processFilesSequentially(vm);
                         } else {
                             vm.totalFilesCount = vm.selectedFSO.length;
@@ -3357,6 +3589,7 @@ export default {
                                     delete headers.Host;
                                 }
                                 cFile.uploadURL = u.url;
+                                cFile.storageKey = u.key;
                                 setTimeout(() =>
                                     vm.dropzone.processFile(cFile)
                                 );
@@ -3490,9 +3723,6 @@ export default {
                     clickable: `#${vm.dropzoneClickTargetId}`,
                     hiddenInputContainer: `#${vm.dropzoneHiddenInputId}`,
                     dictDefaultMessage: dropzoneMessageElement.innerHTML,
-                    totaluploadprogress: function (progress) {
-                        vm.progress = Math.ceil(progress);
-                    },
                 };
 
                 // Initialize Dropzone instance
@@ -3508,7 +3738,14 @@ export default {
                     vm.dropzone.options.url = file.uploadURL;
                     vm.status = "UPLOAD IN PROGRESS";
                 });
+                vm.dropzone.on(
+                    "uploadprogress",
+                    (file, progress, bytesSent) => {
+                        vm.trackUploadedBytes(file, bytesSent);
+                    }
+                );
                 vm.dropzone.on("success", (file) => {
+                    vm.trackUploadedBytes(file, file.size || 0);
                     let message = "Upload complete";
                     if (file.fullPath) {
                         vm.logs[file.fullPath].status = "Success";
@@ -3516,6 +3753,14 @@ export default {
                     } else {
                         vm.logs[file.name].status = "Success";
                         vm.logs[file.name].messages.push(message);
+                    }
+                    if (
+                        file.storageKey &&
+                        vm.isExtractableArchive(file.storageKey)
+                    ) {
+                        vm.pendingArchiveKeys.push(file.storageKey);
+                        vm.archiveLogKeys[file.storageKey] =
+                            file.fullPath || file.name;
                     }
                     vm.uploadedFilesCount += 1;
                     vm.precentageUpload =

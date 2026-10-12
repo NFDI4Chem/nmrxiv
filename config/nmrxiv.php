@@ -85,4 +85,23 @@ return [
         'max_file_kb' => (int) env('ASSIGNMENT_VALIDATION_MAX_FILE_KB', 2048),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Zip Extraction
+    |--------------------------------------------------------------------------
+    |
+    | Limits applied to zip archives extracted on the server (submission
+    | uploads and ELN imports). Archives exceeding any limit are rejected
+    | before anything is written to storage.
+    |
+    */
+
+    'zip_extraction' => [
+        'queue' => env('ZIP_EXTRACTION_QUEUE', 'default'),
+        'job_timeout' => (int) env('ZIP_EXTRACTION_JOB_TIMEOUT', 3600),
+        'max_entries' => (int) env('ZIP_EXTRACTION_MAX_ENTRIES', 20000),
+        'max_uncompressed_bytes' => (int) env('ZIP_EXTRACTION_MAX_UNCOMPRESSED_BYTES', 50 * 1024 * 1024 * 1024),
+        'max_compression_ratio' => (int) env('ZIP_EXTRACTION_MAX_COMPRESSION_RATIO', 100),
+    ],
+
 ];
