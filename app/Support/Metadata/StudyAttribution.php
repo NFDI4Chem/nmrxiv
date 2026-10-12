@@ -32,12 +32,15 @@ class StudyAttribution
     {
         $study->loadMissing(['project.authors', 'project.citations', 'studyAuthors', 'linkedCitations', 'owner']);
 
+        // A study can be published without its project, so only a public parent may contribute metadata.
+        $project = $study->project?->is_public ? $study->project : null;
+
         $source = null;
         $authors = collect();
 
-        if ($study->project && $study->project->authors->isNotEmpty()) {
+        if ($project && $project->authors->isNotEmpty()) {
             $source = self::SOURCE_PROJECT;
-            $authors = $study->project->authors->map(fn ($author) => self::person(
+            $authors = $project->authors->map(fn ($author) => self::person(
                 $author->given_name, $author->family_name, $author->orcid_id, $author->affiliation, $author->pivot?->contributor_type
             ));
         } elseif ($study->studyAuthors->isNotEmpty()) {
@@ -54,7 +57,7 @@ class StudyAttribution
         }
 
         $citations = collect()
-            ->merge($study->project?->citations ?? [])
+            ->merge($project?->citations ?? [])
             ->merge($study->linkedCitations)
             ->map(fn ($citation) => [
                 'doi' => self::doi($citation->doi),
@@ -71,6 +74,10 @@ class StudyAttribution
         ];
     }
 
+    /**
+     * Canonical https://orcid.org/xxxx-xxxx-xxxx-xxxx URL, or null when the stored value is not a
+     * well-formed ORCID iD (CFF and Bioschema consumers reject anything else).
+     */
     public static function orcidUrl(?string $orcid): ?string
     {
         $orcid = self::clean($orcid);
@@ -79,7 +86,11 @@ class StudyAttribution
             return null;
         }
 
-        return str_starts_with($orcid, 'http') ? $orcid : 'https://orcid.org/'.$orcid;
+        if (! preg_match('~^(?:https?://(?:www\.)?orcid\.org/)?(\d{4}-\d{4}-\d{4}-\d{3}[\dX])/?$~i', $orcid, $matches)) {
+            return null;
+        }
+
+        return 'https://orcid.org/'.strtoupper($matches[1]);
     }
 
     protected static function person(?string $given, ?string $family, ?string $orcid, ?string $affiliation, ?string $role = null): array

@@ -76,6 +76,42 @@ class StudyAttributionTest extends TestCase
         $this->assertSame([], $result['citations']);
     }
 
+    public function test_private_project_metadata_is_not_used_or_linked(): void
+    {
+        Http::fake(['pubchem.ncbi.nlm.nih.gov/*' => Http::response([], 404)]);
+
+        $study = $this->makeStudy();
+        Sample::factory()->create(['study_id' => $study->id]);
+        $study->project->update(['is_public' => false]);
+        $author = Author::factory()->create(['given_name' => 'Pat', 'family_name' => 'Private']);
+        $study->project->authors()->attach($author->id, ['contributor_type' => 'Researcher', 'sort_order' => 1]);
+        $citation = Citation::factory()->create(['doi' => '10.1/private', 'title' => 'Private paper', 'authors' => 'Pat Private']);
+        $study->project->citations()->attach($citation->id);
+
+        $result = StudyAttribution::resolve($study->fresh());
+
+        $this->assertSame('owner', $result['source']);
+        $this->assertSame([], $result['citations']);
+
+        $response = $this->getJson('/api/v1/schemas/bioschemas/S7001')->assertOk();
+        $this->assertArrayNotHasKey('isPartOf', $response->json());
+        $this->assertStringNotContainsString('Private', json_encode($response->json()));
+    }
+
+    public function test_malformed_orcid_values_are_dropped_and_valid_ones_normalised(): void
+    {
+        $this->assertSame('https://orcid.org/0000-0002-1825-009X', StudyAttribution::orcidUrl('0000-0002-1825-009x'));
+        $this->assertSame('https://orcid.org/0000-0002-1825-0097', StudyAttribution::orcidUrl('http://www.orcid.org/0000-0002-1825-0097/'));
+        $this->assertNull(StudyAttribution::orcidUrl('not-an-orcid'));
+        $this->assertNull(StudyAttribution::orcidUrl('https://example.com/0000-0002-1825-0097'));
+        $this->assertNull(StudyAttribution::orcidUrl('   '));
+
+        $study = $this->makeStudy();
+        $study->owner->update(['orcid_id' => 'ORCID: unknown']);
+
+        $this->assertStringNotContainsString('orcid:', StudyCitationCff::build($study->fresh()));
+    }
+
     public function test_cff_has_the_required_keys_and_structure_data(): void
     {
         $study = $this->makeStudy(['name' => 'Caffeine "test"', 'doi' => '10.57992/nmrxiv.p1.s7001']);

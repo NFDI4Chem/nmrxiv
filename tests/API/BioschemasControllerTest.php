@@ -736,7 +736,10 @@ class BioschemasControllerTest extends TestCase
         $this->assertSame(['BSYNRYMUTXBXSQ-UHFFFAOYSA-N', 'RYYVLZVUVIJVGH-UHFFFAOYSA-N'], array_column($parts, '@id'));
         $this->assertSame('Percentage composition: 60%', $parts[0]['description']);
         $this->assertArrayNotHasKey('description', $parts[1]);
-        $this->assertStringNotContainsString('pubchem.ncbi.nlm.nih.gov/compound/"', json_encode($parts));
+        // PubChem answered 404, so no part may carry a PubChem compound link (not even an empty one).
+        foreach ($parts as $part) {
+            $this->assertStringNotContainsString('pubchem.ncbi.nlm.nih.gov', $part['url'] ?? '');
+        }
     }
 
     /**

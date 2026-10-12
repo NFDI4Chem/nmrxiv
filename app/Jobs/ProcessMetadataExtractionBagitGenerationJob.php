@@ -265,16 +265,26 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             Log::info('Step 6/7: Generating BagIt manifests...');
             $this->generateBagItManifests($workBaseDir);
 
+            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
+
             if (! $isLocalDisk) {
                 // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
-                // This must run before the archive is uploaded: the storage disk and path can coincide with the
-                // archive location (e.g. archive/{id}/), and the cleanup would otherwise delete the new zip.
-                $disk->deleteDirectory($baseDir);
+                // The storage disk and path can coincide with the archive location (e.g. archive/{id}/); in that
+                // case the published zip is kept, so a failure before the replacement uploads cannot leave
+                // bagit_archive_link pointing at a deleted object.
+                $archiveInsideBag = $diskName === config('filesystems.default_public', 'local')
+                    && str_starts_with($archiveKey, $baseDir.'/');
+
+                if ($archiveInsideBag) {
+                    $disk->delete(array_values(array_diff($disk->allFiles($baseDir), [$archiveKey])));
+                } else {
+                    $disk->deleteDirectory($baseDir);
+                }
+
                 $this->uploadDirectory($workBaseDir, $disk, $baseDir);
             }
 
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
-            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
             $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
             $archiveStream = fopen($archiveZipPath, 'rb');
             if ($archiveStream === false) {

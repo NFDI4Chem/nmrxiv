@@ -897,7 +897,8 @@ class BioschemasController extends Controller
     {
         $studySchema = $this->studyLite($study);
         $study->loadMissing('project.license');
-        if ($study->project) {
+        // A study can be published without its project, so a private parent must not be serialized.
+        if ($study->project && $study->project->is_public) {
             $studySchema->isPartOf($this->projectLite($study->project));
         }
         $studySchema->hasPart($this->prepareDatasets($study));
