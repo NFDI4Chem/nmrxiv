@@ -36,6 +36,12 @@ class VerifyFileIntegrityJob implements ShouldQueue
      */
     public int $backoff = 60;
 
+    /**
+     * Files can be deleted before verification runs (e.g. extracted zip
+     * archives), in which case there is nothing left to verify.
+     */
+    public bool $deleteWhenMissingModels = true;
+
     public function __construct(
         public FileSystemObject $fileSystemObject,
         public int $delaySeconds = 0
