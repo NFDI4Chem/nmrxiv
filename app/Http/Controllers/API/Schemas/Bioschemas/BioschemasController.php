@@ -10,7 +10,6 @@ use App\Models\Sample;
 use App\Models\Schemas\Bioschemas;
 use App\Models\Study;
 use App\Models\User;
-use App\Support\Metadata\StudyAttribution;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -534,42 +533,28 @@ class BioschemasController extends Controller
         foreach ($sample->molecules as &$molecule) {
             $inchiKey = $molecule->inchi_key;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
-            $pubchemDataJSON = json_decode(Http::get($pubchemLink)->body(), true) ?? [];
+            $pubchemDataJSON = json_decode(Http::get($pubchemLink)->body(), true);
             $cid = '';
-            $iupacName = $molecule->iupac_name ?: '';
+            $iupacName = '';
             if (array_key_exists('PropertyTable', $pubchemDataJSON)) {
                 $cid = $pubchemDataJSON['PropertyTable']['Properties'][0]['CID'];
-                $iupacName = $pubchemDataJSON['PropertyTable']['Properties'][0]['IUPACName'] ?? $iupacName;
+                $iupacName = $pubchemDataJSON['PropertyTable']['Properties'][0]['IUPACName'];
             }
-
-            // A molecule has a single structure; the profile's smiles is one Text value, so
-            // use the best available form instead of listing every (mostly empty) column.
-            $smiles = $molecule->canonical_smiles ?: ($molecule->absolute_smiles ?: $molecule->smiles);
 
             $moleculeSchema = Schema::MolecularEntity();
             $moleculeSchema['@id'] = $inchiKey;
             $moleculeSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02']);
             $moleculeSchema['identifier'] = $inchiKey;
-            $moleculeSchema->name($molecule->name ?: ($iupacName ?: $molecule->cas));
-            // Prefer PubChem; fall back to the nmrXiv compound page rather than a link with no CID.
-            if ($cid) {
-                $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
-            } elseif ($molecule->getRawOriginal('identifier')) {
-                $moleculeSchema->url($molecule->public_url);
-            }
+            $moleculeSchema->name($molecule->cas);
+            $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
             $moleculeSchema->inChI($molecule->standard_inchi);
             $moleculeSchema->inChIKey($inchiKey);
             $moleculeSchema->iupacName($iupacName);
             $moleculeSchema->molecularFormula($molecule->molecular_formula);
             $moleculeSchema->molecularWeight($molecule->molecular_weight);
-            if ($smiles) {
-                $moleculeSchema->smiles($smiles);
-            }
-            // Unknown and mixture compositions have no percentage on the sample link.
-            $percentage = $molecule->pivot->percentage_composition;
-            if ($percentage !== null && $percentage !== '') {
-                $moleculeSchema->description('Percentage composition: '.$percentage.'%');
-            }
+            $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
+            $moleculeSchema->hasRepresentation($molecule->MOL);
+            $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
             array_push($moleculesSchemas, $moleculeSchema);
         }
 
@@ -596,7 +581,7 @@ class BioschemasController extends Controller
         $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
-        $sampleSchema->hasBioChemEntityPart($molecules);
+        $sampleSchema->hasBioChemEntityPart($this->prepareMoleculesSchemas($sample));
 
         return $sampleSchema;
     }
@@ -863,7 +848,7 @@ class BioschemasController extends Controller
         $studySchema->name($study->name);
         $studySchema->description($study->description);
         $studySchema->keywords(BioschemasHelper::getTags($study));
-        $studySchema->license($study->license?->url);
+        $studySchema->license($study->license->url);
         $studySchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->dateCreated($study->created_at ? $study->created_at->toISOString() : null);
         $studySchema->dateModified($study->updated_at ? $study->updated_at->toISOString() : null);
@@ -871,16 +856,6 @@ class BioschemasController extends Controller
         $studySchema->about($this->getSample($study));
         $studySchema->studyDomain('Chemistry');
         $studySchema->studySubject('Small molecules');
-        $studySchema->publisher(BioschemasHelper::preparePublisher());
-
-        // Project authors/citations, else the study's own, else its owner.
-        $attribution = StudyAttribution::resolve($study);
-        if ($attribution['authors'] !== []) {
-            $studySchema->author(array_map([BioschemasHelper::class, 'prepareAttributionAuthor'], $attribution['authors']));
-        }
-        if ($attribution['citations'] !== []) {
-            $studySchema->citation(array_map([BioschemasHelper::class, 'prepareAttributionCitation'], $attribution['citations']));
-        }
 
         return $studySchema;
     }
@@ -896,8 +871,7 @@ class BioschemasController extends Controller
     public function study($study)
     {
         $studySchema = $this->studyLite($study);
-        $study->loadMissing('project.license');
-        if ($study->project) {
+        if (property_exists($study, 'project')) {
             $studySchema->isPartOf($this->projectLite($study->project));
         }
         $studySchema->hasPart($this->prepareDatasets($study));
@@ -921,7 +895,7 @@ class BioschemasController extends Controller
         $projectSchema->name($project->name);
         $projectSchema->description($project->description);
         $projectSchema->keywords(BioschemasHelper::getTags($project));
-        $projectSchema->license($project->license?->url);
+        $projectSchema->license($project->license->url);
         $projectSchema->publisher(BioschemasHelper::preparePublisher());
         $projectSchema->url(config('app.url').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
         $projectSchema->dateCreated($project->created_at ? $project->created_at->toISOString() : null);

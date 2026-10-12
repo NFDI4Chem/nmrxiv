@@ -6,7 +6,6 @@ use App\Models\Study;
 use App\Models\User;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
-use App\Support\Bagit\StudyCitationCff;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -267,9 +266,6 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             file_put_contents("{$metaDir}/{$studyIdentifier}.nmrium", $formattedJson);
 
-            // Save CITATION.cff so the download says how to cite it
-            file_put_contents("{$metaDir}/".StudyCitationCff::FILE_NAME, StudyCitationCff::build($study));
-
             // Save bio-schema.json
             if ($bioSchema !== null) {
                 $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -279,14 +275,6 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             // Step 6: Generate BagIt manifests
             Log::info('Step 6/7: Generating BagIt manifests...');
             $this->generateBagItManifests($workBaseDir);
-
-            if (! $isLocalDisk) {
-                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
-                // This must run before the archive is uploaded: the storage disk and path can coincide with the
-                // archive location (e.g. archive/{id}/), and the cleanup would otherwise delete the new zip.
-                $disk->deleteDirectory($baseDir);
-                $this->uploadDirectory($workBaseDir, $disk, $baseDir);
-            }
 
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
             $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
@@ -301,6 +289,12 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             if ($archiveUploaded === false) {
                 throw new \RuntimeException("Failed to upload BagIt archive to disk: {$archiveKey}");
+            }
+
+            if (! $isLocalDisk) {
+                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
+                $disk->deleteDirectory($baseDir);
+                $this->uploadDirectory($workBaseDir, $disk, $baseDir);
             }
 
             $archiveUrl = $archiveDisk->url($archiveKey);
