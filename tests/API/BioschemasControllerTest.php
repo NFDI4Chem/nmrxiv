@@ -707,6 +707,42 @@ class BioschemasControllerTest extends TestCase
     }
 
     /**
+     * Every molecule submitted for the sample gets its own MolecularEntity, without placeholder text.
+     */
+    public function test_bioschemas_has_one_molecular_entity_per_sample_molecule_without_placeholders()
+    {
+        Http::fake(['pubchem.ncbi.nlm.nih.gov/*' => Http::response([], 404)]);
+
+        $user = User::factory()->create();
+        $license = License::factory()->create();
+        $project = Project::factory()->create(['owner_id' => $user->id, 'is_public' => true, 'license_id' => $license->id]);
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'owner_id' => $user->id,
+            'is_public' => true,
+            'identifier' => 33334,
+            'license_id' => $license->id,
+        ]);
+        $sample = Sample::factory()->create(['study_id' => $study->id]);
+
+        $withPercentage = Molecule::factory()->create(['inchi_key' => 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N']);
+        $withoutPercentage = Molecule::factory()->create(['inchi_key' => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N']);
+        $sample->molecules()->attach($withPercentage->id, ['percentage_composition' => '60']);
+        $sample->molecules()->attach($withoutPercentage->id);
+
+        $parts = $this->getJson('/api/v1/schemas/bioschemas/S33334')->assertOk()->json('about.hasBioChemEntityPart');
+
+        $this->assertCount(2, $parts);
+        $this->assertSame(['BSYNRYMUTXBXSQ-UHFFFAOYSA-N', 'RYYVLZVUVIJVGH-UHFFFAOYSA-N'], array_column($parts, '@id'));
+        $this->assertSame('Percentage composition: 60%', $parts[0]['description']);
+        $this->assertArrayNotHasKey('description', $parts[1]);
+        // PubChem answered 404, so no part may carry a PubChem compound link (not even an empty one).
+        foreach ($parts as $part) {
+            $this->assertStringNotContainsString('pubchem.ncbi.nlm.nih.gov', $part['url'] ?? '');
+        }
+    }
+
+    /**
      * Test Bioschemas experiment extraction from NMRium
      */
     public function test_bioschemas_extracts_experiment_type()

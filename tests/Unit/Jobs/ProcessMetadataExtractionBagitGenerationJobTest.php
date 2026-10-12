@@ -218,6 +218,16 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertTrue($disk->exists("{$metaDir}/S213.nmrium"));
         $this->assertTrue($disk->exists('spectra_parse/S213/bagit.txt'));
 
+        // CITATION.cff is part of the payload: written, checksummed in the manifest and zipped into the archive.
+        $this->assertTrue($disk->exists("{$metaDir}/CITATION.cff"));
+        $this->assertStringContainsString('cff-version: 1.2.0', $disk->get("{$metaDir}/CITATION.cff"));
+        $this->assertStringContainsString('data/S213/nmrxiv-meta/CITATION.cff', $disk->get('spectra_parse/S213/manifest-sha256.txt'));
+
+        $archive = new ZipArchive;
+        $this->assertTrue($archive->open($disk->path('archive/S213/S213.zip')));
+        $this->assertNotFalse($archive->locateName('data/S213/nmrxiv-meta/CITATION.cff'));
+        $archive->close();
+
         $nmrium = json_decode($disk->get("{$metaDir}/S213.nmrium"), true);
         $spectrum = $nmrium['data']['spectra'][0];
         $this->assertArrayNotHasKey('data', $spectrum);
@@ -276,7 +286,77 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertArrayHasKey('spectra_parse/S213/bagit.txt', $adapter->files);
         $this->assertArrayHasKey('spectra_parse/S213/manifest-sha256.txt', $adapter->files);
 
+        $this->assertArrayHasKey("{$metaDir}/CITATION.cff", $adapter->files);
+        $this->assertStringContainsString('type: dataset', $adapter->files["{$metaDir}/CITATION.cff"]);
+        $this->assertStringContainsString('data/S213/nmrxiv-meta/CITATION.cff', $adapter->files['spectra_parse/S213/manifest-sha256.txt']);
+
         $this->assertEmpty(glob(storage_path('app/bagit_work_*')));
+    }
+
+    public function test_the_archive_zip_survives_when_the_storage_disk_and_path_match_the_archive_location(): void
+    {
+        Notification::fake();
+
+        $adapter = new InMemoryFlysystemAdapter;
+        $this->registerMemoryDisk('spectra_memory', $adapter);
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
+            'nmrxiv.spectra_parsing.storage_path' => 'archive',
+            'filesystems.default_public' => 'spectra_memory',
+        ]);
+
+        $study = $this->makeStudy();
+        $adapter->files['archive/S213/stale-from-previous-run.txt'] = 'stale';
+
+        $this->fakeSuccessfulPipeline($study);
+
+        (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+
+        $this->assertArrayHasKey('archive/S213/S213.zip', $adapter->files);
+        $this->assertArrayHasKey('archive/S213/bagit.txt', $adapter->files);
+        $this->assertArrayNotHasKey('archive/S213/stale-from-previous-run.txt', $adapter->files);
+    }
+
+    public function test_the_published_archive_is_kept_when_the_replacement_upload_fails(): void
+    {
+        Notification::fake();
+
+        $adapter = new ZipRejectingFlysystemAdapter;
+        $this->registerMemoryDisk('spectra_memory', $adapter);
+
+        config([
+            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
+            'nmrxiv.spectra_parsing.retry_count' => 1,
+            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
+            'nmrxiv.spectra_parsing.storage_path' => 'archive',
+            'filesystems.default_public' => 'spectra_memory',
+        ]);
+
+        $study = $this->makeStudy();
+        $study->update(['bagit_archive_link' => 'https://memory.test/archive/S213/S213.zip']);
+
+        // Left by a previous successful run: the zip the study currently links to, and a stale bag file.
+        $adapter->files['archive/S213/S213.zip'] = 'previous archive';
+        $adapter->files['archive/S213/stale-from-previous-run.txt'] = 'stale';
+
+        $this->fakeSuccessfulPipeline($study);
+
+        try {
+            (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
+            $this->fail('The rejected archive upload should have failed the job.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('Failed to upload BagIt archive to disk', $e->getMessage());
+        }
+
+        $this->assertSame('previous archive', $adapter->files['archive/S213/S213.zip']);
+        $this->assertSame('https://memory.test/archive/S213/S213.zip', $study->fresh()->bagit_archive_link);
+        $this->assertArrayNotHasKey('archive/S213/stale-from-previous-run.txt', $adapter->files);
+        $this->assertArrayHasKey('archive/S213/bagit.txt', $adapter->files);
     }
 
     public function test_handle_marks_study_as_failed_when_archive_upload_is_rejected_by_the_disk(): void
@@ -792,6 +872,11 @@ class InMemoryFlysystemAdapter implements FlysystemAdapterContract
     /** @var array<string, string> */
     public array $files = [];
 
+    public function getUrl(string $path): string
+    {
+        return 'https://memory.test/'.ltrim($path, '/');
+    }
+
     /** @var array<string, bool> */
     public array $directories = [];
 
@@ -899,5 +984,17 @@ class RejectingFlysystemAdapter extends InMemoryFlysystemAdapter
     public function write(string $path, string $contents, Config $config): void
     {
         throw UnableToWriteFile::atLocation($path, 'disk rejected the write');
+    }
+}
+
+class ZipRejectingFlysystemAdapter extends InMemoryFlysystemAdapter
+{
+    public function write(string $path, string $contents, Config $config): void
+    {
+        if (str_ends_with($path, '.zip')) {
+            throw UnableToWriteFile::atLocation($path, 'disk rejected the archive');
+        }
+
+        parent::write($path, $contents, $config);
     }
 }
