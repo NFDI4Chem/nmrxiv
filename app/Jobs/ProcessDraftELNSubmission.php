@@ -17,6 +17,7 @@ use App\Services\ChemotionRepositoryTrackerService;
 use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
 use App\Services\PathGeneratorService;
+use App\Services\ZipArchiveExtractor;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Queue\Queueable;
@@ -24,8 +25,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use ZipArchive;
 
 class ProcessDraftELNSubmission implements ShouldQueue
@@ -131,95 +130,71 @@ class ProcessDraftELNSubmission implements ShouldQueue
             throw new \Exception("Failed to download zip file. HTTP status: {$response->status()}");
         }
 
-        // Create temp paths
         $tempZipPath = tempnam(sys_get_temp_dir(), 'eln_zip_');
-        $tempExtractDir = sys_get_temp_dir().'/eln_extract_'.$this->draftId.'_'.time();
+        $extractor = app(ZipArchiveExtractor::class);
 
         try {
-            // Save and extract zip
             file_put_contents($tempZipPath, $response->body());
-            mkdir($tempExtractDir, 0755, true);
 
-            $zip = new ZipArchive;
-            if ($zip->open($tempZipPath) !== true) {
-                throw new \Exception('Failed to open zip file');
+            $zip = $extractor->open($tempZipPath);
+
+            try {
+                $entries = $extractor->inspect($zip);
+
+                $logger->log($draft, 'info', 'Zip file validated', ['files' => count($entries)]);
+
+                return $this->moveFilesToStorage($draft, $zip, $entries, $extractor, $pathGenerator);
+            } finally {
+                $zip->close();
             }
-
-            $zip->extractTo($tempExtractDir);
-            $zip->close();
-
-            $logger->log($draft, 'info', 'Zip file extracted successfully');
-
-            // Move files to storage
-            return $this->moveFilesToStorage($draft, $tempExtractDir, $pathGenerator);
-
         } finally {
-            // Cleanup
             if (file_exists($tempZipPath)) {
                 unlink($tempZipPath);
             }
-            $this->removeDirectory($tempExtractDir, $logger);
         }
     }
 
     /**
-     * Move files from temp to storage.
+     * Stream validated archive entries into draft storage.
+     *
+     * @param  list<array{index: int, name: string, relativePath: string, filename: string, size: int}>  $entries
      */
-    private function moveFilesToStorage(Draft $draft, string $tempDir, PathGeneratorService $pathGenerator): array
-    {
+    private function moveFilesToStorage(
+        Draft $draft,
+        ZipArchive $zip,
+        array $entries,
+        ZipArchiveExtractor $extractor,
+        PathGeneratorService $pathGenerator
+    ): array {
         $extractedFiles = [];
         $baseDestination = $draft->external_id;
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($tempDir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
+        foreach ($entries as $entry) {
+            $storageRelativePath = $baseDestination.'/'.$entry['relativePath'];
+            $storagePath = $pathGenerator->generateDraftFilePath($draft, $storageRelativePath);
 
-        foreach ($iterator as $file) {
-            if ($file->isFile()) {
-                $relativePath = str_replace($tempDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
-                $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
-                $storageRelativePath = $baseDestination.'/'.$relativePath;
-                $storagePath = $pathGenerator->generateDraftFilePath($draft, $storageRelativePath);
+            $stream = $extractor->stream($zip, $entry);
 
-                // Ensure directory exists and move file
-                $storageDir = dirname($storagePath);
-                if (! Storage::exists($storageDir)) {
-                    Storage::makeDirectory($storageDir);
+            try {
+                Storage::getDriver()->writeStream(ltrim($storagePath, '/'), $stream);
+            } finally {
+                if (is_resource($stream)) {
+                    fclose($stream);
                 }
-
-                Storage::put(ltrim($storagePath, '/'), file_get_contents($file->getPathname()));
-
-                $extractedFiles[] = [
-                    'upload' => [
-                        'filename' => $file->getFilename(),
-                        'total' => $file->getSize(),
-                    ],
-                    'fullPath' => $storageRelativePath,
-                    'relativePath' => $storageRelativePath,
-                    'storagePath' => $storagePath,
-                ];
             }
+
+            $extractedFiles[] = [
+                'upload' => [
+                    'filename' => $entry['filename'],
+                    'total' => $entry['size'],
+                ],
+                'fullPath' => $storageRelativePath,
+                'relativePath' => $storageRelativePath,
+                'storagePath' => $storagePath,
+            ];
         }
 
         return $extractedFiles;
-    }
-
-    /**
-     * Remove directory recursively.
-     */
-    private function removeDirectory(string $dir, DraftProcessingLogger $logger): void
-    {
-        if (! is_dir($dir)) {
-            return;
-        }
-
-        $files = array_diff(scandir($dir), ['.', '..']);
-        foreach ($files as $file) {
-            $path = $dir.DIRECTORY_SEPARATOR.$file;
-            is_dir($path) ? $this->removeDirectory($path, $logger) : unlink($path);
-        }
-        rmdir($dir);
     }
 
     /**
