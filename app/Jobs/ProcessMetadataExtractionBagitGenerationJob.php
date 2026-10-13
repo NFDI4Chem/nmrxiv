@@ -258,7 +258,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             }
 
             // Save S{identifier}.nmrium (full API response with base64 images intact)
-            $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             file_put_contents("{$metaDir}/{$studyIdentifier}.nmrium", $formattedJson);
 
             // Save CITATION.cff so the download says how to cite it
@@ -266,7 +266,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             // Save bio-schema.json
             if ($bioSchema !== null) {
-                $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 file_put_contents("{$metaDir}/bio-schema.json", $bioSchemaJson);
             }
 
