@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    |
+    | Kept in sync with the latest release by release-please (see the marker
+    | comment). Written into generated BagIt archives as Bag-Software-Agent.
+    |
+    */
+
+    'version' => '2.5.0', // x-release-please-version
+
+    /*
+    |--------------------------------------------------------------------------
     | Cool Off Period
     |--------------------------------------------------------------------------
     |
