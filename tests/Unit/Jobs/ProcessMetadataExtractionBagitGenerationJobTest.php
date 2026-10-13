@@ -186,6 +186,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'https://bioschema.test/schemas/S213' => Http::response([
                 '@context' => 'https://schema.org',
                 'name' => 'Test study',
+                'author' => 'Weißenborn V, Müller K',
             ], 200),
         ]);
 
@@ -225,6 +226,11 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertContains("{$metaDir}/CITATION.cff", $entries);
         $this->assertStringContainsString('cff-version: 1.2.0', $this->readZipEntry($zipPath, "{$metaDir}/CITATION.cff"));
         $this->assertStringContainsString("{$metaDir}/CITATION.cff", $this->readZipEntry($zipPath, 'manifest-sha256.txt'));
+
+        // Non-ASCII characters (author names) are written as UTF-8, not as \\uXXXX escapes.
+        $bioSchema = $this->readZipEntry($zipPath, "{$metaDir}/bio-schema.json");
+        $this->assertStringContainsString('Weißenborn V, Müller K', $bioSchema);
+        $this->assertStringNotContainsString('\\u00', $bioSchema);
 
         $nmrium = json_decode($this->readZipEntry($zipPath, "{$metaDir}/S213.nmrium"), true);
         $spectrum = $nmrium['data']['spectra'][0];
