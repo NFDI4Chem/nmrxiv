@@ -616,7 +616,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             $bag->setAlgorithm('sha256');
 
             if (! $bag->hasBagInfoTag('Bag-Software-Agent')) {
-                $bag->addBagInfoTag('Bag-Software-Agent', 'nmrXiv/1.0');
+                $bag->addBagInfoTag('Bag-Software-Agent', $this->softwareAgent());
             }
 
             // Writes bagit.txt, manifest-sha256.txt, bag-info.txt and tagmanifest-sha256.txt.
@@ -629,6 +629,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             // Fallback: Generate manually
             $this->generateBagItManually($bagPath);
         }
+    }
+
+    /**
+     * The Bag-Software-Agent value: nmrXiv and the current release version.
+     */
+    protected function softwareAgent(): string
+    {
+        return 'nmrXiv/'.config('nmrxiv.version');
     }
 
     /**
@@ -664,7 +672,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         // Create bag-info.txt
         $bagInfoContent = 'Payload-Oxum: '.$this->calculatePayloadOxum($dataPath)."\n";
         $bagInfoContent .= 'Bagging-Date: '.date('Y-m-d')."\n";
-        $bagInfoContent .= "Bag-Software-Agent: Laravel-Queue-ProcessStudySpectraJob/1.0\n";
+        $bagInfoContent .= 'Bag-Software-Agent: '.$this->softwareAgent()."\n";
         file_put_contents($bagPath.'/bag-info.txt', $bagInfoContent);
 
         // Create tagmanifest-sha256.txt

@@ -3,7 +3,8 @@
   "packages": {
     ".": {
       "release-type": "php",
-      "changelog-path": "CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": ["config/nmrxiv.php"]
     }
   }
 }

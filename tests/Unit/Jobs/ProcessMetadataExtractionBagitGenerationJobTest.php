@@ -642,12 +642,30 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
             $bagInfo = file_get_contents($bagPath.'/bag-info.txt');
             $this->assertStringContainsString('Payload-Oxum:', $bagInfo);
-            $this->assertStringContainsString('Bag-Software-Agent:', $bagInfo);
+            $this->assertStringContainsString('Bag-Software-Agent: nmrXiv/'.config('nmrxiv.version'), $bagInfo);
 
             $this->assertTrue(Bag::load($bagPath)->isValid());
         } finally {
             $this->removeDirectory($bagPath);
         }
+    }
+
+    public function test_the_software_agent_follows_the_configured_release_version(): void
+    {
+        config(['nmrxiv.version' => '9.8.7']);
+
+        $this->assertSame('nmrXiv/9.8.7', $this->makeTestableJob(1)->softwareAgentForTest());
+    }
+
+    public function test_the_release_version_is_a_semver_marked_for_release_please(): void
+    {
+        $this->assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', config('nmrxiv.version'));
+
+        $manifest = json_decode(file_get_contents(base_path('.release-please-manifest.json')), true);
+        $this->assertSame($manifest['.'], config('nmrxiv.version'));
+
+        $this->assertStringContainsString('// x-release-please-version', file_get_contents(base_path('config/nmrxiv.php')));
+        $this->assertContains('config/nmrxiv.php', json_decode(file_get_contents(base_path('release-please-config.json')), true)['packages']['.']['extra-files']);
     }
 
     public function test_generate_bagit_manually_writes_all_bagit_tag_files(): void
@@ -668,6 +686,10 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
             $this->assertStringContainsString('data/Sample/fid', file_get_contents($bagPath.'/manifest-sha256.txt'));
             $this->assertStringContainsString('Payload-Oxum:', file_get_contents($bagPath.'/bag-info.txt'));
+            $this->assertStringContainsString(
+                'Bag-Software-Agent: nmrXiv/'.config('nmrxiv.version'),
+                file_get_contents($bagPath.'/bag-info.txt')
+            );
         } finally {
             $this->removeDirectory($bagPath);
         }
@@ -749,6 +771,11 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             public function generateBagItManifestsForTest(string $bagPath): void
             {
                 $this->generateBagItManifests($bagPath);
+            }
+
+            public function softwareAgentForTest(): string
+            {
+                return $this->softwareAgent();
             }
 
             public function generateBagItManuallyForTest(string $bagPath): void
