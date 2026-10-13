@@ -14,19 +14,19 @@ use App\Support\Bagit\DatasetPhotoBackfillResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\WritesBagitZip;
 use Tests\TestCase;
 
 class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
 {
     use RefreshDatabase;
+    use WritesBagitZip;
 
     public function test_it_backfills_dataset_and_combined_study_photo_paths(): void
     {
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -54,8 +54,6 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -82,14 +80,12 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
         [$study, $dataset] = $this->makeStudyWithDataset(219, 'proton');
 
-        Storage::disk('local')->put('spectra_parse/S219/bagit.txt', "BagIt-Version: 1.0\n");
+        $this->putBagZip('S219', ['bagit.txt' => "BagIt-Version: 1.0\n"]);
 
         $this->artisan('nmrxiv:backfill-dataset-photo')->assertSuccessful();
 
@@ -102,8 +98,6 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -126,8 +120,6 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -151,8 +143,6 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -188,7 +178,7 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         $this->putBagWithSpectra('S230', 'StudyRoot', [
             ['id' => 'spec-1', 'selectorPath' => '/StudyRoot/proton/acqus', 'imageBytes' => 'x'],
         ]);
-        Storage::disk('local')->put('spectra_parse/S999/bagit.txt', 'x');
+        $this->putBagZip('S999', ['bagit.txt' => 'x']);
 
         $exit = Artisan::call('nmrxiv:backfill-dataset-photo');
         $output = Artisan::output();
@@ -205,14 +195,14 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         $this->useLocalDisks();
 
         $this->makeStudyWithDataset(231, 'proton');
-        Storage::disk('local')->put('spectra_parse/S231/bagit.txt', "BagIt-Version: 1.0\n");
+        $this->putBagZip('S231', ['bagit.txt' => "BagIt-Version: 1.0\n"]);
 
         $exit = Artisan::call('nmrxiv:backfill-dataset-photo');
         $output = Artisan::output();
 
         $this->assertSame(0, $exit);
         $this->assertStringContainsString(
-            '[skip] S231: no .nmrium file found under spectra_parse/S231',
+            '[skip] S231: no .nmrium file found under archive/S231.zip',
             $output
         );
         $this->assertSummary($output, [0, 0, 0, 1, 0, 0, 0]);
@@ -223,14 +213,14 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         $this->useLocalDisks();
 
         $this->makeStudyWithDataset(232, 'proton');
-        Storage::disk('local')->put('spectra_parse/S232/data/StudyRoot/nmrxiv-meta/StudyRoot.nmrium', '{not json');
+        $this->putBagZip('S232', ['data/StudyRoot/nmrxiv-meta/StudyRoot.nmrium' => '{not json']);
 
         $exit = Artisan::call('nmrxiv:backfill-dataset-photo');
         $output = Artisan::output();
 
         $this->assertSame(0, $exit);
         $this->assertStringContainsString(
-            '[skip] S232: invalid JSON in .nmrium file under spectra_parse/S232',
+            '[skip] S232: invalid JSON in .nmrium file under archive/S232.zip',
             $output
         );
         $this->assertSummary($output, [0, 0, 0, 1, 0, 0, 0]);
@@ -241,10 +231,9 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         $this->useLocalDisks();
 
         $this->makeStudyWithDataset(233, 'proton');
-        Storage::disk('local')->put(
-            'spectra_parse/S233/data/StudyRoot/nmrxiv-meta/StudyRoot.nmrium',
-            json_encode(['nmriumState' => ['data' => ['molecules' => []]]])
-        );
+        $this->putBagZip('S233', [
+            'data/StudyRoot/nmrxiv-meta/StudyRoot.nmrium' => json_encode(['nmriumState' => ['data' => ['molecules' => []]]]),
+        ]);
 
         $exit = Artisan::call('nmrxiv:backfill-dataset-photo');
         $output = Artisan::output();
@@ -372,7 +361,7 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
 
         // S250 has a loose .nmrium that cannot be read as JSON object, S251 is healthy.
         $this->makeStudyWithDataset(250, 'proton');
-        Storage::disk('local')->put('spectra_parse/S250/data/StudyRoot/nmrxiv-meta/StudyRoot.nmrium', '"just a string"');
+        $this->putBagZip('S250', ['data/StudyRoot/nmrxiv-meta/StudyRoot.nmrium' => '"just a string"']);
 
         [, $healthy] = $this->makeStudyWithDataset(251, 'proton');
         $this->putBagWithSpectra('S251', 'StudyRoot', [
@@ -443,8 +432,6 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
     }
@@ -489,7 +476,7 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
 
     /**
      * Write a bag whose .nmrium file lists the given spectra (id + selector
-     * path), and — for any entry with imageBytes set — a matching loose
+     * path), and — for any entry with imageBytes set — a matching
      * preview PNG under nmrxiv-meta/images/{id}.png, mirroring how NMRKit
      * actually stores previews (not as base64 inside the JSON).
      *
@@ -509,14 +496,16 @@ class BackfillDatasetPhotoFromBagitCommandTest extends TestCase
             'logs' => [],
         ]);
 
-        $metaDir = "spectra_parse/{$folderName}/data/{$sampleName}/nmrxiv-meta";
-        Storage::disk('local')->put("{$metaDir}/{$sampleName}.nmrium", $content);
+        $metaDir = "data/{$sampleName}/nmrxiv-meta";
+        $entries = ["{$metaDir}/{$sampleName}.nmrium" => $content];
 
         foreach ($spectra as $s) {
             if (($s['imageBytes'] ?? null) !== null) {
-                Storage::disk('local')->put("{$metaDir}/images/{$s['id']}.png", $s['imageBytes']);
+                $entries["{$metaDir}/images/{$s['id']}.png"] = $s['imageBytes'];
             }
         }
+
+        $this->putBagZip($folderName, $entries);
     }
 
     /**

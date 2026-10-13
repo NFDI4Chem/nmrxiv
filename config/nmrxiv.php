@@ -43,10 +43,6 @@ return [
         'nmrkit_api_url' => env('NMRKIT_API_URL', 'https://nmrkit.nmrxiv.org/latest/spectra/parse/url'),
         'bioschema_api_url' => env('BIOSCHEMA_API_URL', 'https://nmrxiv.org/api/v1/schemas/bioschemas'),
 
-        // Storage Configuration
-        'storage_disk' => env('SPECTRA_STORAGE_DISK', 'local'),
-        'storage_path' => env('SPECTRA_STORAGE_PATH', 'spectra_parse'),
-
         // Queue Configuration
         'queue' => env('SPECTRA_QUEUE', 'metadata-extraction'),
         'backoff' => array_map('intval', explode(',', env('SPECTRA_BACKOFF', '60,300,900'))),
