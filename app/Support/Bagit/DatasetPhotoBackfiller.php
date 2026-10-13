@@ -36,14 +36,12 @@ class DatasetPhotoBackfiller
     ): DatasetPhotoBackfillResult {
         $result = new DatasetPhotoBackfillResult;
 
-        $sourceDisk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
-        $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
         $folderName ??= 'S'.$study->getRawOriginal('identifier');
 
         $study->loadMissing(['fsObject', 'draft', 'project', 'datasets.fsObject']);
 
-        $remoteBagDir = "{$basePath}/{$folderName}";
-        $archive = BagitArchive::open($sourceDisk, $remoteBagDir);
+        $remoteBagDir = BagitArchive::archiveKey($folderName);
+        $archive = BagitArchive::forStudy($folderName);
 
         if ($archive === null) {
             $result->skippedNoFile++;

@@ -6,9 +6,9 @@ use App\Models\Study;
 use App\Models\User;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
+use App\Support\Bagit\BagitArchive;
 use App\Support\Bagit\StudyCitationCff;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,7 +16,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Throwable;
@@ -184,17 +183,12 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     {
         // Remove NMRXIV: prefix if present (e.g., "NMRXIV:S1295" -> "S1295")
         $studyIdentifier = str_replace('NMRXIV:', '', $study->identifier);
-        $diskName = config('nmrxiv.spectra_parsing.storage_disk', 'local');
-        $disk = Storage::disk($diskName);
-        $isLocalDisk = config("filesystems.disks.{$diskName}.driver") === 'local';
-        $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
-        $baseDir = "{$basePath}/{$studyIdentifier}";
         $zipPath = null;
         $archiveZipPath = null;
 
-        // The bag is always assembled with native filesystem calls, so remote disks need a real local staging directory.
-        $tempWorkRoot = $isLocalDisk ? null : storage_path('app/bagit_work_'.uniqid());
-        $workBaseDir = $isLocalDisk ? $disk->path($baseDir) : "{$tempWorkRoot}/{$studyIdentifier}";
+        // The bag is assembled in a throwaway local directory; the zip uploaded to the public archive is its only stored copy.
+        $tempWorkRoot = storage_path('app/bagit_work_'.uniqid());
+        $workBaseDir = "{$tempWorkRoot}/{$studyIdentifier}";
         $workDataDir = "{$workBaseDir}/data";
 
         try {
@@ -280,27 +274,10 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             Log::info('Step 6/7: Generating BagIt manifests...');
             $this->generateBagItManifests($workBaseDir);
 
-            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
-
-            if (! $isLocalDisk) {
-                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
-                // The storage disk and path can coincide with the archive location (e.g. archive/{id}/); in that
-                // case the published zip is kept, so a failure before the replacement uploads cannot leave
-                // bagit_archive_link pointing at a deleted object.
-                $archiveInsideBag = $diskName === config('filesystems.default_public', 'local')
-                    && str_starts_with($archiveKey, $baseDir.'/');
-
-                if ($archiveInsideBag) {
-                    $disk->delete(array_values(array_diff($disk->allFiles($baseDir), [$archiveKey])));
-                } else {
-                    $disk->deleteDirectory($baseDir);
-                }
-
-                $this->uploadDirectory($workBaseDir, $disk, $baseDir);
-            }
+            $archiveKey = BagitArchive::archiveKey($studyIdentifier);
 
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
-            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
+            $archiveDisk = BagitArchive::publicDisk();
             $archiveStream = fopen($archiveZipPath, 'rb');
             if ($archiveStream === false) {
                 throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
@@ -324,7 +301,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             return [
                 'imageCount' => $imageCount,
-                'location' => $isLocalDisk ? $workBaseDir : $baseDir,
+                'location' => $archiveKey,
                 'archiveUrl' => $archiveUrl,
             ];
         } finally {
@@ -338,40 +315,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 @unlink($archiveZipPath);
             }
 
-            if ($tempWorkRoot) {
-                $this->deleteLocalDirectory($tempWorkRoot);
-            }
-        }
-    }
-
-    /**
-     * Mirror a locally assembled directory tree onto the configured storage disk.
-     */
-    protected function uploadDirectory(string $localPath, Filesystem $disk, string $remotePath): void
-    {
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($localPath, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $file) {
-            if (! $file->isFile()) {
-                continue;
-            }
-
-            $relativePath = ltrim(str_replace($localPath, '', $file->getPathname()), '/');
-            $stream = fopen($file->getPathname(), 'rb');
-
-            if ($stream === false) {
-                throw new \RuntimeException("Failed to open file for upload: {$file->getPathname()}");
-            }
-
-            $uploaded = $disk->put("{$remotePath}/{$relativePath}", $stream);
-            fclose($stream);
-
-            if ($uploaded === false) {
-                throw new \RuntimeException("Failed to upload bag file to disk: {$remotePath}/{$relativePath}");
-            }
+            $this->deleteLocalDirectory($tempWorkRoot);
         }
     }
 

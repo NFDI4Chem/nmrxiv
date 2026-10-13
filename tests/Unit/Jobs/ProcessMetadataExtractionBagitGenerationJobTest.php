@@ -154,8 +154,6 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -210,25 +208,25 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             }
         );
 
+        // The zip in the public archive is the only stored copy: no unzipped bag is left next to it.
         $disk = Storage::disk('local');
-        $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';
+        $this->assertSame(['archive/S213.zip'], $disk->allFiles());
 
-        $this->assertTrue($disk->exists("{$metaDir}/images/img1.png"));
-        $this->assertTrue($disk->exists("{$metaDir}/bio-schema.json"));
-        $this->assertTrue($disk->exists("{$metaDir}/S213.nmrium"));
-        $this->assertTrue($disk->exists('spectra_parse/S213/bagit.txt'));
+        $metaDir = 'data/S213/nmrxiv-meta';
+        $zipPath = $disk->path('archive/S213.zip');
+        $entries = $this->zipEntryNames($zipPath);
+
+        $this->assertContains("{$metaDir}/images/img1.png", $entries);
+        $this->assertContains("{$metaDir}/bio-schema.json", $entries);
+        $this->assertContains("{$metaDir}/S213.nmrium", $entries);
+        $this->assertContains('bagit.txt', $entries);
 
         // CITATION.cff is part of the payload: written, checksummed in the manifest and zipped into the archive.
-        $this->assertTrue($disk->exists("{$metaDir}/CITATION.cff"));
-        $this->assertStringContainsString('cff-version: 1.2.0', $disk->get("{$metaDir}/CITATION.cff"));
-        $this->assertStringContainsString('data/S213/nmrxiv-meta/CITATION.cff', $disk->get('spectra_parse/S213/manifest-sha256.txt'));
+        $this->assertContains("{$metaDir}/CITATION.cff", $entries);
+        $this->assertStringContainsString('cff-version: 1.2.0', $this->readZipEntry($zipPath, "{$metaDir}/CITATION.cff"));
+        $this->assertStringContainsString("{$metaDir}/CITATION.cff", $this->readZipEntry($zipPath, 'manifest-sha256.txt'));
 
-        $archive = new ZipArchive;
-        $this->assertTrue($archive->open($disk->path('archive/S213/S213.zip')));
-        $this->assertNotFalse($archive->locateName('data/S213/nmrxiv-meta/CITATION.cff'));
-        $archive->close();
-
-        $nmrium = json_decode($disk->get("{$metaDir}/S213.nmrium"), true);
+        $nmrium = json_decode($this->readZipEntry($zipPath, "{$metaDir}/S213.nmrium"), true);
         $spectrum = $nmrium['data']['spectra'][0];
         $this->assertArrayNotHasKey('data', $spectrum);
         $this->assertArrayNotHasKey('meta', $spectrum);
@@ -236,17 +234,20 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->assertArrayNotHasKey('originalInfo', $spectrum);
         $this->assertSame('yes', $spectrum['keep']);
 
-        // Re-run against the same study to exercise the "clean up old images" branch.
+        // Re-run against the same study: the zip is replaced, not accumulated.
         $secondJob = new ProcessMetadataExtractionBagitGenerationJob($study->id);
         $secondJob->handle();
 
         $study->refresh();
         $this->assertSame('completed', $study->metadata_bagit_generation_status);
-        $this->assertTrue($disk->exists("{$metaDir}/images/img1.png"));
-        $this->assertCount(1, $disk->files("{$metaDir}/images"));
+        $this->assertSame(['archive/S213.zip'], $disk->allFiles());
+        $this->assertCount(1, array_filter(
+            $this->zipEntryNames($zipPath),
+            fn (string $name) => str_starts_with($name, "{$metaDir}/images/")
+        ));
     }
 
-    public function test_handle_processes_study_successfully_on_a_non_local_storage_disk(): void
+    public function test_handle_stores_only_the_zip_on_a_non_local_public_disk(): void
     {
         Storage::fake('local');
         Notification::fake();
@@ -258,15 +259,10 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
-            'filesystems.default_public' => 'local',
+            'filesystems.default_public' => 'spectra_memory',
         ]);
 
         $study = $this->makeStudy();
-
-        // NMRKit returns fresh image ids per parse, so a previous run's files must not survive.
-        $adapter->files['spectra_parse/S213/data/S213/nmrxiv-meta/images/stale.png'] = 'stale';
 
         $this->fakeSuccessfulPipeline($study);
 
@@ -276,49 +272,25 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
         $this->assertSame('completed', $study->metadata_bagit_generation_status);
         $this->assertSame(1, data_get($study->metadata_bagit_generation_logs, 'image_count'));
+        $this->assertSame('archive/S213.zip', data_get($study->metadata_bagit_generation_logs, 'archive_path'));
 
-        $metaDir = 'spectra_parse/S213/data/S213/nmrxiv-meta';
+        // One object only: archive/S213.zip, with no unzipped copy beside it.
+        $this->assertSame(['archive/S213.zip'], array_keys($adapter->files));
 
-        $this->assertArrayHasKey("{$metaDir}/images/img1.png", $adapter->files);
-        $this->assertArrayNotHasKey("{$metaDir}/images/stale.png", $adapter->files);
-        $this->assertArrayHasKey("{$metaDir}/S213.nmrium", $adapter->files);
-        $this->assertArrayHasKey("{$metaDir}/bio-schema.json", $adapter->files);
-        $this->assertArrayHasKey('spectra_parse/S213/bagit.txt', $adapter->files);
-        $this->assertArrayHasKey('spectra_parse/S213/manifest-sha256.txt', $adapter->files);
+        $metaDir = 'data/S213/nmrxiv-meta';
+        $zipPath = $this->writeTempZip($adapter->files['archive/S213.zip']);
+        $entries = $this->zipEntryNames($zipPath);
 
-        $this->assertArrayHasKey("{$metaDir}/CITATION.cff", $adapter->files);
-        $this->assertStringContainsString('type: dataset', $adapter->files["{$metaDir}/CITATION.cff"]);
-        $this->assertStringContainsString('data/S213/nmrxiv-meta/CITATION.cff', $adapter->files['spectra_parse/S213/manifest-sha256.txt']);
+        $this->assertContains("{$metaDir}/images/img1.png", $entries);
+        $this->assertContains("{$metaDir}/S213.nmrium", $entries);
+        $this->assertContains("{$metaDir}/bio-schema.json", $entries);
+        $this->assertContains('bagit.txt', $entries);
+        $this->assertContains('manifest-sha256.txt', $entries);
+        $this->assertContains("{$metaDir}/CITATION.cff", $entries);
+        $this->assertStringContainsString('type: dataset', $this->readZipEntry($zipPath, "{$metaDir}/CITATION.cff"));
+        @unlink($zipPath);
 
         $this->assertEmpty(glob(storage_path('app/bagit_work_*')));
-    }
-
-    public function test_the_archive_zip_survives_when_the_storage_disk_and_path_match_the_archive_location(): void
-    {
-        Notification::fake();
-
-        $adapter = new InMemoryFlysystemAdapter;
-        $this->registerMemoryDisk('spectra_memory', $adapter);
-
-        config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
-            'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
-            'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
-            'nmrxiv.spectra_parsing.storage_path' => 'archive',
-            'filesystems.default_public' => 'spectra_memory',
-        ]);
-
-        $study = $this->makeStudy();
-        $adapter->files['archive/S213/stale-from-previous-run.txt'] = 'stale';
-
-        $this->fakeSuccessfulPipeline($study);
-
-        (new ProcessMetadataExtractionBagitGenerationJob($study->id))->handle();
-
-        $this->assertArrayHasKey('archive/S213/S213.zip', $adapter->files);
-        $this->assertArrayHasKey('archive/S213/bagit.txt', $adapter->files);
-        $this->assertArrayNotHasKey('archive/S213/stale-from-previous-run.txt', $adapter->files);
     }
 
     public function test_the_published_archive_is_kept_when_the_replacement_upload_fails(): void
@@ -332,17 +304,14 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'spectra_memory',
-            'nmrxiv.spectra_parsing.storage_path' => 'archive',
             'filesystems.default_public' => 'spectra_memory',
         ]);
 
         $study = $this->makeStudy();
-        $study->update(['bagit_archive_link' => 'https://memory.test/archive/S213/S213.zip']);
+        $study->update(['bagit_archive_link' => 'https://memory.test/archive/S213.zip']);
 
-        // Left by a previous successful run: the zip the study currently links to, and a stale bag file.
-        $adapter->files['archive/S213/S213.zip'] = 'previous archive';
-        $adapter->files['archive/S213/stale-from-previous-run.txt'] = 'stale';
+        // Left by a previous successful run: the zip the study currently links to.
+        $adapter->files['archive/S213.zip'] = 'previous archive';
 
         $this->fakeSuccessfulPipeline($study);
 
@@ -353,10 +322,9 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             $this->assertStringContainsString('Failed to upload BagIt archive to disk', $e->getMessage());
         }
 
-        $this->assertSame('previous archive', $adapter->files['archive/S213/S213.zip']);
-        $this->assertSame('https://memory.test/archive/S213/S213.zip', $study->fresh()->bagit_archive_link);
-        $this->assertArrayNotHasKey('archive/S213/stale-from-previous-run.txt', $adapter->files);
-        $this->assertArrayHasKey('archive/S213/bagit.txt', $adapter->files);
+        $this->assertSame('previous archive', $adapter->files['archive/S213.zip']);
+        $this->assertSame('https://memory.test/archive/S213.zip', $study->fresh()->bagit_archive_link);
+        $this->assertSame(['archive/S213.zip'], array_keys($adapter->files));
     }
 
     public function test_handle_marks_study_as_failed_when_archive_upload_is_rejected_by_the_disk(): void
@@ -370,8 +338,6 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'rejecting',
         ]);
 
@@ -405,8 +371,6 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -428,7 +392,6 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
         config([
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
         ]);
 
         $study = $this->makeStudy();
@@ -453,8 +416,6 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -487,8 +448,6 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
             'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'filesystems.default_public' => 'local',
         ]);
 
@@ -508,9 +467,9 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
         $this->assertSame('completed', $study->metadata_bagit_generation_status);
 
-        $disk = Storage::disk('local');
-        $this->assertFalse($disk->exists('spectra_parse/S213/data/S213/nmrxiv-meta/bio-schema.json'));
-        $this->assertTrue($disk->exists('spectra_parse/S213/data/S213/nmrxiv-meta/S213.nmrium'));
+        $entries = $this->zipEntryNames(Storage::disk('local')->path('archive/S213.zip'));
+        $this->assertNotContains('data/S213/nmrxiv-meta/bio-schema.json', $entries);
+        $this->assertContains('data/S213/nmrxiv-meta/S213.nmrium', $entries);
     }
 
     public function test_handle_logs_error_and_rethrows_when_download_fails(): void
@@ -855,6 +814,43 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
     /**
      * Storage::fake() always registers a 'local' driver, so a non-local disk has to be registered by hand.
      */
+    /**
+     * @return list<string>
+     */
+    private function zipEntryNames(string $zipPath): array
+    {
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($zipPath));
+
+        $names = [];
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $names[] = $zip->getNameIndex($i);
+        }
+        $zip->close();
+
+        return $names;
+    }
+
+    private function readZipEntry(string $zipPath, string $entry): string
+    {
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($zipPath));
+        $contents = $zip->getFromName($entry);
+        $zip->close();
+
+        $this->assertIsString($contents, "{$entry} is missing from {$zipPath}");
+
+        return $contents;
+    }
+
+    private function writeTempZip(string $contents): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'bagit-test-').'.zip';
+        file_put_contents($path, $contents);
+
+        return $path;
+    }
+
     private function registerMemoryDisk(string $name, InMemoryFlysystemAdapter $adapter): void
     {
         Storage::extend('memory', function ($app, $config) use ($adapter) {

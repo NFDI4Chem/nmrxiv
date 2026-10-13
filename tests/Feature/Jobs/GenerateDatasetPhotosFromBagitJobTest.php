@@ -16,11 +16,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use RuntimeException;
+use Tests\Support\WritesBagitZip;
 use Tests\TestCase;
 
 class GenerateDatasetPhotosFromBagitJobTest extends TestCase
 {
     use RefreshDatabase;
+    use WritesBagitZip;
 
     protected function setUp(): void
     {
@@ -29,8 +31,6 @@ class GenerateDatasetPhotosFromBagitJobTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
             'nmrxiv.spectra_parsing.queue' => 'metadata-extraction',
             'nmrxiv.spectra_parsing.backoff' => [15, 60, 180],
             'nmrxiv.spectra_parsing.job_tries' => 4,
@@ -106,6 +106,10 @@ class GenerateDatasetPhotosFromBagitJobTest extends TestCase
         // A disk configured with throw => false returns false instead of throwing.
         $failing = Mockery::mock(FilesystemAdapter::class);
         $failing->shouldReceive('put')->andReturn(false);
+        // The bag is read from the same public disk the photos are written to, so reads still reach the bag.
+        foreach (['exists', 'allFiles', 'files', 'get', 'readStream'] as $method) {
+            $failing->shouldReceive($method)->andReturnUsing(fn (...$args) => Storage::disk('local')->{$method}(...$args));
+        }
         Storage::set('failing', $failing);
         config(['filesystems.default_public' => 'failing']);
 
@@ -134,15 +138,17 @@ class GenerateDatasetPhotosFromBagitJobTest extends TestCase
 
     private function putBag(string $folderName, string $datasetName, string $imageBytes): void
     {
-        $metaDir = "spectra_parse/{$folderName}/data/StudyRoot/nmrxiv-meta";
+        $metaDir = 'data/StudyRoot/nmrxiv-meta';
 
-        Storage::disk('local')->put("{$metaDir}/StudyRoot.nmrium", json_encode([
-            'nmriumState' => ['data' => ['spectra' => [[
-                'id' => 'spec-1',
-                'sourceSelector' => ['files' => ["https://example.org/files/StudyRoot/{$datasetName}/acqus"]],
-            ]]]],
-        ]));
-        Storage::disk('local')->put("{$metaDir}/images/spec-1.png", $imageBytes);
+        $this->putBagZip($folderName, [
+            "{$metaDir}/StudyRoot.nmrium" => json_encode([
+                'nmriumState' => ['data' => ['spectra' => [[
+                    'id' => 'spec-1',
+                    'sourceSelector' => ['files' => ["https://example.org/files/StudyRoot/{$datasetName}/acqus"]],
+                ]]]],
+            ]),
+            "{$metaDir}/images/spec-1.png" => $imageBytes,
+        ]);
     }
 
     /**

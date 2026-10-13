@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Study;
+use App\Support\Bagit\BagitArchive;
 use App\Support\Bagit\DatasetPhotoBackfiller;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class BackfillDatasetPhotoFromBagit extends Command
@@ -53,13 +53,7 @@ class BackfillDatasetPhotoFromBagit extends Command
      */
     public function handle(DatasetPhotoBackfiller $backfiller): int
     {
-        $sourceDisk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
-        $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
-
-        $folders = collect($sourceDisk->directories($basePath))
-            ->map(fn (string $path) => basename($path))
-            ->filter(fn (string $name) => preg_match('/^S\d+$/i', $name) === 1)
-            ->values();
+        $folders = BagitArchive::studyFolders();
 
         if ($ids = $this->option('ids')) {
             $wanted = array_map(fn (string $id) => strtoupper(trim($id)), explode(',', $ids));
