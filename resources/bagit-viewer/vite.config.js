@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 import { prepareOfflineHtml } from './src/build/prepareOfflineHtml.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const version = process.env.BAGIT_VIEWER_VERSION || '1.0.0';
+const version = process.env.BAGIT_VIEWER_VERSION || '1.1.0';
 const buildDate = new Date().toISOString().slice(0, 10);
 
 /**
