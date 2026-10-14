@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ProcessDraft;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
-use App\Models\Project;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -119,7 +119,7 @@ class ProcessFiles implements ShouldBeUnique, ShouldQueue
      */
     private function handleMissingFilesRestored(): void
     {
-        $project = Project::where('draft_id', $this->draft->id)->first();
+        $project = app(ProcessDraft::class)->resolveDraftProject($this->draft);
 
         if (! $project) {
             Log::warning('No project found for draft '.$this->draft->id);

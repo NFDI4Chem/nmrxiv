@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Actions\Draft\ProcessDraft;
 use App\Models\Draft;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -18,7 +19,7 @@ class DraftPolicy
             return true;
         }
 
-        $project = $draft->project;
+        $project = app(ProcessDraft::class)->resolveDraftProject($draft);
 
         return $project !== null && $user->canUpdateProject($project);
     }

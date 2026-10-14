@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Draft\ProcessDraft;
 use App\Models\Draft;
-use App\Models\Project;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +12,8 @@ use Inertia\Inertia;
 
 class UploadController extends Controller
 {
+    public function __construct(private ProcessDraft $processDraft) {}
+
     public function upload(Request $request)
     {
         $draftId = $request->get('draft_id');
@@ -20,7 +22,7 @@ class UploadController extends Controller
             $draft = Draft::find((int) $draftId);
 
             if ($draft && $request->user()?->can('updateDraft', $draft)) {
-                $project = Project::where('draft_id', $draft->id)->first();
+                $project = $this->processDraft->resolveDraftProject($draft);
 
                 if ($project && $project->status !== 'draft') {
                     return redirect()->route('publish', ['draft' => $draft->id]);
@@ -39,7 +41,7 @@ class UploadController extends Controller
     {
         $this->authorize('updateDraft', $draft);
 
-        $project = Project::where('draft_id', $draft->id)->first();
+        $project = $this->processDraft->resolveDraftProject($draft);
 
         if (! $project) {
             return redirect()->route('upload', ['draft_id' => $draft->id]);
@@ -50,11 +52,23 @@ class UploadController extends Controller
         }
 
         $validation = $project->validation;
-        $validation->process();
+        $validation->process(project: $project);
+
+        $project->load([
+            'studies.datasets',
+            'studies.sample.molecules',
+            'studies.sample.mixtureComposition.components.molecule',
+            'owner',
+            'citations',
+            'fundingReferences',
+            'authors',
+            'tags',
+            'license',
+        ]);
 
         return Inertia::render('Publish', [
             'draft' => $draft,
-            'project' => Project::with(['studies.datasets', 'studies.sample.molecules', 'studies.sample.mixtureComposition.components.molecule', 'owner', 'citations', 'fundingReferences', 'authors', 'tags', 'license'])->where('draft_id', $draft->id)->first(),
+            'project' => $project,
             'validation' => $validation,
         ]);
     }

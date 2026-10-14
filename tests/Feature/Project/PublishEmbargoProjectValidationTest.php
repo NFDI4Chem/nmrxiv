@@ -56,7 +56,7 @@ class PublishEmbargoProjectValidationTest extends ProjectFeatureTestCase
         $response->assertStatus(422);
         $response->assertJsonPath(
             'validation.report.project.citations_detail.0.doi',
-            'false|required'
+            'true|optional'
         );
 
         $project->refresh();

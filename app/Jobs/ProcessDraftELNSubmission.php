@@ -231,6 +231,8 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $fileSystemController->processFolder($draftFolders, $draft, true, $logger);
 
             DB::transaction(function () use ($draft, $processDraft, $logger) {
+                Draft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
+
                 $user_id = $draft->owner_id;
                 $team_id = $draft->team_id;
                 $user = $draft->owner;
@@ -299,7 +301,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $logger->log($draft, 'info', 'Processing study metadata');
 
             // Get the project associated with this draft
-            $project = $draft->project;
+            $project = $processDraft->resolveDraftProject($draft);
             if (! $project) {
                 $logger->log($draft, 'error', 'No project found for draft');
 

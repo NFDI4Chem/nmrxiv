@@ -16,7 +16,6 @@ use App\Support\Draft\HifsaPdfResolver;
 use App\Support\ProvisionalDoi;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -67,10 +66,8 @@ class DraftController extends Controller
 
     /**
      * Process draft and convert to project structure.
-     *
-     * @return Response|JsonResponse|RedirectResponse
      */
-    public function process(Request $request, Draft $draft)
+    public function process(Request $request, Draft $draft): Response|JsonResponse
     {
         $this->authorize('updateDraft', $draft);
 
@@ -176,7 +173,7 @@ class DraftController extends Controller
     {
         $this->authorize('updateDraft', $draft);
 
-        $project = Project::where('draft_id', $draft->id)->first();
+        $project = $this->processDraft->resolveDraftProject($draft);
 
         if (! $project) {
             return response()->json([
@@ -186,10 +183,12 @@ class DraftController extends Controller
         }
 
         $validation = $project->validation;
-        $validation->process();
+        $validation->process(project: $project);
+
+        $project->load(['studies.datasets', 'owner', 'citations', 'authors', 'tags']);
 
         return response()->json([
-            'project' => Project::with(['studies.datasets', 'owner', 'citations', 'authors', 'tags'])->where('draft_id', $draft->id)->first(),
+            'project' => $project,
             'validation' => $validation,
         ]);
     }
@@ -201,7 +200,7 @@ class DraftController extends Controller
     {
         $this->authorize('updateDraft', $draft);
 
-        $project = Project::where('draft_id', $draft->id)->first();
+        $project = $this->processDraft->resolveDraftProject($draft);
 
         if (! $project) {
             return response()->json([
@@ -268,7 +267,7 @@ class DraftController extends Controller
     {
         $this->authorize('updateDraft', $draft);
 
-        $project = Project::where('draft_id', $draft->id)->first();
+        $project = $this->processDraft->resolveDraftProject($draft);
 
         if (! $project) {
             return response()->json([
@@ -321,7 +320,7 @@ class DraftController extends Controller
             $payload = DB::transaction(function () use ($draft, $user, $user_id, $team_id, $team): array {
                 Draft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
 
-                $project = Project::query()->where('draft_id', $draft->id)->first();
+                $project = $this->processDraft->resolveDraftProject($draft);
 
                 if (! $project) {
                     $project = $this->processDraft->createNewProject($draft, $user_id, $team_id, $user, $team);
@@ -357,7 +356,7 @@ class DraftController extends Controller
     {
         $this->authorize('updateDraft', $draft);
 
-        $project = Project::query()->where('draft_id', $draft->id)->first();
+        $project = $this->processDraft->resolveDraftProject($draft);
 
         if (! $project) {
             return response()->noContent();
