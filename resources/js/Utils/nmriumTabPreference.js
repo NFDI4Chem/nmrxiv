@@ -183,6 +183,49 @@ export function requestSelectTab(iframe, tab, targetOrigin) {
 }
 
 /**
+ * @param {Window} iframe
+ * @param {string[]} ids
+ * @param {string} targetOrigin
+ */
+export function requestHighlight(iframe, ids, targetOrigin) {
+    if (!iframe?.postMessage || !ids?.length) {
+        return;
+    }
+
+    // Vue stores these ids on reactive state. postMessage cannot clone a proxy.
+    const plainIds = Array.from(ids, (id) => String(id));
+
+    iframe.postMessage(
+        {
+            type: "nmr-wrapper:action-request",
+            data: {
+                type: "highlight",
+                params: { ids: plainIds },
+            },
+        },
+        targetOrigin
+    );
+}
+
+/**
+ * @param {Window} iframe
+ * @param {string} targetOrigin
+ */
+export function requestClearHighlight(iframe, targetOrigin) {
+    if (!iframe?.postMessage) {
+        return;
+    }
+
+    iframe.postMessage(
+        {
+            type: "nmr-wrapper:action-request",
+            data: { type: "clearHighlight" },
+        },
+        targetOrigin
+    );
+}
+
+/**
  * @param {{ props?: object }} page
  * @returns {string}
  */

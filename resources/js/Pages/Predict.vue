@@ -6,6 +6,42 @@
             <div class="relative">
                 <PublicSiteHeader />
 
+                <div
+                    class="border-b border-amber-200 bg-amber-50"
+                    role="status"
+                >
+                    <div
+                        class="mx-auto flex max-w-7xl items-start gap-3 px-4 py-4 sm:px-6 lg:px-8"
+                    >
+                        <ExclamationTriangleIcon
+                            class="mt-0.5 h-5 w-5 shrink-0 text-amber-600"
+                            aria-hidden="true"
+                        />
+                        <p class="text-sm leading-relaxed text-amber-950">
+                            <span class="font-semibold"
+                                >Experimental feature.</span
+                            >
+                            Please use NMR Spectrum Prediction with caution. It
+                            is still under development, and the results should
+                            be verified independently before you rely on them.
+                            If you need assistance, please contact us at
+                            <a
+                                href="mailto:info.nmrxiv@uni-jena.de?subject=NMR%20Spectrum%20Prediction"
+                                class="font-medium underline decoration-amber-400 underline-offset-2 hover:text-amber-800"
+                                >info.nmrxiv@uni-jena.de</a
+                            >
+                            or through the
+                            <a
+                                href="https://helpdesk.nfdi4chem.de/"
+                                class="font-medium underline decoration-amber-400 underline-offset-2 hover:text-amber-800"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                >NFDI4Chem Help Desk</a
+                            >.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                     <div class="mb-12 text-center">
                         <h1
@@ -270,7 +306,7 @@
                             </div>
                         </div>
 
-                        <!-- Results: structure (1) + NMRium (4) -->
+                        <!-- Results: 2D structure (left) + NMRium (right) -->
                         <div
                             v-if="showResults && !isPredicting"
                             class="relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl"
@@ -297,13 +333,11 @@
                                 </button>
                             </div>
                             <div
-                                class="grid grid-cols-1 items-start gap-4 p-4 pb-20 lg:grid-cols-5 sm:p-6 sm:pb-20"
+                                class="grid grid-cols-1 items-start gap-4 p-4 pb-20 sm:p-6 sm:pb-20 lg:grid-cols-10"
                             >
-                                <div
-                                    class="flex flex-col gap-3 self-start lg:col-span-1"
-                                >
+                                <div class="flex flex-col gap-3 lg:col-span-3">
                                     <div
-                                        class="flex flex-col rounded-md border border-gray-200 bg-gray-50 p-3"
+                                        class="flex min-h-[320px] flex-col rounded-md border border-gray-200 bg-white p-3"
                                     >
                                         <p
                                             class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500"
@@ -311,12 +345,14 @@
                                             Structure
                                         </p>
                                         <div
-                                            class="flex items-center justify-center overflow-hidden"
+                                            class="flex flex-1 items-center justify-center overflow-hidden"
                                         >
                                             <!-- OCL SVG is generated locally — do not run through sanitizeHtml (it strips <svg>). -->
                                             <div
                                                 v-if="predictedStructureSvg"
-                                                class="flex w-full max-w-full items-center justify-center [&_svg]:h-auto [&_svg]:max-w-full"
+                                                ref="structurePanel"
+                                                class="predict-mol flex w-full max-w-full items-center justify-center [&_svg]:h-auto [&_svg]:max-w-full"
+                                                @click="onStructureClick"
                                                 v-html="predictedStructureSvg"
                                             />
                                             <p
@@ -326,6 +362,11 @@
                                                 Structure unavailable
                                             </p>
                                         </div>
+                                        <p
+                                            class="mt-2 text-center text-xs text-gray-500"
+                                        >
+                                            Click an atom to highlight its peak
+                                        </p>
                                     </div>
                                     <div
                                         class="rounded-md border border-gray-200 bg-white p-3"
@@ -355,7 +396,7 @@
                                         </dl>
                                     </div>
                                 </div>
-                                <div class="min-w-0 lg:col-span-4">
+                                <div class="min-w-0 lg:col-span-7">
                                     <div
                                         v-if="predictedNuclei.length > 1"
                                         class="mb-2 flex flex-wrap gap-2"
@@ -425,6 +466,7 @@
 
 <script>
 import { Head } from "@inertiajs/vue3";
+import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 import { markRaw } from "vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 import Footer from "@/Shared/Footer.vue";
@@ -433,9 +475,15 @@ import OCL from "openchemlib";
 import { createStructureEditor } from "@/Utils/structureEditor";
 import {
     postNmriumLoad,
+    requestClearHighlight,
+    requestHighlight,
     requestSelectTab,
     resolveNmriumTargetOrigin,
 } from "@/Utils/nmriumTabPreference.js";
+import {
+    attachPredictionPeaks,
+    interactiveStructureSvg,
+} from "@/Utils/predictionHighlight.js";
 
 const SPECTRA_BY_TYPE = {
     "1h": ["proton"],
@@ -444,7 +492,6 @@ const SPECTRA_BY_TYPE = {
 };
 
 const PREDICT_TIMEOUT_MS = 130000;
-const PREDICTED_MOLECULE_ID = "predicted-molecule";
 
 /** Defaults match NMRKit nmrshift OpenAPI options. */
 const DEFAULT_NMRSHIFT_OPTIONS = {
@@ -464,6 +511,7 @@ const SPECTRUM_LABELS = {
 export default {
     components: {
         Head,
+        ExclamationTriangleIcon,
         FlashMessages,
         Footer,
         PublicSiteHeader,
@@ -487,6 +535,8 @@ export default {
             predictedNuclei: [],
             activePredictedTab: null,
             pendingNmriumPayload: null,
+            atomPeaks: null,
+            selectedAtomIndices: [],
             nmriumIframeReady: false,
             nmriumPayloadPosted: false,
             nmriumMessageHandler: null,
@@ -777,33 +827,13 @@ export default {
             }
 
             try {
-                const mol = OCL.Molecule.fromMolfile(molfile);
-                if (!mol || mol.getAllAtoms() < 1) {
-                    return "";
-                }
-
-                return mol.toSVG(280, 280);
+                return interactiveStructureSvg(molfile, OCL);
             } catch (error) {
                 console.error("Unable to render structure SVG:", error);
                 return "";
             }
         },
-        buildFloatingMoleculeView() {
-            return {
-                floating: {
-                    visible: true,
-                    bounding: {
-                        x: 10,
-                        y: 10,
-                        width: 160,
-                        height: 140,
-                    },
-                },
-                showLabel: true,
-                atomAnnotation: "none",
-            };
-        },
-        buildNmriumPayload(responseData, molfile) {
+        buildNmriumPayload(responseData) {
             const payload =
                 responseData && typeof responseData === "object"
                     ? JSON.parse(JSON.stringify(responseData))
@@ -813,28 +843,7 @@ export default {
                 payload.data = { spectra: [] };
             }
 
-            const normalizedMolfile = this.ensureMolfileHeader(
-                molfile,
-                "Structure"
-            );
-
-            payload.data.molecules = [
-                {
-                    id: PREDICTED_MOLECULE_ID,
-                    label: "Structure",
-                    molfile: normalizedMolfile,
-                },
-            ];
-
-            if (!payload.view || typeof payload.view !== "object") {
-                payload.view = {};
-            }
-
-            payload.view.molecules = {
-                [PREDICTED_MOLECULE_ID]: this.buildFloatingMoleculeView(),
-            };
-
-            // Collapse the NMRium side panel/bar completely for this view.
+            // Spectrum only. The 2D structure lives beside the iframe.
             payload.settings = {
                 display: {
                     general: {
@@ -849,7 +858,63 @@ export default {
                 },
             };
 
+            this.atomPeaks = attachPredictionPeaks(payload, {
+                frequency: DEFAULT_NMRSHIFT_OPTIONS.frequency,
+                lineWidth: DEFAULT_NMRSHIFT_OPTIONS.lineWidth,
+                tolerance: DEFAULT_NMRSHIFT_OPTIONS.tolerance,
+            });
+
             return payload;
+        },
+        onStructureClick(event) {
+            const hit = event.target?.closest?.(".atom-hit");
+            if (!hit || !event.currentTarget.contains(hit)) {
+                return;
+            }
+
+            const atom = Number(hit.getAttribute("data-atom"));
+            if (Number.isFinite(atom)) {
+                this.selectAtom(atom);
+            }
+        },
+        markStructureSelection(atomIndices) {
+            this.selectedAtomIndices = Array.isArray(atomIndices)
+                ? atomIndices.slice()
+                : [];
+            const selected = new Set(this.selectedAtomIndices);
+            const panel = this.$refs.structurePanel;
+            if (!panel) {
+                return;
+            }
+
+            panel
+                .querySelectorAll(".atom-glow, .atom-hit")
+                .forEach((element) => {
+                    const atom = Number(element.getAttribute("data-atom"));
+                    element.classList.toggle("is-selected", selected.has(atom));
+                });
+        },
+        selectAtom(index) {
+            const atomIndex = Number(index);
+            if (!Number.isFinite(atomIndex) || atomIndex < 1) {
+                return;
+            }
+
+            const peak = this.atomPeaks?.get?.(atomIndex);
+            const iframe = this.predictionNmriumWindow();
+            const origin = this.nmriumTargetOrigin();
+
+            if (!peak) {
+                requestClearHighlight(iframe, origin);
+                this.markStructureSelection([]);
+                return;
+            }
+
+            if (peak.nucleus) {
+                this.selectPredictedSpectrumTab(peak.nucleus);
+            }
+            requestHighlight(iframe, peak.highlightIds, origin);
+            this.markStructureSelection(peak.atoms);
         },
         formatNucleusLabel(nucleus) {
             if (nucleus === "1H") {
@@ -903,7 +968,7 @@ export default {
             this.predictedMolfile = normalizedMolfile;
             this.predictedStructureSvg = this.molfileToSvg(normalizedMolfile);
             this.pendingNmriumPayload = markRaw(
-                this.buildNmriumPayload(responseData, normalizedMolfile)
+                this.buildNmriumPayload(responseData)
             );
             this.predictedNuclei = this.nucleiFromPayload(
                 this.pendingNmriumPayload
@@ -918,6 +983,8 @@ export default {
             this.predictedNuclei = [];
             this.activePredictedTab = null;
             this.pendingNmriumPayload = null;
+            this.atomPeaks = null;
+            this.selectedAtomIndices = [];
             this.nmriumIframeReady = false;
             this.nmriumPayloadPosted = false;
             this.errorMessage = "";
@@ -938,6 +1005,9 @@ export default {
                 if (typeof detail === "string" && detail.trim() !== "") {
                     return detail;
                 }
+                if (this.isPredictionServiceFailure(detail)) {
+                    return "The prediction service is temporarily unavailable. Please try again.";
+                }
                 if (
                     detail &&
                     typeof detail === "object" &&
@@ -946,10 +1016,18 @@ export default {
                 ) {
                     return "Prediction failed for this structure. Try a single spectrum type, or simplify the structure.";
                 }
+                const message = error?.response?.data?.message;
+                if (typeof message === "string" && message.trim() !== "") {
+                    return message;
+                }
                 return "Invalid structure or prediction error. Check the structure and try again.";
             }
 
-            if (status === 500) {
+            if (status === 500 || status === 503) {
+                const message = error?.response?.data?.message;
+                if (typeof message === "string" && message.trim() !== "") {
+                    return message;
+                }
                 return "Prediction service is temporarily unavailable.";
             }
 
@@ -962,6 +1040,16 @@ export default {
             }
 
             return "Unable to reach the prediction service. Please try again.";
+        },
+        isPredictionServiceFailure(detail) {
+            const text =
+                typeof detail === "string"
+                    ? detail
+                    : JSON.stringify(detail || "");
+
+            return /ECONNREFUSED|ECONNRESET|ENOTFOUND|NMR CLI command failed|certificate/i.test(
+                text
+            );
         },
         mergeNmriumPredictions(payloads) {
             const merged = {
@@ -1058,6 +1146,8 @@ export default {
             this.predictedNuclei = [];
             this.activePredictedTab = null;
             this.pendingNmriumPayload = null;
+            this.atomPeaks = null;
+            this.selectedAtomIndices = [];
             this.nmriumPayloadPosted = false;
             this.nmriumIframeReady = false;
 
@@ -1084,3 +1174,39 @@ export default {
     },
 };
 </script>
+
+<style>
+.predict-mol .atom-glow {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.predict-mol .atom-glow.is-selected {
+    opacity: 1;
+    filter: blur(2.5px);
+}
+
+.predict-mol .atom-hit {
+    cursor: pointer;
+    fill: transparent;
+    stroke: none;
+    transition: fill 0.12s ease;
+}
+
+.predict-mol .atom-hit:hover {
+    fill: hsl(48 100% 50% / 0.18);
+}
+
+.predict-mol .atom-hit[data-elem="H"]:hover {
+    fill: hsl(199 70% 60% / 0.22);
+}
+
+.predict-mol .atom-hit[data-elem="O"]:hover {
+    fill: hsl(6 78% 57% / 0.2);
+}
+
+.predict-mol .atom-hit[data-elem="N"]:hover {
+    fill: hsl(217 70% 60% / 0.2);
+}
+</style>

@@ -74,6 +74,11 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Each public prediction calls NMRShiftDB, then NMRKit when that host is unreachable.
+        RateLimiter::for('nmr-prediction', function (Request $request) {
+            return Limit::perMinute(30)->by($request->ip());
+        });
+
         // Each public Quickcheck calls the shared prediction service.
         RateLimiter::for('assignment-quickcheck', function (Request $request) {
             return [
