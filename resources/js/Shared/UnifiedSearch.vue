@@ -610,7 +610,7 @@ export default {
             validator: (value) => ["button", "hero"].includes(value),
         },
     },
-    emits: ["search-type-selected"],
+    emits: ["search-type-selected", "hero-search-type"],
     setup(props, { emit }) {
         const { meta, k } = useMagicKeys();
         const open = ref(false);
@@ -700,6 +700,8 @@ export default {
                 if (props.variant !== "hero") {
                     return;
                 }
+
+                emit("hero-search-type", newType);
 
                 const url = new URL(window.location.href);
                 url.searchParams.set("tab", newType);

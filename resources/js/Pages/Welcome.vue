@@ -53,13 +53,20 @@
                         </nav>
                     </template>
                 </PublicSiteHeader>
+                <ExperimentalFeatureBanner
+                    v-if="heroSearchTab === 'spectra'"
+                    feature="Spectra similarity search"
+                />
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="relative py-20 sm:py-24 lg:py-32">
                         <div class="text-center">
                             <h1 class="sr-only">
                                 nmrXiv — Open NMR data repository
                             </h1>
-                            <UnifiedSearch variant="hero" />
+                            <UnifiedSearch
+                                variant="hero"
+                                @hero-search-type="heroSearchTab = $event"
+                            />
 
                             <!-- Quick Links -->
                             <div
@@ -304,6 +311,7 @@ import Footer from "@/Shared/Footer.vue";
 import PublicSiteHeader from "@/Shared/PublicSiteHeader.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
 import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
+import ExperimentalFeatureBanner from "@/Shared/ExperimentalFeatureBanner.vue";
 import {
     ChatBubbleLeftRightIcon,
     HeartIcon,
@@ -325,6 +333,14 @@ import {
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
+
+function heroSearchTabFromLocation() {
+    if (typeof window === "undefined") {
+        return "metadata";
+    }
+
+    return new URL(window.location.href).searchParams.get("tab") || "metadata";
+}
 
 const Search = [
     {
@@ -389,6 +405,7 @@ export default {
         FlashMessages,
         StructureSearch,
         UnifiedSearch,
+        ExperimentalFeatureBanner,
         Footer,
     },
 
@@ -410,6 +427,7 @@ export default {
     data() {
         return {
             schema: {},
+            heroSearchTab: heroSearchTabFromLocation(),
         };
     },
 

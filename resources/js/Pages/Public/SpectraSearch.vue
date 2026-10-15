@@ -1,6 +1,7 @@
 <template>
     <app-layout :title="pageTitle">
         <template #header>
+            <ExperimentalFeatureBanner feature="Spectra similarity search" />
             <div class="relative overflow-hidden border-b border-zinc-900/5">
                 <div
                     class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
@@ -372,6 +373,7 @@ import PeakListSearchContent from "@/Shared/PeakListSearchContent.vue";
 import PeakMatchPlot from "@/Shared/PeakMatchPlot.vue";
 import TextSearchSectionPagination from "@/Shared/TextSearchSectionPagination.vue";
 import EmptySearchState from "@/Shared/EmptySearchState.vue";
+import ExperimentalFeatureBanner from "@/Shared/ExperimentalFeatureBanner.vue";
 import {
     emptySpectraResults,
     fetchSpectrumSearch,
@@ -397,6 +399,7 @@ export default {
         PeakMatchPlot,
         TextSearchSectionPagination,
         EmptySearchState,
+        ExperimentalFeatureBanner,
     },
     props: {
         initialParams: {
