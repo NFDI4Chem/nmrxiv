@@ -269,7 +269,9 @@ class BioschemasControllerTest extends TestCase
         $response = $this->getJson('/api/v1/schemas/bioschemas/P33333');
 
         $response->assertStatus(200);
-        $response->assertJsonPath('license', $license->url);
+        $response->assertJsonPath('license.@type', 'CreativeWork');
+        $response->assertJsonPath('license.name', 'CC BY 4.0');
+        $response->assertJsonPath('license.url', $license->url);
     }
 
     /**
