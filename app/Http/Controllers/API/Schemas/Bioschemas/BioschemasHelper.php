@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Models\Dataset;
 use App\Models\FileSystemObject;
+use App\Models\License;
 use App\Models\NMRium;
 use Illuminate\Support\Facades\DB;
 use Spatie\SchemaOrg\Schema;
@@ -243,6 +244,29 @@ class BioschemasHelper
         $DataDownloadSchema->contentURL($contentURL);
 
         return $DataDownloadSchema;
+    }
+
+    /**
+     * Use Schema.org CreativeWork to describe a license, so consumers get both
+     * the license title and its URL (schema.org `license` accepts a URL or a
+     * CreativeWork).
+     *
+     * @link https://schema.org/license
+     */
+    public static function prepareLicense(?License $license)
+    {
+        if (! $license) {
+            return null;
+        }
+
+        $licenseSchema = Schema::CreativeWork();
+        $licenseSchema->name($license->title);
+        $licenseSchema->url($license->url);
+        if ($license->spdx_id) {
+            $licenseSchema->identifier($license->spdx_id);
+        }
+
+        return $licenseSchema;
     }
 
     /**
