@@ -44,6 +44,26 @@ class PublicSearchController extends Controller
             ]);
         }
 
+        if ($scope === 'spectra') {
+            return Inertia::render('Public/SpectraSearch', [
+                'scope' => 'spectra',
+                'initialParams' => array_filter([
+                    'peaks' => collect((array) $request->query('peaks', []))
+                        ->filter(fn ($value) => is_string($value) && $value !== '')
+                        ->all(),
+                    'mode' => $request->query('mode'),
+                    'closeness' => $request->query('closeness'),
+                    'solvent' => $request->query('solvent'),
+                    'same_solvent' => $request->query('same_solvent'),
+                    'ignore_solvent_peaks' => $request->query('ignore_solvent_peaks'),
+                    'allow_offset' => $request->query('allow_offset'),
+                    'group' => $request->query('group'),
+                    'page' => $request->query('page'),
+                ], fn ($value) => $value !== null && $value !== '' && $value !== []),
+                'perPage' => max(1, min(24, (int) $request->query('per_page', 12))),
+            ]);
+        }
+
         return Inertia::render('Public/TextSearch', [
             'scope' => 'catalog',
             'initialQuery' => (string) $request->query('q', ''),

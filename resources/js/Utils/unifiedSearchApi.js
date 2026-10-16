@@ -5,7 +5,79 @@ export const SEARCH_SCOPE = {
     CATALOG: "catalog",
     COMPOUNDS: "compounds",
     METADATA: "metadata",
+    SPECTRA: "spectra",
 };
+
+const SPECTRA_PARAM_KEYS = [
+    "mode",
+    "closeness",
+    "solvent",
+    "same_solvent",
+    "ignore_solvent_peaks",
+    "allow_offset",
+    "group",
+];
+
+export const emptySpectraResults = () => ({
+    query: {},
+    results: {
+        data: [],
+        meta: { total: 0, current_page: 1, per_page: 12, last_page: 1 },
+    },
+});
+
+/**
+ * Chemical shift search. A 404 means no matches and resolves to empty results.
+ *
+ * @param {object} params API params (peaks per nucleus, mode, closeness, ...)
+ */
+export async function fetchSpectrumSearch(params) {
+    try {
+        const { data } = await axios.get("/api/v1/search/spectra", { params });
+
+        return data;
+    } catch (error) {
+        if (error?.response?.status === 404) {
+            return {
+                ...emptySpectraResults(),
+                query: error.response.data?.query ?? {},
+            };
+        }
+
+        throw error;
+    }
+}
+
+/**
+ * Read pasted peaks (lists, nmrshiftdb lines or ACS text) into rows per nucleus.
+ *
+ * @param {{text: string, nucleus: string, rule?: string}} payload
+ */
+export async function parsePeakText(payload) {
+    const { data } = await axios.post("/api/v1/search/spectra/peaks", payload);
+
+    return data;
+}
+
+/**
+ * Example peaks from a random public sample.
+ */
+export async function fetchSpectrumExample() {
+    const { data } = await axios.get("/api/v1/search/spectra/example");
+
+    return data;
+}
+
+/**
+ * @param {object} params
+ */
+export function syncSpectraBrowserUrl(params) {
+    window.history.replaceState(
+        null,
+        "",
+        buildSearchPagePath(SEARCH_SCOPE.SPECTRA, params)
+    );
+}
 
 export const emptyCatalogSection = () => ({
     data: [],
@@ -402,6 +474,23 @@ export function buildSearchPagePath(scope, params = {}) {
         }
         if (params.datasets_page > 1) {
             search.set("datasets_page", String(params.datasets_page));
+        }
+    } else if (scope === SEARCH_SCOPE.SPECTRA) {
+        for (const [nucleus, encoded] of Object.entries(params.peaks ?? {})) {
+            if (encoded) {
+                search.set(`peaks[${nucleus}]`, encoded);
+            }
+        }
+
+        for (const key of SPECTRA_PARAM_KEYS) {
+            const value = params[key];
+            if (value !== null && value !== undefined && value !== "") {
+                search.set(key, String(value));
+            }
+        }
+
+        if (params.page > 1) {
+            search.set("page", String(params.page));
         }
     }
 
