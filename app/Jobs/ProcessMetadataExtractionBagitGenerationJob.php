@@ -6,8 +6,9 @@ use App\Models\Study;
 use App\Models\User;
 use App\Notifications\BagitGenerationFailedNotification;
 use App\Notifications\BagitGenerationSucceededNotification;
+use App\Support\Bagit\BagitArchive;
+use App\Support\Bagit\StudyCitationCff;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,7 +16,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Throwable;
@@ -106,6 +106,8 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             Log::info("Successfully processed study {$study->id} ({$study->identifier}): {$result['imageCount']} images saved to {$result['location']}");
 
+            $this->dispatchDatasetPhotoGeneration($study);
+
             if ($study->owner) {
                 Notification::send($study->owner, new BagitGenerationSucceededNotification(
                     $study->fresh(),
@@ -124,6 +126,19 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * Queue the dataset photo step now that the bag exists. The bag is already
+     * complete at this point, so nothing here may fail or retry this job.
+     */
+    protected function dispatchDatasetPhotoGeneration(Study $study): void
+    {
+        try {
+            GenerateDatasetPhotosFromBagitJob::dispatch($study->id);
+        } catch (Throwable $e) {
+            Log::warning("Could not generate dataset photos for study {$study->id}: {$e->getMessage()}");
         }
     }
 
@@ -168,17 +183,12 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
     {
         // Remove NMRXIV: prefix if present (e.g., "NMRXIV:S1295" -> "S1295")
         $studyIdentifier = str_replace('NMRXIV:', '', $study->identifier);
-        $diskName = config('nmrxiv.spectra_parsing.storage_disk', 'local');
-        $disk = Storage::disk($diskName);
-        $isLocalDisk = config("filesystems.disks.{$diskName}.driver") === 'local';
-        $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
-        $baseDir = "{$basePath}/{$studyIdentifier}";
         $zipPath = null;
         $archiveZipPath = null;
 
-        // The bag is always assembled with native filesystem calls, so remote disks need a real local staging directory.
-        $tempWorkRoot = $isLocalDisk ? null : storage_path('app/bagit_work_'.uniqid());
-        $workBaseDir = $isLocalDisk ? $disk->path($baseDir) : "{$tempWorkRoot}/{$studyIdentifier}";
+        // The bag is assembled in a throwaway local directory; the zip uploaded to the public archive is its only stored copy.
+        $tempWorkRoot = storage_path('app/bagit_work_'.uniqid());
+        $workBaseDir = "{$tempWorkRoot}/{$studyIdentifier}";
         $workDataDir = "{$workBaseDir}/data";
 
         try {
@@ -248,12 +258,15 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             }
 
             // Save S{identifier}.nmrium (full API response with base64 images intact)
-            $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $formattedJson = json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             file_put_contents("{$metaDir}/{$studyIdentifier}.nmrium", $formattedJson);
+
+            // Save CITATION.cff so the download says how to cite it
+            file_put_contents("{$metaDir}/".StudyCitationCff::FILE_NAME, StudyCitationCff::build($study));
 
             // Save bio-schema.json
             if ($bioSchema !== null) {
-                $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                $bioSchemaJson = json_encode($bioSchema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 file_put_contents("{$metaDir}/bio-schema.json", $bioSchemaJson);
             }
 
@@ -261,9 +274,10 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             Log::info('Step 6/7: Generating BagIt manifests...');
             $this->generateBagItManifests($workBaseDir);
 
+            $archiveKey = BagitArchive::archiveKey($studyIdentifier);
+
             $archiveZipPath = $this->createBagItArchive($workBaseDir, $studyIdentifier);
-            $archiveKey = 'archive/'.$studyIdentifier.'/'.$studyIdentifier.'.zip';
-            $archiveDisk = Storage::disk(config('filesystems.default_public', 'local'));
+            $archiveDisk = BagitArchive::publicDisk();
             $archiveStream = fopen($archiveZipPath, 'rb');
             if ($archiveStream === false) {
                 throw new \RuntimeException("Failed to open archive for upload: {$archiveZipPath}");
@@ -274,12 +288,6 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             if ($archiveUploaded === false) {
                 throw new \RuntimeException("Failed to upload BagIt archive to disk: {$archiveKey}");
-            }
-
-            if (! $isLocalDisk) {
-                // The staging directory is fresh on every run, so stale remote files must be dropped explicitly.
-                $disk->deleteDirectory($baseDir);
-                $this->uploadDirectory($workBaseDir, $disk, $baseDir);
             }
 
             $archiveUrl = $archiveDisk->url($archiveKey);
@@ -293,7 +301,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
 
             return [
                 'imageCount' => $imageCount,
-                'location' => $isLocalDisk ? $workBaseDir : $baseDir,
+                'location' => $archiveKey,
                 'archiveUrl' => $archiveUrl,
             ];
         } finally {
@@ -307,40 +315,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 @unlink($archiveZipPath);
             }
 
-            if ($tempWorkRoot) {
-                $this->deleteLocalDirectory($tempWorkRoot);
-            }
-        }
-    }
-
-    /**
-     * Mirror a locally assembled directory tree onto the configured storage disk.
-     */
-    protected function uploadDirectory(string $localPath, Filesystem $disk, string $remotePath): void
-    {
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($localPath, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $file) {
-            if (! $file->isFile()) {
-                continue;
-            }
-
-            $relativePath = ltrim(str_replace($localPath, '', $file->getPathname()), '/');
-            $stream = fopen($file->getPathname(), 'rb');
-
-            if ($stream === false) {
-                throw new \RuntimeException("Failed to open file for upload: {$file->getPathname()}");
-            }
-
-            $uploaded = $disk->put("{$remotePath}/{$relativePath}", $stream);
-            fclose($stream);
-
-            if ($uploaded === false) {
-                throw new \RuntimeException("Failed to upload bag file to disk: {$remotePath}/{$relativePath}");
-            }
+            $this->deleteLocalDirectory($tempWorkRoot);
         }
     }
 
@@ -641,7 +616,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             $bag->setAlgorithm('sha256');
 
             if (! $bag->hasBagInfoTag('Bag-Software-Agent')) {
-                $bag->addBagInfoTag('Bag-Software-Agent', 'nmrXiv/1.0');
+                $bag->addBagInfoTag('Bag-Software-Agent', $this->softwareAgent());
             }
 
             // Writes bagit.txt, manifest-sha256.txt, bag-info.txt and tagmanifest-sha256.txt.
@@ -654,6 +629,14 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
             // Fallback: Generate manually
             $this->generateBagItManually($bagPath);
         }
+    }
+
+    /**
+     * The Bag-Software-Agent value: nmrXiv and the current release version.
+     */
+    protected function softwareAgent(): string
+    {
+        return 'nmrXiv/'.config('nmrxiv.version');
     }
 
     /**
@@ -689,7 +672,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
         // Create bag-info.txt
         $bagInfoContent = 'Payload-Oxum: '.$this->calculatePayloadOxum($dataPath)."\n";
         $bagInfoContent .= 'Bagging-Date: '.date('Y-m-d')."\n";
-        $bagInfoContent .= "Bag-Software-Agent: Laravel-Queue-ProcessStudySpectraJob/1.0\n";
+        $bagInfoContent .= 'Bag-Software-Agent: '.$this->softwareAgent()."\n";
         file_put_contents($bagPath.'/bag-info.txt', $bagInfoContent);
 
         // Create tagmanifest-sha256.txt

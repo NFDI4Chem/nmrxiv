@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    |
+    | Kept in sync with the latest release by release-please (see the marker
+    | comment). Written into generated BagIt archives as Bag-Software-Agent.
+    |
+    */
+
+    'version' => '2.5.0', // x-release-please-version
+
+    /*
+    |--------------------------------------------------------------------------
     | Cool Off Period
     |--------------------------------------------------------------------------
     |
@@ -42,10 +54,6 @@ return [
         // API Endpoints
         'nmrkit_api_url' => env('NMRKIT_API_URL', 'https://nmrkit.nmrxiv.org/latest/spectra/parse/url'),
         'bioschema_api_url' => env('BIOSCHEMA_API_URL', 'https://nmrxiv.org/api/v1/schemas/bioschemas'),
-
-        // Storage Configuration
-        'storage_disk' => env('SPECTRA_STORAGE_DISK', 'local'),
-        'storage_path' => env('SPECTRA_STORAGE_PATH', 'spectra_parse'),
 
         // Queue Configuration
         'queue' => env('SPECTRA_QUEUE', 'metadata-extraction'),
@@ -113,6 +121,25 @@ return [
         'backoff' => array_map('intval', explode(',', env('ASSIGNMENT_VALIDATION_BACKOFF', '60,300,900'))),
         'public_per_minute' => (int) env('ASSIGNMENT_QUICKCHECK_PER_MINUTE', 6),
         'max_file_kb' => (int) env('ASSIGNMENT_VALIDATION_MAX_FILE_KB', 2048),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Zip Extraction
+    |--------------------------------------------------------------------------
+    |
+    | Limits applied to zip archives extracted on the server (submission
+    | uploads and ELN imports). Archives exceeding any limit are rejected
+    | before anything is written to storage.
+    |
+    */
+
+    'zip_extraction' => [
+        'queue' => env('ZIP_EXTRACTION_QUEUE', 'default'),
+        'job_timeout' => (int) env('ZIP_EXTRACTION_JOB_TIMEOUT', 3600),
+        'max_entries' => (int) env('ZIP_EXTRACTION_MAX_ENTRIES', 20000),
+        'max_uncompressed_bytes' => (int) env('ZIP_EXTRACTION_MAX_UNCOMPRESSED_BYTES', 50 * 1024 * 1024 * 1024),
+        'max_compression_ratio' => (int) env('ZIP_EXTRACTION_MAX_COMPRESSION_RATIO', 100),
     ],
 
 ];

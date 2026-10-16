@@ -34,7 +34,7 @@
                 >
                     <div
                         v-show="show"
-                        class="mb-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                        class="relative z-10 mb-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                         :class="maxWidthClass"
                     >
                         <slot v-if="show"></slot>

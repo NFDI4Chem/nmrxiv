@@ -3,23 +3,22 @@
 namespace App\Support\Bagit;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 /**
- * Opens a bag folder once — whether it's a loose data/*\/nmrxiv-meta/ folder
- * tree or a single archived {folder}.zip (the output of
- * nmrxiv:backfill-bagit-archives, how bags actually live on the public
- * bucket) — and lets callers cheaply read the .nmrium JSON and individual
- * spectrum preview images (from nmrxiv-meta/images/{id}.png) without
- * re-downloading/re-opening the zip per read.
+ * Opens a study's bag once and lets callers cheaply read the .nmrium JSON and
+ * individual spectrum preview images (from nmrxiv-meta/images/{id}.png)
+ * without re-downloading/re-opening the zip per read.
+ *
+ * A study's one stored copy is archive/{folder}.zip on the public disk.
  */
 class BagitArchive
 {
-    private bool $isZip = false;
+    public const ARCHIVE_DIR = 'archive';
 
     private ?string $nmriumMetaDir = null;
-
-    private ?string $nmriumFilePath = null;
 
     private ?string $nmriumEntryName = null;
 
@@ -29,45 +28,50 @@ class BagitArchive
 
     private function __construct(private Filesystem $disk) {}
 
-    public static function open(Filesystem $disk, string $bagDir): ?self
+    /**
+     * Where a study's one and only BagIt copy lives on the public disk.
+     */
+    public static function archiveKey(string $folderName): string
     {
-        $archive = new self($disk);
-
-        if ($archive->openLoose($bagDir) || $archive->openZip($bagDir)) {
-            return $archive;
-        }
-
-        return null;
+        return self::ARCHIVE_DIR.'/'.$folderName.'.zip';
     }
 
-    private function openLoose(string $bagDir): bool
+    public static function publicDisk(): Filesystem
     {
-        $matches = collect($this->disk->allFiles($bagDir))
-            ->filter(fn (string $path) => str_ends_with(strtolower($path), '.nmrium')
-                && str_contains($path, '/nmrxiv-meta/'))
-            ->values();
+        return Storage::disk(config('filesystems.default_public', 'local'));
+    }
 
-        if ($matches->count() !== 1) {
+    /**
+     * Open a study's bag from archive/{folder}.zip on the public disk.
+     */
+    public static function forStudy(string $folderName): ?self
+    {
+        $archive = new self(self::publicDisk());
+
+        return $archive->openZipFile(self::archiveKey($folderName)) ? $archive : null;
+    }
+
+    /**
+     * Study folder names (S1, S2, ...) that have a bag in the public archive.
+     *
+     * @return Collection<int, string>
+     */
+    public static function studyFolders(): Collection
+    {
+        return collect(self::publicDisk()->files(self::ARCHIVE_DIR))
+            ->map(fn (string $path) => basename($path))
+            ->filter(fn (string $name) => preg_match('/^S\d+\.zip$/i', $name) === 1)
+            ->map(fn (string $name) => substr($name, 0, -4))
+            ->values();
+    }
+
+    private function openZipFile(string $zipKey): bool
+    {
+        if (! $this->disk->exists($zipKey)) {
             return false;
         }
 
-        $this->nmriumFilePath = $matches->first();
-        $this->nmriumMetaDir = dirname($this->nmriumFilePath);
-
-        return true;
-    }
-
-    private function openZip(string $bagDir): bool
-    {
-        $zipFiles = collect($this->disk->files($bagDir))
-            ->filter(fn (string $path) => str_ends_with(strtolower($path), '.zip'))
-            ->values();
-
-        if ($zipFiles->count() !== 1) {
-            return false;
-        }
-
-        $stream = $this->disk->readStream($zipFiles->first());
+        $stream = $this->disk->readStream($zipKey);
         if ($stream === null) {
             return false;
         }
@@ -102,39 +106,28 @@ class BagitArchive
         }
 
         $this->zip = $zip;
-        $this->isZip = true;
 
         return true;
     }
 
     public function readNmrium(): ?string
     {
-        if ($this->isZip) {
-            $contents = $this->zip->getFromName($this->nmriumEntryName);
+        $contents = $this->zip->getFromName($this->nmriumEntryName);
 
-            return $contents === false ? null : $contents;
-        }
-
-        return $this->disk->get($this->nmriumFilePath);
+        return $contents === false ? null : $contents;
     }
 
     /**
-     * Read a spectrum's rendered preview PNG straight from the bag's loose
+     * Read a spectrum's rendered preview PNG straight from the bag's
      * nmrxiv-meta/images/{spectrumId}.png — no base64 decoding needed, since
      * this reads the raw file NMRKit already saved, rather than the base64
      * copy embedded inside the (often multi-MB) .nmrium JSON.
      */
     public function readImage(string $spectrumId): ?string
     {
-        $relativePath = $this->nmriumMetaDir.'/images/'.$spectrumId.'.png';
+        $contents = $this->zip->getFromName($this->nmriumMetaDir.'/images/'.$spectrumId.'.png');
 
-        if ($this->isZip) {
-            $contents = $this->zip->getFromName($relativePath);
-
-            return $contents === false ? null : $contents;
-        }
-
-        return $this->disk->exists($relativePath) ? $this->disk->get($relativePath) : null;
+        return $contents === false ? null : $contents;
     }
 
     public function close(): void

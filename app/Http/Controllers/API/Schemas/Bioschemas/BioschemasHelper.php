@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Models\Dataset;
 use App\Models\FileSystemObject;
+use App\Models\License;
 use App\Models\NMRium;
 use Illuminate\Support\Facades\DB;
 use Spatie\SchemaOrg\Schema;
@@ -141,6 +142,82 @@ class BioschemasHelper
     }
 
     /**
+     * Use Schema.org Person type for an attribution entry from {@see StudyAttribution}.
+     * The email is deliberately left out of the public schema.
+     *
+     * @link https://schema.org/Person
+     */
+    public static function prepareAttributionPerson(array $person)
+    {
+        $personSchema = Schema::Person();
+        $name = trim(($person['given_name'] ?? '').' '.($person['family_name'] ?? ''));
+
+        if ($name !== '') {
+            $personSchema->name($name);
+        }
+        if (! empty($person['given_name'])) {
+            $personSchema->givenName($person['given_name']);
+        }
+        if (! empty($person['family_name'])) {
+            $personSchema->familyName($person['family_name']);
+        }
+        if (! empty($person['orcid'])) {
+            $personSchema->identifier($person['orcid']);
+            $personSchema->sameAs($person['orcid']);
+        }
+        if (! empty($person['affiliation'])) {
+            $personSchema->affiliation($person['affiliation']);
+        }
+
+        return $personSchema;
+    }
+
+    /**
+     * Wrap an attribution person in a schema.org Role so the author's contribution
+     * (e.g. Researcher, DataCurator) is stated. Without a role the Person is returned as is.
+     *
+     * @link https://schema.org/Role
+     */
+    public static function prepareAttributionAuthor(array $person)
+    {
+        $personSchema = self::prepareAttributionPerson($person);
+
+        if (empty($person['role'])) {
+            return $personSchema;
+        }
+
+        $roleSchema = Schema::Role();
+        $roleSchema->roleName($person['role']);
+        $roleSchema->setProperty('author', $personSchema);
+
+        return $roleSchema;
+    }
+
+    /**
+     * Use Schema.org ScholarlyArticle type for an attribution citation from {@see StudyAttribution}.
+     *
+     * @link https://schema.org/ScholarlyArticle
+     */
+    public static function prepareAttributionCitation(array $citation)
+    {
+        $citationSchema = Schema::ScholarlyArticle();
+
+        if (! empty($citation['title'])) {
+            $citationSchema->name($citation['title']);
+            $citationSchema->headline($citation['title']);
+        }
+        if (! empty($citation['doi'])) {
+            $citationSchema->identifier($citation['doi']);
+            $citationSchema->sameAs('https://doi.org/'.$citation['doi']);
+        }
+        if (! empty($citation['authors'])) {
+            $citationSchema->author($citation['authors']);
+        }
+
+        return $citationSchema;
+    }
+
+    /**
      * Use Schema.org DataDownload type to represent Dataset download details.
      *
      * @link https://schema.org/DataDownload
@@ -167,6 +244,29 @@ class BioschemasHelper
         $DataDownloadSchema->contentURL($contentURL);
 
         return $DataDownloadSchema;
+    }
+
+    /**
+     * Use Schema.org CreativeWork to describe a license, so consumers get both
+     * the license title and its URL (schema.org `license` accepts a URL or a
+     * CreativeWork).
+     *
+     * @link https://schema.org/license
+     */
+    public static function prepareLicense(?License $license)
+    {
+        if (! $license) {
+            return null;
+        }
+
+        $licenseSchema = Schema::CreativeWork();
+        $licenseSchema->name($license->title);
+        $licenseSchema->url($license->url);
+        if ($license->spdx_id) {
+            $licenseSchema->identifier($license->spdx_id);
+        }
+
+        return $licenseSchema;
     }
 
     /**
