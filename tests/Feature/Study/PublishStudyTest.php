@@ -4,6 +4,7 @@ namespace Tests\Feature\Study;
 
 use App\Actions\Study\PublishStudy;
 use App\Actions\Study\UpdateStudy;
+use App\Jobs\DetectDatasetSignals;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
 use App\Models\Dataset;
 use App\Models\License;
@@ -134,6 +135,7 @@ class PublishStudyTest extends TestCase
         Queue::assertPushed(ProcessMetadataExtractionBagitGenerationJob::class, function ($job) use ($study) {
             return $job->studyId === $study->id;
         });
+        Queue::assertPushed(DetectDatasetSignals::class, fn (DetectDatasetSignals $job): bool => $job->studyId === $study->id);
     }
 
     // This test is removed as it requires complex license validation logic changes

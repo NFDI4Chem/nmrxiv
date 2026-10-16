@@ -808,7 +808,7 @@ class BioschemasController extends Controller
             $datasetSchema->name($prefix.'['.$dataset->name.']');
             $datasetSchema->description($dataset->description);
             $datasetSchema->keywords($nmriumInfo[0]);
-            $datasetSchema->license($dataset->study->license->url);
+            $datasetSchema->license(BioschemasHelper::prepareLicense($dataset->study->license));
             $datasetSchema->url(config('app.url').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
             $datasetSchema->dateCreated($dataset->created_at ? $dataset->created_at->toISOString() : null);
             $datasetSchema->dateModified($dataset->updated_at ? $dataset->updated_at->toISOString() : null);
@@ -863,7 +863,7 @@ class BioschemasController extends Controller
         $studySchema->name($study->name);
         $studySchema->description($study->description);
         $studySchema->keywords(BioschemasHelper::getTags($study));
-        $studySchema->license($study->license?->url);
+        $studySchema->license(BioschemasHelper::prepareLicense($study->license));
         $studySchema->url(config('app.url').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->dateCreated($study->created_at ? $study->created_at->toISOString() : null);
         $studySchema->dateModified($study->updated_at ? $study->updated_at->toISOString() : null);
@@ -922,7 +922,7 @@ class BioschemasController extends Controller
         $projectSchema->name($project->name);
         $projectSchema->description($project->description);
         $projectSchema->keywords(BioschemasHelper::getTags($project));
-        $projectSchema->license($project->license?->url);
+        $projectSchema->license(BioschemasHelper::prepareLicense($project->license));
         $projectSchema->publisher(BioschemasHelper::preparePublisher());
         $projectSchema->url(config('app.url').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
         $projectSchema->dateCreated($project->created_at ? $project->created_at->toISOString() : null);
