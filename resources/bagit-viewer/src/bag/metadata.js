@@ -1,4 +1,15 @@
-import { basename, normalizePath, readEntryJson, readEntryText } from './sources.js';
+import {
+    extractAuthors,
+    extractCitations,
+    normalizeDoi,
+    parseCffScalars,
+} from './citation.js';
+import {
+    basename,
+    normalizePath,
+    readEntryJson,
+    readEntryText,
+} from './sources.js';
 
 /**
  * @typedef {object} BagMetadata
@@ -34,6 +45,11 @@ export async function loadBagMetadata(bag) {
     const schemaEntry = findBioSchema(bag);
     const schema = schemaEntry ? await readEntryJson(schemaEntry) : null;
 
+    const cffEntry = findCff(bag);
+    const cff = cffEntry
+        ? parseCffScalars(await readEntryText(cffEntry).catch(() => ''))
+        : {};
+
     const nmriumEntry = findNmrium(bag);
     let nmriumParsed = null;
     if (nmriumEntry) {
@@ -44,6 +60,7 @@ export async function loadBagMetadata(bag) {
         }
     }
 
+    const license = extractLicense(schema?.license);
     const molecules = extractMolecules(schema);
     const datasets = extractDatasets(schema, nmriumParsed);
     const previewObjectUrls = await loadPreviewUrls(bag, nmriumParsed);
@@ -61,20 +78,56 @@ export async function loadBagMetadata(bag) {
                   (kw) => typeof kw === 'string' && kw.length > 0,
               )
             : [],
-        license: schema?.license || null,
+        license: license.url,
+        licenseName: license.name,
         url: schema?.url || null,
         datePublished: schema?.datePublished || null,
         dateCreated: schema?.dateCreated || null,
+        authors: extractAuthors(schema),
+        citations: extractCitations(schema),
+        publisher: schema?.publisher?.name || null,
+        releaseDate:
+            schema?.datePublished ||
+            cff['date-released'] ||
+            schema?.dateCreated ||
+            bagInfo['Bagging-Date'] ||
+            null,
         molecules,
         datasets,
         previewObjectUrls,
     };
 }
 
+/**
+ * schema.org `license` is either a URL string or a CreativeWork object
+ * ({ name, url }); older bags only have the URL.
+ *
+ * @param {unknown} value
+ * @returns {{ url: string|null, name: string|null }}
+ */
+export function extractLicense(value) {
+    if (typeof value === 'string') {
+        return { url: value || null, name: null };
+    }
+
+    const entry = Array.isArray(value) ? value[0] : value;
+    if (entry && typeof entry === 'object') {
+        return {
+            url: entry.url || entry['@id'] || null,
+            name: entry.name || null,
+        };
+    }
+
+    return { url: null, name: null };
+}
+
 function findBioSchema(bag) {
     for (const entry of bag.entries) {
         const path = normalizePath(entry.path).toLowerCase();
-        if (path.endsWith('/nmrxiv-meta/bio-schema.json') || path === 'nmrxiv-meta/bio-schema.json') {
+        if (
+            path.endsWith('/nmrxiv-meta/bio-schema.json') ||
+            path === 'nmrxiv-meta/bio-schema.json'
+        ) {
             return entry;
         }
         if (basename(path) === 'bio-schema.json') {
@@ -83,6 +136,14 @@ function findBioSchema(bag) {
     }
 
     return null;
+}
+
+function findCff(bag) {
+    return (
+        bag.entries.find(
+            (entry) => basename(normalizePath(entry.path)) === 'CITATION.cff',
+        ) || null
+    );
 }
 
 function findNmrium(bag) {
@@ -166,12 +227,18 @@ export function extractDatasets(schema, nmriumParsed) {
                       }))
                 : [];
 
-            // Try match spectrum by jdf filename in description / name
+            // Match the NMRium spectrum: its name is the original (often long)
+            // path ending in the dataset folder, e.g. ".../Perlatolic acid/13_c13"
+            const folder = part.description || null;
             let spectrumId = null;
             let matched = null;
             for (const [spName, sp] of spectrumByName) {
                 if (
                     name.includes(spName) ||
+                    (folder &&
+                        (spName === folder ||
+                            spName.endsWith(`/${folder}`) ||
+                            spName.includes(folder))) ||
                     (part.description && part.description.includes(spName))
                 ) {
                     matched = sp;
@@ -180,9 +247,18 @@ export function extractDatasets(schema, nmriumParsed) {
                 }
             }
 
+            const title = part.description || name;
+
             return {
                 id: part['@id'] || name,
                 name,
+                title,
+                techniqueLabel: techniqueLabel(variables, title),
+                folder,
+                doi: normalizeDoi(part['@id']),
+                dateCreated: part.dateCreated || null,
+                datePublished: part.datePublished || null,
+                spectrum: matched,
                 description: part.description || null,
                 url: part.url || null,
                 keywords: Array.isArray(part.keywords)
@@ -197,6 +273,41 @@ export function extractDatasets(schema, nmriumParsed) {
                 peaks: extractPeaks(matched),
             };
         });
+}
+
+/**
+ * "13C NMR - 1D" / "1H-13C NMR - HSQC", as the website labels a dataset.
+ * Built from the acquisition nuclei and dimensionality in variableMeasured;
+ * the experiment name for 2D comes from the dataset title (e.g. 3_hsqc).
+ *
+ * @param {Array<{ name: string|null, value: unknown }>} variables
+ * @param {string} title
+ * @returns {string|null}
+ */
+export function techniqueLabel(variables, title) {
+    const find = (label) =>
+        variables.find((v) => v.name?.toLowerCase() === label)?.value;
+
+    const rawNuclei = find('acquisition nucleus');
+    const nuclei = (Array.isArray(rawNuclei) ? rawNuclei : [rawNuclei]).filter(
+        (n) => typeof n === 'string' && n,
+    );
+    if (!nuclei.length) {
+        return null;
+    }
+
+    const rawDimension = find('nmr spectrum by dimensionality');
+    const dimension = Number(
+        Array.isArray(rawDimension) ? rawDimension[0] : rawDimension,
+    );
+    const experiment =
+        dimension >= 2
+            ? String(title || '')
+                  .replace(/^\d+_/, '')
+                  .toUpperCase() || '2D'
+            : '1D';
+
+    return `${nuclei.join('-')} NMR - ${experiment}`;
 }
 
 /**
@@ -220,8 +331,8 @@ export function extractPeaks(spectrum) {
                     typeof peak.x === 'number'
                         ? peak.x
                         : typeof peak.delta === 'number'
-                          ? peak.delta
-                          : null,
+                        ? peak.delta
+                        : null,
                 multiplicity: peak.multiplicity || null,
                 intensity: typeof peak.y === 'number' ? peak.y : null,
             }));
@@ -250,8 +361,8 @@ export function extractPeaks(spectrum) {
                     typeof signal.delta === 'number'
                         ? signal.delta
                         : typeof signal.originalDelta === 'number'
-                          ? signal.originalDelta
-                          : null,
+                        ? signal.originalDelta
+                        : null,
                 multiplicity: signal.multiplicity || null,
                 intensity: null,
             });
@@ -291,7 +402,11 @@ async function loadPreviewUrls(bag, nmriumParsed) {
     // Also map embedded base64 images from nmrium if present
     if (Array.isArray(nmriumParsed?.images)) {
         for (const img of nmriumParsed.images) {
-            if (img?.id != null && typeof img.image === 'string' && img.image.startsWith('data:')) {
+            if (
+                img?.id != null &&
+                typeof img.image === 'string' &&
+                img.image.startsWith('data:')
+            ) {
                 // spectrum id may differ from image id; skip unless we can map
             }
         }
@@ -304,7 +419,10 @@ function findImagePath(bag, spectrumId) {
     const needle = `/images/${spectrumId}.png`;
     for (const entry of bag.entries) {
         const path = normalizePath(entry.path);
-        if (path.endsWith(needle) || path.endsWith(`images/${spectrumId}.png`)) {
+        if (
+            path.endsWith(needle) ||
+            path.endsWith(`images/${spectrumId}.png`)
+        ) {
             return path;
         }
     }

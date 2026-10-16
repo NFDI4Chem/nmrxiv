@@ -157,7 +157,7 @@ TXT;
         }
 
         return [
-            'version' => $version ?? '1.0.0',
+            'version' => $version ?? '1.1.0',
             'buildDate' => $buildDate,
         ];
     }

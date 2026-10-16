@@ -2,14 +2,14 @@
     <div class="min-h-screen">
         <header class="border-b border-gray-200 bg-white">
             <div
-                class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8"
+                class="mx-auto flex max-w-[2000px] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-10"
             >
-                <div>
-                    <p
-                        class="text-xs font-semibold uppercase tracking-wide text-teal-700"
-                    >
-                        nmrXiv
-                    </p>
+                <div class="flex items-center gap-4">
+                    <AppLogo />
+                    <span
+                        class="h-6 w-px bg-gray-200"
+                        aria-hidden="true"
+                    ></span>
                     <h1 class="text-xl font-bold text-gray-900">
                         BagIt Viewer
                     </h1>
@@ -20,7 +20,7 @@
             </div>
         </header>
 
-        <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <main class="mx-auto max-w-[2000px] px-4 py-8 sm:px-6 lg:px-10">
             <div v-if="!bags.length" class="space-y-10">
                 <BagPicker @bags="onBags" />
                 <RecentZips
@@ -34,7 +34,9 @@
             </div>
 
             <div v-else class="grid gap-8 lg:grid-cols-12">
-                <div class="space-y-8 lg:col-span-4 xl:col-span-3">
+                <div
+                    class="space-y-8 lg:col-span-4 xl:col-span-3 2xl:col-span-2"
+                >
                     <BagList
                         :bags="bags"
                         :selected-id="selected?.id"
@@ -51,7 +53,7 @@
                         @open="openRecent"
                     />
                 </div>
-                <div class="lg:col-span-8 xl:col-span-9">
+                <div class="lg:col-span-8 xl:col-span-9 2xl:col-span-10">
                     <SampleView
                         v-if="selected"
                         :bag="selected"
@@ -68,6 +70,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import AppLogo from './components/AppLogo.vue';
 import BagPicker from './components/BagPicker.vue';
 import BagList from './components/BagList.vue';
 import SampleView from './components/SampleView.vue';
@@ -85,7 +88,7 @@ const version =
     typeof __BAGIT_VIEWER_VERSION__ !== 'undefined'
         ? // eslint-disable-next-line no-undef -- injected by Vite define
           __BAGIT_VIEWER_VERSION__
-        : '1.0.0';
+        : '1.1.0';
 const buildDate =
     typeof __BAGIT_VIEWER_BUILD_DATE__ !== 'undefined'
         ? // eslint-disable-next-line no-undef -- injected by Vite define
@@ -164,7 +167,8 @@ async function openRecent(item) {
 
         const found = await bagsFromZipFiles([file]);
         if (found.length === 0) {
-            recentError.value = 'That cached zip no longer contains a BagIt bag.';
+            recentError.value =
+                'That cached zip no longer contains a BagIt bag.';
 
             return;
         }
