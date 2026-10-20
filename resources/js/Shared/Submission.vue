@@ -305,8 +305,8 @@
                                         <div>
                                             <vue-tags-input
                                                 v-model="draftForm.tag"
-                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
-                                                :separators="[';', ',']"
+                                                placeholder="Type a keyword or keywords separated by comma (,), semicolon (;) or pipe (|) and press enter"
+                                                :separators="[';', ',', '|']"
                                                 max-width="100%"
                                                 :tags="draftForm.tags"
                                                 @tags-changed="
@@ -680,10 +680,11 @@
                                                                                 v-model="
                                                                                     studyForm.tag
                                                                                 "
-                                                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                                                placeholder="Type a keyword or keywords separated by comma (,), semicolon (;) or pipe (|) and press enter"
                                                                                 :separators="[
                                                                                     ';',
                                                                                     ',',
+                                                                                    '|',
                                                                                 ]"
                                                                                 max-width="100%"
                                                                                 :tags="
