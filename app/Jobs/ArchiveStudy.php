@@ -367,22 +367,6 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
         return rtrim($endpoint, '/').'/'.$bucket.'/'.$key;
     }
 
-    // protected function standardizeMolecule($mol)
-    // {
-    //     $response = Http::post(config('services.chemistry_standardize.url'), $mol);
-    //     return $response->json();
-    // }
-
-    // protected function processSpectra($url)
-    // {
-    //     $response = Http::post(config('nmrxiv.spectra_parsing.nmrkit_api_url'), [
-    //         'url' => $url,
-    //         'capture_snapshot' => false,
-    //     ]);
-
-    //     return $response->json();
-    // }
-
     /**
      * Get the S3 storage client instance.
      *

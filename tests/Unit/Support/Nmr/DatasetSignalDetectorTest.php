@@ -27,7 +27,7 @@ class DatasetSignalDetectorTest extends TestCase
     {
         parent::setUp();
 
-        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => self::PARSER_URL]);
+        config(['nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => self::PARSER_URL]);
 
         $project = Project::factory()->create();
         $this->study = Study::factory()->for($project)->create([

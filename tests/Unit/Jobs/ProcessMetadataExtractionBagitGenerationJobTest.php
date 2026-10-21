@@ -151,7 +151,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         Notification::fake();
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'local',
@@ -262,7 +262,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->registerMemoryDisk('spectra_memory', $adapter);
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'spectra_memory',
@@ -307,7 +307,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->registerMemoryDisk('spectra_memory', $adapter);
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'spectra_memory',
@@ -341,7 +341,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         $this->registerMemoryDisk('rejecting', new RejectingFlysystemAdapter);
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'rejecting',
@@ -374,7 +374,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         Bus::fake([GenerateDatasetPhotosFromBagitJob::class]);
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'local',
@@ -419,7 +419,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         Notification::fake();
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'local',
@@ -451,7 +451,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse',
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse',
             'nmrxiv.spectra_parsing.bioschema_api_url' => 'https://bioschema.test/schemas',
             'nmrxiv.spectra_parsing.retry_count' => 1,
             'filesystems.default_public' => 'local',
@@ -509,7 +509,7 @@ class ProcessMetadataExtractionBagitGenerationJobTest extends TestCase
 
     public function test_call_nmrkit_api_throws_after_exhausting_retries(): void
     {
-        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => 'https://nmrkit.test/parse']);
+        config(['nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => 'https://nmrkit.test/parse']);
 
         Http::fake([
             'https://nmrkit.test/parse' => Http::response('bad gateway', 502),
