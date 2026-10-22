@@ -1352,9 +1352,9 @@ boolbase@^1.0.0:
   integrity sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==
 
 brace-expansion@^5.0.8:
-  version "5.0.9"
-  resolved "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.9.tgz"
-  integrity sha512-ScQ4IuvIEF1TMlP7Zt+vjJ//9zlPb2SDcxWxM3bk8s6t6GGdJ7KO1dCcTidOPJKePW30LE/2cT7wCyPho9/Wxg==
+  version "5.0.12"
+  resolved "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.12.tgz"
+  integrity sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==
   dependencies:
     balanced-match "^4.0.2"
 
@@ -1538,13 +1538,13 @@ commander@^4.0.0:
   integrity sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==
 
 concurrently@^9.0.1:
-  version "9.2.4"
-  resolved "https://registry.npmjs.org/concurrently/-/concurrently-9.2.4.tgz"
-  integrity sha512-TZ0CEhyzvFjgtAvHTusDMgj7wNdihCh7LLLrzdUOXIhdlnL2JBBGA9eJxR24rtqgmdjh3OA3hrN1rCHj6HM8qA==
+  version "9.2.5"
+  resolved "https://registry.npmjs.org/concurrently/-/concurrently-9.2.5.tgz"
+  integrity sha512-YMZlvWrTPQEhjKp60XSmMGt60+pffbv6DyRnOMvVO98+J7aF8w8Ui9FhdcOwvSixc/kyR6SoVvmejcn/2lZBqg==
   dependencies:
     chalk "4.1.2"
     rxjs "7.8.2"
-    shell-quote "1.9.0"
+    shell-quote "1.12.0"
     supports-color "8.1.1"
     tree-kill "1.2.2"
     yargs "17.7.2"
@@ -1647,9 +1647,9 @@ doctrine@^3.0.0:
     esutils "^2.0.2"
 
 dompurify@^3.0.5:
-  version "3.4.15"
-  resolved "https://registry.npmjs.org/dompurify/-/dompurify-3.4.15.tgz"
-  integrity sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==
+  version "3.4.17"
+  resolved "https://registry.npmjs.org/dompurify/-/dompurify-3.4.17.tgz"
+  integrity sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
@@ -1989,9 +1989,9 @@ focus-trap@^7, focus-trap@^7.6.4:
     tabbable "^6.4.0"
 
 follow-redirects@^1.16.0:
-  version "1.16.0"
-  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.0.tgz"
-  integrity sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==
+  version "1.16.1"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.1.tgz"
+  integrity sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==
 
 form-data@>=4.0.6:
   version "4.0.6"
@@ -2839,34 +2839,10 @@ postcss-nested@^6.2.0:
   dependencies:
     postcss-selector-parser "^6.1.1"
 
-postcss-selector-parser@^6.0.15:
-  version "6.1.4"
-  resolved "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.1.4.tgz"
-  integrity sha512-bIoJLOmjCO1S9XdY/DcnR5hJxvrDir1PbGChrzXG3vw0/FOliy/fA3dmdhQ441kah4gKv+TwckGzex6wNS5cnQ==
-  dependencies:
-    cssesc "^3.0.0"
-    util-deprecate "^1.0.2"
-
-postcss-selector-parser@^6.1.1:
-  version "6.1.4"
-  resolved "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.1.4.tgz"
-  integrity sha512-bIoJLOmjCO1S9XdY/DcnR5hJxvrDir1PbGChrzXG3vw0/FOliy/fA3dmdhQ441kah4gKv+TwckGzex6wNS5cnQ==
-  dependencies:
-    cssesc "^3.0.0"
-    util-deprecate "^1.0.2"
-
-postcss-selector-parser@^6.1.2:
-  version "6.1.4"
-  resolved "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.1.4.tgz"
-  integrity sha512-bIoJLOmjCO1S9XdY/DcnR5hJxvrDir1PbGChrzXG3vw0/FOliy/fA3dmdhQ441kah4gKv+TwckGzex6wNS5cnQ==
-  dependencies:
-    cssesc "^3.0.0"
-    util-deprecate "^1.0.2"
-
-postcss-selector-parser@6.0.10:
-  version "6.0.10"
-  resolved "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.0.10.tgz"
-  integrity sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==
+postcss-selector-parser@^7.1.6:
+  version "7.1.7"
+  resolved "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-7.1.7.tgz"
+  integrity sha512-wWBro/7hJ40ye6TPiXkUQoXKCw23xSsjriUvqd7Uls9Sso3oLiON1flc18cCdnjgCRXw4fBVqUJJeOdDTh3P3g==
   dependencies:
     cssesc "^3.0.0"
     util-deprecate "^1.0.2"
@@ -3091,9 +3067,9 @@ shebang-regex@^3.0.0:
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
 shell-quote@>=1.8.4:
-  version "1.10.0"
-  resolved "https://registry.npmjs.org/shell-quote/-/shell-quote-1.10.0.tgz"
-  integrity sha512-w1aiOKwKuRgtwAReIIj89puqg+I7GvX4IbLrvmhXbzQsj1+Zwi4VO3+fa6ZF91TWSjIxoEkKnMeHcLEODK5ZXA==
+  version "1.12.0"
+  resolved "https://registry.npmjs.org/shell-quote/-/shell-quote-1.12.0.tgz"
+  integrity sha512-PcByqNyT/38F2kDNi006HAMRJaULuBzq/FOsw3qdZvX/GA9W/jamDaRskgHjubHiftXK5sIFxLNkvrXUwcof6Q==
 
 shiki@^2.1.0:
   version "2.5.0"
@@ -3176,9 +3152,9 @@ sortablejs@^1, sortablejs@1.14.0:
   integrity sha512-pBXvQCs5/33fdN1/39pPL0NZF20LeRbLQ5jtnheIPN9JQAaufGjKdWduZn4U7wCtVuzKhmRkI0DFYHYRbB2H1w==
 
 source-map-js@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz"
-  integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz"
+  integrity sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==
 
 source-map-support@~0.5.20:
   version "0.5.21"
@@ -3538,9 +3514,9 @@ vite-plugin-full-reload@^1.1.0:
     picomatch "^2.3.1"
 
 "vite@^5.0.0 || ^6.0.0", vite@^6.4.3:
-  version "6.4.3"
-  resolved "https://registry.npmjs.org/vite/-/vite-6.4.3.tgz"
-  integrity sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==
+  version "6.4.5"
+  resolved "https://registry.npmjs.org/vite/-/vite-6.4.5.tgz"
+  integrity sha512-4enwjFfi4IwtEh0w+jPzpLVOFQiPHmmzPxcHXQOyEur47o6u0jE573DmGpjA+7irXoMLYRZD5ZaFUEneS3abPg==
   dependencies:
     esbuild "^0.25.0"
     fdir "^6.4.4"
