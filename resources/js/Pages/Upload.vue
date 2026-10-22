@@ -2364,10 +2364,11 @@
                                                                                                 v-model="
                                                                                                     studyForm.tag
                                                                                                 "
-                                                                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                                                                placeholder="Type a keyword or keywords separated by comma (,), semicolon (;) or pipe (|) and press enter"
                                                                                                 :separators="[
                                                                                                     ';',
                                                                                                     ',',
+                                                                                                    '|',
                                                                                                 ]"
                                                                                                 max-width="100%"
                                                                                                 :tags="
