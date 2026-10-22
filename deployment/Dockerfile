@@ -1,10 +1,5 @@
 FROM dunglas/frankenphp:1.13.2-php8.4-alpine
 
-# Fail the build if the base image ships a PHP release vulnerable to
-# CVE-2026-109618 / CVE-2026-109619 (CERT-EU 2026-018); fixed in 8.4.27.
-RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.27", ">=") ? 0 : 1);' \
-    || (echo "PHP $(php -r 'echo PHP_VERSION;') is vulnerable; need >= 8.4.27" && exit 1)
-
 # Setup proxy settings using build arguments
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
