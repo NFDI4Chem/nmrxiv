@@ -25,7 +25,7 @@ class NmrkitSpectraParser
     public function parseUrl(string $url, bool $autoDetect = true): array
     {
         $response = Http::timeout(config('nmrxiv.spectra_parsing.api_timeout', 300))
-            ->post(config('nmrxiv.spectra_parsing.nmrkit_api_url'), [
+            ->post(config('nmrxiv.spectra_parsing.nmrkit_spectra_parse_url'), [
                 'url' => $url,
                 'capture_snapshot' => false,
                 'auto_processing' => $autoDetect,
