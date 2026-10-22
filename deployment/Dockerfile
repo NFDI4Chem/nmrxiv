@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1-php8.4-alpine
+FROM dunglas/frankenphp:1.13.2-php8.4-alpine
 
 # Fail the build if the base image ships a PHP release vulnerable to
 # CVE-2026-109618 / CVE-2026-109619 (CERT-EU 2026-018); fixed in 8.4.27.
