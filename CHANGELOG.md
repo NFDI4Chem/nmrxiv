@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.2](https://github.com/NFDI4Chem/nmrxiv/compare/v2.5.1...v2.5.2) (2026-10-22)
+
+
+### Miscellaneous Chores
+
+* **docker:** remove temporary PHP version guard ([#1611](https://github.com/NFDI4Chem/nmrxiv/issues/1611)) ([b19bb7b](https://github.com/NFDI4Chem/nmrxiv/commit/b19bb7bebce6a76891387ebf5a916a6446307157))
+
 ## [2.5.1](https://github.com/NFDI4Chem/nmrxiv/compare/v2.5.0...v2.5.1) (2026-10-22)
 
 
