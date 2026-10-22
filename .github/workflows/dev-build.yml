@@ -82,6 +82,7 @@ jobs:
           context: .
           file: ${{ matrix.image.file }}
           push: true
+          pull: true
           build-args: |
             RELEASE_VERSION=${{ matrix.image.tag }}
           tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:${{ matrix.image.tag }}

@@ -34,6 +34,7 @@ jobs:
           context: .
           file: ${{ matrix.container.file }}
           load: true
+          pull: true
           tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:${{ matrix.container.name }}-test
           cache-from: type=gha,scope=${{ matrix.container.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.container.name }}
