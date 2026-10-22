@@ -129,6 +129,7 @@ jobs:
           context: .
           file: ${{ matrix.image.file }}
           push: true
+          pull: true
           build-args: |
             RELEASE_VERSION=${{ steps.fetch-latest-release.outputs.tag_name }}
           tags: |
