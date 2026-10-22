@@ -83,6 +83,7 @@
         "minimatch": "^10.0.3",
         "preact": ">=10.26.10",
         "shell-quote": ">=1.8.4",
+        "postcss-selector-parser": "^7.1.6",
         "vitepress": {
             "vite": "^6.4.3"
         }
