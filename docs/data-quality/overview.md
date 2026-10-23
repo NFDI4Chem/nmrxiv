@@ -33,7 +33,7 @@ See [Why each experiment matters](./experiments.md) for the chemistry behind the
 
 - Compound cards in search and library results
 - The compound page checklist (present / missing experiments)
-- The [compound library](./contributor-stars.md) data-quality panel (contributor / workspace stars)
+- The [compound library](./contributor-stars.md) contributor-stars panel
 
 ## FAQ
 

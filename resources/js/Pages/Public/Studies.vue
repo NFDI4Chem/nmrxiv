@@ -1,30 +1,26 @@
 <template>
     <app-layout :title="pageTitle">
         <template #header>
-            <div class="relative border-b border-zinc-900/5 overflow-hidden">
-                <!-- Animated mesh gradient background -->
+            <div class="relative overflow-hidden border-b border-zinc-900/5">
                 <div
-                    v-if="!molecule"
-                    class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"
+                    class="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-50/40 via-indigo-50/30 to-purple-50/30"
                 ></div>
-                <div v-if="!molecule" class="absolute inset-0 opacity-20">
+                <div class="pointer-events-none absolute inset-0 opacity-20">
                     <div
-                        class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+                        class="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-300 mix-blend-multiply blur-3xl filter animate-blob"
                     ></div>
                     <div
-                        class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+                        class="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-blue-300 mix-blend-multiply blur-3xl filter animate-blob animation-delay-2000"
                     ></div>
                     <div
-                        class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+                        class="absolute -bottom-32 left-1/3 h-96 w-96 rounded-full bg-pink-300 mix-blend-multiply blur-3xl filter animate-blob animation-delay-4000"
                     ></div>
                 </div>
 
-                <div
-                    class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
-                >
-                    <div v-if="!molecule">
+                <div class="relative px-6 py-8 sm:px-8 lg:py-10">
+                    <div v-if="!hasMolecule">
                         <div
-                            class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
+                            class="mb-3 text-4xl font-bold tracking-tight text-gray-900"
                         >
                             Browse Samples (Spectra)
                         </div>
@@ -40,146 +36,217 @@
                             >.
                         </p>
                     </div>
-                    <div v-if="molecule">
+
+                    <div
+                        v-else
+                        class="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8"
+                    >
                         <div
-                            class="mx-auto flex max-w-2xl items-center justify-between gap-x-8 lg:mx-0 lg:max-w-none"
+                            v-if="structureUrl"
+                            class="mx-auto shrink-0 lg:mx-0"
                         >
-                            <div class="flex items-center gap-x-6">
+                            <div
+                                class="overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-gray-900/5"
+                            >
+                                <img
+                                    :src="structureUrl"
+                                    :alt="`2D structure of ${displayName}`"
+                                    class="h-44 w-44 bg-white object-contain sm:h-52 sm:w-52"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <div
+                                class="flex flex-wrap items-center justify-between gap-3"
+                            >
                                 <div
-                                    class="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg shadow-md border"
+                                    class="flex flex-wrap items-center gap-x-3 gap-y-1"
                                 >
-                                    <img
-                                        :src="
-                                            $page.props.CM_API +
-                                            'depict/2D?height=360&width=360&smiles=' +
-                                            molecule.canonical_smiles
-                                        "
-                                        class="bg-white object-cover object-center"
-                                    />
-                                </div>
-                                <div
-                                    class="mx-auto mt-14 max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none"
-                                >
-                                    <div class="flex flex-col-reverse">
-                                        <div class="mt-4">
-                                            <h1
-                                                class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl"
-                                            >
-                                                {{ molecule.iupac_name }}
-                                            </h1>
-                                            <p
-                                                class="mt-2 text-sm text-gray-500"
-                                            >
-                                                {{ molecule.canonical_smiles }}
-                                            </p>
-                                            <div>
-                                                <h3
-                                                    class="mt-3 text-sm text-gray-500"
-                                                >
-                                                    <a>
-                                                        <span
-                                                            class="absolute inset-0"
-                                                        ></span>
-                                                        Molecular Formula:
-                                                        <span
-                                                            class="text-base inline font-semibold text-gray-900"
-                                                        >
-                                                            <MolecularFormula
-                                                                :formula="
-                                                                    molecule.molecular_formula
-                                                                "
-                                                            />
-                                                        </span>
-                                                    </a>
-                                                    &emsp; &middot; &emsp;
-                                                    <a>
-                                                        <span
-                                                            class="absolute inset-0"
-                                                        ></span>
-                                                        Molecular Weight:
-                                                        <span
-                                                            class="text-base inline font-semibold text-gray-900"
-                                                            >{{
-                                                                molecule.molecular_weight
-                                                            }}</span
-                                                        >
-                                                    </a>
-                                                </h3>
-                                            </div>
-                                            <p
-                                                v-if="molecule.synonyms"
-                                                class="mt-3 text-gray-500"
-                                            >
-                                                <span
-                                                    v-for="(
-                                                        synonym, index
-                                                    ) in molecule.synonyms
-                                                        .split(',')
-                                                        .slice(1, 20)"
-                                                    :key="index"
-                                                    class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm mr-2 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 mt-2"
-                                                >
-                                                    {{ synonym }}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <div
-                                                class="flex flex-wrap items-center gap-3"
-                                            >
-                                                <p class="mr-1">
-                                                    {{ molecule.identifier }}
-                                                </p>
-                                                <DataCompletenessBadge
-                                                    :tier="
-                                                        molecule.annotation_level
-                                                    "
-                                                    :breakdown="
-                                                        molecule.quality_breakdown
-                                                    "
-                                                    variant="detailed"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    class="text-xs font-medium text-indigo-600 hover:text-indigo-500"
-                                                    @click="
-                                                        showQualityInfo = true
-                                                    "
-                                                >
-                                                    How is this scored?
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- <div
-                                        class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2"
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-widest text-indigo-600"
                                     >
-                                        <button
-                                            type="button"
-                                            class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
-                                        >
-                                            Pay $220
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-50 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
-                                        >
-                                            Preview
-                                        </button>
-                                    </div> -->
+                                        Compound
+                                    </p>
+                                    <span
+                                        class="inline-flex items-center rounded-md bg-white/80 px-2 py-0.5 font-mono text-xs font-medium text-gray-600 ring-1 ring-gray-900/5"
+                                    >
+                                        {{ molecule.identifier }}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 backdrop-blur transition-colors hover:bg-white hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                    @click="copyText('link', pageUrl)"
+                                >
+                                    <CheckIcon
+                                        v-if="copiedKey === 'link'"
+                                        class="h-4 w-4 text-teal-600"
+                                        aria-hidden="true"
+                                    />
+                                    <LinkIcon
+                                        v-else
+                                        class="h-4 w-4"
+                                        aria-hidden="true"
+                                    />
+                                    {{
+                                        copiedKey === "link"
+                                            ? "Link copied"
+                                            : "Copy link"
+                                    }}
+                                </button>
+                            </div>
+
+                            <h1
+                                class="mt-2 break-words text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                            >
+                                {{ displayName }}
+                            </h1>
+
+                            <section
+                                aria-label="Data completeness"
+                                class="mt-4 rounded-xl bg-white/70 px-4 py-3.5 shadow-sm ring-1 ring-gray-900/5 backdrop-blur"
+                            >
+                                <div
+                                    class="flex items-start justify-between gap-4"
+                                >
+                                    <DataCompletenessBadge
+                                        class="min-w-0 flex-1"
+                                        :tier="molecule.annotation_level"
+                                        :breakdown="molecule.quality_breakdown"
+                                        variant="detailed"
+                                    />
+                                    <button
+                                        type="button"
+                                        class="shrink-0 cursor-pointer pt-0.5 text-xs font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                        @click="showQualityInfo = true"
+                                    >
+                                        How is this scored?
+                                    </button>
+                                </div>
+                            </section>
+
+                            <dl
+                                v-if="factTiles.length"
+                                class="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4"
+                            >
+                                <div
+                                    v-for="tile in factTiles"
+                                    :key="tile.key"
+                                    class="rounded-xl bg-white/70 px-4 py-3 shadow-sm ring-1 ring-gray-900/5 backdrop-blur"
+                                >
+                                    <dt
+                                        class="text-xs font-medium text-gray-500"
+                                    >
+                                        {{ tile.label }}
+                                    </dt>
+                                    <dd
+                                        class="mt-1 text-lg font-semibold tracking-tight text-gray-900"
+                                    >
+                                        <MolecularFormula
+                                            v-if="tile.kind === 'formula'"
+                                            :formula="tile.value"
+                                        />
+                                        <template v-else>
+                                            <span class="tabular-nums">{{
+                                                tile.value
+                                            }}</span>
+                                            <span
+                                                v-if="tile.unit"
+                                                class="ml-1 text-sm font-medium text-gray-400"
+                                                >{{ tile.unit }}</span
+                                            >
+                                        </template>
+                                    </dd>
+                                </div>
+                            </dl>
+
+                            <div
+                                v-if="identifierRows.length"
+                                class="mt-4 space-y-2"
+                            >
+                                <div
+                                    v-for="row in identifierRows"
+                                    :key="row.key"
+                                    class="flex items-center gap-3 rounded-xl bg-white/70 px-3 py-2 shadow-sm ring-1 ring-gray-900/5 backdrop-blur"
+                                >
+                                    <span
+                                        class="w-16 shrink-0 text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                                    >
+                                        {{ row.label }}
+                                    </span>
+                                    <code
+                                        class="min-w-0 flex-1 truncate font-mono text-sm text-gray-800"
+                                        :title="row.value"
+                                    >
+                                        {{ row.value }}
+                                    </code>
+                                    <button
+                                        type="button"
+                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-white hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                        :aria-label="
+                                            copiedKey === row.key
+                                                ? `${row.label} copied`
+                                                : `Copy ${row.label}`
+                                        "
+                                        @click="copyText(row.key, row.value)"
+                                    >
+                                        <CheckIcon
+                                            v-if="copiedKey === row.key"
+                                            class="h-4 w-4 text-teal-600"
+                                            aria-hidden="true"
+                                        />
+                                        <ClipboardDocumentIcon
+                                            v-else
+                                            class="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- <div class="flex items-center gap-x-4 sm:gap-x-6">
-            <a
-                :href="
-                    '/upload?compound=' + molecule.identifier
-                "
-                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-                Upload Spectra
-            </a>
-        </div> -->
+                            <div v-if="synonymList.length" class="mt-5">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                                >
+                                    Also known as
+                                </p>
+                                <div
+                                    class="mt-2 flex flex-wrap gap-1.5"
+                                    :class="
+                                        showAllSynonyms
+                                            ? 'max-h-36 overflow-y-auto'
+                                            : ''
+                                    "
+                                >
+                                    <span
+                                        v-for="synonym in visibleSynonyms"
+                                        :key="synonym"
+                                        class="inline-flex items-center rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-900/5"
+                                    >
+                                        {{ synonym }}
+                                    </span>
+                                    <button
+                                        v-if="
+                                            !showAllSynonyms &&
+                                            hiddenSynonymCount > 0
+                                        "
+                                        type="button"
+                                        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                        @click="showAllSynonyms = true"
+                                    >
+                                        +{{ hiddenSynonymCount }} more
+                                    </button>
+                                </div>
+                                <button
+                                    v-if="showAllSynonyms"
+                                    type="button"
+                                    class="mt-2 text-xs font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                    @click="showAllSynonyms = false"
+                                >
+                                    Show less
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -368,6 +435,8 @@
         </div>
         <DataCompletenessInfoModal
             :show="showQualityInfo"
+            :tier="molecule?.annotation_level"
+            :breakdown="molecule?.quality_breakdown"
             @close="showQualityInfo = false"
         />
     </app-layout>
@@ -390,6 +459,11 @@ import {
     QueueListIcon,
     Squares2X2Icon,
 } from "@heroicons/vue/24/solid";
+import {
+    CheckIcon,
+    ClipboardDocumentIcon,
+    LinkIcon,
+} from "@heroicons/vue/24/outline";
 
 export default {
     components: {
@@ -407,6 +481,9 @@ export default {
         StudyPublicCard,
         DataCompletenessBadge,
         DataCompletenessInfoModal,
+        CheckIcon,
+        ClipboardDocumentIcon,
+        LinkIcon,
     },
     props: {
         studies: {
@@ -434,6 +511,9 @@ export default {
             ],
             open: ref(false),
             showQualityInfo: false,
+            showAllSynonyms: false,
+            copiedKey: null,
+            copiedTimer: null,
             form: {
                 search: this.filters.search,
                 sort: "newest",
@@ -442,6 +522,190 @@ export default {
         };
     },
     computed: {
+        hasMolecule() {
+            return Boolean(this.molecule?.identifier);
+        },
+        displayName() {
+            return (
+                this.molecule?.iupac_name ||
+                this.molecule?.name ||
+                this.molecule?.identifier ||
+                "Compound"
+            );
+        },
+        structureUrl() {
+            const smiles = this.molecule?.canonical_smiles;
+            if (!smiles || !this.$page.props.CM_API) {
+                return null;
+            }
+
+            return `${
+                this.$page.props.CM_API
+            }depict/2D?smiles=${encodeURIComponent(
+                smiles
+            )}&height=400&width=400&CIP=false&toolkit=cdk`;
+        },
+        pageUrl() {
+            if (typeof window === "undefined") {
+                return this.molecule?.public_url || "";
+            }
+
+            return window.location.href;
+        },
+        casNumber() {
+            const raw = this.molecule?.cas;
+            if (raw) {
+                const first = String(raw)
+                    .split(/[,;\n]/)[0]
+                    .trim();
+                if (first) {
+                    return first;
+                }
+            }
+
+            const synonyms = String(this.molecule?.synonyms || "")
+                .split(",")
+                .map((synonym) => synonym.trim());
+
+            return (
+                synonyms.find((synonym) =>
+                    /^\d{2,7}-\d{2}-\d$/.test(synonym)
+                ) || ""
+            );
+        },
+        formattedWeight() {
+            const value = this.molecule?.molecular_weight;
+            if (value === null || value === undefined || value === "") {
+                return "";
+            }
+
+            const number = Number(value);
+            if (!Number.isFinite(number)) {
+                return String(value);
+            }
+
+            return number.toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+            });
+        },
+        publishedSampleCount() {
+            const total = this.studies?.meta?.total;
+
+            return typeof total === "number" ? total : null;
+        },
+        factTiles() {
+            const tiles = [];
+
+            if (this.molecule?.molecular_formula) {
+                tiles.push({
+                    key: "formula",
+                    label: "Formula",
+                    kind: "formula",
+                    value: this.molecule.molecular_formula,
+                });
+            }
+
+            if (this.formattedWeight) {
+                tiles.push({
+                    key: "weight",
+                    label: "Molecular weight",
+                    kind: "text",
+                    value: this.formattedWeight,
+                    unit: "g/mol",
+                });
+            }
+
+            if (this.casNumber) {
+                tiles.push({
+                    key: "cas",
+                    label: "CAS",
+                    kind: "text",
+                    value: this.casNumber,
+                });
+            }
+
+            if (this.publishedSampleCount !== null) {
+                tiles.push({
+                    key: "samples",
+                    label:
+                        this.publishedSampleCount === 1
+                            ? "Published sample"
+                            : "Published samples",
+                    kind: "text",
+                    value: String(this.publishedSampleCount),
+                });
+            }
+
+            return tiles;
+        },
+        identifierRows() {
+            const rows = [];
+            const smiles = this.molecule?.canonical_smiles;
+            const inchiKey =
+                this.molecule?.standard_inchi_key || this.molecule?.inchi_key;
+            const inchi = this.molecule?.standard_inchi || this.molecule?.inchi;
+
+            if (smiles) {
+                rows.push({ key: "smiles", label: "SMILES", value: smiles });
+            }
+
+            if (inchiKey) {
+                rows.push({
+                    key: "inchikey",
+                    label: "InChIKey",
+                    value: inchiKey,
+                });
+            } else if (inchi) {
+                rows.push({ key: "inchi", label: "InChI", value: inchi });
+            }
+
+            return rows;
+        },
+        synonymList() {
+            const raw = this.molecule?.synonyms;
+            if (!raw) {
+                return [];
+            }
+
+            const excluded = new Set(
+                [this.displayName, this.casNumber]
+                    .map((value) =>
+                        String(value || "")
+                            .trim()
+                            .toLowerCase()
+                    )
+                    .filter(Boolean)
+            );
+            const seen = new Set();
+
+            return String(raw)
+                .split(",")
+                .map((synonym) => synonym.trim())
+                .filter((synonym) => {
+                    if (!synonym) {
+                        return false;
+                    }
+
+                    const key = synonym.toLowerCase();
+                    if (excluded.has(key) || seen.has(key)) {
+                        return false;
+                    }
+
+                    seen.add(key);
+
+                    return true;
+                });
+        },
+        visibleSynonyms() {
+            if (this.showAllSynonyms) {
+                return this.synonymList;
+            }
+
+            return this.synonymList.slice(0, 6);
+        },
+        hiddenSynonymCount() {
+            return Math.max(0, this.synonymList.length - 6);
+        },
         compoundNumericId() {
             const raw = this.molecule?.identifier;
             if (raw === null || raw === undefined) {
@@ -497,6 +761,9 @@ export default {
             }, 150),
         },
     },
+    beforeUnmount() {
+        clearTimeout(this.copiedTimer);
+    },
     methods: {
         reset() {
             this.form = {
@@ -504,6 +771,31 @@ export default {
                 sort: "newest",
                 mode: "grid",
             };
+        },
+        async copyText(key, value) {
+            if (!value) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(value);
+            } catch {
+                const element = document.createElement("textarea");
+                element.value = value;
+                element.setAttribute("readonly", "");
+                element.style.position = "fixed";
+                element.style.left = "-9999px";
+                document.body.appendChild(element);
+                element.select();
+                document.execCommand("copy");
+                document.body.removeChild(element);
+            }
+
+            this.copiedKey = key;
+            clearTimeout(this.copiedTimer);
+            this.copiedTimer = setTimeout(() => {
+                this.copiedKey = null;
+            }, 2000);
         },
     },
 };

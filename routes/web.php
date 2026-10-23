@@ -25,6 +25,7 @@ use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\FundingReferenceController;
 use App\Http\Controllers\InteractionTrackingController;
+use App\Http\Controllers\NmrPredictionController;
 use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
@@ -111,11 +112,11 @@ Route::get('/sustainability', function () {
     return Inertia::render('Sustainability');
 })->name('sustainability');
 
-Route::get('/predict', function () {
-    return Inertia::render('Predict', [
-        'nmrPredictUrl' => rtrim((string) config('external-links.nmrkit_url'), '/').'/latest/predict/',
-    ]);
-})->name('predict');
+Route::get('/predict', [NmrPredictionController::class, 'index'])->name('predict');
+
+Route::post('/predict/spectrum', [NmrPredictionController::class, 'store'])
+    ->middleware('throttle:nmr-prediction')
+    ->name('predict.spectrum');
 
 Route::get('/quickcheck', function () {
     return Inertia::render('Quickcheck', [
