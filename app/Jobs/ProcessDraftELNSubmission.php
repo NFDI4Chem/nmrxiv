@@ -640,8 +640,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 });
 
                 if (! empty($keywords)) {
-                    $study->syncTags($keywords);
-                    $study->project->syncTags($keywords);
+                    // Typed like the rest of the app, so the copy done at publish time reuses these tags.
+                    $study->syncTagsWithType($keywords, 'Study');
+                    $study->project->syncTagsWithType($keywords, 'Project');
                     $logger->log($study->project->draft, 'info', 'Keywords attached to study: '.implode(', ', $keywords));
                 } else {
                     $logger->log($study->project->draft, 'info', 'Keywords not found');

@@ -316,4 +316,46 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
 
         $this->assertSame('chemotion', $sample->fresh()->submitted_through);
     }
+
+    public function test_attach_keywords_creates_typed_tags_that_publish_does_not_duplicate(): void
+    {
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+
+        $draft = Draft::factory()->create([
+            'eln' => 'chemotion',
+            'processing_logs' => [],
+        ]);
+
+        $project = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $job = new ProcessDraftELNSubmission($draft->id);
+        $method = new ReflectionMethod($job, 'attachKeywordsToStudy');
+
+        $method->invoke($job, $study, ['keywords' => ['sample', 'chemical reaction']], new DraftProcessingLogger);
+
+        $this->assertEqualsCanonicalizing(['sample', 'chemical reaction'], $study->fresh()->tags->pluck('name')->all());
+        $this->assertSame(['Study'], $study->fresh()->tags->pluck('type')->unique()->values()->all());
+        $this->assertSame(['Project'], $project->fresh()->tags->pluck('type')->unique()->values()->all());
+
+        // What ProcessSubmission does when copying the project's tags onto the study.
+        $study->syncTagsWithType($project->fresh()->tags->pluck('name')->toArray(), 'Study');
+
+        $this->assertCount(2, $study->fresh()->tags);
+    }
 }
