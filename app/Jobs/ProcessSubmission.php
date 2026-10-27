@@ -323,15 +323,16 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'study_count' => $studiesToPublish->count(),
                 ]);
 
-                $assigner->assign($studiesToPublish);
-
                 $releaseDate = Carbon::parse($project->release_date);
 
                 // The staging project is deleted afterwards, so the samples must carry their own release date.
+                // Set before the identifiers/DOIs are assigned so the DOI metadata uses it.
                 $this->stampStudyReleaseDates(
                     $studiesToPublish,
                     filled($project->release_date) ? $releaseDate : now()->startOfDay()
                 );
+
+                $assigner->assign($studiesToPublish);
 
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_immediate_publish_all',

@@ -147,6 +147,10 @@ trait HasDOI
                 $authors = $this->project->authors ? $this->project->authors : [];
                 $citations = $this->project->citations ? $this->project->citations : [];
                 $fundingReferences = $this->project->fundingReferences ? $this->project->fundingReferences : [];
+            } else {
+                // Samples published on their own (e.g. ELN submissions) are detached from the project,
+                // so their authors live on the study itself.
+                $authors = $this->studyAuthors;
             }
 
         } elseif ($this instanceof Dataset) {
@@ -161,6 +165,8 @@ trait HasDOI
 
                 $citations = $project->citations ? $project->citations : [];
                 $fundingReferences = $project->fundingReferences ? $project->fundingReferences : [];
+            } else {
+                $authors = $this->study->studyAuthors;
             }
 
         }

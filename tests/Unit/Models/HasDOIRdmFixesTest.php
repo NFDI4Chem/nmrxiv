@@ -2,9 +2,12 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Author;
 use App\Models\Citation;
+use App\Models\Dataset;
 use App\Models\License;
 use App\Models\Project;
+use App\Models\Study;
 use App\Models\User;
 use App\Services\DOI\DOIService;
 use Carbon\Carbon;
@@ -348,6 +351,61 @@ class HasDOIRdmFixesTest extends TestCase
     /**
      * @param  array<string, mixed>  $overrides
      */
+    public function test_study_without_project_uses_its_own_authors_as_creators(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create();
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+
+        $first = Author::factory()->create(['given_name' => 'Till', 'family_name' => 'Opatz', 'orcid_id' => '0000-0002-3266-4050', 'affiliation' => 'Mainz']);
+        $second = Author::factory()->create(['given_name' => 'Heidrun', 'family_name' => 'Anke', 'orcid_id' => null, 'affiliation' => null]);
+        $study->studyAuthors()->attach([
+            $first->id => ['contributor_type' => 'Researcher', 'sort_order' => 1],
+            $second->id => ['contributor_type' => 'Researcher', 'sort_order' => 2],
+        ]);
+
+        $creators = $study->fresh()->getMetadata()['creators'];
+
+        $this->assertSame(['Opatz, Till', 'Anke, Heidrun'], array_column($creators, 'name'));
+        $this->assertSame('0000-0002-3266-4050', $creators[0]['nameIdentifiers'][0]['nameIdentifier']);
+        $this->assertSame(['Mainz'], $creators[0]['affiliation']);
+    }
+
+    public function test_dataset_without_project_uses_the_study_authors_as_creators(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create();
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => null,
+            'license_id' => $license->id,
+        ]);
+
+        $author = Author::factory()->create(['given_name' => 'Eckhard', 'family_name' => 'Thines']);
+        $study->studyAuthors()->attach($author->id, ['contributor_type' => 'Researcher', 'sort_order' => 1]);
+
+        $creators = $dataset->fresh()->getMetadata()['creators'];
+
+        $this->assertSame(['Thines, Eckhard'], array_column($creators, 'name'));
+    }
+
+    public function test_study_with_project_still_uses_the_project_authors_as_creators(): void
+    {
+        $license = License::factory()->create();
+        $project = Project::factory()->create(['license_id' => $license->id]);
+        $study = Study::factory()->create(['project_id' => $project->id, 'license_id' => $license->id]);
+
+        $projectAuthor = Author::factory()->create(['given_name' => 'Pia', 'family_name' => 'Project']);
+        $studyAuthor = Author::factory()->create(['given_name' => 'Sam', 'family_name' => 'Study']);
+        $project->authors()->attach($projectAuthor->id, ['contributor_type' => 'Researcher', 'sort_order' => 0]);
+        $study->studyAuthors()->attach($studyAuthor->id, ['contributor_type' => 'Researcher', 'sort_order' => 1]);
+
+        $creators = $study->fresh()->getMetadata()['creators'];
+
+        $this->assertSame(['Project, Pia'], array_column($creators, 'name'));
+    }
+
     private function makeProject(array $overrides = []): Project
     {
         $license = License::factory()->create();
