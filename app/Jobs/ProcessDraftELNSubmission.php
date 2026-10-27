@@ -567,24 +567,8 @@ class ProcessDraftELNSubmission implements ShouldQueue
         try {
             $licenseInfo = $studyMetadata['license'] ?? null;
 
-            if ($licenseInfo) {
-                $license = null;
-
-                if (isset($licenseInfo['spdx_id'])) {
-                    $license = License::where('spdx_id', $licenseInfo['spdx_id'])->first();
-                }
-
-                if (! $license && isset($licenseInfo['url'])) {
-                    $license = License::where('url', $licenseInfo['url'])->first();
-                }
-
-                if (! $license && isset($licenseInfo['title'])) {
-                    $license = License::where('title', 'ILIKE', '%'.$licenseInfo['title'].'%')->first();
-                }
-
-                if (! $license) {
-                    $license = License::where('spdx_id', 'CC-BY-4.0')->first();
-                }
+            if (is_array($licenseInfo) && $licenseInfo !== []) {
+                $license = $this->resolveLicense($licenseInfo);
 
                 if ($license) {
                     $study->update([
@@ -603,12 +587,60 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                     $logger->log($study->project->draft, 'info', 'License attached to study: '.$license->title);
                 } else {
-                    $logger->log($study->project->draft, 'info', 'License not found');
+                    // Left blank on purpose: validation then flags the missing license instead of guessing one.
+                    $logger->log($study->project->draft, 'warning', 'License not found, leaving it unset', [
+                        'rightsIdentifier' => $licenseInfo['rightsIdentifier'] ?? null,
+                        'rightsURI' => $licenseInfo['rightsURI'] ?? null,
+                        'rightsName' => $licenseInfo['rightsName'] ?? null,
+                    ]);
                 }
             }
         } catch (\Exception $e) {
             $logger->log($study->project->draft, 'error', 'Failed to attach license to study: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Find the nmrXiv license for the license block of an ELN metadata file.
+     *
+     * Uses the DataCite style keys Chemotion sends: rightsIdentifier (SPDX id), rightsURI and rightsName.
+     *
+     * @param  array<string, mixed>  $licenseInfo
+     */
+    private function resolveLicense(array $licenseInfo): ?License
+    {
+        $spdxId = $licenseInfo['rightsIdentifier'] ?? null;
+        $url = $licenseInfo['rightsURI'] ?? null;
+        $title = $licenseInfo['rightsName'] ?? null;
+
+        $license = null;
+
+        if (filled($spdxId) && is_string($spdxId)) {
+            $license = License::whereRaw('lower(spdx_id) = ?', [strtolower(trim($spdxId))])->first();
+        }
+
+        if (! $license && filled($url) && is_string($url)) {
+            $wanted = $this->normalizeLicenseUrl($url);
+            $license = License::all()->first(fn (License $candidate) => $this->normalizeLicenseUrl((string) $candidate->url) === $wanted);
+        }
+
+        if (! $license && filled($title) && is_string($title)) {
+            $license = License::where('title', 'ILIKE', '%'.$title.'%')->first();
+        }
+
+        return $license;
+    }
+
+    /**
+     * Compare license URLs regardless of scheme, trailing slash and a "/legalcode" suffix.
+     */
+    private function normalizeLicenseUrl(string $url): string
+    {
+        $url = strtolower(trim($url));
+        $url = preg_replace('#^https?://(www\.)?#', '', $url);
+        $url = preg_replace('#/legalcode$#', '', rtrim($url, '/'));
+
+        return rtrim($url, '/');
     }
 
     /**

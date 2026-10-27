@@ -4,6 +4,7 @@ namespace Tests\Unit\Jobs;
 
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Jobs\ProcessDraftELNSubmission;
+use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\License;
 use App\Models\Molecule;
@@ -357,5 +358,113 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
         $study->syncTagsWithType($project->fresh()->tags->pluck('name')->toArray(), 'Study');
 
         $this->assertCount(2, $study->fresh()->tags);
+    }
+
+    private function makeStudyForLicense(): Study
+    {
+        $draft = Draft::factory()->create(['eln' => 'chemotion', 'processing_logs' => []]);
+        $validation = Validation::factory()->create();
+
+        $project = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => License::factory()->create()->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        return Study::factory()->create([
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $project->license_id,
+            'validation_id' => $validation->id,
+        ]);
+    }
+
+    private function attachLicense(Study $study, array $metadata): void
+    {
+        $job = new ProcessDraftELNSubmission($study->project->draft->id);
+        $method = new ReflectionMethod($job, 'attachLicenseToStudy');
+        $method->invoke($job, $study, $metadata, new DraftProcessingLogger);
+    }
+
+    public function test_attach_license_reads_the_chemotion_license_keys(): void
+    {
+        License::factory()->create(['spdx_id' => 'CC-BY-4.0', 'url' => 'https://creativecommons.org/licenses/by/4.0/legalcode']);
+        $cc0 = License::factory()->create(['spdx_id' => 'CC0-1.0', 'url' => 'https://creativecommons.org/publicdomain/zero/1.0/legalcode']);
+
+        $study = $this->makeStudyForLicense();
+        $dataset = Dataset::factory()->create(['study_id' => $study->id, 'project_id' => $study->project_id]);
+
+        $this->attachLicense($study, ['license' => [
+            'schemeURI' => 'https://spdx.org/licenses/',
+            'rightsIdentifierScheme' => 'SPDX',
+            'rightsIdentifier' => 'CC0-1.0',
+            'rightsURI' => 'http://creativecommons.org/publicdomain/zero/1.0/',
+            'rightsName' => 'CC0 1.0 Universal',
+        ]]);
+
+        $this->assertSame($cc0->id, $study->fresh()->license_id);
+        $this->assertSame($cc0->id, $study->project->fresh()->license_id);
+        $this->assertSame($cc0->id, $dataset->fresh()->license_id);
+    }
+
+    public function test_attach_license_matches_chemotion_rights_uri_with_the_stored_legalcode_url(): void
+    {
+        License::factory()->create(['spdx_id' => 'CC-BY-4.0', 'url' => 'https://creativecommons.org/licenses/by/4.0/legalcode']);
+        $bySa = License::factory()->create(['spdx_id' => 'CC-BY-SA-4.0', 'url' => 'https://creativecommons.org/licenses/by-sa/4.0/legalcode']);
+
+        $study = $this->makeStudyForLicense();
+
+        $this->attachLicense($study, ['license' => [
+            'rightsIdentifier' => 'not-in-our-table',
+            'rightsURI' => 'http://creativecommons.org/licenses/by-sa/4.0/',
+        ]]);
+
+        $this->assertSame($bySa->id, $study->fresh()->license_id);
+    }
+
+    public function test_attach_license_ignores_the_old_license_keys(): void
+    {
+        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+        License::factory()->create(['spdx_id' => 'CC-BY-NC-4.0']);
+
+        $study = $this->makeStudyForLicense();
+        $original = $study->license_id;
+
+        $this->attachLicense($study, ['license' => ['spdx_id' => 'CC-BY-NC-4.0']]);
+
+        $this->assertSame($original, $study->fresh()->license_id);
+    }
+
+    public function test_attach_license_ignores_a_license_that_is_not_an_object(): void
+    {
+        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+
+        $study = $this->makeStudyForLicense();
+        $original = $study->license_id;
+
+        $this->attachLicense($study, ['license' => 'https://creativecommons.org/publicdomain/zero/1.0/']);
+
+        $this->assertSame($original, $study->fresh()->license_id);
+    }
+
+    public function test_attach_license_leaves_the_license_unset_when_nothing_matches(): void
+    {
+        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+
+        $study = $this->makeStudyForLicense();
+        $study->update(['license_id' => null]);
+        $study->project->update(['license_id' => null]);
+
+        $this->attachLicense($study, ['license' => ['rightsIdentifier' => 'Unknown-1.0']]);
+
+        $this->assertNull($study->fresh()->license_id);
+        $this->assertNull($study->project->fresh()->license_id);
+
+        $logs = collect($study->project->draft->fresh()->processing_logs);
+        $this->assertTrue($logs->contains(fn ($log) => $log['level'] === 'WARNING' && str_contains($log['message'], 'License not found')));
     }
 }
