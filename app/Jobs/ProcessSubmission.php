@@ -327,6 +327,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                 $releaseDate = Carbon::parse($project->release_date);
 
+                // The staging project is deleted afterwards, so the samples must carry their own release date.
+                $this->stampStudyReleaseDates(
+                    $studiesToPublish,
+                    filled($project->release_date) ? $releaseDate : now()->startOfDay()
+                );
+
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_immediate_publish_all',
                     'project_id' => $project->id,
@@ -386,6 +392,24 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'project_id' => $project->id,
                 ]);
 
+            }
+        }
+    }
+
+    /**
+     * Set the release date on samples (and their datasets) that do not have one yet.
+     *
+     * @param  Collection<int, Study>|\Illuminate\Database\Eloquent\Collection<int, Study>  $studies
+     */
+    private function stampStudyReleaseDates($studies, Carbon $releaseDate): void
+    {
+        foreach ($studies as $study) {
+            $study->release_date ??= $releaseDate;
+            $study->save();
+
+            foreach ($study->datasets as $dataset) {
+                $dataset->release_date ??= $releaseDate;
+                $dataset->save();
             }
         }
     }
