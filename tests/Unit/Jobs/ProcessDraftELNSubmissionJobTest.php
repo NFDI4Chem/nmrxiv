@@ -8,6 +8,7 @@ use App\Models\Draft;
 use App\Models\License;
 use App\Models\Molecule;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Validation;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -263,5 +264,56 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
 
             $this->assertGreaterThan(0, Molecule::query()->count());
         });
+    }
+
+    public function test_attach_molecules_stores_the_draft_eln_as_sample_submitted_through(): void
+    {
+        $license = License::factory()->create();
+        $validation = Validation::factory()->create();
+
+        $draft = Draft::factory()->create([
+            'eln' => 'chemotion',
+            'processing_logs' => [],
+        ]);
+
+        $project = Project::factory()->create([
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        $study = Study::factory()->create([
+            'project_id' => $project->id,
+            'draft_id' => $draft->id,
+            'owner_id' => $draft->owner_id,
+            'team_id' => $draft->team_id,
+            'license_id' => $license->id,
+            'validation_id' => $validation->id,
+        ]);
+
+        // CreateNewStudy / CreateDraftStudy create the sample before the ELN job runs.
+        $sample = Sample::factory()->create([
+            'study_id' => $study->id,
+            'project_id' => $project->id,
+            'submitted_through' => null,
+        ]);
+
+        $job = new ProcessDraftELNSubmission($draft->id);
+        $method = new ReflectionMethod($job, 'attachMoleculesToStudy');
+
+        $molecules = [['standard_inchi' => 'InChI=1S/SUBMITTED_THROUGH_TEST/c1/h1H2', 'molecular_formula' => 'H2']];
+
+        $method->invoke($job, $study, $molecules, new DraftProcessingLogger);
+
+        $this->assertSame('chemotion', $sample->fresh()->submitted_through);
+
+        // A sample that still carries the legacy value is brought in line with the draft's ELN.
+        $sample->update(['submitted_through' => 'ELN']);
+
+        $method->invoke($job, $study->fresh(), $molecules, new DraftProcessingLogger);
+
+        $this->assertSame('chemotion', $sample->fresh()->submitted_through);
     }
 }

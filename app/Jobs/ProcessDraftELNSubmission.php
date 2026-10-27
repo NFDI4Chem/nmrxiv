@@ -695,6 +695,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
         }
 
         try {
+            // Same value ValidateAndSubmitELNDraft writes to the study: the draft's ELN identifier.
+            $submittedThrough = $study->project->draft->eln;
+
             $sample = $study->sample;
             if (! $sample) {
                 $sample = Sample::create([
@@ -702,16 +705,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
                     'description' => '',
                     'study_id' => $study->id,
                     'project_id' => $study->project_id,
-                    'submitted_through' => 'ELN',
+                    'submitted_through' => $submittedThrough,
                 ]);
 
-                $logger->log($study->project->draft, 'info', "Created sample '{$sample->name}' with submitted_through: ELN");
-            } else {
-                // Update existing sample to track ELN submission if not already set
-                if (! $sample->submitted_through) {
-                    $sample->update(['submitted_through' => 'ELN']);
-                    $logger->log($study->project->draft, 'info', "Updated existing sample '{$sample->name}' with submitted_through: ELN");
-                }
+                $logger->log($study->project->draft, 'info', "Created sample '{$sample->name}' with submitted_through: {$submittedThrough}");
+            } elseif ($sample->submitted_through !== $submittedThrough) {
+                // Keep the sample in line with the study's submission source
+                $sample->update(['submitted_through' => $submittedThrough]);
+                $logger->log($study->project->draft, 'info', "Updated existing sample '{$sample->name}' with submitted_through: {$submittedThrough}");
             }
 
             $attachedMolecules = [];
