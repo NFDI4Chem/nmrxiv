@@ -412,8 +412,15 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher = Mockery::mock(PublishStudy::class);
         $studyPublisher->shouldReceive('publish')->twice()->with(Mockery::type(Study::class));
 
+        $projectId = $this->project->id;
+
         $job = new ProcessSubmission($this->project);
         $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
+
+        // The staging project is deleted and leaves no orphaned pivot rows behind.
+        $this->assertNull(Project::find($projectId));
+        $this->assertDatabaseMissing('author_project', ['project_id' => $projectId]);
+        $this->assertDatabaseMissing('citation_project', ['project_id' => $projectId]);
 
         foreach ([$studyOne->id, $studyTwo->id] as $studyId) {
             $study = Study::with('studyAuthors')->find($studyId);

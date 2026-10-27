@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Author\SyncStudyAuthors;
 use App\Actions\Citation\SyncCitations;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
@@ -480,10 +481,10 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
             if (! empty($authorData)) {
                 // Sync authors to project
-                app(SyncProjectAuthors::class)->handle($project, $authorData);
+                $authors = app(SyncProjectAuthors::class)->handle($project, $authorData);
 
-                // Also sync authors directly to the study for independent studies
-                $this->syncStudyAuthors($study, $authorData, $logger);
+                // Also sync the same Author rows directly to the study for independent studies
+                $this->syncStudyAuthors($study, $authors, $logger);
             }
 
         } catch (\Exception $e) {
@@ -493,45 +494,13 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
     /**
      * Sync authors to study.
+     *
+     * @param  array<int, Author>  $authors  Author rows returned by SyncProjectAuthors.
      */
-    private function syncStudyAuthors($study, array $authorData, DraftProcessingLogger $logger): void
+    private function syncStudyAuthors($study, array $authors, DraftProcessingLogger $logger): void
     {
         try {
-            $authorIds = [];
-
-            foreach ($authorData as $index => $data) {
-                // Find existing author by ORCID or name
-                $author = null;
-
-                if (! empty($data['orcid_id'])) {
-                    $author = Author::where('orcid_id', $data['orcid_id'])->first();
-                }
-
-                if (! $author) {
-                    $author = Author::where('given_name', $data['given_name'])
-                        ->where('family_name', $data['family_name'])
-                        ->first();
-                }
-
-                // Create if not found
-                if (! $author) {
-                    $author = Author::create([
-                        'given_name' => $data['given_name'],
-                        'family_name' => $data['family_name'],
-                        'email_id' => $data['email_id'],
-                        'orcid_id' => $data['orcid_id'],
-                        'affiliation' => $data['affiliation'],
-                    ]);
-                }
-
-                $authorIds[$author->id] = [
-                    'contributor_type' => $data['contributor_type'],
-                    'sort_order' => $index + 1,
-                ];
-            }
-
-            // Sync authors to study
-            $study->studyAuthors()->sync($authorIds);
+            $authorIds = app(SyncStudyAuthors::class)->handle($study, $authors);
 
             $logger->log($study->project->draft, 'info', 'Synced '.count($authorIds).' authors to study: '.$study->name);
 

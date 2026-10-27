@@ -373,6 +373,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     $project->save();
                 } else {
                     $logger->log($project, 'info', 'completed', 'Samples mode complete; removing staging project and draft.');
+                    $this->detachStagingProjectRelations($project);
                     $project->delete();
                     $draft->delete();
                 }
@@ -384,6 +385,21 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
             }
         }
+    }
+
+    /**
+     * Remove the many-to-many rows of a staging project that is about to be deleted.
+     *
+     * Deleting the model does not cascade to these pivot tables, so without this the
+     * published samples would leave orphaned rows pointing to a project that no
+     * longer exists. Everything the samples need was already copied onto the studies.
+     */
+    private function detachStagingProjectRelations(Project $project): void
+    {
+        $project->authors()->detach();
+        $project->citations()->detach();
+        $project->fundingReferences()->detach();
+        $project->tags()->detach();
     }
 
     /**
