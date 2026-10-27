@@ -297,6 +297,9 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $study->status = 'complete';
                         $study->save();
 
+                        // The staging project is deleted below, so the sample must not keep pointing at it.
+                        $study->sample()->update(['project_id' => null]);
+
                         $logger->log($project, 'info', 'study_files_moved', 'Files moved for sample.', [
                             'study_id' => $study->id,
                         ]);

@@ -18,6 +18,7 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\License;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -414,10 +415,16 @@ class ProcessSubmissionTest extends TestCase
 
         $projectId = $this->project->id;
 
+        $sample = Sample::factory()->create([
+            'study_id' => $studyOne->id,
+            'project_id' => $projectId,
+        ]);
+
         $job = new ProcessSubmission($this->project);
         $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
 
-        // The staging project is deleted and leaves no orphaned pivot rows behind.
+        // The staging project is deleted and leaves no orphaned pivot rows or references behind.
+        $this->assertNull(Sample::find($sample->id)->project_id);
         $this->assertNull(Project::find($projectId));
         $this->assertDatabaseMissing('author_project', ['project_id' => $projectId]);
         $this->assertDatabaseMissing('citation_project', ['project_id' => $projectId]);
