@@ -431,6 +431,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         $project->citations()->detach();
         $project->fundingReferences()->detach();
         $project->tags()->detach();
+        $project->users()->detach();
     }
 
     /**

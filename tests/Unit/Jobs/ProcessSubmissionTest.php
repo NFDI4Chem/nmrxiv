@@ -528,6 +528,7 @@ class ProcessSubmissionTest extends TestCase
         $this->assertNull(Project::find($projectId));
         $this->assertDatabaseMissing('author_project', ['project_id' => $projectId]);
         $this->assertDatabaseMissing('citation_project', ['project_id' => $projectId]);
+        $this->assertDatabaseMissing('project_user', ['project_id' => $projectId]);
 
         foreach ([$studyOne->id, $studyTwo->id] as $studyId) {
             $study = Study::with('studyAuthors')->find($studyId);

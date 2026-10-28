@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 return new class extends Migration
 {
@@ -20,8 +21,13 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Rows detached from their project cannot satisfy NOT NULL again.
-        DB::table('samples')->whereNull('project_id')->update(['project_id' => 0]);
+        // Samples detached from their project cannot satisfy NOT NULL again and the
+        // original project is not recorded, so refuse instead of inventing a project id.
+        if (DB::table('samples')->whereNull('project_id')->exists()) {
+            throw new RuntimeException(
+                'Cannot make samples.project_id NOT NULL while samples without a project exist.'
+            );
+        }
 
         Schema::table('samples', function (Blueprint $table) {
             $table->unsignedBigInteger('project_id')->nullable(false)->change();
