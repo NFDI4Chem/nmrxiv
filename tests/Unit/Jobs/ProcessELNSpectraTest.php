@@ -3,12 +3,16 @@
 namespace Tests\Unit\Jobs;
 
 use App\Jobs\ProcessELNSpectra;
+use App\Models\Molecule;
 use App\Models\NMRium;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
+use App\Support\Public\PublicMoleculeAggregates;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
@@ -164,7 +168,7 @@ class ProcessELNSpectraTest extends TestCase
         $nmrium = $this->study->nmrium;
         $this->assertNotNull($nmrium);
 
-        $nmriumData = json_decode($nmrium->nmrium_info, true);
+        $nmriumData = $nmrium->nmrium_info;
         $this->assertEquals('2.0', $nmriumData['version']);
         $this->assertArrayNotHasKey('data', $nmriumData['data']['spectra'][0]);
         $this->assertArrayNotHasKey('meta', $nmriumData['data']['spectra'][0]);
@@ -177,7 +181,7 @@ class ProcessELNSpectraTest extends TestCase
         $this->study->save();
 
         $existingNmrium = NMRium::create([
-            'nmrium_info' => json_encode(['old' => 'data']),
+            'nmrium_info' => ['old' => 'data'],
         ]);
         $this->study->nmrium()->save($existingNmrium);
 
@@ -202,7 +206,7 @@ class ProcessELNSpectraTest extends TestCase
         $this->study->refresh();
         $this->assertEquals($existingNmrium->id, $this->study->nmrium->id);
 
-        $nmriumData = json_decode($this->study->nmrium->nmrium_info, true);
+        $nmriumData = $this->study->nmrium->nmrium_info;
         $this->assertEquals('3.0', $nmriumData['version']);
     }
 
@@ -326,8 +330,58 @@ class ProcessELNSpectraTest extends TestCase
         $this->study->refresh();
         $this->assertTrue($this->study->has_nmrium);
 
-        $nmriumData = json_decode($this->study->nmrium->nmrium_info, true);
+        $nmriumData = $this->study->nmrium->nmrium_info;
         $this->assertEquals('4.0', $nmriumData['version']);
+    }
+
+    public function test_handle_stores_nmrium_info_as_a_json_object_the_public_catalog_can_read(): void
+    {
+        $this->study->download_url = 'https://example.com/spectra.zip';
+        $this->study->is_public = true;
+        $this->study->is_archived = false;
+        $this->study->save();
+
+        Http::fake([
+            self::PARSER_URL => Http::response([
+                'nmriumState' => [
+                    'data' => ['spectra' => [['id' => '1', 'info' => ['experiment' => '1H', 'nucleus' => ['1H']]]]],
+                    'version' => '4.0',
+                ],
+            ], 200),
+        ]);
+
+        $sample = Sample::factory()->create(['study_id' => $this->study->id, 'project_id' => $this->project->id]);
+        $molecule = Molecule::factory()->create(['identifier' => 777001]);
+        $sample->molecules()->attach($molecule->id, ['percentage_composition' => 100]);
+
+        (new ProcessELNSpectra($this->project->id))->handle();
+
+        $row = DB::selectOne(
+            'select jsonb_typeof(nmrium_info) as type from nmrium where nmriumable_type = ? and nmriumable_id = ?',
+            [Study::class, $this->study->id]
+        );
+        $this->assertSame('object', $row->type);
+
+        $catalog = DB::selectOne('select '.PublicMoleculeAggregates::hasPublicSpectraExistsSql((string) $molecule->id).' as ok');
+        $this->assertTrue((bool) $catalog->ok);
+    }
+
+    public function test_handle_still_reads_a_study_row_stored_as_a_json_string(): void
+    {
+        $this->study->download_url = 'https://example.com/spectra.zip';
+        $this->study->save();
+
+        $legacy = NMRium::create([
+            'nmrium_info' => json_encode(['data' => ['spectra' => [['id' => '1']]], 'version' => '1.0']),
+        ]);
+        $this->study->nmrium()->save($legacy);
+        $this->study->has_nmrium = true;
+        $this->study->save();
+
+        // Only the dataset pass reads the stored study row back; it must cope with the old string form.
+        (new ProcessELNSpectra($this->project->id))->handle();
+
+        $this->assertTrue($this->study->fresh()->has_nmrium);
     }
 
     public function test_it_can_be_pushed_to_different_queues(): void

@@ -139,15 +139,20 @@ class ProcessELNSpectra implements ShouldQueue
                 'version' => $version,
             ];
 
+            // Store the array itself: NMRium::$nmrium_info is cast to array, so a pre-encoded JSON
+            // string would be encoded a second time and the SQL that reads data.spectra (public
+            // molecule catalog, metadata search) could not find the spectra.
+            $nmriumJSON = sanitizeUnicodeInNMRiumData($nmriumJSON);
+
             // Create or update NMRium record
             $nmrium = $study->nmrium;
 
             if ($nmrium) {
-                $nmrium->nmrium_info = json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE);
+                $nmrium->nmrium_info = $nmriumJSON;
                 $nmrium->save();
             } else {
                 $nmrium = NMRium::create([
-                    'nmrium_info' => json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE),
+                    'nmrium_info' => $nmriumJSON,
                 ]);
                 $study->nmrium()->save($nmrium);
             }
@@ -170,7 +175,11 @@ class ProcessELNSpectra implements ShouldQueue
             return;
         }
 
-        $nmriumInfo = json_decode($study->nmrium->nmrium_info, true);
+        $nmriumInfo = $study->nmrium->nmrium_info;
+        if (is_string($nmriumInfo)) {
+            // Rows written before the value was stored as an array are JSON strings.
+            $nmriumInfo = json_decode($nmriumInfo, true);
+        }
 
         if (! isset($nmriumInfo['data']['spectra']) || count($nmriumInfo['data']['spectra']) == 0) {
             Log::warning("Study {$study->identifier} has no spectra info, skipping datasets");
@@ -228,15 +237,17 @@ class ProcessELNSpectra implements ShouldQueue
             unset($nmriumJSON['data']['spectra']);
             $nmriumJSON['data']['spectra'] = $matchingSpectra;
 
+            $nmriumJSON = sanitizeUnicodeInNMRiumData($nmriumJSON);
+
             // Create or update NMRium record for dataset
             $nmrium = $dataset->nmrium;
 
             if ($nmrium) {
-                $nmrium->nmrium_info = json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE);
+                $nmrium->nmrium_info = $nmriumJSON;
                 $nmrium->save();
             } else {
                 $nmrium = NMRium::create([
-                    'nmrium_info' => json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE),
+                    'nmrium_info' => $nmriumJSON,
                 ]);
                 $dataset->nmrium()->save($nmrium);
             }
