@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Models\NMRium;
 use App\Models\Project;
 use Exception;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ProcessELNSpectra implements ShouldQueue
 {
@@ -66,6 +68,18 @@ class ProcessELNSpectra implements ShouldQueue
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * The job threw: tell the submitter and the admins (ELN submissions only).
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Project::find($this->projectId)?->draft;
+
+        if ($draft) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Processing the spectra', $exception);
         }
     }
 
@@ -139,15 +153,20 @@ class ProcessELNSpectra implements ShouldQueue
                 'version' => $version,
             ];
 
+            // Store the array itself: NMRium::$nmrium_info is cast to array, so a pre-encoded JSON
+            // string would be encoded a second time and the SQL that reads data.spectra (public
+            // molecule catalog, metadata search) could not find the spectra.
+            $nmriumJSON = sanitizeUnicodeInNMRiumData($nmriumJSON);
+
             // Create or update NMRium record
             $nmrium = $study->nmrium;
 
             if ($nmrium) {
-                $nmrium->nmrium_info = json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE);
+                $nmrium->nmrium_info = $nmriumJSON;
                 $nmrium->save();
             } else {
                 $nmrium = NMRium::create([
-                    'nmrium_info' => json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE),
+                    'nmrium_info' => $nmriumJSON,
                 ]);
                 $study->nmrium()->save($nmrium);
             }
@@ -170,7 +189,11 @@ class ProcessELNSpectra implements ShouldQueue
             return;
         }
 
-        $nmriumInfo = json_decode($study->nmrium->nmrium_info, true);
+        $nmriumInfo = $study->nmrium->nmrium_info;
+        if (is_string($nmriumInfo)) {
+            // Rows written before the value was stored as an array are JSON strings.
+            $nmriumInfo = json_decode($nmriumInfo, true);
+        }
 
         if (! isset($nmriumInfo['data']['spectra']) || count($nmriumInfo['data']['spectra']) == 0) {
             Log::warning("Study {$study->identifier} has no spectra info, skipping datasets");
@@ -202,10 +225,9 @@ class ProcessELNSpectra implements ShouldQueue
         $fsObject = $dataset->fsObject;
         $studyFSObject = $study->fsObject;
         $datasetFSObject = $dataset->fsObject;
-        $draft = $study->draft;
 
         // Determine path based on ELN type
-        if ($draft && $draft->eln == 'chemotion') {
+        if ($study->isChemotionSubmission()) {
             $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->parent->name.'/'.$datasetFSObject->name;
         } else {
             $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
@@ -228,15 +250,17 @@ class ProcessELNSpectra implements ShouldQueue
             unset($nmriumJSON['data']['spectra']);
             $nmriumJSON['data']['spectra'] = $matchingSpectra;
 
+            $nmriumJSON = sanitizeUnicodeInNMRiumData($nmriumJSON);
+
             // Create or update NMRium record for dataset
             $nmrium = $dataset->nmrium;
 
             if ($nmrium) {
-                $nmrium->nmrium_info = json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE);
+                $nmrium->nmrium_info = $nmriumJSON;
                 $nmrium->save();
             } else {
                 $nmrium = NMRium::create([
-                    'nmrium_info' => json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE),
+                    'nmrium_info' => $nmriumJSON,
                 ]);
                 $dataset->nmrium()->save($nmrium);
             }
@@ -262,7 +286,8 @@ class ProcessELNSpectra implements ShouldQueue
      */
     private function spectraMatchesDataset($spectra, string $path, string $fType): bool
     {
-        $files = $spectra['sourceSelector']['files'] ?? [];
+        // NMRKit returns the source files under `selector`; older payloads used `sourceSelector`.
+        $files = $spectra['sourceSelector']['files'] ?? $spectra['selector']['files'] ?? [];
 
         if (! $files) {
             return false;

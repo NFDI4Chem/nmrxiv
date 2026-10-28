@@ -396,7 +396,7 @@ class StudyController extends Controller
                     continue;
                 }
 
-                $isChemotion = $draft && $draft->eln === 'chemotion';
+                $isChemotion = $study->isChemotionSubmission();
                 $parentName = $isChemotion ? optional($datasetFSObject->parent)->name : null;
                 if ($isChemotion && $parentName === null) {
                     Log::warning('nmriumInfo: chemotion dataset without parent fsObject', [

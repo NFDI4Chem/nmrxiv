@@ -3,9 +3,11 @@
 namespace App\Jobs;
 
 use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Author\SyncStudyAuthors;
 use App\Actions\Citation\SyncCitations;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Http\Controllers\FileSystemController;
 use App\Models\Author;
 use App\Models\Draft;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 use ZipArchive;
 
 class ProcessDraftELNSubmission implements ShouldQueue
@@ -95,6 +98,18 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $logger->log($draft, 'error', 'ELN processing failed: '.$e->getMessage());
             $draft->update(['status' => 'FAILED']);
             throw $e;
+        }
+    }
+
+    /**
+     * All attempts are used up: tell the submitter and the admins.
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Draft::find($this->draftId);
+
+        if ($draft) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Importing the submitted files', $exception);
         }
     }
 
@@ -256,10 +271,12 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                     // update STATUS_PROCESSED in Chemotion Repository Tracker
                     $trackerService = app(ChemotionRepositoryTrackerService::class);
-                    $trackerService->updateElnSubmissionStatus(
-                        submissionId: $draft->external_id,
-                        newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
-                    );
+                    if ($draft->eln === 'chemotion' && $trackerService->isEnabled()) {
+                        $trackerService->updateElnSubmissionStatus(
+                            submissionId: $draft->external_id,
+                            newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
+                        );
+                    }
 
                     if ($allMetadata) {
                         $logger->log($draft, 'info', 'Metadata extracted from draft');
@@ -424,9 +441,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             // update STATUS_PROCESSED in Chemotion Repository Tracker (only once for the first study)
-            if ($studiesInSample->isNotEmpty()) {
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+            if ($studiesInSample->isNotEmpty() && $project->draft?->eln === 'chemotion' && $trackerService->isEnabled()) {
                 $firstStudy = $studiesInSample->first();
-                $trackerService = app(ChemotionRepositoryTrackerService::class);
                 $trackerService->updateElnSubmissionStatus(
                     submissionId: $firstStudy->tracking_item_name,
                     newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
@@ -480,10 +497,10 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
             if (! empty($authorData)) {
                 // Sync authors to project
-                app(SyncProjectAuthors::class)->handle($project, $authorData);
+                $authors = app(SyncProjectAuthors::class)->handle($project, $authorData);
 
-                // Also sync authors directly to the study for independent studies
-                $this->syncStudyAuthors($study, $authorData, $logger);
+                // Also sync the same Author rows directly to the study for independent studies
+                $this->syncStudyAuthors($study, $authors, $logger);
             }
 
         } catch (\Exception $e) {
@@ -493,45 +510,13 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
     /**
      * Sync authors to study.
+     *
+     * @param  array<int, Author>  $authors  Author rows returned by SyncProjectAuthors.
      */
-    private function syncStudyAuthors($study, array $authorData, DraftProcessingLogger $logger): void
+    private function syncStudyAuthors($study, array $authors, DraftProcessingLogger $logger): void
     {
         try {
-            $authorIds = [];
-
-            foreach ($authorData as $index => $data) {
-                // Find existing author by ORCID or name
-                $author = null;
-
-                if (! empty($data['orcid_id'])) {
-                    $author = Author::where('orcid_id', $data['orcid_id'])->first();
-                }
-
-                if (! $author) {
-                    $author = Author::where('given_name', $data['given_name'])
-                        ->where('family_name', $data['family_name'])
-                        ->first();
-                }
-
-                // Create if not found
-                if (! $author) {
-                    $author = Author::create([
-                        'given_name' => $data['given_name'],
-                        'family_name' => $data['family_name'],
-                        'email_id' => $data['email_id'],
-                        'orcid_id' => $data['orcid_id'],
-                        'affiliation' => $data['affiliation'],
-                    ]);
-                }
-
-                $authorIds[$author->id] = [
-                    'contributor_type' => $data['contributor_type'],
-                    'sort_order' => $index + 1,
-                ];
-            }
-
-            // Sync authors to study
-            $study->studyAuthors()->sync($authorIds);
+            $authorIds = app(SyncStudyAuthors::class)->handle($study, $authors);
 
             $logger->log($study->project->draft, 'info', 'Synced '.count($authorIds).' authors to study: '.$study->name);
 
@@ -598,24 +583,8 @@ class ProcessDraftELNSubmission implements ShouldQueue
         try {
             $licenseInfo = $studyMetadata['license'] ?? null;
 
-            if ($licenseInfo) {
-                $license = null;
-
-                if (isset($licenseInfo['spdx_id'])) {
-                    $license = License::where('spdx_id', $licenseInfo['spdx_id'])->first();
-                }
-
-                if (! $license && isset($licenseInfo['url'])) {
-                    $license = License::where('url', $licenseInfo['url'])->first();
-                }
-
-                if (! $license && isset($licenseInfo['title'])) {
-                    $license = License::where('title', 'ILIKE', '%'.$licenseInfo['title'].'%')->first();
-                }
-
-                if (! $license) {
-                    $license = License::where('spdx_id', 'CC-BY-4.0')->first();
-                }
+            if (is_array($licenseInfo) && $licenseInfo !== []) {
+                $license = $this->resolveLicense($licenseInfo);
 
                 if ($license) {
                     $study->update([
@@ -634,12 +603,60 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                     $logger->log($study->project->draft, 'info', 'License attached to study: '.$license->title);
                 } else {
-                    $logger->log($study->project->draft, 'info', 'License not found');
+                    // Left blank on purpose: validation then flags the missing license instead of guessing one.
+                    $logger->log($study->project->draft, 'warning', 'License not found, leaving it unset', [
+                        'rightsIdentifier' => $licenseInfo['rightsIdentifier'] ?? null,
+                        'rightsURI' => $licenseInfo['rightsURI'] ?? null,
+                        'rightsName' => $licenseInfo['rightsName'] ?? null,
+                    ]);
                 }
             }
         } catch (\Exception $e) {
             $logger->log($study->project->draft, 'error', 'Failed to attach license to study: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Find the nmrXiv license for the license block of an ELN metadata file.
+     *
+     * Uses the DataCite style keys Chemotion sends: rightsIdentifier (SPDX id), rightsURI and rightsName.
+     *
+     * @param  array<string, mixed>  $licenseInfo
+     */
+    private function resolveLicense(array $licenseInfo): ?License
+    {
+        $spdxId = $licenseInfo['rightsIdentifier'] ?? null;
+        $url = $licenseInfo['rightsURI'] ?? null;
+        $title = $licenseInfo['rightsName'] ?? null;
+
+        $license = null;
+
+        if (filled($spdxId) && is_string($spdxId)) {
+            $license = License::whereRaw('lower(spdx_id) = ?', [strtolower(trim($spdxId))])->first();
+        }
+
+        if (! $license && filled($url) && is_string($url)) {
+            $wanted = $this->normalizeLicenseUrl($url);
+            $license = License::all()->first(fn (License $candidate) => $this->normalizeLicenseUrl((string) $candidate->url) === $wanted);
+        }
+
+        if (! $license && filled($title) && is_string($title)) {
+            $license = License::where('title', 'ILIKE', '%'.$title.'%')->first();
+        }
+
+        return $license;
+    }
+
+    /**
+     * Compare license URLs regardless of scheme, trailing slash and a "/legalcode" suffix.
+     */
+    private function normalizeLicenseUrl(string $url): string
+    {
+        $url = strtolower(trim($url));
+        $url = preg_replace('#^https?://(www\.)?#', '', $url);
+        $url = preg_replace('#/legalcode$#', '', rtrim($url, '/'));
+
+        return rtrim($url, '/');
     }
 
     /**
@@ -671,8 +688,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 });
 
                 if (! empty($keywords)) {
-                    $study->syncTags($keywords);
-                    $study->project->syncTags($keywords);
+                    // Typed like the rest of the app, so the copy done at publish time reuses these tags.
+                    $study->syncTagsWithType($keywords, 'Study');
+                    $study->project->syncTagsWithType($keywords, 'Project');
                     $logger->log($study->project->draft, 'info', 'Keywords attached to study: '.implode(', ', $keywords));
                 } else {
                     $logger->log($study->project->draft, 'info', 'Keywords not found');
@@ -695,6 +713,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
         }
 
         try {
+            // Same value ValidateAndSubmitELNDraft writes to the study: the draft's ELN identifier.
+            $submittedThrough = $study->project->draft->eln;
+
             $sample = $study->sample;
             if (! $sample) {
                 $sample = Sample::create([
@@ -702,16 +723,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
                     'description' => '',
                     'study_id' => $study->id,
                     'project_id' => $study->project_id,
-                    'submitted_through' => 'ELN',
+                    'submitted_through' => $submittedThrough,
                 ]);
 
-                $logger->log($study->project->draft, 'info', "Created sample '{$sample->name}' with submitted_through: ELN");
-            } else {
-                // Update existing sample to track ELN submission if not already set
-                if (! $sample->submitted_through) {
-                    $sample->update(['submitted_through' => 'ELN']);
-                    $logger->log($study->project->draft, 'info', "Updated existing sample '{$sample->name}' with submitted_through: ELN");
-                }
+                $logger->log($study->project->draft, 'info', "Created sample '{$sample->name}' with submitted_through: {$submittedThrough}");
+            } elseif ($sample->submitted_through !== $submittedThrough) {
+                // Keep the sample in line with the study's submission source
+                $sample->update(['submitted_through' => $submittedThrough]);
+                $logger->log($study->project->draft, 'info', "Updated existing sample '{$sample->name}' with submitted_through: {$submittedThrough}");
             }
 
             $attachedMolecules = [];

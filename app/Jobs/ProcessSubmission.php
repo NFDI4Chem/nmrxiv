@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Actions\Citation\SyncCitationPivot;
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishProject;
@@ -297,6 +298,9 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $study->status = 'complete';
                         $study->save();
 
+                        // The staging project is deleted below, so the sample must not keep pointing at it.
+                        $study->sample()->update(['project_id' => null]);
+
                         $logger->log($project, 'info', 'study_files_moved', 'Files moved for sample.', [
                             'study_id' => $study->id,
                         ]);
@@ -320,9 +324,22 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'study_count' => $studiesToPublish->count(),
                 ]);
 
-                $assigner->assign($studiesToPublish);
-
                 $releaseDate = Carbon::parse($project->release_date);
+
+                // The staging project is deleted afterwards, so the samples must carry their own release date.
+                // Set before the identifiers/DOIs are assigned so the DOI metadata uses it.
+                $this->stampStudyReleaseDates(
+                    $studiesToPublish,
+                    filled($project->release_date) ? $releaseDate : now()->startOfDay()
+                );
+
+                // Also before the DOIs: the samples no longer have a project to read citations from.
+                $project->load('citations');
+                foreach ($studiesToPublish as $study) {
+                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
+                }
+
+                $assigner->assign($studiesToPublish);
 
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_immediate_publish_all',
@@ -357,10 +374,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'project_id' => $project->id,
                 ]);
                 event(new StudyPublish($studiesToPublish, $this->prepareSendList($project)));
-                $project->load('citations');
-                foreach ($studiesToPublish as $study) {
-                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
-                }
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_delete_project_draft',
                     'project_id' => $project->id,
@@ -373,6 +386,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     $project->save();
                 } else {
                     $logger->log($project, 'info', 'completed', 'Samples mode complete; removing staging project and draft.');
+                    $this->detachStagingProjectRelations($project);
                     $project->delete();
                     $draft->delete();
                 }
@@ -384,6 +398,40 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
             }
         }
+    }
+
+    /**
+     * Set the release date on samples (and their datasets) that do not have one yet.
+     *
+     * @param  Collection<int, Study>|\Illuminate\Database\Eloquent\Collection<int, Study>  $studies
+     */
+    private function stampStudyReleaseDates($studies, Carbon $releaseDate): void
+    {
+        foreach ($studies as $study) {
+            $study->release_date ??= $releaseDate;
+            $study->save();
+
+            foreach ($study->datasets as $dataset) {
+                $dataset->release_date ??= $releaseDate;
+                $dataset->save();
+            }
+        }
+    }
+
+    /**
+     * Remove the many-to-many rows of a staging project that is about to be deleted.
+     *
+     * Deleting the model does not cascade to these pivot tables, so without this the
+     * published samples would leave orphaned rows pointing to a project that no
+     * longer exists. Everything the samples need was already copied onto the studies.
+     */
+    private function detachStagingProjectRelations(Project $project): void
+    {
+        $project->authors()->detach();
+        $project->citations()->detach();
+        $project->fundingReferences()->detach();
+        $project->tags()->detach();
+        $project->users()->detach();
     }
 
     /**
@@ -407,6 +455,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         $project->status = 'failed';
         $project->save();
+
+        // ELN submissions have no one watching the publish step: tell the submitter and the admins.
+        $draft = $project->draft;
+        if ($draft && filled($draft->eln)) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Publishing the submission', $exception);
+        }
 
         Log::error('ProcessSubmission failed permanently', [
             'project_id' => $project->id,

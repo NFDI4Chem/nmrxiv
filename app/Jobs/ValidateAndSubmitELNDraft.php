@@ -2,12 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Actions\Project\AssignIdentifier;
 use App\Models\Draft;
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ValidateAndSubmitELNDraft implements ShouldQueue
 {
@@ -133,6 +135,8 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
 
                 // Track validation failure
                 $this->trackValidationFailed($draft, $project);
+
+                app(ReportElnSubmissionFailure::class)->handle($draft, 'Validating the submission');
             }
 
         } catch (\Exception $e) {
@@ -153,6 +157,18 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
     }
 
     /**
+     * The job threw (not the same as failing validation): tell the submitter and the admins.
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Draft::find($this->draftId);
+
+        if ($draft) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Validating the submission', $exception);
+        }
+    }
+
+    /**
      * Track submission as validated and ready for publishing
      */
     private function trackSubmissionValidated(Draft $draft, $project, $owner): void
@@ -161,7 +177,7 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             $trackerService = app(ChemotionRepositoryTrackerService::class);
 
             // Check if tracking is enabled
-            if (! $trackerService->isEnabled()) {
+            if ($draft->eln !== 'chemotion' || ! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for validated submission', [
                     'external_id' => $draft->external_id,
                     'project_id' => $project->id,
@@ -209,7 +225,7 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             $trackerService = app(ChemotionRepositoryTrackerService::class);
 
             // Check if tracking is enabled
-            if (! $trackerService->isEnabled()) {
+            if ($draft->eln !== 'chemotion' || ! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for failed validation', [
                     'external_id' => $draft->external_id,
                     'project_id' => $project->id,
