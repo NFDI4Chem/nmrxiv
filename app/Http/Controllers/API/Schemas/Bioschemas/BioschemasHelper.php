@@ -366,8 +366,7 @@ class BioschemasHelper
             return [];
         }
 
-        $draft = $study->relationLoaded('draft') ? $study->draft : $study->draft()->first();
-        $isChemotion = $draft && ($draft->eln === 'chemotion');
+        $isChemotion = $study->isChemotionSubmission();
         $parentName = $isChemotion ? optional($datasetFSObject->parent)->name : null;
         if ($isChemotion && $parentName === null) {
             return [];

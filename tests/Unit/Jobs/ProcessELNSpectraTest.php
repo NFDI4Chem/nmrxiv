@@ -384,6 +384,20 @@ class ProcessELNSpectraTest extends TestCase
         $this->assertTrue($this->study->fresh()->has_nmrium);
     }
 
+    public function test_spectra_are_matched_to_a_dataset_through_selector_or_source_selector_files(): void
+    {
+        $job = new ProcessELNSpectra($this->project->id);
+        $method = new \ReflectionMethod($job, 'spectraMatchesDataset');
+
+        $path = '/sample_170435/analysis_1033223/dataset_1033224';
+        $file = '/nmrxiv/production/archive/uuid/sample_170435.zip/sample_170435/analysis_1033223/dataset_1033224/20.zip/20/pdata/1/1i';
+
+        $this->assertTrue($method->invoke($job, ['selector' => ['files' => [$file]]], $path, 'directory'));
+        $this->assertTrue($method->invoke($job, ['sourceSelector' => ['files' => [$file]]], $path, 'directory'));
+        $this->assertFalse($method->invoke($job, ['selector' => ['files' => [$file]]], '/sample_170435/analysis_1033223/dataset_9999999', 'directory'));
+        $this->assertFalse($method->invoke($job, ['id' => 'no-source-files'], $path, 'directory'));
+    }
+
     public function test_it_can_be_pushed_to_different_queues(): void
     {
         Queue::fake();

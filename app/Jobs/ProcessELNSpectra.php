@@ -211,10 +211,9 @@ class ProcessELNSpectra implements ShouldQueue
         $fsObject = $dataset->fsObject;
         $studyFSObject = $study->fsObject;
         $datasetFSObject = $dataset->fsObject;
-        $draft = $study->draft;
 
         // Determine path based on ELN type
-        if ($draft && $draft->eln == 'chemotion') {
+        if ($study->isChemotionSubmission()) {
             $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->parent->name.'/'.$datasetFSObject->name;
         } else {
             $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
@@ -273,7 +272,8 @@ class ProcessELNSpectra implements ShouldQueue
      */
     private function spectraMatchesDataset($spectra, string $path, string $fType): bool
     {
-        $files = $spectra['sourceSelector']['files'] ?? [];
+        // NMRKit returns the source files under `selector`; older payloads used `sourceSelector`.
+        $files = $spectra['sourceSelector']['files'] ?? $spectra['selector']['files'] ?? [];
 
         if (! $files) {
             return false;
