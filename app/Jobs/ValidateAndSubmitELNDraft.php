@@ -177,7 +177,7 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             $trackerService = app(ChemotionRepositoryTrackerService::class);
 
             // Check if tracking is enabled
-            if (! $trackerService->isEnabled()) {
+            if ($draft->eln !== 'chemotion' || ! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for validated submission', [
                     'external_id' => $draft->external_id,
                     'project_id' => $project->id,
@@ -225,7 +225,7 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             $trackerService = app(ChemotionRepositoryTrackerService::class);
 
             // Check if tracking is enabled
-            if (! $trackerService->isEnabled()) {
+            if ($draft->eln !== 'chemotion' || ! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for failed validation', [
                     'external_id' => $draft->external_id,
                     'project_id' => $project->id,

@@ -271,10 +271,12 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                     // update STATUS_PROCESSED in Chemotion Repository Tracker
                     $trackerService = app(ChemotionRepositoryTrackerService::class);
-                    $trackerService->updateElnSubmissionStatus(
-                        submissionId: $draft->external_id,
-                        newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
-                    );
+                    if ($draft->eln === 'chemotion' && $trackerService->isEnabled()) {
+                        $trackerService->updateElnSubmissionStatus(
+                            submissionId: $draft->external_id,
+                            newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
+                        );
+                    }
 
                     if ($allMetadata) {
                         $logger->log($draft, 'info', 'Metadata extracted from draft');
@@ -439,9 +441,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             // update STATUS_PROCESSED in Chemotion Repository Tracker (only once for the first study)
-            if ($studiesInSample->isNotEmpty()) {
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+            if ($studiesInSample->isNotEmpty() && $project->draft?->eln === 'chemotion' && $trackerService->isEnabled()) {
                 $firstStudy = $studiesInSample->first();
-                $trackerService = app(ChemotionRepositoryTrackerService::class);
                 $trackerService->updateElnSubmissionStatus(
                     submissionId: $firstStudy->tracking_item_name,
                     newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
