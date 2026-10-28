@@ -390,6 +390,105 @@ class HasDOIRdmFixesTest extends TestCase
         $this->assertSame(['Thines, Eckhard'], array_column($creators, 'name'));
     }
 
+    public function test_study_without_project_uses_its_own_citations_as_related_identifiers(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create();
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+        $study->linkedCitations()->attach(Citation::factory()->create(['doi' => '10.1234/study-paper'])->id);
+
+        $related = $study->fresh()->getMetadata()['relatedIdentifiers'];
+
+        $this->assertContains(
+            ['relatedIdentifier' => '10.1234/study-paper', 'relatedIdentifierType' => 'DOI', 'relationType' => 'IsReferencedBy'],
+            $related
+        );
+    }
+
+    public function test_dataset_without_project_uses_the_study_citations_as_related_identifiers(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create();
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+        $dataset = Dataset::factory()->create(['study_id' => $study->id, 'project_id' => null, 'license_id' => $license->id]);
+        $study->linkedCitations()->attach(Citation::factory()->create(['doi' => '10.1234/dataset-paper'])->id);
+
+        $related = $dataset->fresh()->getMetadata()['relatedIdentifiers'];
+
+        $this->assertContains(
+            ['relatedIdentifier' => '10.1234/dataset-paper', 'relatedIdentifierType' => 'DOI', 'relationType' => 'IsReferencedBy'],
+            $related
+        );
+    }
+
+    public function test_study_without_project_keeps_only_the_submitter_and_hosting_institution_as_contributors(): void
+    {
+        config()->set('doi.publisher_name', 'nmrXiv');
+        config()->set('doi.publisher_ror', null);
+
+        $license = License::factory()->create();
+        $owner = User::factory()->create(['first_name' => 'Till', 'last_name' => 'Opatz']);
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+
+        $first = Author::factory()->create(['given_name' => 'Till', 'family_name' => 'Opatz']);
+        $second = Author::factory()->create(['given_name' => 'Heidrun', 'family_name' => 'Anke']);
+        $study->studyAuthors()->attach([
+            $first->id => ['contributor_type' => 'Researcher', 'sort_order' => 1],
+            $second->id => ['contributor_type' => 'DataCurator', 'sort_order' => 2],
+        ]);
+
+        $metadata = $study->fresh()->getMetadata();
+
+        $this->assertSame(['Opatz, Till', 'Anke, Heidrun'], array_column($metadata['creators'], 'name'));
+        $this->assertSame(
+            ['Opatz, Till' => 'ContactPerson', 'nmrXiv' => 'HostingInstitution'],
+            collect($metadata['contributors'])->pluck('contributorType', 'name')->all()
+        );
+    }
+
+    public function test_study_with_project_does_not_add_authors_to_contributors(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create(['first_name' => 'Ola', 'last_name' => 'Owner']);
+        $project = Project::factory()->create(['owner_id' => $owner->id, 'license_id' => $license->id]);
+        $project->users()->attach($owner, ['role' => 'creator']);
+        $study = Study::factory()->create(['project_id' => $project->id, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+
+        $author = Author::factory()->create(['given_name' => 'Pia', 'family_name' => 'Project']);
+        $project->authors()->attach($author->id, ['contributor_type' => 'DataCurator', 'sort_order' => 0]);
+
+        $names = array_column($study->fresh()->getMetadata()['contributors'], 'name');
+
+        $this->assertNotContains('Project, Pia', $names);
+        $this->assertContains('Owner, Ola', $names);
+    }
+
+    public function test_study_without_project_uses_its_own_tags_as_subjects(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create();
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+        $study->syncTagsWithType(['sample', 'chemical reaction'], 'Study');
+
+        $subjects = array_column($study->fresh()->getMetadata()['subjects'], 'subject');
+
+        $this->assertContains('sample', $subjects);
+        $this->assertContains('chemical reaction', $subjects);
+    }
+
+    public function test_dataset_without_project_uses_the_study_tags_as_subjects(): void
+    {
+        $license = License::factory()->create();
+        $owner = User::factory()->create();
+        $study = Study::factory()->create(['project_id' => null, 'owner_id' => $owner->id, 'license_id' => $license->id]);
+        $dataset = Dataset::factory()->create(['study_id' => $study->id, 'project_id' => null, 'license_id' => $license->id]);
+        $study->syncTagsWithType(['Analytical Chemistry'], 'Study');
+
+        $subjects = array_column($dataset->fresh()->getMetadata()['subjects'], 'subject');
+
+        $this->assertContains('Analytical Chemistry', $subjects);
+    }
+
     public function test_study_with_project_still_uses_the_project_authors_as_creators(): void
     {
         $license = License::factory()->create();

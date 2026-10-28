@@ -332,6 +332,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     filled($project->release_date) ? $releaseDate : now()->startOfDay()
                 );
 
+                // Also before the DOIs: the samples no longer have a project to read citations from.
+                $project->load('citations');
+                foreach ($studiesToPublish as $study) {
+                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
+                }
+
                 $assigner->assign($studiesToPublish);
 
                 Log::info('embargo_publish_trace', [
@@ -367,10 +373,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'project_id' => $project->id,
                 ]);
                 event(new StudyPublish($studiesToPublish, $this->prepareSendList($project)));
-                $project->load('citations');
-                foreach ($studiesToPublish as $study) {
-                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
-                }
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_delete_project_draft',
                     'project_id' => $project->id,

@@ -498,7 +498,12 @@ class ProcessSubmissionTest extends TestCase
 
         $assigner = Mockery::mock(AssignIdentifier::class);
         $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
-        $assigner->shouldReceive('assign')->once();
+        // The DOIs are built while the samples have no project, so the citations must already be on the study.
+        $assigner->shouldReceive('assign')->once()->andReturnUsing(function ($studies) {
+            foreach ($studies as $study) {
+                $this->assertCount(1, $study->fresh()->linkedCitations);
+            }
+        });
 
         $updater = Mockery::mock(UpdateDOI::class);
         $updater->shouldReceive('update')->once();
