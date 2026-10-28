@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Actions\Citation\SyncCitationPivot;
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishProject;
@@ -453,6 +454,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         $project->status = 'failed';
         $project->save();
+
+        // ELN submissions have no one watching the publish step: tell the submitter and the admins.
+        $draft = $project->draft;
+        if ($draft && filled($draft->eln)) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Publishing the submission', $exception);
+        }
 
         Log::error('ProcessSubmission failed permanently', [
             'project_id' => $project->id,

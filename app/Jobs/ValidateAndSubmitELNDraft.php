@@ -2,12 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Actions\Project\AssignIdentifier;
 use App\Models\Draft;
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ValidateAndSubmitELNDraft implements ShouldQueue
 {
@@ -133,6 +135,8 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
 
                 // Track validation failure
                 $this->trackValidationFailed($draft, $project);
+
+                app(ReportElnSubmissionFailure::class)->handle($draft, 'Validating the submission');
             }
 
         } catch (\Exception $e) {
@@ -149,6 +153,18 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * The job threw (not the same as failing validation): tell the submitter and the admins.
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Draft::find($this->draftId);
+
+        if ($draft) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Validating the submission', $exception);
         }
     }
 

@@ -2,15 +2,22 @@
 
 namespace Tests\Unit\Jobs;
 
+use App\Jobs\ProcessSubmission;
 use App\Jobs\ValidateAndSubmitELNDraft;
 use App\Models\Draft;
 use App\Models\Project;
+use App\Models\Sample;
+use App\Models\Study;
 use App\Models\User;
+use App\Models\Validation;
+use App\Notifications\ElnSubmissionFailedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class ValidateAndSubmitELNDraftTest extends TestCase
@@ -122,5 +129,47 @@ class ValidateAndSubmitELNDraftTest extends TestCase
     {
         Mockery::close();
         parent::tearDown();
+    }
+
+    public function test_a_failed_validation_notifies_the_submitter_and_the_admins(): void
+    {
+        Notification::fake();
+        Queue::fake();
+
+        Role::findOrCreate('super-admin');
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $this->draft->update(['owner_id' => $this->user->id]);
+
+        $validation = Validation::factory()->create();
+        $this->project->update(['validation_id' => $validation->id]);
+
+        // A sample without NMRium data fails the study validation.
+        $study = Study::factory()->create(['project_id' => $this->project->id, 'draft_id' => $this->draft->id, 'has_nmrium' => false]);
+        Sample::factory()->create(['study_id' => $study->id, 'project_id' => $this->project->id]);
+
+        (new ValidateAndSubmitELNDraft($this->draft->id))->handle();
+
+        Queue::assertNotPushed(ProcessSubmission::class);
+
+        Notification::assertSentTo($this->user, ElnSubmissionFailedNotification::class);
+        Notification::assertSentTo($admin, ElnSubmissionFailedNotification::class);
+        Notification::assertSentToTimes($this->user, ElnSubmissionFailedNotification::class, 1);
+    }
+
+    public function test_a_failed_notification_does_not_fail_the_job(): void
+    {
+        Queue::fake();
+        Notification::shouldReceive('send')->andThrow(new \RuntimeException('mail down'));
+
+        $validation = Validation::factory()->create();
+        $this->project->update(['validation_id' => $validation->id]);
+        $study = Study::factory()->create(['project_id' => $this->project->id, 'draft_id' => $this->draft->id, 'has_nmrium' => false]);
+        Sample::factory()->create(['study_id' => $study->id, 'project_id' => $this->project->id]);
+
+        (new ValidateAndSubmitELNDraft($this->draft->id))->handle();
+
+        $this->assertSame('PUBLISHING', $this->draft->fresh()->status);
     }
 }

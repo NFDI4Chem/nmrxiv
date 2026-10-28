@@ -7,6 +7,7 @@ use App\Actions\Author\SyncStudyAuthors;
 use App\Actions\Citation\SyncCitations;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Http\Controllers\FileSystemController;
 use App\Models\Author;
 use App\Models\Draft;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 use ZipArchive;
 
 class ProcessDraftELNSubmission implements ShouldQueue
@@ -96,6 +98,18 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $logger->log($draft, 'error', 'ELN processing failed: '.$e->getMessage());
             $draft->update(['status' => 'FAILED']);
             throw $e;
+        }
+    }
+
+    /**
+     * All attempts are used up: tell the submitter and the admins.
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Draft::find($this->draftId);
+
+        if ($draft) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Importing the submitted files', $exception);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Models\NMRium;
 use App\Models\Project;
 use Exception;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ProcessELNSpectra implements ShouldQueue
 {
@@ -66,6 +68,18 @@ class ProcessELNSpectra implements ShouldQueue
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * The job threw: tell the submitter and the admins (ELN submissions only).
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Project::find($this->projectId)?->draft;
+
+        if ($draft) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Processing the spectra', $exception);
         }
     }
 
