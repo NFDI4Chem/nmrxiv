@@ -6,6 +6,9 @@ New samples have been published and are now publicly available on nmrXiv.
 
 @foreach ($samples as $sample)
 - **Sample Name:** {{ $sample->name }}
+@if (filled(data_get($sample, 'public_url')))
+- **Link:** [{{ data_get($sample, 'public_url') }}]({{ data_get($sample, 'public_url') }})
+@endif
 - **DOI:** {{ $sample->doi }}
 @endforeach
 
