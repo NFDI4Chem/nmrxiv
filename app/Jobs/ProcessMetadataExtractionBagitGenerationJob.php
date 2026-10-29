@@ -524,7 +524,7 @@ class ProcessMetadataExtractionBagitGenerationJob implements ShouldQueue
                 Log::debug("NMRKit API attempt {$attempt}/{$retries}...");
 
                 $timeout = config('nmrxiv.spectra_parsing.api_timeout', 300);
-                $apiUrl = config('nmrxiv.spectra_parsing.nmrkit_api_url');
+                $apiUrl = config('nmrxiv.spectra_parsing.nmrkit_spectra_parse_url');
 
                 $response = Http::timeout($timeout)
                     ->post($apiUrl, [

@@ -51,8 +51,8 @@ return [
     */
 
     'spectra_parsing' => [
-        // API Endpoints
-        'nmrkit_api_url' => env('NMRKIT_API_URL', 'https://nmrkit.nmrxiv.org/latest/spectra/parse/url'),
+        // API Endpoints (NMRKit is configured through the single NMRKIT_URL base URL)
+        'nmrkit_spectra_parse_url' => rtrim((string) env('NMRKIT_URL', 'https://nmrkit.nmrxiv.org'), '/').'/latest/spectra/parse/url',
         'bioschema_api_url' => env('BIOSCHEMA_API_URL', 'https://nmrxiv.org/api/v1/schemas/bioschemas'),
 
         // Queue Configuration

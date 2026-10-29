@@ -327,7 +327,7 @@ class ProcessELNSpectra implements ShouldQueue
      */
     private function processSpectra(string $url): ?array
     {
-        $parserUrl = config('nmrxiv.spectra_parsing.nmrkit_api_url');
+        $parserUrl = config('nmrxiv.spectra_parsing.nmrkit_spectra_parse_url');
         if (! is_string($parserUrl) || $parserUrl === '') {
             Log::error('NMRKit spectra parser URL is not configured.');
 

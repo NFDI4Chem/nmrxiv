@@ -17,7 +17,7 @@ class SpectrumQueryControllerTest extends TestCase
         parent::setUp();
 
         config([
-            'nmrxiv.spectra_parsing.nmrkit_api_url' => self::PARSER_URL,
+            'nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => self::PARSER_URL,
             'nmrxiv.spectra_search.temp_prefix' => 'spectra-search',
         ]);
         Storage::fake(config('filesystems.default'), ['url' => 'https://s3.test']);
