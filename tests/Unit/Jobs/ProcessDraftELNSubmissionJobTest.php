@@ -426,34 +426,46 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
         $this->assertSame($bySa->id, $study->fresh()->license_id);
     }
 
-    public function test_attach_license_ignores_the_old_license_keys(): void
+    public function test_attach_license_ignores_the_old_license_keys_and_uses_the_default(): void
     {
-        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+        $default = License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
         License::factory()->create(['spdx_id' => 'CC-BY-NC-4.0']);
 
         $study = $this->makeStudyForLicense();
-        $original = $study->license_id;
 
         $this->attachLicense($study, ['license' => ['spdx_id' => 'CC-BY-NC-4.0']]);
 
-        $this->assertSame($original, $study->fresh()->license_id);
+        $this->assertSame($default->id, $study->fresh()->license_id);
     }
 
-    public function test_attach_license_ignores_a_license_that_is_not_an_object(): void
+    public function test_attach_license_uses_the_default_when_the_license_is_not_an_object(): void
     {
-        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+        $default = License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
 
         $study = $this->makeStudyForLicense();
-        $original = $study->license_id;
 
         $this->attachLicense($study, ['license' => 'https://creativecommons.org/publicdomain/zero/1.0/']);
 
-        $this->assertSame($original, $study->fresh()->license_id);
+        $this->assertSame($default->id, $study->fresh()->license_id);
     }
 
-    public function test_attach_license_leaves_the_license_unset_when_nothing_matches(): void
+    public function test_attach_license_uses_the_default_when_the_request_has_no_license(): void
     {
-        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+        $default = License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+
+        $study = $this->makeStudyForLicense();
+        $dataset = Dataset::factory()->create(['study_id' => $study->id, 'owner_id' => $study->owner_id]);
+
+        $this->attachLicense($study, []);
+
+        $this->assertSame($default->id, $study->fresh()->license_id);
+        $this->assertSame($default->id, $study->project->fresh()->license_id);
+        $this->assertSame($default->id, $dataset->fresh()->license_id);
+    }
+
+    public function test_attach_license_uses_the_default_when_nothing_matches(): void
+    {
+        $default = License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
 
         $study = $this->makeStudyForLicense();
         $study->update(['license_id' => null]);
@@ -461,10 +473,20 @@ class ProcessDraftELNSubmissionJobTest extends TestCase
 
         $this->attachLicense($study, ['license' => ['rightsIdentifier' => 'Unknown-1.0']]);
 
-        $this->assertNull($study->fresh()->license_id);
-        $this->assertNull($study->project->fresh()->license_id);
+        $this->assertSame($default->id, $study->fresh()->license_id);
+        $this->assertSame($default->id, $study->project->fresh()->license_id);
+    }
 
-        $logs = collect($study->project->draft->fresh()->processing_logs);
-        $this->assertTrue($logs->contains(fn ($log) => $log['level'] === 'WARNING' && str_contains($log['message'], 'License not found')));
+    public function test_attach_license_default_can_be_configured(): void
+    {
+        License::factory()->create(['spdx_id' => 'CC-BY-4.0']);
+        $configured = License::factory()->create(['spdx_id' => 'CC0-1.0']);
+        config(['services.eln.default_license' => 'CC0-1.0']);
+
+        $study = $this->makeStudyForLicense();
+
+        $this->attachLicense($study, []);
+
+        $this->assertSame($configured->id, $study->fresh()->license_id);
     }
 }

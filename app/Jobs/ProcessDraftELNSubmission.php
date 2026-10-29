@@ -583,33 +583,37 @@ class ProcessDraftELNSubmission implements ShouldQueue
         try {
             $licenseInfo = $studyMetadata['license'] ?? null;
 
-            if (is_array($licenseInfo) && $licenseInfo !== []) {
-                $license = $this->resolveLicense($licenseInfo);
+            $license = is_array($licenseInfo) && $licenseInfo !== [] ? $this->resolveLicense($licenseInfo) : null;
 
-                if ($license) {
-                    $study->update([
+            if (! $license) {
+                // The license is optional in the ELN but mandatory in nmrXiv, so fall back to the default.
+                $defaultSpdxId = (string) config('services.eln.default_license');
+                $license = License::whereRaw('lower(spdx_id) = ?', [strtolower($defaultSpdxId)])->first();
+
+                $logger->log($study->project->draft, 'info', 'No matching license in the ELN metadata, using the default', [
+                    'default' => $defaultSpdxId,
+                    'license' => $licenseInfo,
+                ]);
+            }
+
+            if ($license) {
+                $study->update([
+                    'license_id' => $license->id,
+                ]);
+
+                $study->project->update([
+                    'license_id' => $license->id,
+                ]);
+
+                $study->datasets->each(function ($dataset) use ($license) {
+                    $dataset->update([
                         'license_id' => $license->id,
                     ]);
+                });
 
-                    $study->project->update([
-                        'license_id' => $license->id,
-                    ]);
-
-                    $study->datasets->each(function ($dataset) use ($license) {
-                        $dataset->update([
-                            'license_id' => $license->id,
-                        ]);
-                    });
-
-                    $logger->log($study->project->draft, 'info', 'License attached to study: '.$license->title);
-                } else {
-                    // Left blank on purpose: validation then flags the missing license instead of guessing one.
-                    $logger->log($study->project->draft, 'warning', 'License not found, leaving it unset', [
-                        'rightsIdentifier' => $licenseInfo['rightsIdentifier'] ?? null,
-                        'rightsURI' => $licenseInfo['rightsURI'] ?? null,
-                        'rightsName' => $licenseInfo['rightsName'] ?? null,
-                    ]);
-                }
+                $logger->log($study->project->draft, 'info', 'License attached to study: '.$license->title);
+            } else {
+                $logger->log($study->project->draft, 'warning', 'License not found');
             }
         } catch (\Exception $e) {
             $logger->log($study->project->draft, 'error', 'Failed to attach license to study: '.$e->getMessage());

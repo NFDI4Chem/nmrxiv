@@ -34,6 +34,11 @@ return [
         'redirect' => env('NFDIAAI_REDIRECT_URL'), // Consider changing value to .../regapp/callback
     ],
 
+    'eln' => [
+        // SPDX id of the license applied when an ELN submission carries no usable license.
+        'default_license' => env('ELN_DEFAULT_LICENSE', 'CC-BY-4.0'),
+    ],
+
     'chemotion_tracker' => [
         'enabled' => env('CHEMOTION_TRACKER_ENABLED', false),
         'base_url' => env('CHEMOTION_TRACKER_BASE_URL', 'https://tracker-deploy.chemdev.scc.kit.edu'),
