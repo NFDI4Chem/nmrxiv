@@ -331,6 +331,10 @@ class ChemotionRepositoryTrackerService
         string $fromSystem = 'nmrxiv',
         string $toSystem = 'nmrxiv'
     ): ?array {
+        if (! $this->isEnabled()) {
+            return null;
+        }
+
         $fromSystem = $status === self::STATUS_RECEIVED ? 'chemotion_repository' : $fromSystem;
         $trackingData = [
             'status' => $status,
@@ -355,6 +359,10 @@ class ChemotionRepositoryTrackerService
         string $ownerName = '',
         string $ownerEmail = ''
     ): ?array {
+        if (! $this->isEnabled()) {
+            return null;
+        }
+
         // Get existing tracking to preserve owner information if not provided
         $existingTracking = null;
         if (empty($ownerName) || empty($ownerEmail)) {

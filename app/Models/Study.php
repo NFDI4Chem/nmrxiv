@@ -197,6 +197,18 @@ class Study extends Model implements Auditable
     }
 
     /**
+     * Whether this study came in through the Chemotion ELN integration.
+     *
+     * The draft is the source while the submission is being processed. Samples published on
+     * their own lose their draft, so `submitted_through` (set when the submission is finalised)
+     * takes over afterwards.
+     */
+    public function isChemotionSubmission(): bool
+    {
+        return $this->submitted_through === 'chemotion' || $this->draft?->eln === 'chemotion';
+    }
+
+    /**
      * The directory backing this study.
      *
      * The canonical link is `studies.fs_id -> file_system_objects.id`,

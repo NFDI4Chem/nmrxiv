@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use Aws\S3\S3Client;
@@ -13,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 use ZipStream;
 
 class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
@@ -60,6 +62,18 @@ class ArchiveStudy implements ShouldBeUniqueUntilProcessing, ShouldQueue
     public function uniqueFor(): int
     {
         return 600;
+    }
+
+    /**
+     * Archiving is not retried; when it fails for an ELN submission, tell the submitter and the admins.
+     */
+    public function failed(Throwable $exception): void
+    {
+        $draft = Project::find($this->project->id)?->draft;
+
+        if ($draft && filled($draft->eln)) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Packaging the samples', $exception);
+        }
     }
 
     /**
