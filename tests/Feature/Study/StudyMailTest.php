@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Study;
 
+use App\Mail\DraftProcessedNotifyAdmins;
 use App\Mail\StudyInvitation;
 use App\Mail\StudyPublish;
 use App\Models\Project;
@@ -164,5 +165,39 @@ class StudyMailTest extends TestCase
         $content = $mailable->render();
 
         $this->assertNotEmpty($content);
+    }
+
+    public function test_study_publish_mail_links_a_single_sample_to_its_public_page(): void
+    {
+        $this->study->update(['identifier' => 1039]);
+        $study = $this->study->fresh();
+
+        $content = (new StudyPublish([$study]))->render();
+
+        $this->assertStringContainsString(config('app.url').'/sample/S1039', $content);
+        $this->assertStringNotContainsString(config('app.url').'/projects"', $content);
+    }
+
+    public function test_study_publish_mail_falls_back_to_the_project_list_for_several_samples(): void
+    {
+        $other = Study::factory()->create(['project_id' => $this->project->id, 'identifier' => 1040]);
+        $this->study->update(['identifier' => 1039]);
+
+        $mailable = new StudyPublish([$this->study->fresh(), $other->fresh()]);
+        $content = $mailable->render();
+
+        $this->assertStringContainsString(config('app.url').'/projects', $content);
+        $this->assertStringContainsString('/sample/S1039', $content);
+        $this->assertStringContainsString('/sample/S1040', $content);
+    }
+
+    public function test_admin_sample_mail_links_a_single_sample_to_its_public_page(): void
+    {
+        $this->study->update(['identifier' => 1039]);
+
+        $content = (new DraftProcessedNotifyAdmins(null, collect([$this->study->fresh()])))->render();
+
+        $this->assertStringContainsString(config('app.url').'/sample/S1039', $content);
+        $this->assertStringNotContainsString(config('app.url').'/projects"', $content);
     }
 }

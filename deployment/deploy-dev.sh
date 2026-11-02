@@ -228,6 +228,7 @@ build_multi_platform() {
     # Build app image for multiple platforms
     log_message "Building app image for multiple platforms..."
     docker buildx build \
+        --pull \
         --platform linux/amd64,linux/arm64 \
         --tag nfdi4chem/nmrxiv:app-dev-latest \
         --tag nfdi4chem/nmrxiv:app-dev-$(date +%Y%m%d-%H%M%S) \
@@ -238,6 +239,7 @@ build_multi_platform() {
     # Build worker image for multiple platforms
     log_message "Building worker image for multiple platforms..."
     docker buildx build \
+        --pull \
         --platform linux/amd64,linux/arm64 \
         --tag nfdi4chem/nmrxiv:worker-dev-latest \
         --tag nfdi4chem/nmrxiv:worker-dev-$(date +%Y%m%d-%H%M%S) \
