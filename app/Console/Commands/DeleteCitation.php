@@ -34,5 +34,7 @@ class DeleteCitation extends Command
             $citations = Citation::all();
         }
         DeleteCitations::dispatch($citations);
+
+        return self::SUCCESS;
     }
 }

@@ -34,12 +34,17 @@ return [
         'redirect' => env('NFDIAAI_REDIRECT_URL'), // Consider changing value to .../regapp/callback
     ],
 
+    'eln' => [
+        // SPDX id of the license applied when an ELN submission carries no usable license.
+        'default_license' => env('ELN_DEFAULT_LICENSE', 'CC-BY-4.0'),
+    ],
+
     'chemotion_tracker' => [
         'enabled' => env('CHEMOTION_TRACKER_ENABLED', false),
         'base_url' => env('CHEMOTION_TRACKER_BASE_URL', 'https://tracker-deploy.chemdev.scc.kit.edu'),
         'client_id' => env('CHEMOTION_TRACKER_CLIENT_ID', 'S8HbJdAEo--y05h4EUYblZBu-bgWkSDJrEb7kKMCpwc'),
-        'username' => env('CHEMOTION_TRACKER_USERNAME'),
-        'password' => env('CHEMOTION_TRACKER_PASSWORD'),
+        'username' => env('CHEMOTION_TRACKER_USERNAME', ''),
+        'password' => env('CHEMOTION_TRACKER_PASSWORD', ''),
     ],
 
     // External chemistry / molecular data sources

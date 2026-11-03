@@ -107,7 +107,7 @@
                                     GitHub
                                 </a>
                                 <a
-                                    href="https://nmrxiv.org/api/documentation"
+                                    :href="route('l5-swagger.default.api')"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
