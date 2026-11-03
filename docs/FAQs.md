@@ -95,6 +95,6 @@ If the above criteria are not met
 
 ### How to reach to you?
 
-Please write to us at info.nmrxiv@uni-jena.de or reach out to our [Helpdesk](https://www.nfdi4chem.de/index.php/helpdesk/).
+Please write to us at info.nmrxiv@uni-jena.de or helpdesk@nfdi4chem.de.
 You can also leave us a message via our support bubble which you find in the left down corner on our [application](https://nmrxiv.org/) page.
 We will try to get back to your queries as soon as possible.

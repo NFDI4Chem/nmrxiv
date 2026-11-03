@@ -570,18 +570,18 @@
                                 Help Desk
                             </dt>
                             <dd class="mt-1 text-gray-600">
-                                Any issues or support requests can be raised at
-                                our
-                                <a
-                                    class="text-blue-900 underline"
-                                    href="https://helpdesk.nfdi4chem.de/"
-                                    >Help Desk</a
-                                >
-                                or write to us at
+                                Any issues or support requests can be sent to
+                                either
                                 <a
                                     class="text-blue-900 underline"
                                     href="mailto:info.nmrxiv@uni-jena.de"
                                     >info.nmrxiv@uni-jena.de</a
+                                >
+                                or
+                                <a
+                                    class="text-blue-900 underline"
+                                    href="mailto:helpdesk@nfdi4chem.de"
+                                    >helpdesk@nfdi4chem.de</a
                                 >.
                             </dd>
                         </div>

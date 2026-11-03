@@ -30,13 +30,11 @@
                                 class="font-medium underline decoration-amber-400 underline-offset-2 hover:text-amber-800"
                                 >info.nmrxiv@uni-jena.de</a
                             >
-                            or through the
+                            or
                             <a
-                                href="https://helpdesk.nfdi4chem.de/"
+                                href="mailto:helpdesk@nfdi4chem.de"
                                 class="font-medium underline decoration-amber-400 underline-offset-2 hover:text-amber-800"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                >NFDI4Chem Help Desk</a
+                                >helpdesk@nfdi4chem.de</a
                             >.
                         </p>
                     </div>
