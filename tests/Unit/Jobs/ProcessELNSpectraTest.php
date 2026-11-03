@@ -32,7 +32,7 @@ class ProcessELNSpectraTest extends TestCase
     {
         parent::setUp();
 
-        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => self::PARSER_URL]);
+        config(['nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => self::PARSER_URL]);
 
         $user = User::factory()->create();
         $this->project = Project::factory()->create([
@@ -239,7 +239,7 @@ class ProcessELNSpectraTest extends TestCase
 
     public function test_handle_logs_error_when_parser_url_not_configured(): void
     {
-        config(['nmrxiv.spectra_parsing.nmrkit_api_url' => '']);
+        config(['nmrxiv.spectra_parsing.nmrkit_spectra_parse_url' => '']);
 
         $this->study->download_url = 'https://example.com/spectra.zip';
         $this->study->save();

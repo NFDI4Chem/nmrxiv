@@ -34,5 +34,7 @@ class DeleteAuthor extends Command
             $authors = Author::all();
         }
         DeleteAuthors::dispatch($authors);
+
+        return self::SUCCESS;
     }
 }
