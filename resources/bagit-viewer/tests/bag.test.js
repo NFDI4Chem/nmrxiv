@@ -8,7 +8,10 @@ import {
     validateBag,
     hashBlob,
 } from '../src/bag/validate.js';
-import { rewriteNmriumForLocal, applyOnLoadProcessing } from '../src/nmrium/loadLocal.js';
+import {
+    rewriteNmriumForLocal,
+    applyOnLoadProcessing,
+} from '../src/nmrium/loadLocal.js';
 import {
     clearRecentZips,
     displayNameFromPath,
@@ -100,9 +103,9 @@ describe('discoverBags', () => {
             entry('project/S2/data/y.jdf', 'y'),
         ]);
         expect(bags.map((b) => b.label).sort()).toEqual(['S1', 'S2']);
-        expect(bags.find((b) => b.label === 'S1').byPath.has('data/x.jdf')).toBe(
-            true,
-        );
+        expect(
+            bags.find((b) => b.label === 'S1').byPath.has('data/x.jdf'),
+        ).toBe(true);
     });
 
     it('lists zip entries', () => {
@@ -119,7 +122,8 @@ describe('validateBag', () => {
     it('passes a valid sha256 bag', async () => {
         const payload = 'spectrum-bytes';
         const checksum = await sha256Hex(payload);
-        const bagit = 'BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8\n';
+        const bagit =
+            'BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8\n';
         const bagInfo = `Payload-Oxum: ${payload.length}.1\nBagging-Date: 2026-01-01\n`;
         const manifest = `${checksum}  data/a.jdf\n`;
 
@@ -140,13 +144,16 @@ describe('validateBag', () => {
         const result = await validateBag(bags[0]);
         expect(result.valid).toBe(true);
         expect(result.errors).toEqual([]);
-        expect(result.files.filter((f) => f.status === 'pass').length).toBeGreaterThan(0);
+        expect(
+            result.files.filter((f) => f.status === 'pass').length,
+        ).toBeGreaterThan(0);
     });
 
     it('fails on tampered payload', async () => {
         const payload = 'spectrum-bytes';
         const checksum = await sha256Hex(payload);
-        const bagit = 'BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8\n';
+        const bagit =
+            'BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8\n';
         const bagInfo = `Payload-Oxum: ${payload.length}.1\n`;
         const manifest = `${checksum}  data/a.jdf\n`;
 
@@ -262,7 +269,9 @@ describe('applyOnLoadProcessing', () => {
     it('is a no-op for empty or missing spectra', () => {
         expect(() => applyOnLoadProcessing(null)).not.toThrow();
         expect(() => applyOnLoadProcessing({})).not.toThrow();
-        expect(() => applyOnLoadProcessing({ data: { spectra: [] } })).not.toThrow();
+        expect(() =>
+            applyOnLoadProcessing({ data: { spectra: [] } }),
+        ).not.toThrow();
     });
 });
 
@@ -351,7 +360,10 @@ describe('extractDatasets null safety', () => {
                     {
                         '@id': 'd1',
                         name: 'Seeds[sample.jdf]',
-                        variableMeasured: [null, { name: 'Nucleus', value: '1H' }],
+                        variableMeasured: [
+                            null,
+                            { name: 'Nucleus', value: '1H' },
+                        ],
                         keywords: [null, 'D'],
                     },
                 ],
@@ -361,7 +373,10 @@ describe('extractDatasets null safety', () => {
                     data: {
                         spectra: [
                             null,
-                            { id: 'sp1', info: { name: 'sample.jdf', nucleus: '1H' } },
+                            {
+                                id: 'sp1',
+                                info: { name: 'sample.jdf', nucleus: '1H' },
+                            },
                         ],
                     },
                 },
@@ -406,5 +421,132 @@ describe('recent zip history', () => {
         expect(loadRecentZips()).toHaveLength(1);
         expect(await clearRecentZips()).toEqual([]);
         expect(loadRecentZips()).toEqual([]);
+    });
+});
+
+describe('citation helpers', () => {
+    const schema = {
+        author: [
+            {
+                '@type': 'Role',
+                roleName: 'Researcher',
+                author: {
+                    name: 'Hans‐Ullrich Siehl',
+                    givenName: 'Hans‐Ullrich',
+                    familyName: 'Siehl',
+                },
+            },
+            {
+                '@type': 'Role',
+                roleName: 'Researcher',
+                author: {
+                    name: 'Stefan Berger',
+                    givenName: 'Stefan',
+                    familyName: 'Berger',
+                },
+            },
+        ],
+        citation: [
+            {
+                '@type': 'ScholarlyArticle',
+                headline: 'T',
+                sameAs: 'https://doi.org/10.1002/x',
+                author: 'A, B',
+                '@id': '10.1002/x',
+            },
+        ],
+    };
+
+    it('extracts authors and citations', async () => {
+        const { extractAuthors, extractCitations } = await import(
+            '../src/bag/citation.js'
+        );
+        expect(extractAuthors(schema).map((a) => a.role)).toEqual([
+            'Researcher',
+            'Researcher',
+        ]);
+        expect(extractCitations(schema)[0]).toMatchObject({
+            doi: '10.1002/x',
+            authors: 'A, B',
+        });
+    });
+
+    it('formats citations in the same styles as the site', async () => {
+        const { extractAuthors } = await import('../src/bag/citation.js');
+        const { CITATION_STYLES, formatCitation } = await import(
+            '../src/bag/citeStyles.js'
+        );
+        const input = {
+            title: 'Sample',
+            authors: extractAuthors(schema),
+            doi: '10.82347/x.s1',
+            url: null,
+            date: '2026-10-13',
+            publisher: 'nmrXiv',
+        };
+        expect(CITATION_STYLES.map((s) => s.key)).toEqual([
+            'APA',
+            'Harvard',
+            'MLA',
+            'Vancouver',
+            'Chicago',
+            'IEEE',
+            'ACS',
+            'RSC',
+            'Wiley',
+            'Springer',
+        ]);
+        expect(formatCitation('APA', input)).toBe(
+            'Siehl, H. U., & Berger, S. (2026). Sample [Data set]. nmrXiv. https://doi.org/10.82347/x.s1',
+        );
+        for (const style of CITATION_STYLES) {
+            const text = formatCitation(style.key, input);
+            expect(text).not.toMatch(/^\s*[[(]?\d+[\].)]?\s/);
+            // the RSC dataset template omits the title, as DataCite's does
+            if (style.key !== 'RSC') {
+                expect(text).toContain('Sample');
+            }
+        }
+        expect(formatCitation('Wiley', input)).toMatch(/^\[dataset\] /);
+        expect(formatCitation('ACS', input)).toContain('. nmrXiv. 2026');
+        expect(formatCitation('RSC', input)).toContain(
+            'nmrXiv Data set:s1, DOI:10.82347/x.s1',
+        );
+    });
+});
+
+describe('techniqueLabel', () => {
+    it('builds the website-style technique label', async () => {
+        const { techniqueLabel } = await import('../src/bag/metadata.js');
+        const v = (nuc, dim) => [
+            { name: 'acquisition nucleus', value: nuc },
+            { name: 'NMR spectrum by dimensionality', value: dim },
+        ];
+        expect(techniqueLabel(v(['13C'], 1), '13_c13')).toBe('13C NMR - 1D');
+        expect(techniqueLabel(v(['1H', '13C'], 2), '3_hsqc')).toBe(
+            '1H-13C NMR - HSQC',
+        );
+        expect(techniqueLabel([], 'x')).toBeNull();
+    });
+});
+
+describe('extractLicense', () => {
+    it('accepts a URL string or a CreativeWork object', async () => {
+        const { extractLicense } = await import('../src/bag/metadata.js');
+        expect(extractLicense('https://cdla.dev/permissive-1-0/')).toEqual({
+            url: 'https://cdla.dev/permissive-1-0/',
+            name: null,
+        });
+        expect(
+            extractLicense({
+                '@type': 'CreativeWork',
+                name: 'CC BY 4.0',
+                url: 'https://creativecommons.org/licenses/by/4.0/legalcode',
+            }),
+        ).toEqual({
+            url: 'https://creativecommons.org/licenses/by/4.0/legalcode',
+            name: 'CC BY 4.0',
+        });
+        expect(extractLicense(undefined)).toEqual({ url: null, name: null });
     });
 });
