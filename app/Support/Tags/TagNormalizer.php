@@ -17,7 +17,7 @@ class TagNormalizer
     /**
      * Characters used to separate keywords in pasted lists.
      */
-    private const SEPARATORS = '/[|\r\n]+/';
+    private const SEPARATORS = '/[,;|\r\n]+/';
 
     /**
      * @param  mixed  $tags  Keywords as submitted (array of strings or a single string)
