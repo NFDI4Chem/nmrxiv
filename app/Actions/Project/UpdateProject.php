@@ -6,6 +6,7 @@ use App\Actions\Citation\SyncCitationPivot;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Validation;
+use App\Support\Tags\TagNormalizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -31,6 +32,10 @@ class UpdateProject
             'license' => ['required_if:is_public,"true"'],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'],
         ], $errorMessages)->validate();
+
+        if (array_key_exists('tags_array', $input)) {
+            $input['tags_array'] = TagNormalizer::normalize($input['tags_array']);
+        }
 
         return DB::transaction(function () use ($input, $project) {
             $s3filePath = null;
@@ -103,9 +108,7 @@ class UpdateProject
                 && filter_var($input['project_tags_updated'], FILTER_VALIDATE_BOOLEAN);
 
             if ($projectTagsUpdated) {
-                $raw = $input['tags_array'] ?? [];
-                $tagsArray = is_array($raw) ? $raw : [];
-                $project->syncTagsWithType($tagsArray, 'Project');
+                $project->syncTagsWithType($input['tags_array'] ?? [], 'Project');
             } elseif (array_key_exists('tags_array', $input)) {
                 $project->syncTagsWithType($input['tags_array'], 'Project');
             }

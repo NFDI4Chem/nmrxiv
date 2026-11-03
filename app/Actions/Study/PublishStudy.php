@@ -44,8 +44,8 @@ class PublishStudy
      */
     private function trackStudyPublished(Study $study): void
     {
-        // Only track if this study came from an ELN submission
-        if (! $study->tracking_item_name || ! $study->submitted_through) {
+        // Only track studies that came in through Chemotion
+        if (! $study->tracking_item_name || $study->submitted_through !== 'chemotion') {
             return;
         }
 

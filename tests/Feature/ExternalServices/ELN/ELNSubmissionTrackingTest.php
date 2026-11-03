@@ -2,13 +2,16 @@
 
 namespace Tests\Feature\ExternalServices\ELN;
 
+use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Study\PublishStudy;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Dataset;
 use App\Models\Draft;
+use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
+use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -203,6 +206,78 @@ class ELNSubmissionTrackingTest extends TestCase
         $this->assertTrue($study->fresh()->is_public);
 
         // Verify no tracking API calls were made
+        Http::assertNothingSent();
+    }
+
+    public function test_no_tracker_request_is_made_when_tracking_is_disabled(): void
+    {
+        Http::fake();
+        config(['services.chemotion_tracker.enabled' => false]);
+
+        $service = app(ChemotionRepositoryTrackerService::class);
+
+        $this->assertNull($service->updateElnSubmissionStatus('CHEM-1', ChemotionRepositoryTrackerService::STATUS_PROCESSED));
+        $this->assertNull($service->createElnSubmissionTracking('CHEM-1', ChemotionRepositoryTrackerService::STATUS_RECEIVED, [], 'John Doe', 'john@example.com'));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_the_import_job_does_not_contact_the_tracker_when_tracking_is_disabled(): void
+    {
+        Http::fake();
+        config(['services.chemotion_tracker.enabled' => false]);
+
+        $owner = User::factory()->create();
+        $draft = Draft::factory()->create(['eln' => 'chemotion', 'external_id' => 'CHEM-2', 'owner_id' => $owner->id, 'processing_logs' => []]);
+        $project = Project::factory()->create(['draft_id' => $draft->id, 'owner_id' => $owner->id]);
+        Study::factory()->create(['name' => 'sample_170435', 'project_id' => $project->id, 'owner_id' => $owner->id]);
+
+        $method = new \ReflectionMethod(ProcessDraftELNSubmission::class, 'attachMetadataToStudy');
+        $method->invoke(new ProcessDraftELNSubmission($draft->id), $project->fresh(), [
+            'name' => 'Sample',
+            'url' => 'https://example.org/sample',
+            'tracking_item_name' => 'chemotion-repository-JCL-80-170435',
+            'authors' => [],
+        ], app(DraftProcessingLogger::class));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_the_import_job_reports_to_the_tracker_when_tracking_is_enabled(): void
+    {
+        Http::fake(['*' => Http::response(['access_token' => 'token'], 200)]);
+
+        $owner = User::factory()->create();
+        $draft = Draft::factory()->create(['eln' => 'chemotion', 'external_id' => 'CHEM-3', 'owner_id' => $owner->id, 'processing_logs' => []]);
+        $project = Project::factory()->create(['draft_id' => $draft->id, 'owner_id' => $owner->id]);
+        Study::factory()->create(['name' => 'sample_170435', 'project_id' => $project->id, 'owner_id' => $owner->id]);
+
+        $method = new \ReflectionMethod(ProcessDraftELNSubmission::class, 'attachMetadataToStudy');
+        $method->invoke(new ProcessDraftELNSubmission($draft->id), $project->fresh(), [
+            'name' => 'Sample',
+            'url' => 'https://example.org/sample',
+            'tracking_item_name' => 'chemotion-repository-JCL-80-170435',
+            'authors' => [],
+        ], app(DraftProcessingLogger::class));
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'test-tracker.example.com'));
+    }
+
+    public function test_studies_from_other_elns_are_not_reported_to_the_chemotion_tracker(): void
+    {
+        Http::fake();
+
+        $user = User::factory()->create();
+        $study = Study::factory()->create([
+            'tracking_item_name' => 'NOBS-1',
+            'submitted_through' => 'nobs',
+            'owner_id' => $user->id,
+            'is_public' => false,
+        ]);
+
+        (new PublishStudy)->publish($study);
+
+        $this->assertTrue($study->fresh()->is_public);
         Http::assertNothingSent();
     }
 }

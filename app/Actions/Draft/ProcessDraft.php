@@ -14,6 +14,7 @@ use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use App\Support\Draft\HifsaPdfResolver;
+use App\Support\Tags\TagNormalizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -83,7 +84,7 @@ class ProcessDraft
         $draftName = $request->get('name');
         $draft->name = $draftName ? $draftName : 'Untitled Project (draft)';
         $draft->description = $request->get('description');
-        $draft->syncTagsWithType($request->input('tags_array', []), 'Draft');
+        $draft->syncTagsWithType(TagNormalizer::normalize($request->input('tags_array', [])), 'Draft');
         $draft->save();
 
         $this->fileSystemController->processFolder($draftFolders);

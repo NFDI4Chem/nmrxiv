@@ -36,19 +36,33 @@ export function getNmriumCore() {
  *
  * @param {import('../bag/discover.js').DiscoveredBag} bag
  * @param {object|null} nmriumParsed
+ * @param {{ folder?: string|null }} [options] only load files inside this
+ *   dataset folder (e.g. "13_c13"); falls back to every file if none match
  * @returns {Promise<{ state: object|null, aggregator: FileCollection|null, warnings: string[], core: object }>}
  */
-export async function prepareLocalNmriumFiles(bag, nmriumParsed) {
+export async function prepareLocalNmriumFiles(bag, nmriumParsed, options = {}) {
     const warnings = [];
     const core = getNmriumCore();
     const spectrumFiles = [];
 
-    for (const entry of bag.entries) {
-        const relativePath = payloadFileRelativePath(entry.path);
-        if (!relativePath) {
-            continue;
-        }
+    const payload = bag.entries
+        .map((entry) => ({
+            entry,
+            relativePath: payloadFileRelativePath(entry.path),
+        }))
+        .filter(({ relativePath }) => relativePath);
 
+    let selected = payload;
+    if (options.folder) {
+        const inFolder = payload.filter(({ relativePath }) =>
+            `/${relativePath}`.includes(`/${options.folder}/`),
+        );
+        if (inFolder.length > 0) {
+            selected = inFolder;
+        }
+    }
+
+    for (const { entry, relativePath } of selected) {
         const blob = await entry.getBlob();
         spectrumFiles.push(fileFromPayloadEntry(blob, relativePath));
     }
