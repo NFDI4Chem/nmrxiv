@@ -99,11 +99,35 @@ class ApplicationControllerTest extends TestCase
     {
         Molecule::factory()->create([
             'identifier' => 188,
+            'annotation_level' => 4,
+            'quality_breakdown' => [
+                'version' => 1,
+                'tier' => 4,
+                'tier_label' => 'Full elucidation set',
+                'criteria' => [
+                    'proton' => true,
+                    'carbon' => true,
+                    'assignments' => false,
+                ],
+                'bonuses' => [
+                    'dept' => true,
+                ],
+                'next_tier_missing' => ['assignments'],
+            ],
         ]);
 
         $response = $this->get('/compound/M188');
 
-        $this->assertInertiaPageComponent($response, 'Public/Studies');
+        $page = $this->assertInertiaPageComponent($response, 'Public/Studies');
+        $this->assertSame(4, $page['props']['molecule']['annotation_level']);
+        $this->assertSame(
+            'Full elucidation set',
+            $page['props']['molecule']['quality_breakdown']['tier_label']
+        );
+        $this->assertSame(
+            ['assignments'],
+            $page['props']['molecule']['quality_breakdown']['next_tier_missing']
+        );
     }
 
     public function test_resolve_compound_with_lowercase_prefix(): void

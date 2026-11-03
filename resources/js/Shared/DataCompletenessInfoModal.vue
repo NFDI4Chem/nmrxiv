@@ -13,6 +13,24 @@
                     quality or of whether the proposed structure is correct.
                 </p>
 
+                <section
+                    v-if="breakdown"
+                    class="rounded-md border border-gray-200 px-3 py-3 dark:border-gray-700"
+                >
+                    <h3
+                        class="text-sm font-semibold text-gray-900 dark:text-slate-100"
+                    >
+                        This compound
+                    </h3>
+                    <div class="mt-2">
+                        <DataCompletenessBadge
+                            :tier="tier"
+                            :breakdown="breakdown"
+                            variant="detailed"
+                        />
+                    </div>
+                </section>
+
                 <section v-if="rubric">
                     <h3
                         class="text-sm font-semibold text-gray-900 dark:text-slate-100"
@@ -82,16 +100,26 @@
 <script>
 import { usePage } from "@inertiajs/vue3";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import DataCompletenessBadge from "@/Shared/DataCompletenessBadge.vue";
 
 export default {
     name: "DataCompletenessInfoModal",
     components: {
         JetDialogModal,
+        DataCompletenessBadge,
     },
     props: {
         show: {
             type: Boolean,
             default: false,
+        },
+        tier: {
+            type: [Number, String],
+            default: 0,
+        },
+        breakdown: {
+            type: Object,
+            default: null,
         },
     },
     emits: ["close"],

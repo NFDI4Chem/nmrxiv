@@ -1,6 +1,6 @@
 # Library and contributor stars
 
-Each shareable [compound library](https://docs.nmrxiv.org) page (`/library/{code}`) shows a **Data quality** panel with contributor stars for that workspace.
+Each shareable [compound library](https://docs.nmrxiv.org) page (`/library/{code}`) shows **Contributor stars** for that workspace.
 
 ## How they are counted
 
@@ -20,10 +20,9 @@ A workspace never receives credit for an HMBC (or any other spectrum) uploaded b
 
 ## Reading the panel
 
-- **Stars** — the contributor level for this library
-- **Fully characterised compounds** — how many of this workspace's compounds are at 4★ or 5★
-- **Tier distribution bar** — how many compounds sit at each star level
-- **Next-level hint** — how many more 4★+ compounds are needed for the next contributor star
+- **Contributor stars** — the contributor level for this library. Select the stars or **How is this scored?** to open the thresholds.
+- **Compounds with a full NMR set** — how many of this workspace's published compounds include ¹H, ¹³C, COSY/TOCSY, HSQC, and HMBC
+- **Next step** — how many more of those compounds are needed for the next contributor star
 
 ## Personal vs group workspaces
 
