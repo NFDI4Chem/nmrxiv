@@ -4,6 +4,7 @@ namespace App\Actions\Study;
 
 use App\Models\Study;
 use App\Models\Ticker;
+use App\Support\Tags\TagNormalizer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -25,6 +26,10 @@ class UpdateStudy
             'name' => ['required', 'string', 'max:255'],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
+
+        if (array_key_exists('tags_array', $input)) {
+            $input['tags_array'] = TagNormalizer::normalize($input['tags_array']);
+        }
 
         return DB::transaction(function () use ($input, $study) {
             $study->forceFill([
