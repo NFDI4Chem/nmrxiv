@@ -52,7 +52,7 @@ class DatasetSignalDetector
             }
         }
 
-        $source = config('nmrxiv.spectra_parsing.nmrkit_api_url');
+        $source = config('nmrxiv.spectra_parsing.nmrkit_spectra_parse_url');
         $detectedAt = now()->toIso8601String();
         foreach ($study->datasets->whereIn('id', array_keys($spectraByDataset)) as $dataset) {
             $dataset->auto_detected_signals = [
