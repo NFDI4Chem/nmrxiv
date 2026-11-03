@@ -633,8 +633,8 @@ class ELNController extends Controller
         try {
             $trackerService = app(ChemotionRepositoryTrackerService::class);
 
-            // Check if tracking is enabled
-            if (! $trackerService->isEnabled()) {
+            // Check if tracking is enabled (the tracker only knows Chemotion submissions)
+            if ($draft->eln !== 'chemotion' || ! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for received submission', [
                     'external_id' => $draft->external_id,
                     'draft_id' => $draft->id,

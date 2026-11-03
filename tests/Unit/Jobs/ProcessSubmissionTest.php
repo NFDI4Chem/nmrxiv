@@ -18,8 +18,10 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\License;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -297,6 +299,100 @@ class ProcessSubmissionTest extends TestCase
         $this->assertNull($dataset->project_id);
     }
 
+    public function test_sample_mode_sets_release_date_on_studies_and_datasets_when_project_has_none(): void
+    {
+        Storage::fake('local');
+        Event::fake();
+
+        $this->project->update(['release_date' => null]);
+
+        $this->draft->project_enabled = false;
+        $environment = env('APP_ENV', 'local');
+        $this->draft->path = $environment.'/draft-'.$this->draft->id;
+        $this->draft->save();
+
+        $study = Study::factory()->create(['project_id' => $this->project->id, 'release_date' => null]);
+
+        FileSystemObject::create([
+            'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
+            'type' => 'directory',
+            'name' => 'study',
+            'slug' => 'study',
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
+            'path' => $this->draft->path,
+            'status' => 'present',
+        ]);
+
+        $dataset = Dataset::factory()->create([
+            'study_id' => $study->id,
+            'draft_id' => $this->draft->id,
+            'project_id' => $this->project->id,
+            'release_date' => null,
+        ]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
+        $assigner->shouldReceive('assign')->once();
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once();
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, Mockery::mock(PublishProject::class), $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
+
+        $today = now()->toDateString();
+        $this->assertSame($today, Carbon::parse($study->fresh()->release_date)->toDateString());
+        $this->assertSame($today, Carbon::parse($dataset->fresh()->release_date)->toDateString());
+    }
+
+    public function test_sample_mode_keeps_the_project_release_date_on_studies(): void
+    {
+        Storage::fake('local');
+        Event::fake();
+
+        $releaseDate = now()->subDays(3)->startOfDay();
+        $this->project->update(['release_date' => $releaseDate]);
+
+        $this->draft->project_enabled = false;
+        $environment = env('APP_ENV', 'local');
+        $this->draft->path = $environment.'/draft-'.$this->draft->id;
+        $this->draft->save();
+
+        $study = Study::factory()->create(['project_id' => $this->project->id, 'release_date' => null]);
+
+        FileSystemObject::create([
+            'draft_id' => $this->draft->id,
+            'study_id' => $study->id,
+            'type' => 'directory',
+            'name' => 'study',
+            'slug' => 'study',
+            'key' => Str::uuid()->toString(),
+            'uuid' => Str::uuid()->toString(),
+            'path' => $this->draft->path,
+            'status' => 'present',
+        ]);
+
+        $assigner = Mockery::mock(AssignIdentifier::class);
+        $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
+        $assigner->shouldReceive('assign')->once();
+
+        $updater = Mockery::mock(UpdateDOI::class);
+        $updater->shouldReceive('update')->once();
+
+        $studyPublisher = Mockery::mock(PublishStudy::class);
+        $studyPublisher->shouldReceive('publish')->once()->with(Mockery::type(Study::class));
+
+        $job = new ProcessSubmission($this->project);
+        $job->handle($assigner, $updater, Mockery::mock(PublishProject::class), $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
+
+        $this->assertSame($releaseDate->toDateString(), Carbon::parse($study->fresh()->release_date)->toDateString());
+    }
+
     public function test_move_folder_updates_nested_file_structure(): void
     {
         Storage::fake('local');
@@ -402,7 +498,12 @@ class ProcessSubmissionTest extends TestCase
 
         $assigner = Mockery::mock(AssignIdentifier::class);
         $assigner->shouldReceive('reserveProjectIdentifier')->andReturnUsing(fn ($project) => $project);
-        $assigner->shouldReceive('assign')->once();
+        // The DOIs are built while the samples have no project, so the citations must already be on the study.
+        $assigner->shouldReceive('assign')->once()->andReturnUsing(function ($studies) {
+            foreach ($studies as $study) {
+                $this->assertCount(1, $study->fresh()->linkedCitations);
+            }
+        });
 
         $updater = Mockery::mock(UpdateDOI::class);
         $updater->shouldReceive('update')->once();
@@ -412,8 +513,22 @@ class ProcessSubmissionTest extends TestCase
         $studyPublisher = Mockery::mock(PublishStudy::class);
         $studyPublisher->shouldReceive('publish')->twice()->with(Mockery::type(Study::class));
 
+        $projectId = $this->project->id;
+
+        $sample = Sample::factory()->create([
+            'study_id' => $studyOne->id,
+            'project_id' => $projectId,
+        ]);
+
         $job = new ProcessSubmission($this->project);
         $job->handle($assigner, $updater, $projectPublisher, $studyPublisher, new DetachStudyFilesystemFromDraft, new ProjectProcessingLogger);
+
+        // The staging project is deleted and leaves no orphaned pivot rows or references behind.
+        $this->assertNull(Sample::find($sample->id)->project_id);
+        $this->assertNull(Project::find($projectId));
+        $this->assertDatabaseMissing('author_project', ['project_id' => $projectId]);
+        $this->assertDatabaseMissing('citation_project', ['project_id' => $projectId]);
+        $this->assertDatabaseMissing('project_user', ['project_id' => $projectId]);
 
         foreach ([$studyOne->id, $studyTwo->id] as $studyId) {
             $study = Study::with('studyAuthors')->find($studyId);

@@ -54,6 +54,12 @@ export default defineConfig({
               { text: 'Community Contribution', link: '/submission-guides/community-contribution.md'},
             ]
           },
+          { text: 'Submit from ELN',
+            items: [
+              { text: 'Overview', link: '/submission-guides/eln/index.md'},
+              { text: 'Chemotion', link: '/submission-guides/eln/chemotion.md'},
+            ]
+          },
           { text: 'Embargo Publication', link: '/submission-guides/embargo.md'},
           { text: 'Dashboard', link: '/submission-guides/dashboard.md'},
           { text: 'Data Models',
