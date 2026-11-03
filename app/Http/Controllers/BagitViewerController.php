@@ -52,7 +52,7 @@ class BagitViewerController extends Controller
         $htmlPath = self::htmlPath();
 
         if (! File::exists($htmlPath)) {
-            abort(404, 'BagIt viewer has not been built yet.');
+            abort(503, 'The BagIt viewer has not been built yet. Run "npm run build:bagit-viewer" and try again.');
         }
 
         $htmlContents = File::get($htmlPath);

@@ -94,8 +94,8 @@
                         <h2 class="mb-4 text-2xl font-bold text-gray-900">
                             {{
                                 metadata.molecules.length === 1
-                                    ? 'Molecular info'
-                                    : 'Molecular infos'
+                                    ? "Molecular info"
+                                    : "Molecular infos"
                             }}
                         </h2>
                         <div class="space-y-4">
@@ -155,7 +155,7 @@
                                             class="mt-0.5 text-gray-900"
                                             v-html="
                                                 formatFormula(
-                                                    mol.molecularFormula,
+                                                    mol.molecularFormula
                                                 )
                                             "
                                         ></dd>
@@ -260,7 +260,8 @@
                             <article
                                 v-for="dataset in metadata.datasets"
                                 :key="dataset.id"
-                                class="flex flex-col rounded-2xl bg-white p-4 shadow-sm ring-1 ring-inset ring-gray-900/5"
+                                class="flex cursor-pointer flex-col rounded-2xl bg-white p-4 shadow-sm ring-1 ring-inset ring-gray-900/5 transition hover:ring-teal-600/40"
+                                @click="openPreview(dataset)"
                             >
                                 <h3
                                     class="text-lg font-semibold text-gray-900 line-clamp-2"
@@ -279,12 +280,12 @@
                                     v-if="
                                         dataset.spectrumId &&
                                         metadata.previewObjectUrls.get(
-                                            dataset.spectrumId,
+                                            dataset.spectrumId
                                         )
                                     "
                                     :src="
                                         metadata.previewObjectUrls.get(
-                                            dataset.spectrumId,
+                                            dataset.spectrumId
                                         )
                                     "
                                     :alt="dataset.title"
@@ -296,9 +297,9 @@
                                     <button
                                         type="button"
                                         class="flex w-full items-center justify-between text-sm text-gray-500 hover:text-gray-900"
-                                        @click="openDataset(dataset)"
+                                        :aria-label="'View ' + dataset.title"
                                     >
-                                        Open dataset
+                                        View spectrum
                                         <span aria-hidden="true">→</span>
                                     </button>
                                 </div>
@@ -468,32 +469,106 @@
                 </aside>
             </div>
         </div>
+
+        <Teleport to="body">
+            <div
+                v-if="previewDataset"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/70 p-4"
+                role="dialog"
+                aria-modal="true"
+                :aria-label="previewDataset.title"
+                @click.self="closePreview"
+            >
+                <div
+                    class="flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+                >
+                    <div
+                        class="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4"
+                    >
+                        <div class="min-w-0">
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                {{ previewDataset.title }}
+                            </h3>
+                            <span
+                                v-if="previewDataset.techniqueLabel"
+                                class="mt-2 inline-block rounded-md bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-500/10"
+                            >
+                                {{ previewDataset.techniqueLabel }}
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            class="shrink-0 rounded-md p-1 text-gray-500 hover:text-gray-900"
+                            aria-label="Close"
+                            @click="closePreview"
+                        >
+                            <span
+                                aria-hidden="true"
+                                class="text-2xl leading-none"
+                                >&times;</span
+                            >
+                        </button>
+                    </div>
+                    <div class="min-h-0 flex-1 overflow-auto p-4">
+                        <img
+                            v-if="previewUrl(previewDataset)"
+                            :src="previewUrl(previewDataset)"
+                            :alt="previewDataset.title"
+                            class="mx-auto max-h-[75vh] w-auto max-w-full object-contain"
+                        />
+                        <p
+                            v-else
+                            class="py-12 text-center text-sm text-gray-500"
+                        >
+                            No preview image available for this dataset.
+                        </p>
+                    </div>
+                    <div class="border-t border-gray-100 px-5 py-3 text-right">
+                        <button
+                            type="button"
+                            class="text-sm font-medium text-teal-700 hover:underline"
+                            @click="openFromPreview"
+                        >
+                            Open interactive view →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </div>
 </template>
 
 <script setup>
-import { markRaw, ref, shallowRef, watch } from 'vue';
-import ValidationPanel from './ValidationPanel.vue';
-import NmriumPanel from './NmriumPanel.vue';
-import CitationCard from './CitationCard.vue';
-import IdentifierPill from './IdentifierPill.vue';
-import LicenseInfo from './LicenseInfo.vue';
-import DatasetView from './DatasetView.vue';
-import { formatDate, formatFormula, moleculeSvg } from '../bag/chem.js';
-import { validateBag } from '../bag/validate.js';
-import { loadBagMetadata, revokePreviewUrls } from '../bag/metadata.js';
-import { prepareLocalNmriumFiles } from '../nmrium/loadLocal.js';
+import {
+    markRaw,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    shallowRef,
+    watch,
+} from "vue";
+import ValidationPanel from "./ValidationPanel.vue";
+import NmriumPanel from "./NmriumPanel.vue";
+import CitationCard from "./CitationCard.vue";
+import IdentifierPill from "./IdentifierPill.vue";
+import LicenseInfo from "./LicenseInfo.vue";
+import DatasetView from "./DatasetView.vue";
+import { formatDate, formatFormula, moleculeSvg } from "../bag/chem.js";
+import { validateBag } from "../bag/validate.js";
+import { loadBagMetadata, revokePreviewUrls } from "../bag/metadata.js";
+import { prepareLocalNmriumFiles } from "../nmrium/loadLocal.js";
 
 const props = defineProps({
     bag: { type: Object, required: true },
 });
 
 const activeDataset = ref(null);
+const previewDataset = ref(null);
 const validating = ref(false);
-const progress = ref({ current: 0, total: 0, path: '' });
+const progress = ref({ current: 0, total: 0, path: "" });
 const validation = ref(null);
 const metadata = ref({
-    sampleName: '',
+    sampleName: "",
     doi: null,
     description: null,
     keywords: [],
@@ -525,8 +600,37 @@ watch(
         }
         await openBag(bag);
     },
-    { immediate: true },
+    { immediate: true }
 );
+
+function previewUrl(dataset) {
+    return dataset?.spectrumId
+        ? metadata.value.previewObjectUrls.get(dataset.spectrumId)
+        : null;
+}
+
+function openPreview(dataset) {
+    previewDataset.value = dataset;
+}
+
+function closePreview() {
+    previewDataset.value = null;
+}
+
+function openFromPreview() {
+    const dataset = previewDataset.value;
+    closePreview();
+    openDataset(dataset);
+}
+
+function onKeydown(event) {
+    if (event.key === "Escape" && previewDataset.value) {
+        closePreview();
+    }
+}
+
+onMounted(() => window.addEventListener("keydown", onKeydown));
+onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
 
 function openDataset(dataset) {
     activeDataset.value = dataset;
@@ -540,12 +644,13 @@ function closeDataset() {
 
 async function openBag(bag) {
     activeDataset.value = null;
+    previewDataset.value = null;
     validating.value = true;
     validation.value = null;
     prepared.value = null;
     nmriumError.value = null;
     nmriumWarnings.value = [];
-    progress.value = { current: 0, total: 0, path: '' };
+    progress.value = { current: 0, total: 0, path: "" };
 
     revokePreviewUrls(metadata.value.previewObjectUrls);
 
@@ -566,18 +671,18 @@ async function openBag(bag) {
         nmriumWarnings.value = prep.warnings;
         prepared.value = markRaw(prep);
     } catch (error) {
-        nmriumError.value = error?.message || 'Failed to open bag';
+        nmriumError.value = error?.message || "Failed to open bag";
     } finally {
         validating.value = false;
     }
 }
 
 function onNmriumError(error) {
-    nmriumError.value = error?.message || 'NMRium failed to load spectra';
+    nmriumError.value = error?.message || "NMRium failed to load spectra";
 }
 
 function orcidId(url) {
-    return String(url).replace(/^https?:\/\/orcid\.org\//i, '');
+    return String(url).replace(/^https?:\/\/orcid\.org\//i, "");
 }
 
 function truncate(text, max) {
@@ -585,6 +690,6 @@ function truncate(text, max) {
         return text;
     }
 
-    return text.slice(0, max) + '…';
+    return text.slice(0, max) + "…";
 }
 </script>

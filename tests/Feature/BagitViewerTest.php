@@ -95,10 +95,10 @@ HTML);
         $this->assertStringContainsString(hash('sha256', $html), $readme);
     }
 
-    public function test_bagit_viewer_download_returns_404_when_html_missing(): void
+    public function test_bagit_viewer_download_returns_503_when_html_missing(): void
     {
         File::delete($this->fixtureHtml);
 
-        $this->get('/bagit-viewer/download')->assertNotFound();
+        $this->get('/bagit-viewer/download')->assertStatus(503);
     }
 }
