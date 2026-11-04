@@ -800,7 +800,7 @@ export default {
         vm.$page.props.selectedFolder = vm.file.children[0]
             ? vm.file.children[0].relative_url
             : "";
-        if (!this.study.is_public) {
+        if (!this.study.is_public && this.canUpdateFiles) {
             let options = {
                 url: "/",
                 method: "put",
