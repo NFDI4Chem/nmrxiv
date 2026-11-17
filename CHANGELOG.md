@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.6.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.5.1...v2.6.0) (2026-11-17)
+
+
+### Features
+
+* **bagit-viewer:** show authors, citations and dataset pages in offl… ([#1601](https://github.com/NFDI4Chem/nmrxiv/issues/1601)) ([51dd721](https://github.com/NFDI4Chem/nmrxiv/commit/51dd72199db773f6dd1f5131b9ec6594143428f7))
+* predict NMR spectra in the app and clarify public compound pages ([#1605](https://github.com/NFDI4Chem/nmrxiv/issues/1605)) ([3d9b478](https://github.com/NFDI4Chem/nmrxiv/commit/3d9b4781fe54103a08fa2832701e3168153cf558))
+* **tags:** implement TagNormalizer for keyword validation and update… ([#1607](https://github.com/NFDI4Chem/nmrxiv/issues/1607)) ([ce0d642](https://github.com/NFDI4Chem/nmrxiv/commit/ce0d6429df061774c3aa7dfbae574f91c625fbab))
+
+
+### Bug Fixes
+
+* chemotion integration bugs ([#1613](https://github.com/NFDI4Chem/nmrxiv/issues/1613)) ([d86ee78](https://github.com/NFDI4Chem/nmrxiv/commit/d86ee7839074634352f60cf45b69d91d2697559a))
+* **chemotion-integration:** add default license configuration and update license handling in ELN submissions ([7ef81cf](https://github.com/NFDI4Chem/nmrxiv/commit/7ef81cfeed40de182f500380c1a9b2d7ff1333fe))
+* **Chemotion-Integration:** enhance author deletion logic to consider authors linked to studies. ([390b483](https://github.com/NFDI4Chem/nmrxiv/commit/390b4835a969b97a2c056ead3c3922822e358ab9))
+* **docker:** update PHP to 8.4.27 to address CVE-2026-109618/109619 ([a66acaa](https://github.com/NFDI4Chem/nmrxiv/commit/a66acaaa5b5bbc1c519b8fad46d1d2b79dd65a66))
+* implement advisory locking for race condition handling in file system object creation and update permissions for embargoed studies ([#1618](https://github.com/NFDI4Chem/nmrxiv/issues/1618)) ([6c121e7](https://github.com/NFDI4Chem/nmrxiv/commit/6c121e7f945830c1dcf047b5c31553f1c06b5e4f))
+* **publish:** avoid 404 reload after publish processing completes ([#1620](https://github.com/NFDI4Chem/nmrxiv/issues/1620)) ([8e49179](https://github.com/NFDI4Chem/nmrxiv/commit/8e491790d981a0b319a12e270bf2b0912b76338b))
+* update API documentation link to use route helper and resolve as per environment. ([f1645a1](https://github.com/NFDI4Chem/nmrxiv/commit/f1645a1489dd884f668172b3ae9d0ae015aaa666))
+* update email templates to link single published samples to their public pages and fallback to project list for multiple samples ([a3ff302](https://github.com/NFDI4Chem/nmrxiv/commit/a3ff302fe51db0e874e278a1ed48bef7cab8b2df))
+
+
+### Miscellaneous Chores
+
+* composer update ([8499c1e](https://github.com/NFDI4Chem/nmrxiv/commit/8499c1e728672da629b1b9d8e654c793cab42211))
+* **docker:** remove temporary PHP version guard ([#1611](https://github.com/NFDI4Chem/nmrxiv/issues/1611)) ([b19bb7b](https://github.com/NFDI4Chem/nmrxiv/commit/b19bb7bebce6a76891387ebf5a916a6446307157))
+* npm update ([050d273](https://github.com/NFDI4Chem/nmrxiv/commit/050d2739076e3ed4edc150aacfaeb05aa376f387))
+
 ## [2.5.1](https://github.com/NFDI4Chem/nmrxiv/compare/v2.5.0...v2.5.1) (2026-10-22)
 
 
