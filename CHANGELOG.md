@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.5.1](https://github.com/NFDI4Chem/nmrxiv/compare/v2.5.0...v2.5.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* **docker:** enforce PHP &gt;= 8.4.27 to address CVE-2026-109618/109619 ([#1610](https://github.com/NFDI4Chem/nmrxiv/issues/1610)) ([cc9d176](https://github.com/NFDI4Chem/nmrxiv/commit/cc9d176a28539f11dea8f5af23b32c5e22238964))
+
+
+### Performance Improvements
+
+* **search:** denormalize public compound catalog onto molecules ([#1531](https://github.com/NFDI4Chem/nmrxiv/issues/1531)) ([#1563](https://github.com/NFDI4Chem/nmrxiv/issues/1563)) ([a1a4017](https://github.com/NFDI4Chem/nmrxiv/commit/a1a4017485b84703492ee40aa6711ee20766dd4c))
+
 ## [2.5.0](https://github.com/NFDI4Chem/nmrxiv/compare/v2.4.0...v2.5.0) (2026-09-21)
 
 
