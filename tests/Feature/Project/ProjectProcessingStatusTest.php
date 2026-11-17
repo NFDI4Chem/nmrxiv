@@ -93,6 +93,37 @@ class ProjectProcessingStatusTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_publish_page_is_gone_but_project_page_loads_after_processing_completes(): void
+    {
+        $draftId = $this->draft->id;
+
+        $this->project->update([
+            'status' => 'published',
+            'draft_id' => null,
+        ]);
+        $this->draft->delete();
+
+        $this->actingAs($this->owner)
+            ->get(route('publish', $draftId))
+            ->assertNotFound();
+
+        $this->actingAs($this->owner)
+            ->get(route('dashboard.projects', $this->project))
+            ->assertOk();
+    }
+
+    public function test_status_endpoint_returns_not_found_after_staging_project_is_deleted(): void
+    {
+        $projectId = $this->project->id;
+
+        $this->project->users()->detach();
+        $this->project->delete();
+
+        $this->actingAs($this->owner)
+            ->getJson(route('project.status', $projectId))
+            ->assertNotFound();
+    }
+
     public function test_retry_publish_returns_to_draft_when_draft_exists(): void
     {
         $this->project->update(['status' => 'failed']);

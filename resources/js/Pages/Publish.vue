@@ -1373,6 +1373,8 @@
                     <ProcessingLogs
                         v-if="project"
                         :project="project"
+                        :complete-url="route('dashboard.projects', project.id)"
+                        :missing-url="route('dashboard')"
                         @status-changed="status = $event"
                     />
                 </div>

@@ -297,10 +297,4 @@ class ProcessProjectJobTest extends TestCase
         $this->assertStringContainsString($this->project->uuid, $fsObject->path);
         $this->assertStringContainsString($newPath, $fsObject->path);
     }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
-    }
 }
