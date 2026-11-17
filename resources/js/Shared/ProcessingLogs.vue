@@ -204,6 +204,14 @@ export default {
             type: Object,
             required: true,
         },
+        completeUrl: {
+            type: String,
+            default: null,
+        },
+        missingUrl: {
+            type: String,
+            default: null,
+        },
     },
 
     emits: ["status-changed"],
@@ -302,12 +310,20 @@ export default {
                             TERMINAL_SUCCESS.includes(this.currentStatus) &&
                             previousStatus !== this.currentStatus
                         ) {
-                            router.reload({ preserveScroll: true });
+                            if (this.completeUrl) {
+                                router.visit(this.completeUrl);
+                            } else {
+                                router.reload({ preserveScroll: true });
+                            }
                         }
                     }
                 })
-                .catch(() => {
-                    // Keep last known state; next poll will retry.
+                .catch((error) => {
+                    if (error.response?.status === 404 && this.missingUrl) {
+                        this.stopPolling();
+                        router.visit(this.missingUrl);
+                    }
+                    // Otherwise keep last known state; next poll will retry.
                 });
         },
 
