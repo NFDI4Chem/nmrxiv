@@ -69,6 +69,7 @@ RUN mkdir -p /var/www/html/config/caddy \
 
 # Build frontend assets
 RUN npm run build && \
+    npm run build:bagit-viewer && \
     npm cache clean --force
 
 # Configure Supervisord and Caddy

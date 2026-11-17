@@ -11,17 +11,21 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BagitViewerController;
 use App\Http\Controllers\CASController;
 use App\Http\Controllers\ChemistryStandardizeController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\CommunityContributionController;
+use App\Http\Controllers\CompoundLibraryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\DraftArchiveController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\FundingReferenceController;
 use App\Http\Controllers\InteractionTrackingController;
+use App\Http\Controllers\NmrPredictionController;
 use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
@@ -30,6 +34,7 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\PublicSearchController;
 use App\Http\Controllers\PublicStatsController;
 use App\Http\Controllers\RorController;
+use App\Http\Controllers\StudyAssignmentValidationController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
@@ -103,9 +108,27 @@ Route::get('/faqs', function () {
     return Inertia::render('FAQs');
 })->name('faqs');
 
-Route::get('/predict', function () {
-    return Inertia::render('Predict');
-})->name('predict');
+Route::get('/sustainability', function () {
+    return Inertia::render('Sustainability');
+})->name('sustainability');
+
+Route::get('/predict', [NmrPredictionController::class, 'index'])->name('predict');
+
+Route::post('/predict/spectrum', [NmrPredictionController::class, 'store'])
+    ->middleware('throttle:nmr-prediction')
+    ->name('predict.spectrum');
+
+Route::get('/quickcheck', function () {
+    return Inertia::render('Quickcheck', [
+        'quickcheckUrl' => route('api.quickcheck'),
+    ]);
+})->name('quickcheck');
+
+Route::get('/bagit-viewer', [BagitViewerController::class, 'show'])
+    ->name('bagit-viewer');
+
+Route::get('/bagit-viewer/download', [BagitViewerController::class, 'download'])
+    ->name('bagit-viewer.download');
 
 Route::get('/stats', [PublicStatsController::class, 'index'])->name('stats');
 
@@ -217,6 +240,9 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
         ->name('project.status');
+
+    Route::post('projects/{project}/publish/retry', [ProjectController::class, 'retryPublish'])
+        ->name('project.publish.retry');
 
     Route::get('projects/{project}/validation', [ProjectController::class, 'validationReport'])
         ->name('project.validation');
@@ -365,6 +391,13 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::put('datasets/{dataset}/assignments', [DatasetController::class, 'updateAssignments'])
             ->name('dashboard.datasets.assignments.update');
 
+        Route::get('studies/{study}/assignment-validation', [StudyAssignmentValidationController::class, 'show'])
+            ->name('dashboard.studies.assignment-validation.show');
+        Route::post('studies/{study}/assignment-validation', [StudyAssignmentValidationController::class, 'store'])
+            ->name('dashboard.studies.assignment-validation.store');
+        Route::post('studies/{study}/assignment-validation/{validation}/confirm', [StudyAssignmentValidationController::class, 'confirm'])
+            ->name('dashboard.studies.assignment-validation.confirm');
+
         Route::get('drafts/{draft}/show', [DraftController::class, 'show'])
             ->name('dashboard.draft.show');
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
@@ -389,6 +422,10 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.sample-folder.reset');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
+        Route::get('drafts/{draft}/archives', [DraftArchiveController::class, 'index'])
+            ->name('dashboard.draft.archives.index');
+        Route::post('drafts/{draft}/archives/extract', [DraftArchiveController::class, 'extract'])
+            ->name('dashboard.draft.archives.extract');
         Route::get('drafts/{draft}/hifsa/{filesystemobject}', [DraftController::class, 'hifsaFile'])
             ->name('dashboard.draft.hifsa');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
@@ -495,6 +532,10 @@ Route::get('{id}', function ($id) {
 
 // Search / browse page
 Route::get('/compounds', [ApplicationController::class, 'compounds'])->name('compounds');
+
+Route::get('/library/{team:compound_library_code}', [CompoundLibraryController::class, 'show'])
+    ->whereAlphaNumeric('team')
+    ->name('public.compound-library');
 
 Route::get('/search', [PublicSearchController::class, 'index'])->name('search');
 

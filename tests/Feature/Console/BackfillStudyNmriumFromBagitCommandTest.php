@@ -9,19 +9,19 @@ use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\WritesBagitZip;
 use Tests\TestCase;
 
 class BackfillStudyNmriumFromBagitCommandTest extends TestCase
 {
     use RefreshDatabase;
+    use WritesBagitZip;
 
     public function test_it_unwraps_the_bagit_nmrium_export_and_backfills_the_study(): void
     {
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
         ]);
 
         $study = $this->makeStudy(['identifier' => 213, 'is_public' => true]);
@@ -53,8 +53,6 @@ class BackfillStudyNmriumFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
         ]);
 
         $study = $this->makeStudy(['identifier' => 214, 'is_public' => true]);
@@ -78,8 +76,6 @@ class BackfillStudyNmriumFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
         ]);
 
         $this->putNmriumFile('S999', '26giii');
@@ -94,13 +90,11 @@ class BackfillStudyNmriumFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
         ]);
 
         $study = $this->makeStudy(['identifier' => 215, 'is_public' => true]);
 
-        Storage::disk('local')->put('spectra_parse/S215/bagit.txt', "BagIt-Version: 1.0\n");
+        $this->putBagZip('S215', ['bagit.txt' => "BagIt-Version: 1.0\n"]);
 
         $this->artisan('nmrxiv:backfill-study-nmrium')->assertSuccessful();
 
@@ -113,8 +107,6 @@ class BackfillStudyNmriumFromBagitCommandTest extends TestCase
         Storage::fake('local');
 
         config([
-            'nmrxiv.spectra_parsing.storage_disk' => 'local',
-            'nmrxiv.spectra_parsing.storage_path' => 'spectra_parse',
         ]);
 
         $study = $this->makeStudy(['identifier' => 216, 'is_public' => true]);
@@ -152,10 +144,7 @@ class BackfillStudyNmriumFromBagitCommandTest extends TestCase
             ],
         ]);
 
-        Storage::disk('local')->put(
-            "spectra_parse/{$folderName}/data/{$sampleName}/nmrxiv-meta/{$sampleName}.nmrium",
-            $content
-        );
+        $this->putBagZip($folderName, ["data/{$sampleName}/nmrxiv-meta/{$sampleName}.nmrium" => $content]);
     }
 
     private function makeStudy(array $overrides = []): Study

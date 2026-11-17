@@ -248,8 +248,7 @@ class RefreshNmriumInfo extends Command
         if (! $studyFSObject) {
             return;
         }
-        $draft = $study->draft;
-        $isChemotion = $draft && $draft->eln === 'chemotion';
+        $isChemotion = $study->isChemotionSubmission();
 
         foreach ($study->datasets as $dataset) {
             $dsFSO = $dataset->fsObject;

@@ -54,6 +54,12 @@ export default defineConfig({
               { text: 'Community Contribution', link: '/submission-guides/community-contribution.md'},
             ]
           },
+          { text: 'Submit from ELN',
+            items: [
+              { text: 'Overview', link: '/submission-guides/eln/index.md'},
+              { text: 'Chemotion', link: '/submission-guides/eln/chemotion.md'},
+            ]
+          },
           { text: 'Embargo Publication', link: '/submission-guides/embargo.md'},
           { text: 'Dashboard', link: '/submission-guides/dashboard.md'},
           { text: 'Data Models',
@@ -68,6 +74,14 @@ export default defineConfig({
           { text: 'Licenses', link: '/submission-guides/licenses.md' },
           { text: 'Team', link: '/submission-guides/team.md'},
           { text: 'Sharing', link: '/submission-guides/sharing.md'}
+        ],
+      },
+      {
+        text: 'Data Quality',
+        items: [
+          { text: 'Data Completeness Scores', link: '/data-quality/overview.md' },
+          { text: 'Why Each Experiment Matters', link: '/data-quality/experiments.md' },
+          { text: 'Library and Contributor Stars', link: '/data-quality/contributor-stars.md' },
         ],
       },
       {
@@ -99,13 +113,15 @@ export default defineConfig({
             ]
           },
           { text: 'Code Contribution Guidelines', link: '/developer-guides/code-contribution-guidelines.md' },
-          { text: 'API', link: '/developer-guides/api.md' }
+          { text: 'API', link: '/developer-guides/api.md' },
+          { text: 'Data Quality Scoring', link: '/developer-guides/data-quality-scoring.md' },
         ],
       },
       {
         text: 'Advance Guides',
         items: [
           { text: 'NMRium', link: '/advanced-guides/nmrium/nmrium.md' },  
+          { text: 'HiFSA', link: '/advanced-guides/hifsa/hifsa.md' },
           { text: 'NMR Repositories Overview',
             items: [
               { text: 'Background', link: '/advanced-guides/nmr-repositories/background.md'},

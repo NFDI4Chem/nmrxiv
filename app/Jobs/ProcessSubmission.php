@@ -4,7 +4,9 @@ namespace App\Jobs;
 
 use App\Actions\Citation\SyncCitationPivot;
 use App\Actions\Draft\DetachStudyFilesystemFromDraft;
+use App\Actions\Draft\ReportElnSubmissionFailure;
 use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
@@ -26,6 +28,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 {
@@ -78,9 +81,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher, DetachStudyFilesystemFromDraft $detachStudyFilesystemFromDraft): void
+    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher, DetachStudyFilesystemFromDraft $detachStudyFilesystemFromDraft, ProjectProcessingLogger $logger): void
     {
         $project = $this->project->fresh();
+
+        $assigner->reserveProjectIdentifier($project);
+        $project = $project->fresh();
 
         $draft = $project->draft;
 
@@ -95,13 +101,22 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'project_id' => $project->id,
                 ]);
 
-                $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater);
+                $logger->log($project, 'info', 'started', 'Resuming publish without draft (re-publish path).', [
+                    'attempt' => $this->attempts(),
+                ]);
+
+                $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater, $logger);
 
                 return;
             }
 
             Log::warning('ProcessSubmission skipped: project has no associated draft', [
                 'project_id' => $project->id,
+                'draft_id' => $project->draft_id,
+                'status' => $project->status,
+            ]);
+
+            $logger->log($project, 'warning', 'skipped', 'Processing skipped: project has no associated draft.', [
                 'draft_id' => $project->draft_id,
                 'status' => $project->status,
             ]);
@@ -124,6 +139,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         $project->status = 'processing';
         $project->save();
+
+        $logger->log($project, 'info', 'started', 'Publish processing started.', [
+            'attempt' => $this->attempts(),
+            'draft_id' => $draft->id,
+            'project_enabled' => (bool) $draft->project_enabled,
+        ]);
 
         $draft = $project->draft;
 
@@ -148,17 +169,23 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     'project_id' => $this->project->id,
                 ]);
 
+                if ($project) {
+                    $logger->log($project, 'warning', 'aborted', 'Processing aborted: draft missing and project has no studies.');
+                }
+
                 return;
             }
 
-            $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater);
+            $logger->log($project, 'info', 'started', 'Resuming publish without draft (re-publish path).', [
+                'attempt' => $this->attempts(),
+            ]);
+
+            $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater, $logger);
 
             return;
         }
 
         if ($draft->project_enabled) {
-            $logs = 'Moving files in progress';
-
             if ($project) {
                 if ($draft) {
                     $environment = config('app.env', 'local');
@@ -176,33 +203,26 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         ])
                         ->get();
 
+                    $logger->log($project, 'info', 'moving_files', 'Moving files to project storage.', [
+                        'folder_count' => $projectFSObjects->count(),
+                    ]);
+
                     foreach ($projectFSObjects as $FSObject) {
                         $FSObject->project_id = $project->id;
                         $FSObject->save();
                         $this->moveFolder($FSObject, $draft, $projectPath);
                     }
 
-                    $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
+                    $logger->log($project, 'info', 'files_moved', 'File move complete.');
 
                     $draft->delete();
+
+                    $logger->log($project, 'info', 'draft_removed', 'Draft removed after files were moved.');
                 }
-
-                $process_logs = json_decode($project->process_logs, true);
-
-                $process_log = [Carbon::now()->timestamp => $logs];
-
-                if (! is_null($process_logs)) {
-                    array_push($process_logs, $process_log);
-                } else {
-                    $process_logs = [];
-                    array_push($process_logs, $process_log);
-                }
-
-                $project->process_logs = $process_logs;
 
                 $project->draft_id = null;
 
-                $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater);
+                $this->finalizeProjectModeFromReleaseDate($project, $projectPublisher, $assigner, $updater, $logger);
             }
         } else {
             Log::info('embargo_publish_trace', [
@@ -210,7 +230,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 'project_id' => $project->id,
             ]);
 
-            $logs = 'Moving files in progress';
+            $logger->log($project, 'info', 'samples_mode', 'Publishing as individual samples.');
 
             if ($project) {
                 $_studies = $project->studies;
@@ -224,6 +244,10 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     $projectSpecies = $project->species;
 
                     $studiesToPublish = $this->filterStudiesForSubmission($_studies);
+
+                    $logger->log($project, 'info', 'moving_files', 'Moving files for samples.', [
+                        'study_count' => $studiesToPublish->count(),
+                    ]);
 
                     foreach ($studiesToPublish as $study) {
                         // $study->users()->sync($project->user()->getDictionary());
@@ -246,38 +270,40 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                         $detachStudyFilesystemFromDraft->execute($draft, [(int) $study->id]);
 
-                        $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
+                        $process_logs = is_array($study->process_logs)
+                            ? $study->process_logs
+                            : (json_decode((string) $study->process_logs, true) ?: []);
 
-                        $process_logs = json_decode($study->process_logs, true);
-
-                        $process_log = [Carbon::now()->timestamp => $logs];
-
-                        if (! is_null($process_logs)) {
-                            array_push($process_logs, $process_log);
-                        } else {
-                            $process_logs = [];
-                            array_push($process_logs, $process_log);
-                        }
+                        $process_logs[] = [Carbon::now()->timestamp => 'Moving files complete'];
                         $study->process_logs = $process_logs;
                         $study->draft_id = null;
                         $study->project_id = null;
-
-                        foreach ($study->datasets as $dataset) {
-                            $dataset->draft_id = null;
-                            $dataset->project_id = null;
-                            $dataset->save();
-                        }
 
                         $this->copyProjectMetadataToStudy(
                             $study,
                             $projectAuthorPivot,
                             $projectCitationsArray,
                             $projectTagNames,
-                            $projectSpecies
+                            $projectSpecies,
+                            $project->license_id
                         );
+
+                        foreach ($study->datasets as $dataset) {
+                            $dataset->draft_id = null;
+                            $dataset->project_id = null;
+                            $dataset->license_id ??= $study->license_id;
+                            $dataset->save();
+                        }
 
                         $study->status = 'complete';
                         $study->save();
+
+                        // The staging project is deleted below, so the sample must not keep pointing at it.
+                        $study->sample()->update(['project_id' => null]);
+
+                        $logger->log($project, 'info', 'study_files_moved', 'Files moved for sample.', [
+                            'study_id' => $study->id,
+                        ]);
                     }
                 }
 
@@ -289,12 +315,31 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         'project_id' => $project->id,
                     ]);
 
+                    $logger->log($project, 'warning', 'aborted', 'No studies to publish in samples mode.');
+
                     return;
                 }
 
-                $assigner->assign($studiesToPublish);
+                $logger->log($project, 'info', 'identifiers_assigned', 'Assigning identifiers to samples.', [
+                    'study_count' => $studiesToPublish->count(),
+                ]);
 
                 $releaseDate = Carbon::parse($project->release_date);
+
+                // The staging project is deleted afterwards, so the samples must carry their own release date.
+                // Set before the identifiers/DOIs are assigned so the DOI metadata uses it.
+                $this->stampStudyReleaseDates(
+                    $studiesToPublish,
+                    filled($project->release_date) ? $releaseDate : now()->startOfDay()
+                );
+
+                // Also before the DOIs: the samples no longer have a project to read citations from.
+                $project->load('citations');
+                foreach ($studiesToPublish as $study) {
+                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
+                }
+
+                $assigner->assign($studiesToPublish);
 
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_immediate_publish_all',
@@ -314,18 +359,21 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         ]);
                         $studyPublisher->publish($study);
                     }
+
+                    $logger->log($project, 'info', 'published', 'Samples published.', [
+                        'study_count' => $studiesToPublish->count(),
+                    ]);
                 }
                 $updater->update($studiesToPublish);
+
+                $logger->log($project, 'info', 'dois_updated', 'Sample DOIs updated.');
+
                 // Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_study_publish_event',
                     'project_id' => $project->id,
                 ]);
                 event(new StudyPublish($studiesToPublish, $this->prepareSendList($project)));
-                $project->load('citations');
-                foreach ($studiesToPublish as $study) {
-                    app(SyncCitationPivot::class)->mergeProjectCitationsOntoStudy($study, $project->citations);
-                }
                 Log::info('embargo_publish_trace', [
                     'stage' => 'process_submission_samples_mode_before_delete_project_draft',
                     'project_id' => $project->id,
@@ -333,9 +381,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 ]);
 
                 if ($this->preserveDraft) {
+                    $logger->log($project, 'info', 'completed', 'Samples mode complete; draft preserved.');
                     $project->status = 'draft';
                     $project->save();
                 } else {
+                    $logger->log($project, 'info', 'completed', 'Samples mode complete; removing staging project and draft.');
+                    $this->detachStagingProjectRelations($project);
                     $project->delete();
                     $draft->delete();
                 }
@@ -347,6 +398,77 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
             }
         }
+    }
+
+    /**
+     * Set the release date on samples (and their datasets) that do not have one yet.
+     *
+     * @param  Collection<int, Study>|\Illuminate\Database\Eloquent\Collection<int, Study>  $studies
+     */
+    private function stampStudyReleaseDates($studies, Carbon $releaseDate): void
+    {
+        foreach ($studies as $study) {
+            $study->release_date ??= $releaseDate;
+            $study->save();
+
+            foreach ($study->datasets as $dataset) {
+                $dataset->release_date ??= $releaseDate;
+                $dataset->save();
+            }
+        }
+    }
+
+    /**
+     * Remove the many-to-many rows of a staging project that is about to be deleted.
+     *
+     * Deleting the model does not cascade to these pivot tables, so without this the
+     * published samples would leave orphaned rows pointing to a project that no
+     * longer exists. Everything the samples need was already copied onto the studies.
+     */
+    private function detachStagingProjectRelations(Project $project): void
+    {
+        $project->authors()->detach();
+        $project->citations()->detach();
+        $project->fundingReferences()->detach();
+        $project->tags()->detach();
+        $project->users()->detach();
+    }
+
+    /**
+     * Handle a job failure after all retry attempts have been exhausted.
+     */
+    public function failed(Throwable $exception): void
+    {
+        $project = Project::find($this->project->id);
+
+        if (! $project) {
+            return;
+        }
+
+        $logger = app(ProjectProcessingLogger::class);
+
+        $logger->log($project, 'error', 'failed', 'Publish processing failed: '.$exception->getMessage(), [
+            'exception' => $exception::class,
+            'file' => $exception->getFile().':'.$exception->getLine(),
+            'attempts' => $this->attempts(),
+        ]);
+
+        $project->status = 'failed';
+        $project->save();
+
+        // ELN submissions have no one watching the publish step: tell the submitter and the admins.
+        $draft = $project->draft;
+        if ($draft && filled($draft->eln)) {
+            app(ReportElnSubmissionFailure::class)->handle($draft, 'Publishing the submission', $exception);
+        }
+
+        Log::error('ProcessSubmission failed permanently', [
+            'project_id' => $project->id,
+            'exception' => $exception::class,
+            'message' => $exception->getMessage(),
+            'file' => $exception->getFile().':'.$exception->getLine(),
+            'attempts' => $this->attempts(),
+        ]);
     }
 
     /**
@@ -375,6 +497,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         PublishProject $projectPublisher,
         AssignIdentifier $assigner,
         UpdateDOI $updater,
+        ProjectProcessingLogger $logger,
     ): void {
         $release_date = Carbon::parse($project->release_date);
         if ($release_date->isFuture()) {
@@ -394,6 +517,16 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
             'resolved_status' => $project->status,
         ]);
 
+        if ($release_date->isFuture()) {
+            $logger->log($project, 'info', 'embargo', 'Project placed under embargo until '.$release_date->toDateString().'.', [
+                'release_date' => $release_date->toIso8601String(),
+            ]);
+        } else {
+            $logger->log($project, 'info', 'published', 'Project marked for immediate publication.');
+        }
+
+        $logger->log($project, 'info', 'identifiers_assigned', 'Assigning identifiers.');
+
         $assigner->assign($project->fresh());
 
         Log::info('embargo_publish_trace', [
@@ -407,6 +540,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 'project_id' => $project->id,
             ]);
             $projectPublisher->publish($project);
+            $logger->log($project, 'info', 'published', 'Project published.');
         } else {
             Log::info('embargo_publish_trace', [
                 'stage' => 'process_submission_project_mode_skip_publish_embargo',
@@ -415,14 +549,16 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         }
         $updater->update($project->fresh());
 
+        $logger->log($project, 'info', 'dois_updated', 'DOIs updated.');
+
         Log::info('embargo_publish_trace', [
             'stage' => 'process_submission_project_mode_after_update_doi',
             'project_id' => $project->id,
         ]);
 
-        $this->linkProvisionalDoiSafely($project->fresh());
+        $this->linkProvisionalDoiSafely($project->fresh(), $logger);
 
-        $this->dispatchArchives($project->fresh());
+        $this->dispatchArchives($project->fresh(), $logger);
 
         Log::info('embargo_publish_trace', [
             'stage' => 'process_submission_project_mode_before_publish_notification',
@@ -431,9 +567,15 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         $project->sendNotification('publish', $this->prepareSendList($project));
 
+        $logger->log($project, 'info', 'notification_sent', 'Publish notification sent.');
+
         Log::info('embargo_publish_trace', [
             'stage' => 'process_submission_project_mode_complete',
             'project_id' => $project->id,
+        ]);
+
+        $logger->log($project, 'info', 'completed', 'Publish processing completed.', [
+            'status' => $project->fresh()?->status,
         ]);
     }
 
@@ -463,7 +605,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
      * samples (the Collection-of-Studies branch in `handle()`) never reach
      * this path because they're published without a parent Project.
      */
-    private function linkProvisionalDoiSafely(Project $project): void
+    private function linkProvisionalDoiSafely(Project $project, ProjectProcessingLogger $logger): void
     {
         if (empty($project->provisional_doi) || empty($project->doi)) {
             return;
@@ -471,17 +613,22 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         try {
             $project->linkProvisionalDoi(app(DOIService::class));
-        } catch (\Throwable $e) {
+            $logger->log($project, 'info', 'provisional_doi_linked', 'Provisional DOI linked to canonical DOI.');
+        } catch (Throwable $e) {
             Log::warning('ProcessSubmission: linkProvisionalDoi failed; canonical DOI is still valid', [
                 'project_id' => $project->id,
                 'doi' => $project->doi,
                 'provisional_doi' => $project->provisional_doi,
                 'error' => $e->getMessage(),
             ]);
+
+            $logger->log($project, 'warning', 'provisional_doi_link_failed', 'Provisional DOI linking failed; canonical DOI is still valid.', [
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
-    private function dispatchArchives(Project $project): void
+    private function dispatchArchives(Project $project, ProjectProcessingLogger $logger): void
     {
         Log::info('embargo_publish_trace', [
             'stage' => 'dispatch_archives',
@@ -495,6 +642,8 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         ArchiveProject::dispatch($project->fresh());
         ArchiveStudy::dispatch($project->fresh());
+
+        $logger->log($project, 'info', 'archives_queued', 'Archive rebuild jobs queued.');
     }
 
     /**
@@ -578,8 +727,13 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
         array $authorPivot,
         ?array $citationsArray,
         array $tagNames,
-        $species
+        $species,
+        ?int $licenseId = null
     ): void {
+        if ($licenseId !== null && empty($study->license_id)) {
+            $study->license_id = $licenseId;
+        }
+
         if (! empty($authorPivot)) {
             $study->studyAuthors()->syncWithoutDetaching($authorPivot);
         }

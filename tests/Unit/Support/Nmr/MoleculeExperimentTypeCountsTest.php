@@ -7,6 +7,7 @@ use App\Models\Molecule;
 use App\Models\NMRium;
 use App\Models\Sample;
 use App\Models\Study;
+use App\Models\User;
 use App\Support\Nmr\MoleculeExperimentTypeCounts;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -158,5 +159,41 @@ class MoleculeExperimentTypeCountsTest extends TestCase
 
         $this->assertSame(1, $counts[$molecule->id]['1H NMR - 1D']);
         $this->assertSame(1, $counts[$molecule->id]['13C-1H NMR - 2D']);
+    }
+
+    public function test_public_catalog_team_scope_only_counts_that_teams_studies(): void
+    {
+        $owner = User::factory()->withPersonalTeam()->create();
+        $otherOwner = User::factory()->withPersonalTeam()->create();
+        $molecule = Molecule::factory()->create();
+
+        foreach ([[$owner, '1H NMR - 1D'], [$otherOwner, '13C NMR - 1D']] as [$studyOwner, $type]) {
+            $study = Study::factory()->create([
+                'owner_id' => $studyOwner->id,
+                'team_id' => $studyOwner->currentTeam->id,
+                'project_id' => null,
+                'is_public' => true,
+                'is_archived' => false,
+                'is_deleted' => false,
+            ]);
+            $sample = Sample::factory()->create(['study_id' => $study->id]);
+            $molecule->samples()->attach($sample->id, ['percentage_composition' => '100']);
+
+            Dataset::factory()->create([
+                'study_id' => $study->id,
+                'team_id' => $study->team_id,
+                'owner_id' => $study->owner_id,
+                'project_id' => null,
+                'type' => $type,
+                'is_public' => true,
+                'is_archived' => false,
+                'is_deleted' => false,
+                'has_nmrium' => true,
+            ]);
+        }
+
+        $counts = (new MoleculeExperimentTypeCounts)->forPublicCatalog([$molecule->id], $owner->currentTeam);
+
+        $this->assertSame(['1H NMR - 1D' => 1], $counts[$molecule->id]);
     }
 }

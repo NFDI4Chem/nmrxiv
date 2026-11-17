@@ -2240,6 +2240,21 @@
                                                                                             </div>
                                                                                         </section>
                                                                                     </div>
+
+                                                                                    <SampleQuickcheckPanel
+                                                                                        v-if="
+                                                                                            selectedStudy &&
+                                                                                            selectedStudy
+                                                                                                .datasets
+                                                                                                ?.length
+                                                                                        "
+                                                                                        :study-id="
+                                                                                            selectedStudy.id
+                                                                                        "
+                                                                                        :study-name="
+                                                                                            selectedStudy.name
+                                                                                        "
+                                                                                    />
                                                                                 </div>
                                                                             </section>
                                                                         </div>
@@ -2349,10 +2364,11 @@
                                                                                                 v-model="
                                                                                                     studyForm.tag
                                                                                                 "
-                                                                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                                                                placeholder="Type a keyword or keywords separated by comma (,), semicolon (;) or pipe (|) and press enter"
                                                                                                 :separators="[
                                                                                                     ';',
                                                                                                     ',',
+                                                                                                    '|',
                                                                                                 ]"
                                                                                                 max-width="100%"
                                                                                                 :tags="
@@ -2986,6 +3002,7 @@ import {
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ChemicalCompositionEditor from "@/Shared/ChemicalCompositionEditor.vue";
 import HifsaScoresPanel from "@/Shared/HifsaScoresPanel.vue";
+import SampleQuickcheckPanel from "@/Shared/Assignments/SampleQuickcheckPanel.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
@@ -3029,6 +3046,7 @@ export default {
         SpectraEditor,
         ChemicalCompositionEditor,
         HifsaScoresPanel,
+        SampleQuickcheckPanel,
         Depictor,
         Depictor2D,
         slider,

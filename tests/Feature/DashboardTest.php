@@ -338,6 +338,49 @@ class DashboardTest extends TestCase
         $response->assertDontSee('VisibilityPrivateStudyToken', false);
     }
 
+    public function test_dashboard_compound_library_includes_share_url_and_public_count(): void
+    {
+        $publicStudy = Study::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'project_id' => null,
+            'is_deleted' => false,
+            'is_public' => true,
+        ]);
+        $privateStudy = Study::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->user->currentTeam->id,
+            'project_id' => null,
+            'is_deleted' => false,
+            'is_public' => false,
+        ]);
+
+        foreach ([$publicStudy, $privateStudy] as $study) {
+            $sample = Sample::factory()->create(['study_id' => $study->id]);
+            Molecule::factory()->create()->samples()->attach($sample->id, ['percentage_composition' => '100']);
+        }
+
+        $page = $this->inertiaPageFromResponse(
+            $this->actingAs($this->user)->get('/dashboard?tab=samples')
+        );
+
+        $this->assertSame(
+            $this->user->currentTeam->compoundLibraryUrl(),
+            $page['props']['compoundLibraryUrl']
+        );
+        $this->assertSame(1, $page['props']['publicCompoundsCount']);
+    }
+
+    public function test_dashboard_projects_tab_skips_public_compound_count(): void
+    {
+        $page = $this->inertiaPageFromResponse(
+            $this->actingAs($this->user)->get('/dashboard')
+        );
+
+        $this->assertNotNull($page['props']['compoundLibraryUrl']);
+        $this->assertNull($page['props']['publicCompoundsCount']);
+    }
+
     public function test_dashboard_with_non_personal_team(): void
     {
         $team = Team::factory()->create([

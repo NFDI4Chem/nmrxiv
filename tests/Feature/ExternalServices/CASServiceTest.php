@@ -26,7 +26,7 @@ class CASServiceTest extends TestCase
 
         // Set up CAS configuration for tests
         Config::set('services.cas.api_token', 'test-api-token');
-        Config::set('services.cas.base_url', 'https://commonchemistry.cas.org/api');
+        Config::set('services.cas.base_url', 'https://commonchemistry.cas.org/direct-api');
     }
 
     public function test_fetch_cas_data_requires_cas_rn_parameter(): void
@@ -302,7 +302,8 @@ class CASServiceTest extends TestCase
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.example.com/detail?cas_rn=50-00-0' &&
                    $request->method() === 'GET' &&
-                   $request->hasHeader('X-API-KEY', 'test-token');
+                   $request->hasHeader('X-API-KEY', 'test-token') &&
+                   $request->hasHeader('x-origin', 'https://commonchemistry.cas.org/api-overview');
         });
     }
 
@@ -356,7 +357,8 @@ class CASServiceTest extends TestCase
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.example.com/search?q=C%3DO' &&
                    $request->method() === 'GET' &&
-                   $request->hasHeader('X-API-KEY', 'test-token');
+                   $request->hasHeader('X-API-KEY', 'test-token') &&
+                   $request->hasHeader('x-origin', 'https://commonchemistry.cas.org/api-overview');
         });
     }
 

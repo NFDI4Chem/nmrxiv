@@ -241,10 +241,4 @@ class DeleteProjectsJobTest extends TestCase
         $userIds = array_map(fn ($user) => $user->id, $sendList);
         $this->assertContains($this->project->owner->id, $userIds);
     }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
-    }
 }

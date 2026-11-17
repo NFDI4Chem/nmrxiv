@@ -2,7 +2,9 @@
 
 namespace App\Actions\Study;
 
+use App\Jobs\DetectDatasetSignals;
 use App\Jobs\ProcessMetadataExtractionBagitGenerationJob;
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\Study;
 use App\Services\ChemotionRepositoryTrackerService;
 use App\Support\Public\PublicMoleculeCatalogIndexer;
@@ -27,8 +29,10 @@ class PublishStudy
         }
 
         app(PublicMoleculeCatalogIndexer::class)->refreshForStudy($study);
+        dispatch(ScoreMoleculeQuality::forStudy($study));
         if ($study->is_public && $study->has_nmrium && filled($study->download_url)) {
             ProcessMetadataExtractionBagitGenerationJob::dispatch($study->id);
+            DetectDatasetSignals::dispatch($study->id);
         }
 
         // Track publication if this is an ELN submission
@@ -40,8 +44,8 @@ class PublishStudy
      */
     private function trackStudyPublished(Study $study): void
     {
-        // Only track if this study came from an ELN submission
-        if (! $study->tracking_item_name || ! $study->submitted_through) {
+        // Only track studies that came in through Chemotion
+        if (! $study->tracking_item_name || $study->submitted_through !== 'chemotion') {
             return;
         }
 

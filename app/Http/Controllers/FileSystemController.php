@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -89,6 +90,9 @@ class FileSystemController extends Controller
 
         $project = Project::findOrFail($request->get('project_id'));
         $study = Study::findOrFail($request->get('study_id'));
+
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         $file = $request->get('file');
         $destination = $request->get('destination');
         $bucket = $request->input('bucket') ?: $this->storageService->getBucket();

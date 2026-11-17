@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Molecule extends Model
 {
@@ -42,6 +43,10 @@ class Molecule extends Model
             'public_samples_count' => 'integer',
             'public_experiment_type_counts' => 'array',
             'public_catalog_indexed_at' => 'datetime',
+            'annotation_level' => 'integer',
+            'quality_breakdown' => 'array',
+            'quality_rubric_version' => 'integer',
+            'quality_scored_at' => 'datetime',
         ];
     }
 
@@ -65,6 +70,11 @@ class Molecule extends Model
         return $this->belongsToMany(Sample::class)
             ->withPivot('percentage_composition')
             ->withTimestamps();
+    }
+
+    public function teamQualityScores(): HasMany
+    {
+        return $this->hasMany(TeamMoleculeQualityScore::class);
     }
 
     public function studies()

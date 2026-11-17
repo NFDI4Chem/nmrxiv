@@ -705,9 +705,16 @@ export default {
         },
         getLink(project) {
             if (!project.is_public) {
+                const status = String(project.status ?? "").toLowerCase();
+                const openCanonicalHome = ["queued", "embargo"].includes(
+                    status
+                );
+
                 if (project.draft_id) {
-                    if (project.is_deleted) {
+                    if (project.is_deleted || openCanonicalHome) {
                         return router.visit(this.projectHomeHref(project));
+                    } else if (status === "processing") {
+                        return router.visit("/publish/" + project.draft_id);
                     } else if (project.viewer_role === "reviewer") {
                         // Reviewers cannot edit drafts, so send them to the
                         // read-only project page instead of the draft editor.

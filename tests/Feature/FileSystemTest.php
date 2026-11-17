@@ -15,6 +15,7 @@ use App\Services\PathGeneratorService;
 use App\Services\StorageSignedUrlService;
 use Aws\S3\S3Client;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -179,6 +180,47 @@ class FileSystemTest extends TestCase
 
         $response->assertStatus(201);
         $response->assertJsonStructure(['uuid', 'bucket', 'key', 'url', 'headers']);
+    }
+
+    public function test_signed_storage_url_is_forbidden_for_embargoed_study(): void
+    {
+        $this->study->update(['doi' => '10.1234/nmrxiv.embargoed']);
+
+        $response = $this->actingAs($this->user)
+            ->postJson('/dashboard/storage/signed-storage-url', [
+                'file' => ['upload' => ['filename' => 'test.txt', 'total' => 1000]],
+                'project_id' => $this->project->id,
+                'study_id' => $this->study->id,
+                'destination' => '/test',
+            ]);
+
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('file_system_objects', ['study_id' => $this->study->id]);
+    }
+
+    public function test_creating_a_root_folder_takes_an_advisory_lock_first(): void
+    {
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            $this->markTestSkipped('Advisory locks are PostgreSQL only.');
+        }
+
+        $statements = [];
+        DB::listen(function ($query) use (&$statements) {
+            $statements[] = $query->sql;
+        });
+
+        app(FileSystemObjectService::class)->createDraftFileSystemObject($this->draft, [
+            'upload' => ['filename' => 'f1.txt', 'total' => 10],
+            'fullPath' => 'NMR_Cpd5/10/f1.txt',
+        ], '');
+
+        $lock = collect($statements)->search(fn ($sql) => str_contains($sql, 'pg_advisory_xact_lock'));
+        $insert = collect($statements)->search(fn ($sql) => str_contains($sql, 'insert into "file_system_objects"'));
+
+        $this->assertNotFalse($lock, 'No advisory lock was taken before creating the folder.');
+        $this->assertNotFalse($insert);
+        $this->assertLessThan($insert, $lock, 'The advisory lock must be taken before the first insert.');
+        $this->assertSame(1, FileSystemObject::where('draft_id', $this->draft->id)->where('level', 0)->count());
     }
 
     public function test_delete_fso_requires_authentication(): void

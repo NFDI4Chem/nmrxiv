@@ -23,7 +23,33 @@ class AssignIdentifier
     }
 
     /**
-     * Archive the given model.
+     * Reserve a public project P-id without creating a DOI.
+     *
+     * Used when publication is queued so dashboard links can open /project/P{n}
+     * while a draft may still be attached.
+     */
+    public function reserveProjectIdentifier(Project $project): Project
+    {
+        if ($project->getRawOriginal('identifier') !== null && $project->getRawOriginal('identifier') !== '') {
+            return $project;
+        }
+
+        $projectTicker = Ticker::query()->firstOrCreate(
+            ['type' => 'project'],
+            ['index' => 0]
+        );
+        $projectIdentifier = $projectTicker->index + 1;
+        $projectTicker->index = $projectIdentifier;
+        $projectTicker->save();
+
+        $project->identifier = $projectIdentifier;
+        $project->save();
+
+        return $project->fresh();
+    }
+
+    /**
+     * Assign identifiers (and DOIs) for a project and its studies/datasets.
      *
      * @param  mixed  $model
      * @return void
@@ -39,18 +65,8 @@ class AssignIdentifier
         }
 
         if ($project) {
-            $projectIdentifier = $project->identifier ? $project->identifier : null;
-
-            if ($projectIdentifier == null) {
-                $projectTicker = Ticker::whereType('project')->first();
-                $projectIdentifier = $projectTicker->index + 1;
-                $projectTicker->index = $projectIdentifier;
-                $projectTicker->save();
-
-                $project->identifier = $projectIdentifier;
-                $project->save();
-                $project->fresh()->generateDOI($this->doiService);
-            }
+            $this->reserveProjectIdentifier($project);
+            $project->fresh()->generateDOI($this->doiService);
 
             $studies = $project->studies;
         }

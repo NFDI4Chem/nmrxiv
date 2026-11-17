@@ -191,6 +191,8 @@ class FileSystemObjectService
 
         // Use database transaction with retry logic for race condition handling
         $directory = DB::transaction(function () use ($searchCriteria, $name, $relativeUrl, $storagePath, $level) {
+            $this->lockForCreation($searchCriteria);
+
             // Double-check if directory was created by another process
             $directory = FileSystemObject::where($searchCriteria)->lockForUpdate()->first();
 
@@ -216,7 +218,7 @@ class FileSystemObjectService
                 return $directory;
             } catch (QueryException $e) {
                 // Handle unique constraint violation - another process created it
-                if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+                if ($this->isUniqueViolation($e)) {
                     // Fetch the directory that was created by the other process
                     $directory = FileSystemObject::where($searchCriteria)->first();
                     if ($directory) {
@@ -233,6 +235,34 @@ class FileSystemObjectService
         }
 
         return $directory;
+    }
+
+    /**
+     * Serialize concurrent creators of the same file system object.
+     *
+     * `lockForUpdate()` locks nothing while the row does not exist yet, and
+     * root rows (`parent_id` NULL) are not covered by the unique index since
+     * NULLs compare as distinct. A transaction-scoped advisory lock on the
+     * search criteria makes parallel requests wait for the first creator, whose
+     * committed row the re-check then finds.
+     */
+    private function lockForCreation(array $searchCriteria): void
+    {
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
+        DB::select('select pg_advisory_xact_lock(hashtextextended(?, 0))', [md5(json_encode($searchCriteria))]);
+    }
+
+    /**
+     * MySQL reports SQLSTATE 23000 / "Duplicate entry", PostgreSQL 23505 / "duplicate key value".
+     */
+    private function isUniqueViolation(QueryException $e): bool
+    {
+        return in_array((string) $e->getCode(), ['23000', '23505'], true)
+            || str_contains($e->getMessage(), 'Duplicate entry')
+            || str_contains($e->getMessage(), 'duplicate key value');
     }
 
     /**
@@ -265,6 +295,8 @@ class FileSystemObjectService
 
         // Use database transaction with retry logic for race condition handling
         $result = DB::transaction(function () use ($searchCriteria, $filename, $relativeFilePath, $filePath, $file, $level) {
+            $this->lockForCreation($searchCriteria);
+
             // Double-check if file was created by another process
             $fileObject = FileSystemObject::where($searchCriteria)->lockForUpdate()->first();
 
@@ -291,7 +323,7 @@ class FileSystemObjectService
                 return ['fileObject' => $fileObject, 'wasRecentlyCreated' => true];
             } catch (QueryException $e) {
                 // Handle unique constraint violation - another process created it
-                if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+                if ($this->isUniqueViolation($e)) {
                     // Fetch the file that was created by the other process
                     $fileObject = FileSystemObject::where($searchCriteria)->first();
                     if ($fileObject) {

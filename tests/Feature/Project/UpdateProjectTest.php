@@ -597,6 +597,39 @@ class UpdateProjectTest extends ProjectFeatureTestCase
         $this->assertCount(0, $this->project->tags);
     }
 
+    public function test_pipe_separated_keywords_are_split_into_separate_tags(): void
+    {
+        $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", [
+                'name' => $this->project->name,
+                'description' => $this->project->description,
+                'project_tags_updated' => true,
+                'tags_array' => ['rotaxanes | BINOL | rotaxanes'],
+            ])
+            ->assertSuccessful();
+
+        $this->project->load('tags');
+        $this->assertEqualsCanonicalizing(['rotaxanes', 'BINOL'], $this->project->tags->pluck('name')->all());
+    }
+
+    public function test_non_ascii_keywords_are_rejected_without_changing_tags(): void
+    {
+        $this->project->syncTagsWithType(['keep-me'], 'Project');
+
+        $this->actingAs($this->owner)
+            ->putJson("/dashboard/projects/{$this->project->id}/update", [
+                'name' => $this->project->name,
+                'description' => $this->project->description,
+                'project_tags_updated' => true,
+                'tags_array' => ['alpha', "\u{03B1}-Mercurin", "one \u{2022} two"],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('tags');
+
+        $this->project->load('tags');
+        $this->assertSame(['keep-me'], $this->project->tags->pluck('name')->all());
+    }
+
     public function test_project_species_can_be_cleared_when_project_species_updated_flag_is_set(): void
     {
         $this->project->update([

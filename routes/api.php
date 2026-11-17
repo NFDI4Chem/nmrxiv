@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AssignmentValidationController;
 use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
 use App\Http\Controllers\API\Schemas\DataCite\DOIController;
 use App\Http\Controllers\API\SearchController;
+use App\Http\Controllers\API\SpectrumQueryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,6 +41,12 @@ Route::prefix('v1')->group(function () {
         Route::get('metadata', [SearchController::class, 'metadata'])->name('metadata');
         Route::get('metadata/facets', [SearchController::class, 'metadataFacets'])->name('metadata.facets');
         Route::get('metadata/stats', [SearchController::class, 'metadataStats'])->name('metadata.stats');
+        Route::get('spectra', [SearchController::class, 'spectra'])->name('spectra');
+        Route::post('spectra/parse', [SpectrumQueryController::class, 'parseFile'])
+            ->middleware('throttle:spectra-parse')
+            ->name('spectra.parse');
+        Route::post('spectra/peaks', [SpectrumQueryController::class, 'parsePeaks'])->name('spectra.peaks');
+        Route::get('spectra/example', [SpectrumQueryController::class, 'example'])->name('spectra.example');
         Route::post('compounds/{smiles?}', [SearchController::class, 'search'])->name('compounds');
     });
 
@@ -71,6 +79,14 @@ Route::prefix('v1')->group(function () {
     Route::get('datasets/{dataset}/nmriumInfo', [NmriumController::class, 'dataset'])
         ->where('dataset', '([0-9]+|(NMRXIV:)?(D|d)[0-9]+)')
         ->name('api.datasets.nmrium');
+
+    Route::get('samples/{study}/assignment-validation', [AssignmentValidationController::class, 'sample'])
+        ->where('study', '([0-9]+|(NMRXIV:)?(S|s)[0-9]+)')
+        ->name('api.samples.assignment-validation');
+
+    Route::post('quickcheck', [AssignmentValidationController::class, 'quickcheck'])
+        ->middleware('throttle:assignment-quickcheck')
+        ->name('api.quickcheck');
 
     Route::get('/{id}', [DataController::class, 'id'])
         ->name('public.api.project');

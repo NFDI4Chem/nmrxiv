@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MetadataFacetsRequest;
 use App\Http\Requests\MetadataSearchRequest;
+use App\Http\Requests\SpectrumSearchRequest;
 use App\Http\Requests\TextSearchRequest;
 use App\Models\Molecule;
 use App\Services\PublicMetadataSearchService;
+use App\Services\PublicSpectrumSearchService;
 use App\Services\PublicTextSearchService;
 use App\Support\Public\PublicMoleculeAggregates;
 use Illuminate\Database\Eloquent\Builder;
@@ -405,6 +407,87 @@ class SearchController extends Controller
         return response()->json(
             $this->metadataSearch->statisticsFromRequest($request, $limit)
         );
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/search/spectra",
+     *     operationId="searchSpectra",
+     *     tags={"Search"},
+     *     summary="Search public spectra by chemical shifts",
+     *     description="Finds public 1H and 13C spectra whose automatically detected peaks match the given chemical shifts, scored as in nmrshiftdb2. Peaks are given per nucleus as a list (one value per line or separated by commas, semicolons or spaces), as ACS text, or in the compact form `3.75:3H:s;5.0-5.5;!9.5-10.5;?7.26` (a region is `from-to`, `!` means must not have, `?` means nice to have, otherwise must have). With peaks for both nuclei, only samples matching both are returned. Residual solvent and water peaks are ignored and a small calibration offset is allowed by default.",
+     *
+     *     @OA\Parameter(name="peaks[1H]", in="query", description="1H peaks", @OA\Schema(type="string", maxLength=5000, example="3.75:3H:s;7.26;!9.5-10.5")),
+     *     @OA\Parameter(name="peaks[13C]", in="query", description="13C peaks", @OA\Schema(type="string", maxLength=5000, example="170.1;128.3;60.5")),
+     *     @OA\Parameter(name="mode", in="query", description="contains: the spectrum must contain the peaks (extra peaks allowed); whole: missing or extra peaks lower the score", @OA\Schema(type="string", enum={"contains", "whole"}, default="contains")),
+     *     @OA\Parameter(name="closeness", in="query", description="How close a peak must be: strict (1H 0.02, 13C 0.5 ppm), normal (0.05 / 1.0) or relaxed (0.10 / 2.0)", @OA\Schema(type="string", enum={"strict", "normal", "relaxed"}, default="normal")),
+     *     @OA\Parameter(name="tolerance[1H]", in="query", description="Override the 1H closeness in ppm", @OA\Schema(type="number", maximum=0.5)),
+     *     @OA\Parameter(name="tolerance[13C]", in="query", description="Override the 13C closeness in ppm", @OA\Schema(type="number", maximum=5)),
+     *     @OA\Parameter(name="solvent", in="query", description="Solvent of the query spectrum", @OA\Schema(type="string", example="CDCl3")),
+     *     @OA\Parameter(name="same_solvent", in="query", description="Only return spectra measured in the same solvent", @OA\Schema(type="boolean", default=false)),
+     *     @OA\Parameter(name="ignore_solvent_peaks", in="query", description="Ignore residual solvent and water peaks", @OA\Schema(type="boolean", default=true)),
+     *     @OA\Parameter(name="allow_offset", in="query", description="Allow a constant calibration offset (up to 0.1 ppm for 1H, 1.5 ppm for 13C) when at least 3 peaks match", @OA\Schema(type="boolean", default=true)),
+     *     @OA\Parameter(name="group", in="query", description="compound: best match per compound; dataset: every matching spectrum", @OA\Schema(type="string", enum={"compound", "dataset"}, default="compound")),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", minimum=1, maximum=24, default=12)),
+     *     @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", minimum=1, default=1)),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ranked matches",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="query", type="object"),
+     *             @OA\Property(
+     *                 property="results",
+     *                 type="object",
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(
+     *                     property="meta",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=1),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="per_page", type="integer", example=12),
+     *                     @OA\Property(property="last_page", type="integer", example=1)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="No public spectra matched the peaks",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="No spectra found matching your peaks.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error, for example a peak that is not a number",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function spectra(SpectrumSearchRequest $request, PublicSpectrumSearchService $spectrumSearch): JsonResponse
+    {
+        $results = $spectrumSearch->searchFromRequest($request);
+
+        if ($results['results']['meta']['total'] === 0) {
+            return response()->json([
+                'message' => 'No spectra found matching your peaks.',
+                'query' => $results['query'],
+            ], 404);
+        }
+
+        return response()->json($results);
     }
 
     /**

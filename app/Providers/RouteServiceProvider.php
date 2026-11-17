@@ -74,6 +74,19 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Each public prediction calls NMRShiftDB, then NMRKit when that host is unreachable.
+        RateLimiter::for('nmr-prediction', function (Request $request) {
+            return Limit::perMinute(30)->by($request->ip());
+        });
+
+        // Each public Quickcheck calls the shared prediction service.
+        RateLimiter::for('assignment-quickcheck', function (Request $request) {
+            return [
+                Limit::perMinute((int) config('nmrxiv.assignment_validation.public_per_minute'))->by($request->ip()),
+                Limit::perDay(200)->by($request->ip()),
+            ];
+        });
+
         // Support bubble rate limiting to prevent spam.
         // ALTCHA + honeypot handle the bulk of bot/spam blocking, so this only
         // needs to guard against abusive bursts, not legitimate retries.
@@ -92,6 +105,15 @@ class RouteServiceProvider extends ServiceProvider
                 Limit::perDay(50)->by($request->ip()),
 
             ];
+        });
+
+        // Each spectrum upload is processed by NMRKit, which is slow and shared.
+        RateLimiter::for('spectra-parse', function (Request $request) {
+            if (app()->environment('testing')) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(10)->by($request->ip());
         });
 
         // ALTCHA challenge generation rate limiting to prevent challenge farming

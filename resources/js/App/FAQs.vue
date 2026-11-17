@@ -61,14 +61,19 @@
                     >
                         View all FAQs
                     </a>
-                    or
+                    or contact support at
                     <a
-                        href="https://www.nfdi4chem.de/helpdesk/"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="mailto:info.nmrxiv@uni-jena.de"
                         class="text-teal-600 font-medium hover:text-teal-700"
                     >
-                        contact support
+                        info.nmrxiv@uni-jena.de
+                    </a>
+                    or
+                    <a
+                        href="mailto:helpdesk@nfdi4chem.de"
+                        class="text-teal-600 font-medium hover:text-teal-700"
+                    >
+                        helpdesk@nfdi4chem.de
                     </a>
                 </p>
             </div>

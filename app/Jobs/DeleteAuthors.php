@@ -36,7 +36,9 @@ class DeleteAuthors implements ShouldQueue
     public function handle(): void
     {
         foreach ($this->authors as $author) {
-            if (! DB::table('author_project')->where('author_id', $author->id)->exists()) {
+            // Samples published without a project (e.g. ELN submissions) link their authors only through author_study.
+            if (! DB::table('author_project')->where('author_id', $author->id)->exists()
+                && ! DB::table('author_study')->where('author_id', $author->id)->exists()) {
                 $author->delete();
             }
         }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use OwenIt\Auditing\Contracts\Auditable;
 use Storage;
@@ -44,6 +45,15 @@ class Dataset extends Model implements Auditable
     ];
 
     /**
+     * Attributes excluded from the audit trail.
+     *
+     * @var array<int, string>
+     */
+    protected $auditExclude = [
+        'auto_detected_signals',
+    ];
+
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array
@@ -63,6 +73,7 @@ class Dataset extends Model implements Auditable
             'starred' => 'boolean',
             'is_public' => 'boolean',
             'assignments' => 'array',
+            'auto_detected_signals' => 'array',
             'spectra_is_ft' => 'boolean',
             'spectra_is_fid' => 'boolean',
             'spectra_info_extracted_at' => 'datetime',
@@ -157,6 +168,14 @@ class Dataset extends Model implements Auditable
     public function nmrium(): MorphOne
     {
         return $this->morphOne(NMRium::class, 'nmriumable');
+    }
+
+    /**
+     * Detected 1D signals indexed for spectrum search.
+     */
+    public function signals(): HasMany
+    {
+        return $this->hasMany(DatasetSignal::class);
     }
 
     /**

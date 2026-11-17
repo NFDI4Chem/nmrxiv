@@ -34,12 +34,17 @@ return [
         'redirect' => env('NFDIAAI_REDIRECT_URL'), // Consider changing value to .../regapp/callback
     ],
 
+    'eln' => [
+        // SPDX id of the license applied when an ELN submission carries no usable license.
+        'default_license' => env('ELN_DEFAULT_LICENSE', 'CC-BY-4.0'),
+    ],
+
     'chemotion_tracker' => [
         'enabled' => env('CHEMOTION_TRACKER_ENABLED', false),
         'base_url' => env('CHEMOTION_TRACKER_BASE_URL', 'https://tracker-deploy.chemdev.scc.kit.edu'),
         'client_id' => env('CHEMOTION_TRACKER_CLIENT_ID', 'S8HbJdAEo--y05h4EUYblZBu-bgWkSDJrEb7kKMCpwc'),
-        'username' => env('CHEMOTION_TRACKER_USERNAME'),
-        'password' => env('CHEMOTION_TRACKER_PASSWORD'),
+        'username' => env('CHEMOTION_TRACKER_USERNAME', ''),
+        'password' => env('CHEMOTION_TRACKER_PASSWORD', ''),
     ],
 
     // External chemistry / molecular data sources
@@ -56,6 +61,8 @@ return [
     'cas' => [
         'provider' => env('CAS_PROVIDER', 'CAS_CommonChemistry'),
         'api_token' => env('CAS_API_TOKEN'),
-        'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org/api'),
+        'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org/direct-api'),
+        // The direct-api rejects keys (401) unless this x-origin header is sent
+        'origin' => env('COMMON_CHEMISTRY_ORIGIN', 'https://commonchemistry.cas.org/api-overview'),
     ],
 ];

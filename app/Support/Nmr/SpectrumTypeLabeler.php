@@ -166,7 +166,7 @@ final class SpectrumTypeLabeler
      *
      * @param  array<string, mixed>  $spectrum
      */
-    private function guessSpectrumDimension(array $spectrum): ?int
+    public function guessSpectrumDimension(array $spectrum): ?int
     {
         $selector = $spectrum['sourceSelector'] ?? $spectrum['selector'] ?? [];
         $files = is_array($selector['files'] ?? null) ? $selector['files'] : [];

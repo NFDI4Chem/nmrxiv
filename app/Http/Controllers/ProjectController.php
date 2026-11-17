@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
+use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
+use App\Actions\Project\ProjectProcessingLogger;
 use App\Actions\Project\PublishEmbargoProject;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\RestoreProject;
@@ -140,11 +142,98 @@ class ProjectController extends Controller
         return Bookmark::toggle($project, $request->user());
     }
 
-    public function status(Request $request, Project $project)
+    public function status(Request $request, Project $project, ProjectProcessingLogger $logger)
     {
-        if ($project) {
-            return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
         }
+
+        $logs = $logger->getLogs($project);
+        $lastActivityAt = $this->resolveLastProcessingActivityAt($project, $logs);
+        $staleAfterMinutes = (int) config('nmrxiv.publish.stale_after_minutes', 30);
+        $isActiveStatus = in_array($project->status, ['queued', 'processing'], true);
+        $isStale = $isActiveStatus
+            && $lastActivityAt !== null
+            && $lastActivityAt->lte(now()->subMinutes($staleAfterMinutes));
+
+        return response()->json([
+            'status' => $project->status,
+            'logs' => $logs,
+            'last_activity_at' => $lastActivityAt?->toIso8601String(),
+            'is_stale' => $isStale,
+            'has_draft' => $project->draft_id !== null && $project->draft !== null,
+        ]);
+    }
+
+    /**
+     * Reset a failed publish so the owner can edit and re-publish, or requeue
+     * when the draft was already removed after the file-move stage.
+     */
+    public function retryPublish(Request $request, Project $project, ProjectProcessingLogger $logger)
+    {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        if ($project->status !== 'failed') {
+            throw ValidationException::withMessages([
+                'publish' => 'Only failed submissions can be retried.',
+            ]);
+        }
+
+        $draft = $project->draft;
+
+        if ($draft) {
+            $project->status = 'draft';
+            $project->save();
+
+            $logger->log($project, 'info', 'retry_draft', 'Returned to draft so the submission can be edited and re-published.');
+
+            if ($this->publishPrefersJsonResponse($request)) {
+                return response()->json([
+                    'project' => $project->fresh(),
+                    'redirect' => route('publish', $draft),
+                ]);
+            }
+
+            return redirect()->route('publish', $draft)
+                ->with('success', 'Submission returned to draft. Fix any issues and publish again.');
+        }
+
+        $project->status = 'queued';
+        $project->save();
+
+        $logger->log($project, 'info', 'queued', 'Re-queued for processing after a previous failure.');
+
+        ProcessSubmission::dispatch($project);
+
+        if ($this->publishPrefersJsonResponse($request)) {
+            return response()->json([
+                'project' => $project->fresh(),
+            ]);
+        }
+
+        return back()->with('success', 'Submission has been re-queued for processing.');
+    }
+
+    /**
+     * @param  array<int, array{timestamp?: string}>  $logs
+     */
+    private function resolveLastProcessingActivityAt(Project $project, array $logs): ?Carbon
+    {
+        if ($logs !== []) {
+            $last = $logs[array_key_last($logs)];
+            $timestamp = $last['timestamp'] ?? null;
+            if (is_string($timestamp) && $timestamp !== '') {
+                try {
+                    return Carbon::parse($timestamp);
+                } catch (\Throwable) {
+                    // Fall through to updated_at.
+                }
+            }
+        }
+
+        return $project->updated_at ? Carbon::parse($project->updated_at) : null;
     }
 
     public function show(Request $request, Project $project, GetLicense $getLicense)
@@ -415,6 +504,16 @@ class ProjectController extends Controller
                     $project->status = 'queued';
                     $project->save();
 
+                    app(AssignIdentifier::class)->reserveProjectIdentifier($project);
+
+                    app(ProjectProcessingLogger::class)->log(
+                        $project,
+                        'info',
+                        'queued',
+                        'Submission queued for processing.',
+                        ['branch' => 'project_mode']
+                    );
+
                     Log::info('embargo_publish_trace', [
                         'stage' => 'publish_controller_dispatch_process_submission',
                         'branch' => 'enable_project_mode',
@@ -427,12 +526,12 @@ class ProjectController extends Controller
 
                     if ($this->publishPrefersJsonResponse($request)) {
                         return response()->json([
-                            'project' => $project,
+                            'project' => $project->fresh(),
                             'validation' => $validation,
                         ]);
                     }
 
-                    return $this->redirectToProjectCanonicalHome($project)
+                    return $this->redirectToProjectCanonicalHome($project->fresh())
                         ->with('success', 'Your submission has been queued for processing.');
                 } else {
                     $project->refresh();
@@ -510,6 +609,16 @@ class ProjectController extends Controller
                 $project->status = 'queued';
                 $project->save();
 
+                app(AssignIdentifier::class)->reserveProjectIdentifier($project);
+
+                app(ProjectProcessingLogger::class)->log(
+                    $project,
+                    'info',
+                    'queued',
+                    'Submission queued for processing.',
+                    ['branch' => 'samples_mode']
+                );
+
                 Log::info('embargo_publish_trace', [
                     'stage' => 'publish_controller_dispatch_process_submission',
                     'branch' => 'default_samples_mode',
@@ -522,12 +631,12 @@ class ProjectController extends Controller
 
                 if ($this->publishPrefersJsonResponse($request)) {
                     return response()->json([
-                        'project' => $project,
+                        'project' => $project->fresh(),
                         'validation' => $validation,
                     ]);
                 }
 
-                return $this->redirectToProjectCanonicalHome($project)
+                return $this->redirectToProjectCanonicalHome($project->fresh())
                     ->with('success', 'Your submission has been queued for processing.');
             }
         }

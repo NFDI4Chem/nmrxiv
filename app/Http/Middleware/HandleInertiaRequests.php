@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Enums\DefaultSpectrumDimension;
 use App\Enums\DefaultSpectrumTab;
 use App\Models\Announcement;
+use App\Support\Quality\QualityRubric;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
@@ -96,6 +97,7 @@ class HandleInertiaRequests extends Middleware
             'defaultSpectrumTabs' => DefaultSpectrumTab::values(),
             'defaultSpectrumTabs1D' => DefaultSpectrumTab::valuesForDimension(DefaultSpectrumDimension::OneD),
             'defaultSpectrumTabs2D' => DefaultSpectrumTab::valuesForDimension(DefaultSpectrumDimension::TwoD),
+            'qualityRubric' => fn () => app(QualityRubric::class)->forFrontend(),
         ]);
     }
 }

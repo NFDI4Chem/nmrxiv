@@ -43,7 +43,10 @@ class DraftProcessedNotifyAdmins extends Mailable
             $studies = $this->studies;
 
             return $this->markdown('vendor.mail.study-published-notify-admins', [
-                'url' => url(config('app.url').'/projects'),
+                // A single published sample links straight to its public page, several fall back to the project list.
+                'url' => count($studies) === 1 && filled(data_get(collect($studies)->first(), 'public_url'))
+                    ? data_get(collect($studies)->first(), 'public_url')
+                    : url(config('app.url').'/projects'),
                 'samples' => $studies,
             ])->subject(__('Sample(s) has been published.'));
 

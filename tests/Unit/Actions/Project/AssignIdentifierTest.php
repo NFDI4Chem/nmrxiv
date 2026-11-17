@@ -182,4 +182,64 @@ class AssignIdentifierTest extends TestCase
         // Now ticker should be updated
         $this->assertEquals(1, Ticker::whereType('project')->first()->index);
     }
+
+    public function test_reserve_project_identifier_assigns_id_without_creating_doi(): void
+    {
+        $this->doiService->expects($this->never())->method('createDOI');
+
+        $license = License::factory()->create();
+        $project = Project::factory()->create([
+            'identifier' => null,
+            'license_id' => $license->id,
+            'doi' => null,
+        ]);
+
+        $reserved = $this->action->reserveProjectIdentifier($project);
+
+        $this->assertSame('NMRXIV:P1', $reserved->identifier);
+        $this->assertNull($reserved->doi);
+        $this->assertEquals(1, Ticker::whereType('project')->first()->index);
+    }
+
+    public function test_reserve_project_identifier_is_idempotent(): void
+    {
+        $license = License::factory()->create();
+        $project = Project::factory()->create([
+            'identifier' => null,
+            'license_id' => $license->id,
+        ]);
+
+        $first = $this->action->reserveProjectIdentifier($project);
+        $second = $this->action->reserveProjectIdentifier($first);
+
+        $this->assertSame('NMRXIV:P1', $first->identifier);
+        $this->assertSame('NMRXIV:P1', $second->identifier);
+        $this->assertEquals(1, Ticker::whereType('project')->first()->index);
+    }
+
+    public function test_assign_generates_doi_after_early_identifier_reservation(): void
+    {
+        $this->doiService->expects($this->once())->method('createDOI')->willReturn([
+            'data' => ['id' => '10.1234/test-doi'],
+        ]);
+
+        $license = License::factory()->create();
+        $project = Project::factory()->create([
+            'identifier' => null,
+            'license_id' => $license->id,
+            'doi' => null,
+        ]);
+
+        $this->action->reserveProjectIdentifier($project);
+        $project->refresh();
+        $this->assertNull($project->doi);
+
+        config(['doi.host' => 'https://api.datacite.org']);
+        $this->action->assign($project->fresh());
+
+        $project->refresh();
+        $this->assertSame('NMRXIV:P1', $project->identifier);
+        $this->assertSame('10.1234/test-doi', $project->doi);
+        $this->assertEquals(1, Ticker::whereType('project')->first()->index);
+    }
 }

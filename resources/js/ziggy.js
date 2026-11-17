@@ -420,6 +420,12 @@ const Ziggy = {
             parameters: ["project"],
             bindings: { project: "id" },
         },
+        "project.publish.retry": {
+            uri: "projects/{project}/publish/retry",
+            methods: ["POST"],
+            parameters: ["project"],
+            bindings: { project: "id" },
+        },
         "project.validation": {
             uri: "projects/{project}/validation",
             methods: ["GET", "HEAD"],

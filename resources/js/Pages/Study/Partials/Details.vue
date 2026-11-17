@@ -240,10 +240,11 @@
                                                     <div>
                                                         <vue-tags-input
                                                             v-model="form.tag"
-                                                            placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                            placeholder="Type a keyword or keywords separated by comma (,), semicolon (;) or pipe (|) and press enter"
                                                             :separators="[
                                                                 ';',
                                                                 ',',
+                                                                '|',
                                                             ]"
                                                             :disabled="
                                                                 !canUpdateStudy

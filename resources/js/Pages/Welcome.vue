@@ -53,13 +53,20 @@
                         </nav>
                     </template>
                 </PublicSiteHeader>
+                <ExperimentalFeatureBanner
+                    v-if="heroSearchTab === 'spectra'"
+                    feature="Spectra similarity search"
+                />
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="relative py-20 sm:py-24 lg:py-32">
                         <div class="text-center">
                             <h1 class="sr-only">
                                 nmrXiv — Open NMR data repository
                             </h1>
-                            <UnifiedSearch variant="hero" />
+                            <UnifiedSearch
+                                variant="hero"
+                                @hero-search-type="heroSearchTab = $event"
+                            />
 
                             <!-- Quick Links -->
                             <div
@@ -100,7 +107,7 @@
                                     GitHub
                                 </a>
                                 <a
-                                    href="https://nmrxiv.org/api/documentation"
+                                    :href="route('l5-swagger.default.api')"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
@@ -123,6 +130,46 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="relative border-t border-gray-100">
+                <div
+                    class="mx-auto grid max-w-4xl grid-cols-1 gap-3 px-6 py-8 sm:grid-cols-2 sm:px-8 lg:px-12"
+                >
+                    <Link
+                        v-for="tool in nmrTools"
+                        :key="tool.route"
+                        :href="route(tool.route)"
+                        class="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                    >
+                        <span
+                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1"
+                            :class="tool.iconClass"
+                        >
+                            <component
+                                :is="tool.icon"
+                                class="h-5 w-5"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span class="min-w-0 flex-1">
+                            <span
+                                class="block text-sm font-semibold text-gray-800"
+                            >
+                                {{ tool.title }}
+                            </span>
+                            <span
+                                class="mt-0.5 block text-xs leading-relaxed text-gray-500"
+                            >
+                                {{ tool.description }}
+                            </span>
+                        </span>
+                        <ArrowRightIcon
+                            class="h-4 w-4 shrink-0 text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-gray-700"
+                            aria-hidden="true"
+                        />
+                    </Link>
                 </div>
             </div>
 
@@ -264,6 +311,7 @@ import Footer from "@/Shared/Footer.vue";
 import PublicSiteHeader from "@/Shared/PublicSiteHeader.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
 import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
+import ExperimentalFeatureBanner from "@/Shared/ExperimentalFeatureBanner.vue";
 import {
     ChatBubbleLeftRightIcon,
     HeartIcon,
@@ -274,15 +322,25 @@ import {
     UsersIcon,
     CloudArrowUpIcon,
     BeakerIcon,
+    CheckBadgeIcon,
     UserGroupIcon,
     ShieldCheckIcon,
     LockClosedIcon,
     GlobeAltIcon,
     DocumentCheckIcon,
+    ArrowRightIcon,
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
+
+function heroSearchTabFromLocation() {
+    if (typeof window === "undefined") {
+        return "metadata";
+    }
+
+    return new URL(window.location.href).searchParams.get("tab") || "metadata";
+}
 
 const Search = [
     {
@@ -301,6 +359,25 @@ const Search = [
     },
 ];
 
+const NMR_TOOLS = [
+    {
+        route: "predict",
+        title: "Predict ¹H and ¹³C NMR spectra",
+        description:
+            "Draw, paste or import a structure and get the predicted ¹H and ¹³C shifts.",
+        icon: BeakerIcon,
+        iconClass: "bg-sky-50 text-sky-600 ring-sky-100",
+    },
+    {
+        route: "quickcheck",
+        title: "Quickcheck your assignments",
+        description:
+            "Upload your ¹H / ¹³C assignments and see which shifts do not match the prediction.",
+        icon: CheckBadgeIcon,
+        iconClass: "bg-emerald-50 text-emerald-600 ring-emerald-100",
+    },
+];
+
 export default {
     components: {
         Head,
@@ -316,16 +393,19 @@ export default {
         ChevronDownIcon,
         CloudArrowUpIcon,
         BeakerIcon,
+        CheckBadgeIcon,
         UserGroupIcon,
         ShieldCheckIcon,
         LockClosedIcon,
         GlobeAltIcon,
         DocumentCheckIcon,
+        ArrowRightIcon,
         ToolTip,
         Projects,
         FlashMessages,
         StructureSearch,
         UnifiedSearch,
+        ExperimentalFeatureBanner,
         Footer,
     },
 
@@ -340,12 +420,14 @@ export default {
     setup() {
         return {
             Search,
+            nmrTools: NMR_TOOLS,
         };
     },
 
     data() {
         return {
             schema: {},
+            heroSearchTab: heroSearchTabFromLocation(),
         };
     },
 

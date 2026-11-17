@@ -770,4 +770,18 @@ class StudyModelTest extends TestCase
 
         $this->assertFalse($study->fresh()->isReadyForCommunityPublish());
     }
+
+    public function test_is_chemotion_submission_uses_the_draft_while_processing_and_submitted_through_afterwards(): void
+    {
+        $draft = Draft::factory()->create(['eln' => 'chemotion']);
+        $processing = Study::factory()->create(['draft_id' => $draft->id, 'submitted_through' => null]);
+        $published = Study::factory()->create(['draft_id' => null, 'submitted_through' => 'chemotion']);
+        $manual = Study::factory()->create(['draft_id' => null, 'submitted_through' => null]);
+        $otherEln = Study::factory()->create(['draft_id' => null, 'submitted_through' => 'nobs']);
+
+        $this->assertTrue($processing->isChemotionSubmission());
+        $this->assertTrue($published->isChemotionSubmission());
+        $this->assertFalse($manual->isChemotionSubmission());
+        $this->assertFalse($otherEln->isChemotionSubmission());
+    }
 }

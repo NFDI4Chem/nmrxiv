@@ -17,6 +17,7 @@ class CommonChemistry implements CASService
         return [
             'base_url' => Config::get('services.cas.base_url'),
             'api_token' => Config::get('services.cas.api_token'),
+            'origin' => Config::get('services.cas.origin'),
         ];
     }
 
@@ -31,6 +32,7 @@ class CommonChemistry implements CASService
             $response = Http::timeout(self::REQUEST_TIMEOUT)
                 ->withHeaders([
                     'X-API-KEY' => $config['api_token'],
+                    'x-origin' => $config['origin'],
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ])
@@ -66,6 +68,7 @@ class CommonChemistry implements CASService
             $response = Http::timeout(self::REQUEST_TIMEOUT)
                 ->withHeaders([
                     'X-API-KEY' => $config['api_token'],
+                    'x-origin' => $config['origin'],
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ])

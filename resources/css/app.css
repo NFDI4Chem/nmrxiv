@@ -1,7 +1,18 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss';
 @import 'vue3-tour/dist/vue3-tour.css';
+
+@config '../../tailwind.config.js';
+
+/* Tailwind v4 defaults borders to currentcolor; keep the v3 look */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
 
 /* Deposit data CTA — solid brand fill (Tailwind classes applied via JS util) */
 .deposit-data-cta {

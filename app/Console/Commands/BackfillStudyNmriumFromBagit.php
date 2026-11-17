@@ -5,9 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Study;
 use App\Support\Bagit\BagitArchive;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class BackfillStudyNmriumFromBagit extends Command
@@ -45,13 +43,7 @@ class BackfillStudyNmriumFromBagit extends Command
      */
     public function handle(): int
     {
-        $sourceDisk = Storage::disk(config('nmrxiv.spectra_parsing.storage_disk', 'local'));
-        $basePath = trim(config('nmrxiv.spectra_parsing.storage_path', 'spectra_parse'), '/');
-
-        $folders = collect($sourceDisk->directories($basePath))
-            ->map(fn (string $path) => basename($path))
-            ->filter(fn (string $name) => preg_match('/^S\d+$/i', $name) === 1)
-            ->values();
+        $folders = BagitArchive::studyFolders();
 
         if ($ids = $this->option('ids')) {
             $wanted = array_map(fn (string $id) => strtoupper(trim($id)), explode(',', $ids));
@@ -74,7 +66,7 @@ class BackfillStudyNmriumFromBagit extends Command
         $bar->setFormat('verbose');
 
         foreach ($folders as $folderName) {
-            $this->processFolder($sourceDisk, $basePath, $folderName);
+            $this->processFolder($folderName);
             $bar->advance();
         }
 
@@ -92,7 +84,7 @@ class BackfillStudyNmriumFromBagit extends Command
     /**
      * Parse and backfill a single study's .nmrium file.
      */
-    private function processFolder(Filesystem $sourceDisk, string $basePath, string $folderName): void
+    private function processFolder(string $folderName): void
     {
         $identifier = (int) substr($folderName, 1);
 
@@ -114,14 +106,10 @@ class BackfillStudyNmriumFromBagit extends Command
             return;
         }
 
-        $remoteBagDir = "{$basePath}/{$folderName}";
-
-        // The bag folder may hold a loose data/*/nmrxiv-meta/*.nmrium file
-        // (a freshly-generated, not-yet-archived bag), or just a single
-        // {folder}.zip (the archived, publicly-downloadable form produced by
-        // nmrxiv:backfill-bagit-archives — which is how bags actually live
-        // on the public bucket in practice). BagitArchive handles both.
-        $archive = BagitArchive::open($sourceDisk, $remoteBagDir);
+        // The one stored copy is archive/{folder}.zip on the public disk;
+        // BagitArchive also reads the legacy archive/{folder}/ layout.
+        $remoteBagDir = BagitArchive::archiveKey($folderName);
+        $archive = BagitArchive::forStudy($folderName);
 
         if ($archive === null) {
             $this->skippedNoFile++;

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Project;
 
+use App\Jobs\ScoreMoleculeQuality;
 use App\Models\Project;
 use App\Support\Public\PublicMoleculeCatalogIndexer;
 
@@ -37,6 +38,7 @@ class ArchiveProject
         $project->save();
 
         app(PublicMoleculeCatalogIndexer::class)->refreshForProject($project);
+        dispatch(ScoreMoleculeQuality::forProject($project));
     }
 
     /**

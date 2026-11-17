@@ -4,6 +4,7 @@ namespace Tests\Unit\Jobs;
 
 use App\Jobs\DeleteAuthors;
 use App\Models\Author;
+use App\Models\Study;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -68,6 +69,23 @@ class DeleteAuthorsJobTest extends TestCase
         // Author2 and Author3 should be deleted (no projects)
         $this->assertDatabaseMissing('authors', ['id' => $author2->id]);
         $this->assertDatabaseMissing('authors', ['id' => $author3->id]);
+    }
+
+    public function test_handle_keeps_authors_attached_only_to_a_study(): void
+    {
+        // Samples published without a project (e.g. via an ELN) only have the author_study link.
+        $study = Study::factory()->create();
+        $studyAuthor = Author::factory()->create();
+        $orphan = Author::factory()->create();
+
+        $study->studyAuthors()->attach($studyAuthor->id, ['contributor_type' => 'Researcher', 'sort_order' => 1]);
+
+        $job = new DeleteAuthors(collect([$studyAuthor, $orphan]));
+        $job->handle();
+
+        $this->assertDatabaseHas('authors', ['id' => $studyAuthor->id]);
+        $this->assertDatabaseHas('author_study', ['study_id' => $study->id, 'author_id' => $studyAuthor->id]);
+        $this->assertDatabaseMissing('authors', ['id' => $orphan->id]);
     }
 
     public function test_handle_keeps_all_authors_if_all_attached_to_projects(): void

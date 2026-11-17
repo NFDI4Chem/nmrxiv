@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Observers\FileSystemObjectObserver;
+use App\Support\Draft\HifsaPdfResolver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class FileSystemObject extends Model
 {
     use HasFactory;
+
+    public const EXTRACTION_PENDING = 'pending';
+
+    public const EXTRACTION_PROCESSING = 'processing';
+
+    public const EXTRACTION_FAILED = 'failed';
 
     protected $fillable = [
         'name',
@@ -152,6 +159,60 @@ class FileSystemObject extends Model
             'last_verification_attempt' => now(),
             'verification_attempts' => $this->verification_attempts + 1,
         ]);
+    }
+
+    /**
+     * Whether this uploaded zip should be unpacked on the server. HiFSA
+     * `_export.zip` files and zips inside a `hifsa` folder are read as zips
+     * by {@see HifsaPdfResolver}, so they are kept.
+     */
+    public function isExtractableArchive(): bool
+    {
+        $name = strtolower((string) $this->name);
+
+        if ($this->type !== 'file' || ! str_ends_with($name, '.zip') || str_ends_with($name, '_export.zip')) {
+            return false;
+        }
+
+        $folders = explode('/', strtolower(trim(dirname((string) $this->relative_url), '/')));
+
+        return ! in_array('hifsa', $folders, true);
+    }
+
+    /**
+     * Record the server-side zip extraction state in the `info` JSON.
+     *
+     * @param  array{extracted?: int, total?: int}  $progress
+     */
+    public function markExtraction(string $status, ?string $error = null, array $progress = []): void
+    {
+        $info = $this->decodedInfo();
+        $info['extraction'] = array_filter(
+            ['status' => $status, 'error' => $error, ...$progress],
+            fn (string|int|null $value) => $value !== null
+        );
+
+        $this->update(['info' => json_encode($info)]);
+    }
+
+    /**
+     * @return array{status?: string, error?: string, extracted?: int, total?: int}|null
+     */
+    public function extraction(): ?array
+    {
+        return $this->decodedInfo()['extraction'] ?? null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodedInfo(): array
+    {
+        if (is_array($this->info)) {
+            return $this->info;
+        }
+
+        return json_decode($this->info ?? '{}', true) ?: [];
     }
 
     public function children(): HasMany

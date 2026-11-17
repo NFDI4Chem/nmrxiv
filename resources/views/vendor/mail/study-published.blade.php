@@ -7,6 +7,9 @@ Your submission has been processed and your sample(s) are now published on nmrXi
 
 @foreach ($samples as $sample)
 - **Sample Name:** {{ $sample->name }}
+@if (filled(data_get($sample, 'public_url')))
+- **Link:** [{{ data_get($sample, 'public_url') }}]({{ data_get($sample, 'public_url') }})
+@endif
 - **DOI:** {{ $sample->doi }}
 @endforeach
 
